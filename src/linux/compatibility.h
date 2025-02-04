@@ -8,9 +8,6 @@
 #include <sys/wait.h>
 #include <poll.h>
 
-#include <iostream>
-#define STUB() std::cout << __FILE__ << ": " << __PRETTY_FUNCTION__ << ": STUB!\n"
-
 // use pidfd instead of handle
 using HANDLE = int;
 using DWORD = uint32_t;
