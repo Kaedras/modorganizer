@@ -52,7 +52,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "shared/directoryentry.h"
 #include "shared/fileentry.h"
 #include "shared/filesorigin.h"
-#include "shared/windows_error.h"
+#include "shared/os_error.h"
 #include "viewmarkingscrollbar.h"
 
 using namespace MOBase;
@@ -770,7 +770,7 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
           // file is locked, probably the game is running
           return false;
         } else {
-          throw windows_error(
+          throw os_error(
               QObject::tr("failed to access %1").arg(fileName).toUtf8().constData());
         }
       }
@@ -785,7 +785,7 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
       esp.time                    = newWriteTime;
       fileEntry->setFileTime(newWriteTime);
       if (!::SetFileTime(file, nullptr, nullptr, &newWriteTime)) {
-        throw windows_error(QObject::tr("failed to set file time %1")
+        throw os_error(QObject::tr("failed to set file time %1")
                                 .arg(fileName)
                                 .toUtf8()
                                 .constData());

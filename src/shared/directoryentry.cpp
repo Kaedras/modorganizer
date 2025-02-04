@@ -23,7 +23,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "filesorigin.h"
 #include "originconnection.h"
 #include "util.h"
-#include "windows_error.h"
+#include "os_error.h"
 #include <log.h>
 #include <utility.h>
 

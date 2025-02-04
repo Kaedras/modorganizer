@@ -318,7 +318,7 @@ mo2_add_filter(NAME src/utilities GROUPS
 	spawn
 	shared/util
 	usvfsconnector
-	shared/windows_error
+	shared/os_error
 	thread_utils
 	json
 	glob_matching

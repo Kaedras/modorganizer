@@ -26,7 +26,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "settings.h"
 #include "settingsdialogworkarounds.h"
 #include "shared/appconfig.h"
-#include "shared/windows_error.h"
+#include "shared/os_error.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QtDebug>

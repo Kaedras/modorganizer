@@ -18,7 +18,7 @@ CONFIG += staticlib c++11
 
 SOURCES += \
     inject.cpp \
-    windows_error.cpp \
+    os_error.cpp \
     error_report.cpp \
     directoryentry.cpp \
     util.cpp \
@@ -28,7 +28,7 @@ SOURCES += \
 
 HEADERS += \
     inject.h \
-    windows_error.h \
+    os_error.h \
     error_report.h \
     directoryentry.h \
     util.h \

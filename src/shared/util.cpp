@@ -20,7 +20,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "../env.h"
 #include "../mainwindow.h"
-#include "windows_error.h"
+#include "os_error.h"
 #include <uibase/log.h>
 #include <usvfs/usvfs.h>
 #include <usvfs/usvfs_version.h>
@@ -157,20 +157,20 @@ VS_FIXEDFILEINFO GetFileVersion(const std::wstring& fileName)
   DWORD handle = 0UL;
   DWORD size   = ::GetFileVersionInfoSizeW(fileName.c_str(), &handle);
   if (size == 0) {
-    throw windows_error("failed to determine file version info size");
+    throw os_error("failed to determine file version info size");
   }
 
   boost::scoped_array<char> buffer(new char[size]);
   try {
     handle = 0UL;
     if (!::GetFileVersionInfoW(fileName.c_str(), handle, size, buffer.get())) {
-      throw windows_error("failed to determine file version info");
+      throw os_error("failed to determine file version info");
     }
 
     void* versionInfoPtr   = nullptr;
     UINT versionInfoLength = 0;
     if (!::VerQueryValue(buffer.get(), L"\\", &versionInfoPtr, &versionInfoLength)) {
-      throw windows_error("failed to determine file version");
+      throw os_error("failed to determine file version");
     }
 
     VS_FIXEDFILEINFO result = *(VS_FIXEDFILEINFO*)versionInfoPtr;
@@ -185,21 +185,21 @@ std::wstring GetFileVersionString(const std::wstring& fileName)
   DWORD handle = 0UL;
   DWORD size   = ::GetFileVersionInfoSizeW(fileName.c_str(), &handle);
   if (size == 0) {
-    throw windows_error("failed to determine file version info size");
+    throw os_error("failed to determine file version info size");
   }
 
   boost::scoped_array<char> buffer(new char[size]);
   try {
     handle = 0UL;
     if (!::GetFileVersionInfoW(fileName.c_str(), handle, size, buffer.get())) {
-      throw windows_error("failed to determine file version info");
+      throw os_error("failed to determine file version info");
     }
 
     LPVOID strBuffer = nullptr;
     UINT strLength   = 0;
     if (!::VerQueryValue(buffer.get(), L"\\StringFileInfo\\040904B0\\ProductVersion",
                          &strBuffer, &strLength)) {
-      throw windows_error("failed to determine file version");
+      throw os_error("failed to determine file version");
     }
 
     return std::wstring((LPCTSTR)strBuffer);
