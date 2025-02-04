@@ -42,18 +42,6 @@ bool FileExists(const QString& filename);
 
 bool FileExists(const QString& searchPath, const QString& filename);
 
-std::string ToString(const std::wstring& source, bool utf8);
-std::wstring ToWString(const std::string& source, bool utf8);
-
-std::string& ToLowerInPlace(std::string& text);
-std::string ToLowerCopy(const std::string& text);
-
-std::wstring& ToLowerInPlace(std::wstring& text);
-std::wstring ToLowerCopy(const std::wstring& text);
-std::wstring ToLowerCopy(std::wstring_view text);
-
-bool CaseInsensitiveEqual(const std::wstring& lhs, const std::wstring& rhs);
-
 MOBase::Version createVersionInfo();
 QString getUsvfsVersionString();
 

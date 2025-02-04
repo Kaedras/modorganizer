@@ -52,50 +52,6 @@ bool FileExists(const std::wstring& searchPath, const std::wstring& filename)
   return FileExists(stream.str());
 }
 
-std::string ToString(const std::wstring& source, bool utf8)
-{
-  std::string result;
-  if (source.length() > 0) {
-    UINT codepage = CP_UTF8;
-    if (!utf8) {
-      codepage = AreFileApisANSI() ? GetACP() : GetOEMCP();
-    }
-    int sizeRequired = ::WideCharToMultiByte(codepage, 0, &source[0], -1, nullptr, 0,
-                                             nullptr, nullptr);
-    if (sizeRequired == 0) {
-      throw windows_error("failed to convert string to multibyte");
-    }
-    // the size returned by WideCharToMultiByte contains zero termination IF -1 is
-    // specified for the length. we don't want that \0 in the string because then the
-    // length field would be wrong. Because madness
-    result.resize(sizeRequired - 1, '\0');
-    ::WideCharToMultiByte(codepage, 0, &source[0], (int)source.size(), &result[0],
-                          sizeRequired, nullptr, nullptr);
-  }
-
-  return result;
-}
-
-std::wstring ToWString(const std::string& source, bool utf8)
-{
-  std::wstring result;
-  if (source.length() > 0) {
-    UINT codepage = CP_UTF8;
-    if (!utf8) {
-      codepage = AreFileApisANSI() ? GetACP() : GetOEMCP();
-    }
-    int sizeRequired = ::MultiByteToWideChar(
-        codepage, 0, source.c_str(), static_cast<int>(source.length()), nullptr, 0);
-    if (sizeRequired == 0) {
-      throw windows_error("failed to convert string to wide character");
-    }
-    result.resize(sizeRequired, L'\0');
-    ::MultiByteToWideChar(codepage, 0, source.c_str(),
-                          static_cast<int>(source.length()), &result[0], sizeRequired);
-  }
-
-  return result;
-}
 
 static std::locale loc("");
 static auto locToLowerW = [](wchar_t in) -> wchar_t {
@@ -105,39 +61,6 @@ static auto locToLowerW = [](wchar_t in) -> wchar_t {
 static auto locToLower = [](char in) -> char {
   return std::tolower(in, loc);
 };
-
-std::string& ToLowerInPlace(std::string& text)
-{
-  CharLowerBuffA(const_cast<CHAR*>(text.c_str()), static_cast<DWORD>(text.size()));
-  return text;
-}
-
-std::string ToLowerCopy(const std::string& text)
-{
-  std::string result(text);
-  CharLowerBuffA(const_cast<CHAR*>(result.c_str()), static_cast<DWORD>(result.size()));
-  return result;
-}
-
-std::wstring& ToLowerInPlace(std::wstring& text)
-{
-  CharLowerBuffW(const_cast<WCHAR*>(text.c_str()), static_cast<DWORD>(text.size()));
-  return text;
-}
-
-std::wstring ToLowerCopy(const std::wstring& text)
-{
-  std::wstring result(text);
-  CharLowerBuffW(const_cast<WCHAR*>(result.c_str()), static_cast<DWORD>(result.size()));
-  return result;
-}
-
-std::wstring ToLowerCopy(std::wstring_view text)
-{
-  std::wstring result(text.begin(), text.end());
-  ToLowerInPlace(result);
-  return result;
-}
 
 bool CaseInsenstiveComparePred(wchar_t lhs, wchar_t rhs)
 {
