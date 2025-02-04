@@ -2,15 +2,21 @@ cmake_minimum_required(VERSION 3.16)
 
 find_package(mo2-cmake CONFIG REQUIRED)
 
-find_package(usvfs CONFIG REQUIRED)
+if(WIN32)
+	find_package(usvfs CONFIG REQUIRED)
+else()
+	# TODO: add this package
+	#	find_package(overlayfs CONFIG REQUIRED)
+endif()
 
+find_package(directx-headers CONFIG REQUIRED)
 find_package(mo2-uibase CONFIG REQUIRED)
 find_package(mo2-archive CONFIG REQUIRED)
 find_package(mo2-lootcli-header CONFIG REQUIRED)
 find_package(mo2-bsatk CONFIG REQUIRED)
 find_package(mo2-esptk CONFIG REQUIRED)
 find_package(mo2-dds-header CONFIG REQUIRED)
-find_package(mo2-libbsarch CONFIG REQUIRED)
+find_package(libbsarchpp CONFIG REQUIRED)
 
 find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets)
 find_package(Boost CONFIG REQUIRED COMPONENTS program_options thread interprocess signals2 uuid accumulators)
@@ -25,7 +31,15 @@ set_target_properties(organizer PROPERTIES
 
 # disable translations because we want to be able to install somewhere else if
 # required
-mo2_configure_target(organizer WARNINGS 4 TRANSLATIONS OFF)
+mo2_configure_target(organizer NO_SOURCES WARNINGS 4 TRANSLATIONS OFF)
+
+file(GLOB_RECURSE SOURCES *.cpp *.h *.qrc *.rc *.ui *.rule)
+if (WIN32)
+	list(FILTER SOURCES EXCLUDE REGEX "linux")
+else()
+	list(FILTER SOURCES EXCLUDE REGEX "win32")
+endif()
+mo2_target_sources(organizer PRIVATE ${SOURCES})
 
 # we add translations "manually" to handle MO2_INSTALL_IS_BIN
 mo2_add_translations(organizer
@@ -36,12 +50,32 @@ mo2_add_translations(organizer
 mo2_set_project_to_run_from_install(
 	organizer EXECUTABLE ${CMAKE_INSTALL_PREFIX}/${_bin}/ModOrganizer.exe)
 
-target_link_libraries(organizer PRIVATE
-	Shlwapi Bcrypt
-	usvfs::usvfs mo2::uibase mo2::archive mo2::libbsarch
-	mo2::bsatk mo2::esptk mo2::lootcli-header
-	Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
-	Qt6::WebEngineWidgets Qt6::WebSockets Version Dbghelp)
+set(PRIVATE_LIBS
+		mo2::uibase mo2::archive libbsarchpp
+		mo2::bsatk mo2::esptk mo2::lootcli-header
+		Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
+		Qt6::WebEngineWidgets Qt6::WebSockets)
+
+set(PRIVATE_WIN32_LIBS
+		Shlwapi Bcrypt
+		usvfs::usvfs Version Dbghelp)
+
+set(PRIVATE_UNIX_LIBS
+		# TODO: add this library
+		#		overlayfs
+)
+
+if (UNIX)
+	target_link_libraries(organizer PRIVATE
+			${PRIVATE_LIBS}
+			${PRIVATE_UNIX_LIBS}
+	)
+else()
+	target_link_libraries(organizer PRIVATE
+			${PRIVATE_LIBS}
+			${PRIVATE_WIN32_LIBS}
+	)
+endif()
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
 		DESTINATION ${_bin}/dlls
@@ -71,34 +105,37 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
 
 # install dependencies DLLs
-install(FILES $<TARGET_FILE:mo2::libbsarch> DESTINATION ${_bin}/dlls)
+install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/dlls)
 install(FILES $<TARGET_FILE:mo2::archive> DESTINATION ${_bin}/dlls)
 install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
 
-# this may copy over the ones from uibase/usvfs
-# - when building with mob, this should not matter as the files should be identical
-# - when building standalone, this should help having matching USVFS DLL between the
-#   build and the installation
-# - this may cause issue with uibase in standalone mode if the installed version does
-#   not match the one used for the build, but there would be other issue anyway (e.g.
-#   different uibase.dll between modorganizer and plugins)
-#
-install(FILES
-	$<TARGET_FILE:mo2::uibase>
-	$<TARGET_FILE:usvfs_x64::usvfs_dll>
-	$<TARGET_FILE:usvfs_x86::usvfs_dll>
-	$<TARGET_FILE:usvfs_x64::usvfs_proxy>
-	$<TARGET_FILE:usvfs_x86::usvfs_proxy>
-DESTINATION ${_bin})
+if (WIN32)
+	# this may copy over the ones from uibase/usvfs
+	# - when building with mob, this should not matter as the files should be identical
+	# - when building standalone, this should help having matching USVFS DLL between the
+	#   build and the installation
+	# - this may cause issue with uibase in standalone mode if the installed version does
+	#   not match the one used for the build, but there would be other issue anyway (e.g.
+	#   different uibase.dll between modorganizer and plugins)
+	#
+	install(FILES
+			$<TARGET_FILE:mo2::uibase>
+			$<TARGET_FILE:usvfs_x64::usvfs_dll>
+			$<TARGET_FILE:usvfs_x86::usvfs_dll>
+			$<TARGET_FILE:usvfs_x64::usvfs_proxy>
+			$<TARGET_FILE:usvfs_x86::usvfs_proxy>
+			DESTINATION ${_bin})
 
-# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
-if (NOT MO2_INSTALL_IS_BIN)
-	install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
+
+	# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
+	if (NOT MO2_INSTALL_IS_BIN)
+		install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
+	endif()
+
+	mo2_deploy_qt(
+			DIRECTORY ${_bin}
+			BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
 endif()
-
-mo2_deploy_qt(
-	DIRECTORY ${_bin}
-	BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
 
 # set source groups for VS
 mo2_add_filter(NAME src/application GROUPS

@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "7zip",
+    "bit7z",
     "boost-accumulators",
     "boost-assign",
     "boost-date-time",
@@ -12,20 +13,24 @@
     "boost-thread",
     "boost-uuid",
     "lz4",
-    "mo2-libbsarch",
+    "libbsarchpp",
     "zlib"
   ],
   "features": {
     "standalone": {
       "description": "Build Standalone.",
       "dependencies": [
+        "directx-headers",
         "mo2-cmake",
         "mo2-archive",
         "mo2-bsatk",
         "mo2-esptk",
         "mo2-lootcli-header",
         "mo2-uibase",
-        "usvfs"
+        {
+          "name": "usvfs",
+          "platform": "windows"
+        }
       ]
     }
   }
