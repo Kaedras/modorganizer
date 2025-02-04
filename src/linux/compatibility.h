@@ -51,6 +51,11 @@ inline bool CloseHandle(HANDLE hObject)
   return close(hObject) == 0;
 }
 
+inline int NtClose(HANDLE Handle)
+{
+  return close(Handle);
+}
+
 inline DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)
 {
   pollfd pfd = {hHandle, POLLIN, 0};
