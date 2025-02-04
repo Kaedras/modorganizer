@@ -328,7 +328,7 @@ std::wstring makeNtPath(const std::wstring& path)
   }
 }
 
-void DirectoryWalker::forEachEntry(const std::wstring& path, void* cx,
+void DirectoryWalker::forEachEntry(const QString& path, void* cx,
                                    DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)
 {
   auto& hc = g_handleClosers.request();
@@ -356,13 +356,13 @@ void DirectoryWalker::forEachEntry(const std::wstring& path, void* cx,
   hc.wakeup();
 }
 
-void forEachEntry(const std::wstring& path, void* cx, DirStartF* dirStartF,
+void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
                   DirEndF* dirEndF, FileF* fileF)
 {
   DirectoryWalker().forEachEntry(path, cx, dirStartF, dirEndF, fileF);
 }
 
-Directory getFilesAndDirs(const std::wstring& path)
+Directory getFilesAndDirs(const QString& path)
 {
   struct Context
   {
@@ -376,19 +376,19 @@ Directory getFilesAndDirs(const std::wstring& path)
 
   env::forEachEntry(
       path, &cx,
-      [](void* pcx, std::wstring_view path) {
+      [](void* pcx, const QString& path) {
         Context* cx = (Context*)pcx;
 
         cx->current.top()->dirs.push_back(Directory(path));
         cx->current.push(&cx->current.top()->dirs.back());
       },
 
-      [](void* pcx, std::wstring_view path) {
+      [](void* pcx, const QString& path) {
         Context* cx = (Context*)pcx;
         cx->current.pop();
       },
 
-      [](void* pcx, std::wstring_view path, FILETIME ft, uint64_t s) {
+      [](void* pcx, const QString& path, QDateTime ft, uint64_t s) {
         Context* cx = (Context*)pcx;
 
         cx->current.top()->files.push_back(File(path, ft, s));
@@ -397,20 +397,20 @@ Directory getFilesAndDirs(const std::wstring& path)
   return root;
 }
 
-File::File(std::wstring_view n, FILETIME ft, uint64_t s)
+File::File(const QString& n, QDateTime ft, uint64_t s)
     : name(n.begin(), n.end()), lcname(MOShared::ToLowerCopy(name)), lastModified(ft),
       size(s)
 {}
 
 Directory::Directory() {}
 
-Directory::Directory(std::wstring_view n)
+Directory::Directory(const QString& n)
     : name(n.begin(), n.end()), lcname(MOShared::ToLowerCopy(name))
 {}
 
-void getFilesAndDirsWithFindImpl(const std::wstring& path, Directory& d)
+void getFilesAndDirsWithFindImpl(const QString& path, Directory& d)
 {
-  const std::wstring searchString = path + L"\\*";
+  const QString searchString = path + "/*";
 
   WIN32_FIND_DATAW findData;
 
@@ -425,7 +425,7 @@ void getFilesAndDirsWithFindImpl(const std::wstring& path, Directory& d)
       if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
         if ((wcscmp(findData.cFileName, L".") != 0) &&
             (wcscmp(findData.cFileName, L"..") != 0)) {
-          const std::wstring newPath = path + L"\\" + findData.cFileName;
+          const QString newPath = path + "/" + findData.cFileName;
           d.dirs.push_back(Directory(findData.cFileName));
           getFilesAndDirsWithFindImpl(newPath, d.dirs.back());
         }
@@ -443,7 +443,7 @@ void getFilesAndDirsWithFindImpl(const std::wstring& path, Directory& d)
   ::FindClose(searchHandle);
 }
 
-Directory getFilesAndDirsWithFind(const std::wstring& path)
+Directory getFilesAndDirsWithFind(const QString& path)
 {
   Directory d;
   getFilesAndDirsWithFindImpl(path, d);

@@ -1004,7 +1004,7 @@ QString Profile::absoluteIniFilePath(QString iniFile) const
 QString Profile::getProfileTweaks() const
 {
   return QDir::cleanPath(
-      m_Directory.absoluteFilePath(ToQString(AppConfig::profileTweakIni())));
+      m_Directory.absoluteFilePath(AppConfig::profileTweakIni()));
 }
 
 QString Profile::absolutePath() const

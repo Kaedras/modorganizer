@@ -1668,32 +1668,32 @@ QString PathSettings::base() const
 
 QString PathSettings::downloads(bool resolve) const
 {
-  return getConfigurablePath("download_directory", ToQString(AppConfig::downloadPath()),
+  return getConfigurablePath("download_directory", AppConfig::downloadPath(),
                              resolve);
 }
 
 QString PathSettings::cache(bool resolve) const
 {
-  return getConfigurablePath("cache_directory", ToQString(AppConfig::cachePath()),
+  return getConfigurablePath("cache_directory", AppConfig::cachePath(),
                              resolve);
 }
 
 QString PathSettings::mods(bool resolve) const
 {
-  return getConfigurablePath("mod_directory", ToQString(AppConfig::modsPath()),
+  return getConfigurablePath("mod_directory", AppConfig::modsPath(),
                              resolve);
 }
 
 QString PathSettings::profiles(bool resolve) const
 {
-  return getConfigurablePath("profiles_directory", ToQString(AppConfig::profilesPath()),
+  return getConfigurablePath("profiles_directory", AppConfig::profilesPath(),
                              resolve);
 }
 
 QString PathSettings::overwrite(bool resolve) const
 {
   return getConfigurablePath("overwrite_directory",
-                             ToQString(AppConfig::overwritePath()), resolve);
+                             AppConfig::overwritePath(), resolve);
 }
 
 void PathSettings::setBase(const QString& path)
@@ -1987,7 +1987,7 @@ void NexusSettings::setCategoryMappings(bool b) const
 void NexusSettings::registerAsNXMHandler(bool force)
 {
   const auto nxmPath = QCoreApplication::applicationDirPath() + "/" +
-                       QString::fromStdWString(AppConfig::nxmHandlerExe());
+                       AppConfig::nxmHandlerExe();
 
   const auto executable = QCoreApplication::applicationFilePath();
 
@@ -2041,7 +2041,7 @@ std::vector<std::chrono::seconds> NexusSettings::validationTimeouts() const
 void NexusSettings::dump() const
 {
   const auto iniPath = InstanceManager::singleton().globalInstancesRootPath() + "/" +
-                       QString::fromStdWString(AppConfig::nxmHandlerIni());
+                       AppConfig::nxmHandlerIni();
 
   if (!QFileInfo(iniPath).exists()) {
     log::debug("nxm ini not found at {}", iniPath);

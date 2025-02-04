@@ -388,7 +388,7 @@ private:
 
   void copyFilesTo(QString& target) const;
 
-  std::vector<std::wstring> splitDZString(const wchar_t* buffer) const;
+  std::vector<QString> splitDZString(const wchar_t* buffer) const;
   void mergeTweak(const QString& tweakName, const QString& tweakedIni) const;
   void mergeTweaks(ModInfo::Ptr modInfo, const QString& tweakedIni) const;
   void touchFile(QString fileName);

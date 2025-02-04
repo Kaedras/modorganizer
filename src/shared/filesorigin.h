@@ -12,7 +12,7 @@ class FilesOrigin
 public:
   FilesOrigin();
 
-  FilesOrigin(OriginID ID, const std::wstring& name, const std::wstring& path,
+  FilesOrigin(OriginID ID, const QString& name, const QString& path,
               int priority, boost::shared_ptr<FileRegister> fileRegister,
               boost::shared_ptr<OriginConnection> originConnection);
 
@@ -26,12 +26,12 @@ public:
 
   int getPriority() const { return m_Priority; }
 
-  void setName(const std::wstring& name);
-  const std::wstring& getName() const { return m_Name; }
+  void setName(const QString& name);
+  const QString& getName() const { return m_Name; }
 
   OriginID getID() const { return m_ID; }
 
-  const std::wstring& getPath() const { return m_Path; }
+  const QString& getPath() const { return m_Path; }
 
   std::vector<FileEntryPtr> getFiles() const;
   FileEntryPtr findFile(FileIndex index) const;
@@ -49,14 +49,14 @@ public:
 
   void removeFile(FileIndex index);
 
-  bool containsArchive(std::wstring archiveName);
+  bool containsArchive(const QString& archiveName);
 
 private:
   OriginID m_ID;
   bool m_Disabled;
   std::set<FileIndex> m_Files;
-  std::wstring m_Name;
-  std::wstring m_Path;
+  QString m_Name;
+  QString m_Path;
   int m_Priority;
   boost::weak_ptr<FileRegister> m_FileRegister;
   boost::weak_ptr<OriginConnection> m_OriginConnection;

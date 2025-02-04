@@ -403,7 +403,7 @@ QStringList PluginContainer::pluginFileNames() const
   for (IPluginProxy* proxy : proxyList) {
     QStringList proxiedPlugins =
         proxy->pluginList(QCoreApplication::applicationDirPath() + "/" +
-                          ToQString(AppConfig::pluginPath()));
+                          AppConfig::pluginPath());
     result.append(proxiedPlugins);
   }
   return result;
@@ -606,7 +606,7 @@ IPlugin* PluginContainer::registerPlugin(QObject* plugin, const QString& filepat
 
       QStringList filepaths =
           proxy->pluginList(QCoreApplication::applicationDirPath() + "/" +
-                            ToQString(AppConfig::pluginPath()));
+                            AppConfig::pluginPath());
       for (const QString& filepath : filepaths) {
         loadProxied(filepath, proxy);
       }
@@ -921,7 +921,7 @@ void PluginContainer::loadPlugin(QString const& filepath)
     // We need to check if this can be handled by a proxy.
     for (auto* proxy : this->plugins<IPluginProxy>()) {
       auto filepaths = proxy->pluginList(QCoreApplication::applicationDirPath() + "/" +
-                                         ToQString(AppConfig::pluginPath()));
+                                         AppConfig::pluginPath());
       if (filepaths.contains(filepath)) {
         plugins = loadProxied(filepath, proxy);
         break;
@@ -1137,7 +1137,7 @@ void PluginContainer::loadPlugins()
   }
 
   QString pluginPath =
-      qApp->applicationDirPath() + "/" + ToQString(AppConfig::pluginPath());
+      qApp->applicationDirPath() + "/" + AppConfig::pluginPath();
   log::debug("looking for plugins in {}", QDir::toNativeSeparators(pluginPath));
   QDirIterator iter(pluginPath, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 

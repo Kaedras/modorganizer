@@ -825,7 +825,7 @@ std::optional<int> ReloadPluginCommand::runPostOrganizer(OrganizerCore& core)
   const QString name = QString::fromStdString(vm()["PLUGIN"].as<std::string>());
 
   QString filepath =
-      QDir(qApp->applicationDirPath() + "/" + ToQString(AppConfig::pluginPath()))
+      QDir(qApp->applicationDirPath() + "/" + AppConfig::pluginPath())
           .absoluteFilePath(name);
 
   log::debug("reloading plugin from {}", filepath);

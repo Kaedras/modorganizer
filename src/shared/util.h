@@ -35,7 +35,7 @@ namespace MOShared
 bool FileExists(const std::string& filename);
 bool FileExists(const std::wstring& filename);
 
-bool FileExists(const std::wstring& searchPath, const std::wstring& filename);
+bool FileExists(const QString& searchPath, const QString& filename);
 
 std::string ToString(const std::wstring& source, bool utf8);
 std::wstring ToWString(const std::string& source, bool utf8);

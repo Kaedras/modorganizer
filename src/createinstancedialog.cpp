@@ -476,7 +476,7 @@ bool CreateInstanceDialog::switching() const
 
 CreateInstanceDialog::CreationInfo CreateInstanceDialog::rawCreationInfo() const
 {
-  const auto iniFilename = QString::fromStdWString(AppConfig::iniFileName());
+  const auto iniFilename = AppConfig::iniFileName();
 
   CreationInfo ci;
 
@@ -502,7 +502,7 @@ CreateInstanceDialog::CreationInfo CreateInstanceDialog::rawCreationInfo() const
 
 CreateInstanceDialog::CreationInfo CreateInstanceDialog::creationInfo() const
 {
-  auto fixVarDir = [](QString& path, const std::wstring& defaultDir) {
+  auto fixVarDir = [](QString& path, const QString& defaultDir) {
     // if the path is empty, it wasn't filled by the user, probably because
     // the "Advanced" checkbox wasn't checked, so use the base dir variable
     // with the default dir

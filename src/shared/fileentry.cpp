@@ -10,12 +10,12 @@ FileEntry::FileEntry()
       m_FileSize(NoFileSize), m_CompressedFileSize(NoFileSize)
 {}
 
-FileEntry::FileEntry(FileIndex index, std::wstring name, DirectoryEntry* parent)
-    : m_Index(index), m_Name(std::move(name)), m_Origin(-1), m_Archive(L"", -1),
+FileEntry::FileEntry(FileIndex index, const QString& name, DirectoryEntry* parent)
+    : m_Index(index), m_Name(std::move(name)), m_Origin(-1), m_Archive("", -1),
       m_Parent(parent), m_FileSize(NoFileSize), m_CompressedFileSize(NoFileSize)
 {}
 
-void FileEntry::addOrigin(OriginID origin, FILETIME fileTime, std::wstring_view archive,
+void FileEntry::addOrigin(OriginID origin, QDateTime fileTime, const QString& archive,
                           int order)
 {
   std::scoped_lock lock(m_OriginsMutex);
@@ -29,7 +29,7 @@ void FileEntry::addOrigin(OriginID origin, FILETIME fileTime, std::wstring_view 
     // alternatives
     m_Origin   = origin;
     m_FileTime = fileTime;
-    m_Archive  = DataArchiveOrigin(std::wstring(archive.begin(), archive.end()), order);
+    m_Archive  = DataArchiveOrigin(archive, order);
   } else if ((m_Parent != nullptr) &&
              ((m_Parent->getOriginByID(origin).getPriority() >
                m_Parent->getOriginByID(m_Origin).getPriority()) ||
@@ -49,7 +49,7 @@ void FileEntry::addOrigin(OriginID origin, FILETIME fileTime, std::wstring_view 
 
     m_Origin   = origin;
     m_FileTime = fileTime;
-    m_Archive  = DataArchiveOrigin(std::wstring(archive.begin(), archive.end()), order);
+    m_Archive  = DataArchiveOrigin(archive, order);
   } else {
     // This mod is just an alternative
     bool found = false;
@@ -69,7 +69,7 @@ void FileEntry::addOrigin(OriginID origin, FILETIME fileTime, std::wstring_view 
           (m_Parent->getOriginByID(iter->originID()).getPriority() <
            m_Parent->getOriginByID(origin).getPriority())) {
         m_Alternatives.insert(
-            iter, {origin, {std::wstring(archive.begin(), archive.end()), order}});
+            iter, {origin, {archive, order}});
         found = true;
         break;
       }
@@ -77,7 +77,7 @@ void FileEntry::addOrigin(OriginID origin, FILETIME fileTime, std::wstring_view 
 
     if (!found) {
       m_Alternatives.push_back(
-          {origin, {std::wstring(archive.begin(), archive.end()), order}});
+          {origin, {archive, order}});
     }
   }
 }
@@ -122,7 +122,7 @@ bool FileEntry::removeOrigin(OriginID origin)
       m_Origin = currentID;
     } else {
       m_Origin  = -1;
-      m_Archive = DataArchiveOrigin(L"", -1);
+      m_Archive = DataArchiveOrigin("", -1);
       return true;
     }
   } else {
@@ -184,7 +184,7 @@ void FileEntry::sortOrigins()
   }
 }
 
-bool FileEntry::isFromArchive(std::wstring archiveName) const
+bool FileEntry::isFromArchive(const QString& archiveName) const
 {
   std::scoped_lock lock(m_OriginsMutex);
 
@@ -205,7 +205,7 @@ bool FileEntry::isFromArchive(std::wstring archiveName) const
   return false;
 }
 
-std::wstring FileEntry::getFullPath(OriginID originID) const
+QString FileEntry::getFullPath(OriginID originID) const
 {
   std::scoped_lock lock(m_OriginsMutex);
 
@@ -220,32 +220,32 @@ std::wstring FileEntry::getFullPath(OriginID originID) const
     return {};
   }
 
-  std::wstring result = o->getPath();
+  QString result = o->getPath();
 
   // all intermediate directories
   recurseParents(result, m_Parent);
 
-  return result + L"\\" + m_Name;
+  return result + "/" + m_Name;
 }
 
-std::wstring FileEntry::getRelativePath() const
+QString FileEntry::getRelativePath() const
 {
-  std::wstring result;
+  QString result;
 
   // all intermediate directories
   recurseParents(result, m_Parent);
 
-  return result + L"\\" + m_Name;
+  return result + "/" + m_Name;
 }
 
-bool FileEntry::recurseParents(std::wstring& path, const DirectoryEntry* parent) const
+bool FileEntry::recurseParents(QString& path, const DirectoryEntry* parent) const
 {
   if (parent == nullptr) {
     return false;
   } else {
     // don't append the topmost parent because it is the virtual data-root
     if (recurseParents(path, parent->getParent())) {
-      path.append(L"\\").append(parent->getName());
+      path.append("/").append(parent->getName());
     }
 
     return true;

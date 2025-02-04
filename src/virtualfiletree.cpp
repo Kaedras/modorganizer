@@ -16,7 +16,7 @@ public:
    */
   VirtualFileTreeImpl(std::shared_ptr<const IFileTree> parent,
                       const DirectoryEntry* dir)
-      : FileTreeEntry(parent, parent ? QString::fromStdWString(dir->getName()) : ""),
+      : FileTreeEntry(parent, parent ? dir->getName() : ""),
         VirtualFileTree(), m_dirEntry(dir)
   {}
 
@@ -56,7 +56,7 @@ protected:
     }
     for (auto& file : m_dirEntry->getFiles()) {
       entries.push_back(
-          createFileEntry(parent, QString::fromStdWString(file->getName())));
+          createFileEntry(parent, file->getName()));
     }
 
     // Vector is already sorted:

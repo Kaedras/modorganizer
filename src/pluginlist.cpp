@@ -135,10 +135,10 @@ void PluginList::highlightPlugins(const std::vector<unsigned int>& modIndices,
                                                         << "*.esm"
                                                         << "*.esl");
       const MOShared::FilesOrigin& origin =
-          directoryEntry.getOriginByName(selectedMod->internalName().toStdWString());
+          directoryEntry.getOriginByName(selectedMod->internalName());
       if (plugins.size() > 0) {
         for (auto plugin : plugins) {
-          MOShared::FileEntryPtr file = directoryEntry.findFile(plugin.toStdWString());
+          MOShared::FileEntryPtr file = directoryEntry.findFile(plugin);
           if (file && file->getOrigin() != origin.getID()) {
             const auto alternatives = file->getAlternatives();
             if (std::find_if(alternatives.begin(), alternatives.end(),
@@ -215,7 +215,7 @@ void PluginList::refresh(const QString& profileName,
     if (current.get() == nullptr) {
       continue;
     }
-    const QString& filename = ToQString(current->getName());
+    const QString& filename = current->getName();
 
     if (filename.endsWith(".esp", Qt::CaseInsensitive) ||
         filename.endsWith(".esm", Qt::CaseInsensitive) ||
@@ -248,7 +248,7 @@ void PluginList::refresh(const QString& profileName,
       QString baseName = QFileInfo(filename).completeBaseName();
 
       QString iniPath = baseName + ".ini";
-      bool hasIni     = baseDirectory.findFile(ToWString(iniPath)).get() != nullptr;
+      bool hasIni     = baseDirectory.findFile(iniPath).get() != nullptr;
       std::set<QString> loadedArchives;
       for (const auto& archiveName : archiveCandidates) {
         if (archiveName.startsWith(baseName, Qt::CaseInsensitive)) {
@@ -256,7 +256,7 @@ void PluginList::refresh(const QString& profileName,
         }
       }
 
-      QString originName    = ToQString(origin.getName());
+      QString originName    = origin.getName();
       unsigned int modIndex = ModInfo::getIndex(originName);
       if (modIndex != UINT_MAX) {
         ModInfo::Ptr modInfo = ModInfo::getByIndex(modIndex);
@@ -264,7 +264,7 @@ void PluginList::refresh(const QString& profileName,
       }
 
       m_ESPs.emplace_back(filename, forceLoaded, forceEnabled, forceDisabled,
-                          originName, ToQString(current->getFullPath()), hasIni,
+                          originName, current->getFullPath(), hasIni,
                           loadedArchives, lightPluginsAreSupported,
                           mediumPluginsAreSupported, blueprintPluginsAreSupported);
       m_ESPs.rbegin()->priority = -1;
@@ -751,16 +751,15 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
   log::debug("setting file times on esps");
 
   for (ESPInfo& esp : m_ESPs) {
-    std::wstring espName         = ToWString(esp.name);
-    const FileEntryPtr fileEntry = directoryStructure.findFile(espName);
+    const FileEntryPtr fileEntry = directoryStructure.findFile(esp.name);
     if (fileEntry.get() != nullptr) {
       QString fileName;
       bool archive = false;
       int originid = fileEntry->getOrigin(archive);
 
       fileName = QString("%1\\%2")
-                     .arg(QDir::toNativeSeparators(ToQString(
-                         directoryStructure.getOriginByID(originid).getPath())))
+                     .arg(QDir::toNativeSeparators(
+                         directoryStructure.getOriginByID(originid).getPath()))
                      .arg(esp.name);
 
       HANDLE file =

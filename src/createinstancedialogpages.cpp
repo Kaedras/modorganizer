@@ -18,10 +18,10 @@ using MOBase::TaskDialog;
 
 // returns %base_dir%/dir
 //
-QString makeDefaultPath(const std::wstring& dir)
+QString makeDefaultPath(const QString& dir)
 {
   return QDir::toNativeSeparators(
-      PathSettings::makeDefaultPath(QString::fromStdWString(dir)));
+      PathSettings::makeDefaultPath(dir));
 }
 
 QString toLocalizedString(CreateInstanceDialog::Types t)

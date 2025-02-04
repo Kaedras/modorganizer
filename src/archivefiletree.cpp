@@ -239,7 +239,7 @@ std::shared_ptr<ArchiveFileTree> ArchiveFileTree::makeTree(Archive const& archiv
     }
 
     files.push_back(
-        std::make_tuple(QString::fromStdWString(data[i]->getArchiveFilePath())
+        std::make_tuple(QString::fromStdWString(data[i]->getArchiveFilePath().generic_wstring())
                             .replace("\\", "/")
                             .split("/", Qt::SkipEmptyParts),
                         data[i]->isDirectory(), (int)i));
