@@ -5,7 +5,6 @@
 #include <QWidget>
 #include <log.h>
 #include <lootcli/lootcli.h>
-#include <windows.h>
 
 Q_DECLARE_METATYPE(lootcli::Progress);
 Q_DECLARE_METATYPE(MOBase::log::Levels);

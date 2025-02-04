@@ -5,6 +5,8 @@
 #include "modinfodialogtab.h"
 #include "organizercore.h"
 #include "plugincontainer.h"
+
+#include <QPainter>
 #include <QScrollBar>
 
 using namespace MOBase;

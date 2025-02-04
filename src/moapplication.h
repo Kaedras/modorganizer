@@ -24,6 +24,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QFileSystemWatcher>
 
+class QSplashScreen;
 class Settings;
 class MOMultiProcess;
 class Instance;

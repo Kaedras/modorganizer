@@ -5,6 +5,7 @@
 #include <QDragEnterEvent>
 #include <QTreeView>
 
+class QLCDNumber;
 namespace Ui
 {
 class MainWindow;

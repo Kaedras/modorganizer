@@ -1,5 +1,9 @@
 #include "shared/fileentry.h"
 
+#include <QModelIndex>
+#include <QString>
+
+class QTreeView;
 class PluginContainer;
 
 class ConflictItem

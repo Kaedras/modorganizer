@@ -4,6 +4,7 @@
 #include "modinfo.h"
 #include "modinfodialogfwd.h"
 
+class QTreeView;
 namespace MOShared
 {
 class FileEntry;

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <filterwidget.h>
 
+class QStandardItemModel;
 namespace Ui
 {
 class InstanceManagerDialog;

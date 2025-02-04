@@ -9,6 +9,8 @@ class MainWindow;
 }
 class OrganizerCore;
 class DownloadListView;
+class QPushButton;
+class QCheckBox;
 
 class DownloadsTab : public QObject
 {

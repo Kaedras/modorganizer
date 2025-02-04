@@ -8,6 +8,8 @@ namespace Ui
 class CategoryImportDialog;
 }
 
+class QAbstractButton;
+
 /**
  * @brief Dialog that allows users to configure mod categories
  **/

@@ -1,6 +1,8 @@
 #ifndef MODORGANIZER_ENVDUMP_INCLUDED
 #define MODORGANIZER_ENVDUMP_INCLUDED
 
+#include <string>
+
 namespace env
 {
 

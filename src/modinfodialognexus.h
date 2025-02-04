@@ -3,6 +3,8 @@
 
 #include "modinfodialogtab.h"
 
+#include <QWebEnginePage>
+
 class NexusTabWebpage : public QWebEnginePage
 {
   Q_OBJECT

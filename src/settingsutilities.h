@@ -3,6 +3,11 @@
 
 #include <log.h>
 
+class QAbstractButton;
+class QDockWidget;
+class QHeaderView;
+class QMainWindow;
+class QSettings;
 namespace MOBase
 {
 class ExpanderWidget;
@@ -62,6 +67,10 @@ void logRemoval(const QString& name);
 QString settingName(const QString& section, const QString& key);
 
 template <class T>
+std::optional<T> getOptional(const QSettings& settings, const QString& section,
+                             const QString& key, std::optional<T> def = {});
+
+template <class T>
 void setImpl(QSettings& settings, const QString& displayName, const QString& section,
              const QString& key, const T& value)
 {
@@ -88,7 +97,7 @@ void removeImpl(QSettings& settings, const QString& displayName, const QString& 
 
 template <class T>
 std::optional<T> getOptional(const QSettings& settings, const QString& section,
-                             const QString& key, std::optional<T> def = {})
+                             const QString& key, std::optional<T> def)
 {
   if (settings.contains(settingName(section, key))) {
     const auto v = settings.value(settingName(section, key));

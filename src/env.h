@@ -1,6 +1,13 @@
 #ifndef ENV_ENV_H
 #define ENV_ENV_H
 
+#include <QFileInfo>
+#include <QString>
+#include <functional>
+#include <memory>
+#include <set>
+
+class QObject;
 class Settings;
 
 namespace env

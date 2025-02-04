@@ -4,6 +4,8 @@
 #include "settings.h"
 #include "settingsdialog.h"
 
+#include <QDir>
+
 class PathsSettingsTab : public SettingsTab
 {
 public:

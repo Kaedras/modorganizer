@@ -14,6 +14,8 @@
 #include "qtgroupingproxy.h"
 #include "viewmarkingscrollbar.h"
 
+class QPushButton;
+class QComboBox;
 namespace Ui
 {
 class MainWindow;

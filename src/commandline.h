@@ -3,6 +3,7 @@
 #include "moshortcut.h"
 #include <memory>
 #include <vector>
+#include <boost/program_options.hpp>
 
 class OrganizerCore;
 class MOApplication;

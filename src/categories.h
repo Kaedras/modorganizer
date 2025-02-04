@@ -21,6 +21,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #define CATEGORIES_H
 
 #include <QString>
+#include <QObject>
 #include <functional>
 #include <map>
 #include <vector>

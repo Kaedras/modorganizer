@@ -2,8 +2,10 @@
 #define MODORGANIZER_ICONFETCHER_INCLUDED
 #include <QFileIconProvider>
 #include <QStringView>
+#include <condition_variable>
 #include <mutex>
 #include <set>
+#include <thread>
 
 class IconFetcher
 {

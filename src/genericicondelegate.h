@@ -3,6 +3,8 @@
 
 #include "icondelegate.h"
 
+class QTreeView;
+
 /**
  * @brief an icon delegate that takes the list of icons from a user-defines data role
  */

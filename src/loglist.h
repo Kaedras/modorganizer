@@ -22,6 +22,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "copyeventfilter.h"
 #include "shared/appconfig.h"
+
+#include <QTimer>
 #include <QTreeView>
 #include <deque>
 #include <log.h>

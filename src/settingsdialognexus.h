@@ -5,6 +5,8 @@
 #include "settings.h"
 #include "settingsdialog.h"
 
+class QListWidget;
+
 // used by the settings dialog and the create instance dialog
 //
 class NexusConnectionUI : public QObject

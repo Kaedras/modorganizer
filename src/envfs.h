@@ -2,6 +2,8 @@
 #define ENV_ENVFS_H
 
 #include "thread_utils.h"
+
+#include <condition_variable>
 #include <thread>
 
 namespace env
