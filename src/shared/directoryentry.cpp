@@ -51,24 +51,6 @@ void elapsedImpl(std::chrono::nanoseconds& out, F&& f)
 #define elapsed(OUT, F) (F)();
 // #define elapsed(OUT, F) elapsedImpl(OUT, F);
 
-static bool SupportOptimizedFind()
-{
-  // large fetch and basic info for FindFirstFileEx is supported on win server 2008 r2,
-  // win 7 and newer
-
-  OSVERSIONINFOEX versionInfo;
-  versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-  versionInfo.dwMajorVersion      = 6;
-  versionInfo.dwMinorVersion      = 1;
-
-  ULONGLONG mask = ::VerSetConditionMask(
-      ::VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL), VER_MINORVERSION,
-      VER_GREATER_EQUAL);
-
-  return (::VerifyVersionInfo(&versionInfo, VER_MAJORVERSION | VER_MINORVERSION,
-                              mask) == TRUE);
-}
-
 bool DirCompareByName::operator()(const DirectoryEntry* lhs,
                                   const DirectoryEntry* rhs) const
 {

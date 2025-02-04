@@ -20,6 +20,10 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef UTIL_H
 #define UTIL_H
 
+#ifdef __WIN32
+#include "win32/util_win32.h"
+#endif
+
 #include <filesystem>
 #include <string>
 
@@ -34,6 +38,7 @@ namespace MOShared
 /// Test if a file (or directory) by the specified name exists
 bool FileExists(const std::string& filename);
 bool FileExists(const std::wstring& filename);
+bool FileExists(const QString& filename);
 
 bool FileExists(const QString& searchPath, const QString& filename);
 
@@ -54,15 +59,6 @@ QString getUsvfsVersionString();
 
 void SetThisThreadName(const QString& s);
 void checkDuplicateShortcuts(const QMenu& m);
-
-inline FILETIME ToFILETIME(std::filesystem::file_time_type t)
-{
-  FILETIME ft;
-  static_assert(sizeof(t) == sizeof(ft));
-
-  std::memcpy(&ft, &t, sizeof(FILETIME));
-  return ft;
-}
 
 }  // namespace MOShared
 

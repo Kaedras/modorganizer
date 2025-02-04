@@ -17,34 +17,23 @@ You should have received a copy of the GNU General Public License
 along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "motddialog.h"
-#include "bbcode.h"
-#include "organizercore.h"
-#include "ui_motddialog.h"
-#include "utility.h"
-#include <utility.h>
+#include "../os_error.h"
+#include <cerrno>
+#include <sstream>
 
-using namespace MOBase;
-
-MotDDialog::MotDDialog(const QString& message, QWidget* parent)
-    : QDialog(parent), ui(new Ui::MotDDialog)
+namespace MOShared
 {
-  ui->setupUi(this);
-  ui->motdView->setHtml(BBCode::convertToHTML(message));
-  connect(ui->motdView, SIGNAL(anchorClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
+
+std::string os_error::constructMessage(const std::string& input, int inErrorCode)
+{
+  std::ostringstream finalMessage;
+  finalMessage << input;
+
+  int errorCode = inErrorCode != -1 ? inErrorCode : errno;
+
+  finalMessage << " (errorcode " << errorCode << ") (" << strerror(errorCode) << " [" << errorCode << "])";
+
+  return finalMessage.str();
 }
 
-MotDDialog::~MotDDialog()
-{
-  delete ui;
-}
-
-void MotDDialog::on_okButton_clicked()
-{
-  this->close();
-}
-
-void MotDDialog::linkClicked(const QUrl& url)
-{
-  shell::Open(url);
-}
+}  // namespace MOShared

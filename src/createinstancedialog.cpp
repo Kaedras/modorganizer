@@ -8,6 +8,10 @@
 #include <iplugingame.h>
 #include <utility.h>
 
+#ifdef __unix__
+#include "linux/compatibility.h"
+#endif
+
 using namespace MOBase;
 
 class Failed
@@ -415,6 +419,11 @@ void CreateInstanceDialog::logCreation(const QString& s)
 void CreateInstanceDialog::logCreation(const std::wstring& s)
 {
   logCreation(QString::fromStdWString(s));
+}
+
+void CreateInstanceDialog::logCreation(const std::string& s)
+{
+  logCreation(QString::fromStdString(s));
 }
 
 void CreateInstanceDialog::selectPage(std::size_t i)

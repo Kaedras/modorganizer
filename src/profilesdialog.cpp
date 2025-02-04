@@ -41,8 +41,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QMessageBox>
 #include <QWhatsThis>
 
-#include <Windows.h>
-
 #include <exception>
 
 using namespace MOBase;

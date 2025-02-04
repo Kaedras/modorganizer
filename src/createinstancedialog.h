@@ -213,6 +213,7 @@ private:
   //
   void logCreation(const QString& s);
   void logCreation(const std::wstring& s);
+  void logCreation(const std::string& s);
 
   // calls the given member function on all pages until one returns an object
   // that's not empty; used by gatherInfo()

@@ -22,8 +22,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "../mainwindow.h"
 #include "os_error.h"
 #include <uibase/log.h>
+
+#ifdef _WIN32
 #include <usvfs/usvfs.h>
 #include <usvfs/usvfs_version.h>
+#else
+#include <overlayfs/overlayfs.h>
+#endif
 
 using namespace MOBase;
 
@@ -32,22 +37,18 @@ namespace MOShared
 
 bool FileExists(const std::string& filename)
 {
-  DWORD dwAttrib = ::GetFileAttributesA(filename.c_str());
-
-  return (dwAttrib != INVALID_FILE_ATTRIBUTES);
+  return std::filesystem::exists(filename);
 }
 
 bool FileExists(const std::wstring& filename)
 {
-  DWORD dwAttrib = ::GetFileAttributesW(filename.c_str());
-
-  return (dwAttrib != INVALID_FILE_ATTRIBUTES);
+  return std::filesystem::exists(filename);
 }
 
 bool FileExists(const std::wstring& searchPath, const std::wstring& filename)
 {
   std::wstringstream stream;
-  stream << searchPath << "\\" << filename;
+  stream << searchPath << "/" << filename;
   return FileExists(stream.str());
 }
 

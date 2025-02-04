@@ -35,7 +35,13 @@
 #include "selfupdater.h"
 #include "settings.h"
 #include "uilocker.h"
-#include "usvfsconnector.h"
+
+#ifdef _WIN32
+#include "win32/usvfsconnector.h"
+#else
+#include "linux/compatibility.h"
+#include "linux/overlayfsconnector.h"
+#endif
 
 class ModListSortProxy;
 class PluginListSortProxy;

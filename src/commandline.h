@@ -5,6 +5,10 @@
 #include <vector>
 #include <boost/program_options.hpp>
 
+#ifdef __unix__
+#include "linux/compatibility.h"
+#endif
+
 class OrganizerCore;
 class MOApplication;
 class MOMultiProcess;

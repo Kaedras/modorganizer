@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QPoint>
 
+class QMainWindow;
 namespace env
 {
 
