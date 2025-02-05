@@ -18,7 +18,7 @@ find_package(mo2-esptk CONFIG REQUIRED)
 find_package(mo2-dds-header CONFIG REQUIRED)
 find_package(libbsarchpp CONFIG REQUIRED)
 
-find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets)
+find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets Test)
 find_package(Boost CONFIG REQUIRED COMPONENTS program_options thread interprocess signals2 uuid accumulators)
 find_package(7zip CONFIG REQUIRED)
 find_package(lz4 CONFIG REQUIRED)
@@ -55,7 +55,7 @@ set(PRIVATE_LIBS
 		mo2::uibase mo2::archive libbsarchpp
 		mo2::bsatk mo2::esptk mo2::lootcli-header
 		Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
-		Qt6::WebEngineWidgets Qt6::WebSockets)
+		Qt6::WebEngineWidgets Qt6::WebSockets Qt6::Test)
 
 set(PRIVATE_WIN32_LIBS
 		Shlwapi Bcrypt

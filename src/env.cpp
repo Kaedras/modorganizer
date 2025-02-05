@@ -333,11 +333,10 @@ QString toString(Service::Status st)
   }
 }
 
-std::filesystem::path processPath(HANDLE process = INVALID_HANDLE_VALUE);
+extern QString processPath(HANDLE process = INVALID_HANDLE_VALUE);
+extern QString processFilename(HANDLE process = INVALID_HANDLE_VALUE);
 
-QString processFilename(HANDLE process = INVALID_HANDLE_VALUE);
-
-std::filesystem::path thisProcessPath()
+QString thisProcessPath()
 {
   return processPath();
 }
@@ -429,14 +428,12 @@ std::string toString(CoreDumpTypes type)
   }
 }
 
-bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
+extern bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
 
 bool coredump(const QString& dir, CoreDumpTypes type)
 {
   std::wclog << L"creating minidump for the current process\n";
   return createMiniDump(dir, GetCurrentProcess(), type);
 }
-
-bool coredumpOther(CoreDumpTypes type);
 
 }  // namespace env

@@ -5863,7 +5863,7 @@ Continue?</source>
 <context>
     <name>OverlayfsConnector</name>
     <message>
-        <location filename="linux/overlayfsconnector.cpp" line="182"/>
+        <location filename="linux/overlayfsconnector.cpp" line="183"/>
         <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9432,6 +9432,14 @@ On Windows XP:
     <message>
         <location filename="updatedialog.cpp" line="69"/>
         <source>Mod Organizer %1 is available.  The current version is %2.  Updating will not affect your mods or profiles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UsvfsConnector</name>
+    <message>
+        <location filename="win32/usvfsconnector.cpp" line="201"/>
+        <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

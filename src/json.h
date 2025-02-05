@@ -16,7 +16,7 @@ class failed
 namespace details
 {
 
-  QString typeName(const QJsonValue& v)
+  inline QString typeName(const QJsonValue& v)
   {
     if (v.isUndefined()) {
       return "undefined";
@@ -37,7 +37,7 @@ namespace details
     }
   }
 
-  QString typeName(const QJsonDocument& doc)
+  inline QString typeName(const QJsonDocument& doc)
   {
     if (doc.isEmpty()) {
       return "empty";
@@ -56,7 +56,7 @@ namespace details
   T convert(const QJsonValue& v) = delete;
 
   template <>
-  bool convert<bool>(const QJsonValue& v)
+  inline bool convert<bool>(const QJsonValue& v)
   {
     if (!v.isBool()) {
       throw failed();
@@ -66,7 +66,7 @@ namespace details
   }
 
   template <>
-  QJsonObject convert<QJsonObject>(const QJsonValue& v)
+  inline QJsonObject convert<QJsonObject>(const QJsonValue& v)
   {
     if (!v.isObject()) {
       throw failed();
@@ -76,7 +76,7 @@ namespace details
   }
 
   template <>
-  QString convert<QString>(const QJsonValue& v)
+  inline QString convert<QString>(const QJsonValue& v)
   {
     if (!v.isString()) {
       throw failed();
@@ -86,7 +86,7 @@ namespace details
   }
 
   template <>
-  QJsonArray convert<QJsonArray>(const QJsonValue& v)
+  inline QJsonArray convert<QJsonArray>(const QJsonValue& v)
   {
     if (!v.isArray()) {
       throw failed();
@@ -96,7 +96,7 @@ namespace details
   }
 
   template <>
-  qint64 convert<qint64>(const QJsonValue& v)
+  inline qint64 convert<qint64>(const QJsonValue& v)
   {
     if (!v.isDouble()) {
       throw failed();

@@ -194,7 +194,7 @@ void deleteRegistryKeyIfEmpty(const QString& name);
 
 // returns the path to this process
 //
-std::filesystem::path thisProcessPath();
+QString thisProcessPath();
 
 }  // namespace env
 
