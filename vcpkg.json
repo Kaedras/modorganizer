@@ -12,6 +12,7 @@
     "boost-signals2",
     "boost-thread",
     "boost-uuid",
+    "spdlog",
     "lz4",
     "libbsarchpp",
     "zlib"

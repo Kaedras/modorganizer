@@ -601,15 +601,15 @@ bool InstanceManagerDialog::doDelete(const QStringList& files, bool recycle)
     }
   }
 
-  if (MOBase::shellDelete(files, recycle, this)) {
+  auto result = MOBase::shellDelete(files, recycle, this);
+  if (result) {
     return true;
   }
 
-  const auto e = GetLastError();
-  if (e == ERROR_CANCELLED) {
+  if (result.error == QFileDevice::AbortError) {
     log::debug("deletion cancelled by user");
   } else {
-    log::error("failed to delete, {}", formatSystemMessage(e));
+    log::error("failed to delete, {}", result.message);
   }
 
   return false;

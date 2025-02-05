@@ -98,7 +98,6 @@ LogLevel toOverlayfsLogLevel(log::Levels level)
   case log::Error:
     return LogLevel::Error;
   case log::Debug:
-    [[fallthrough]]
   default:
     return LogLevel::Debug;
   }

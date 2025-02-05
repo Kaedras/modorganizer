@@ -2,11 +2,14 @@
 #define COMPATIBILITY_H
 
 #include <cerrno>
-
 #include <sys/types.h>
-#include <sys/pidfd.h>
 #include <sys/wait.h>
 #include <poll.h>
+
+extern "C"
+{
+#include <sys/pidfd.h>
+}
 
 // use pidfd instead of handle
 using HANDLE = int;

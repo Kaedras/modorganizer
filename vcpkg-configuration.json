@@ -20,8 +20,8 @@
     {
       "kind": "git",
       "repository": "https://github.com/Kaedras/vcpkg-registry",
-      "baseline": "58e8e03809344704ed5fd7a0aaafd412dbc5799a",
-      "packages": ["mo2-*", "7zip", "usvfs", "libbsarchpp"]
+      "baseline": "601b2f1ecf0a49f3f30c11db9157ba3941e4eb9e",
+      "packages": ["mo2-*", "7zip", "usvfs", "libbsarchpp", "spdlog"]
     }
   ]
 }

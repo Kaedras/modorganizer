@@ -26,6 +26,8 @@ Console::~Console()
 {
 }
 
+ModuleNotification::~ModuleNotification(){}
+
 std::unique_ptr<ModuleNotification> Environment::onModuleLoaded(QObject* o,
     std::function<void(Module)> f)
 {
@@ -105,7 +107,7 @@ void deleteRegistryKeyIfEmpty(const QString& name)
   STUB();
 }
 
-bool createMiniDump(const std::filesystem::path& dir, HANDLE process, CoreDumpTypes type)
+bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
 {
   STUB();
   return true;

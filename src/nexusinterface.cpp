@@ -19,6 +19,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "nexusinterface.h"
 
+#include "apiuseraccount.h"
 #include "bbcode.h"
 #include "iplugingame.h"
 #include "nxmaccessmanager.h"

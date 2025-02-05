@@ -772,7 +772,7 @@ std::optional<ProcessRunner::Results> ProcessRunner::runShell()
     return Error;
   }
 
-  m_handle = pidfd_open((pid_t)r.stealProcessHandle()->processId(), PIDFD_NONBLOCK);
+  m_handle = pidfd_open((pid_t)r.stealProcessHandle()->processId(), 0);
 
   // not all files will return a valid handle even if opening them was
   // successful, such as inproc handlers (like the photo viewer); in this

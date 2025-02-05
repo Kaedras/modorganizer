@@ -29,6 +29,9 @@ namespace env
 
 using namespace MOBase;
 
+extern QString processPath(HANDLE process = INVALID_HANDLE_VALUE);
+extern QString processFilename(HANDLE process = INVALID_HANDLE_VALUE);
+extern bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
 
 ModuleNotification::ModuleNotification(QObject* o, std::function<void(Module)> f)
     : m_cookie(nullptr), m_object(o), m_f(std::move(f))
@@ -142,7 +145,6 @@ QString Environment::timezone() const
 
   return s;
 }
-
 
 void Environment::dump(const Settings& s) const
 {
@@ -333,9 +335,6 @@ QString toString(Service::Status st)
   }
 }
 
-extern QString processPath(HANDLE process = INVALID_HANDLE_VALUE);
-extern QString processFilename(HANDLE process = INVALID_HANDLE_VALUE);
-
 QString thisProcessPath()
 {
   return processPath();
@@ -427,8 +426,6 @@ std::string toString(CoreDumpTypes type)
     return "?";
   }
 }
-
-extern bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
 
 bool coredump(const QString& dir, CoreDumpTypes type)
 {

@@ -530,7 +530,7 @@ private slots:
   void loginFailed(const QString& message);
 
 private:
-  static const unsigned int PROBLEM_MO1SCRIPTEXTENDERWORKAROUND = 1;
+  static constexpr unsigned int PROBLEM_MO1SCRIPTEXTENDERWORKAROUND = 1;
 
 private:
   IUserInterface* m_UserInterface;

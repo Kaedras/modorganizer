@@ -3819,18 +3819,16 @@ void MainWindow::on_restoreButton_clicked()
     QString loadOrderName = m_OrganizerCore.currentProfile()->getLoadOrderFileName();
     QString lockedName    = m_OrganizerCore.currentProfile()->getLockedOrderFileName();
 
-    using FileError = QFileDevice::FileError;
-
     auto r1 = shellCopy(pluginName + "." + choice, pluginName, true, this);
     auto r2 = shellCopy(loadOrderName + "." + choice, loadOrderName, true, this);
     auto r3 = shellCopy(lockedName + "." + choice, lockedName, true, this);
 
-    if (r1 != FileError::NoError || r2 != FileError::NoError || r3 != FileError::NoError) {
+    if (!r1 || !r2 || !r3) {
 
-      QFileDevice::FileError e;
-      if (!(bool)r1) {
+      OperationResult e;
+      if (!r1) {
         e = r1;
-      } else if (!(bool)r2) {
+      } else if (!r2) {
         e = r2;
       } else {
         e = r3;
@@ -3838,7 +3836,7 @@ void MainWindow::on_restoreButton_clicked()
 
       QMessageBox::critical(this, tr("Restore failed"),
                             tr("Failed to restore the backup. Errorcode: %1")
-                                .arg(formatSystemMessageToQString(e)));
+                                .arg(e.message));
     }
     m_OrganizerCore.refreshESPList(true);
   }
@@ -3948,14 +3946,14 @@ void MainWindow::dropLocalFile(const QUrl& url, const QString& outputDir, bool m
     }
   }
 
-  QFileDevice::FileError success = QFileDevice::FileError::NoError;
+  OperationResult result;
   if (move) {
-    success = shellMove(file.absoluteFilePath(), target, true, this);
+    result = shellMove(file.absoluteFilePath(), target, true, this);
   } else {
-    success = shellCopy(file.absoluteFilePath(), target, true, this);
+    result = shellCopy(file.absoluteFilePath(), target, true, this);
   }
-  if (success != QFileDevice::FileError::NoError) {
-    log::error("file operation failed: {}", shell::formatError(success));
+  if (!result) {
+    log::error("file operation failed: {}", result.message);
   }
 }
 
