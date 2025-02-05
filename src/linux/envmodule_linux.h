@@ -24,11 +24,20 @@ typedef struct tagVS_FIXEDFILEINFO {
 namespace env
 {
 // compatibility class for HandlePtr
-// TODO: this is a first draft
 class PidfdCloser
 {
 public:
-  PidfdCloser(int pidfd) { m_pidfd = pidfd; }
+  explicit PidfdCloser(int pidfd) : m_pidfd(pidfd) {}
+  PidfdCloser() = default;
+
+  PidfdCloser& operator=(int pidfd) {
+    if (m_pidfd != -1) {
+      close(m_pidfd);
+    }
+    m_pidfd = pidfd;
+
+    return *this;
+  }
 
   ~PidfdCloser()
   {
@@ -37,13 +46,17 @@ public:
     }
   }
 
-  int get() { return m_pidfd; }
+  int get() const { return m_pidfd; }
 
   int release()
   {
     int tmp = m_pidfd;
     m_pidfd = -1;
     return tmp;
+  }
+
+  bool isValid() const {
+    return m_pidfd != -1;
   }
 
 private:

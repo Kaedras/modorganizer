@@ -19,10 +19,6 @@ static inline constexpr int INVALID_HANDLE_VALUE = -1;
 static inline constexpr auto ERROR_ACCESS_DENIED = EACCES;
 static inline constexpr auto ERROR_CANCELLED = ECANCELED;
 
-#define WAIT_OBJECT_0 1
-#define WAIT_TIMEOUT 0
-#define WAIT_FAILED -1
-
 inline int GetLastError()
 {
   return errno;

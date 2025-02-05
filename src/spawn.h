@@ -20,12 +20,12 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SPAWN_H
 #define SPAWN_H
 
-#ifdef _WIN32
+#ifdef __unix__
+#include "linux/compatibility.h"
+#else
 #define WIN32_LEAN_AND_MEAN
 #include <tchar.h>
 #include <windows.h>
-#else
-#include "linux/compatibility.h"
 #endif
 
 #include <QDir>

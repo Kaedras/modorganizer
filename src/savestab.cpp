@@ -140,11 +140,12 @@ QDir SavesTab::currentSavesDir() const
 
     QString iniPath = m_core.currentProfile()->absoluteIniFilePath(iniFiles[0]);
 
-    wchar_t path[MAX_PATH];
-    if (::GetPrivateProfileStringW(L"General", L"SLocalSavePath", L"", path, MAX_PATH,
-                                   iniPath.toStdWString().c_str())) {
+    QSettings ini(iniPath, QSettings::IniFormat);
+    QString path = ini.value("General/SLocalSavePath").toString();
+
+    if (!path.isEmpty()) {
       savesDir.setPath(m_core.managedGame()->documentsDirectory().absoluteFilePath(
-          QString::fromWCharArray(path)));
+          path));
     } else {
       savesDir = m_core.managedGame()->savesDirectory();
     }

@@ -3,6 +3,12 @@
 
 #include <log.h>
 
+#ifdef __unix__
+#include "linux/settingsutilities_linux.h"
+#else
+#include "win32/settingsutilities_win32.h"
+#endif
+
 class QAbstractButton;
 class QDockWidget;
 class QHeaderView;
@@ -271,7 +277,5 @@ QString checkedSettingName(const QAbstractButton* b);
 
 void warnIfNotCheckable(const QAbstractButton* b);
 
-bool setWindowsCredential(const QString& key, const QString& data);
-QString getWindowsCredential(const QString& key);
 
 #endif  // SETTINGSUTILITIES_H

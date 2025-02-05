@@ -7043,17 +7043,18 @@ p, li { white-space: pre-wrap; }
         <location filename="createinstancedialogpages.cpp" line="676"/>
         <location filename="createinstancedialogpages.cpp" line="697"/>
         <location filename="createinstancedialogpages.cpp" line="724"/>
+        <location filename="linux/spawn_linux.cpp" line="119"/>
         <location filename="settingsdialognexus.cpp" line="270"/>
         <location filename="settingsdialognexus.cpp" line="277"/>
         <location filename="settingsdialogworkarounds.cpp" line="231"/>
-        <location filename="spawn.cpp" line="179"/>
-        <location filename="spawn.cpp" line="203"/>
-        <location filename="spawn.cpp" line="278"/>
-        <location filename="spawn.cpp" line="301"/>
-        <location filename="spawn.cpp" line="328"/>
-        <location filename="spawn.cpp" line="352"/>
-        <location filename="spawn.cpp" line="383"/>
+        <location filename="spawn.cpp" line="114"/>
+        <location filename="spawn.cpp" line="141"/>
+        <location filename="spawn.cpp" line="171"/>
         <location filename="uilocker.cpp" line="349"/>
+        <location filename="win32/spawn_win32.cpp" line="179"/>
+        <location filename="win32/spawn_win32.cpp" line="203"/>
+        <location filename="win32/spawn_win32.cpp" line="238"/>
+        <location filename="win32/spawn_win32.cpp" line="263"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7579,19 +7580,24 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="processrunner.cpp" line="549"/>
-        <location filename="processrunner.cpp" line="616"/>
-        <location filename="processrunner.cpp" line="762"/>
+        <location filename="linux/processrunner.cpp" line="582"/>
+        <location filename="linux/processrunner.cpp" line="649"/>
+        <location filename="linux/processrunner.cpp" line="795"/>
+        <location filename="win32/processrunner.cpp" line="549"/>
+        <location filename="win32/processrunner.cpp" line="616"/>
+        <location filename="win32/processrunner.cpp" line="762"/>
         <source>No profile set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="processrunner.cpp" line="582"/>
+        <location filename="linux/processrunner.cpp" line="615"/>
+        <location filename="win32/processrunner.cpp" line="582"/>
         <source>This shortcut is for instance &apos;%1&apos; but Mod Organizer is currently running for &apos;%2&apos;. Exit Mod Organizer before running the shortcut or change the active instance.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="processrunner.cpp" line="599"/>
+        <location filename="linux/processrunner.cpp" line="632"/>
+        <location filename="win32/processrunner.cpp" line="599"/>
         <source>Executable &apos;%1&apos; does not exist in instance &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7627,19 +7633,19 @@ This program is known to cause issues with Mod Organizer, such as freezing or bl
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.cpp" line="1435"/>
-        <location filename="settings.cpp" line="1459"/>
-        <location filename="settings.cpp" line="1507"/>
+        <location filename="settings.cpp" line="1434"/>
+        <location filename="settings.cpp" line="1458"/>
+        <location filename="settings.cpp" line="1506"/>
         <source>attempt to store setting for unknown plugin &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.cpp" line="2005"/>
+        <location filename="settings.cpp" line="2004"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.cpp" line="2006"/>
+        <location filename="settings.cpp" line="2005"/>
         <source>Failed to start the helper application: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7876,196 +7882,201 @@ Example:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="137"/>
+        <location filename="win32/spawn_win32.cpp" line="137"/>
         <source>This error typically happens because an antivirus has deleted critical files from Mod Organizer&apos;s installation folder or has made them generally inaccessible. Add an exclusion for Mod Organizer&apos;s installation folder in your antivirus, reinstall Mod Organizer and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="144"/>
+        <location filename="win32/spawn_win32.cpp" line="144"/>
         <source>This error typically happens because an antivirus is preventing Mod Organizer from starting programs. Add an exclusion for Mod Organizer&apos;s installation folder in your antivirus and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="149"/>
+        <location filename="win32/spawn_win32.cpp" line="149"/>
         <source>The file &apos;%1&apos; does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="153"/>
+        <location filename="win32/spawn_win32.cpp" line="153"/>
         <source>The working directory &apos;%1&apos; does not exist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="170"/>
-        <location filename="spawn.cpp" line="171"/>
-        <location filename="spawn.cpp" line="196"/>
-        <location filename="spawn.cpp" line="197"/>
+        <location filename="linux/spawn_linux.cpp" line="110"/>
+        <location filename="linux/spawn_linux.cpp" line="111"/>
+        <location filename="win32/spawn_win32.cpp" line="170"/>
+        <location filename="win32/spawn_win32.cpp" line="171"/>
+        <location filename="win32/spawn_win32.cpp" line="196"/>
+        <location filename="win32/spawn_win32.cpp" line="197"/>
         <source>Cannot start Steam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="173"/>
+        <location filename="linux/spawn_linux.cpp" line="113"/>
+        <location filename="win32/spawn_win32.cpp" line="173"/>
         <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="177"/>
-        <location filename="spawn.cpp" line="201"/>
-        <location filename="spawn.cpp" line="299"/>
+        <location filename="linux/spawn_linux.cpp" line="117"/>
+        <location filename="spawn.cpp" line="112"/>
+        <location filename="win32/spawn_win32.cpp" line="177"/>
+        <location filename="win32/spawn_win32.cpp" line="201"/>
         <source>Continue without starting Steam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="178"/>
-        <location filename="spawn.cpp" line="202"/>
+        <location filename="linux/spawn_linux.cpp" line="118"/>
+        <location filename="win32/spawn_win32.cpp" line="178"/>
+        <location filename="win32/spawn_win32.cpp" line="202"/>
         <source>The program may fail to launch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="212"/>
+        <location filename="spawn.cpp" line="61"/>
         <source>Cannot launch program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="214"/>
-        <location filename="spawn.cpp" line="238"/>
-        <location filename="spawn.cpp" line="256"/>
+        <location filename="spawn.cpp" line="63"/>
+        <location filename="spawn.cpp" line="87"/>
+        <location filename="win32/spawn_win32.cpp" line="216"/>
         <source>Cannot start %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="236"/>
+        <location filename="spawn.cpp" line="85"/>
         <source>Cannot launch helper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="254"/>
-        <location filename="spawn.cpp" line="309"/>
+        <location filename="spawn.cpp" line="122"/>
+        <location filename="win32/spawn_win32.cpp" line="214"/>
         <source>Elevation required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="258"/>
+        <location filename="win32/spawn_win32.cpp" line="218"/>
         <source>This program is requesting to run as administrator but Mod Organizer itself is not running as administrator. Running programs as administrator is typically unnecessary as long as the game and Mod Organizer have been installed outside &quot;Program Files&quot;.<byte value="xd"/>
 <byte value="xd"/>
 You can restart Mod Organizer as administrator and try launching the program again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="274"/>
-        <location filename="spawn.cpp" line="323"/>
+        <location filename="spawn.cpp" line="136"/>
+        <location filename="win32/spawn_win32.cpp" line="234"/>
         <source>Restart Mod Organizer as administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="275"/>
-        <location filename="spawn.cpp" line="324"/>
+        <location filename="spawn.cpp" line="137"/>
+        <location filename="win32/spawn_win32.cpp" line="235"/>
         <source>You must allow &quot;helper.exe&quot; to make changes to the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="287"/>
+        <location filename="spawn.cpp" line="100"/>
         <source>Launch Steam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="288"/>
+        <location filename="spawn.cpp" line="101"/>
         <source>This program requires Steam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="289"/>
+        <location filename="spawn.cpp" line="102"/>
         <source>Mod Organizer has detected that this program likely requires Steam to be running to function properly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="298"/>
+        <location filename="spawn.cpp" line="111"/>
         <source>Start Steam</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="300"/>
-        <location filename="spawn.cpp" line="326"/>
+        <location filename="spawn.cpp" line="113"/>
+        <location filename="spawn.cpp" line="139"/>
         <source>The program might fail to run.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="310"/>
+        <location filename="spawn.cpp" line="123"/>
         <source>Steam is running as administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="311"/>
+        <location filename="spawn.cpp" line="124"/>
         <source>Running Steam as administrator is typically unnecessary and can cause problems when Mod Organizer itself is not running as administrator.<byte value="xd"/>
 <byte value="xd"/>
 You can restart Mod Organizer as administrator and try launching the program again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="326"/>
-        <location filename="spawn.cpp" line="350"/>
-        <location filename="spawn.cpp" line="380"/>
+        <location filename="spawn.cpp" line="139"/>
+        <location filename="spawn.cpp" line="168"/>
+        <location filename="win32/spawn_win32.cpp" line="261"/>
         <source>Continue</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="336"/>
+        <location filename="win32/spawn_win32.cpp" line="247"/>
         <source>Event Log not running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="337"/>
+        <location filename="win32/spawn_win32.cpp" line="248"/>
         <source>The Event Log service is not running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="338"/>
+        <location filename="win32/spawn_win32.cpp" line="249"/>
         <source>The Windows Event Log service is not running. This can prevent USVFS from running properly and your mods may not be recognized by the program being launched.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="350"/>
-        <location filename="spawn.cpp" line="381"/>
+        <location filename="spawn.cpp" line="169"/>
+        <location filename="win32/spawn_win32.cpp" line="261"/>
         <source>Your mods might not work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="361"/>
+        <location filename="spawn.cpp" line="149"/>
         <source>Blacklisted program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="363"/>
+        <location filename="spawn.cpp" line="151"/>
         <source>The program %1 is blacklisted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="364"/>
+        <location filename="spawn.cpp" line="152"/>
         <source>The program you are attempting to launch is blacklisted in the virtual filesystem. This will likely prevent it from seeing any mods, INI files or any other virtualized files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="382"/>
+        <location filename="spawn.cpp" line="170"/>
         <source>Change the blacklist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="603"/>
+        <location filename="win32/spawn_win32.cpp" line="436"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="604"/>
+        <location filename="win32/spawn_win32.cpp" line="437"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="892"/>
+        <location filename="win32/spawn_win32.cpp" line="705"/>
         <source>Select binary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="spawn.cpp" line="893"/>
+        <location filename="win32/spawn_win32.cpp" line="706"/>
         <source>Binary</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8221,17 +8232,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SavesTab</name>
     <message>
-        <location filename="savestab.cpp" line="222"/>
+        <location filename="savestab.cpp" line="223"/>
         <source>%1 more</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="savestab.cpp" line="226"/>
+        <location filename="savestab.cpp" line="227"/>
         <source>Confirm</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="savestab.cpp" line="227"/>
+        <location filename="savestab.cpp" line="228"/>
         <source>Are you sure you want to remove the following %n save(s)?&lt;br&gt;&lt;ul&gt;%1&lt;/ul&gt;&lt;br&gt;Removed saves will be sent to the Recycle Bin.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -8239,12 +8250,12 @@ p, li { white-space: pre-wrap; }
         </translation>
     </message>
     <message>
-        <location filename="savestab.cpp" line="250"/>
+        <location filename="savestab.cpp" line="251"/>
         <source>Fix enabled mods...</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="savestab.cpp" line="265"/>
+        <location filename="savestab.cpp" line="266"/>
         <source>Delete %n save(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -8252,7 +8263,7 @@ p, li { white-space: pre-wrap; }
         </translation>
     </message>
     <message>
-        <location filename="savestab.cpp" line="270"/>
+        <location filename="savestab.cpp" line="271"/>
         <source>Open in Explorer...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9421,14 +9432,6 @@ On Windows XP:
     <message>
         <location filename="updatedialog.cpp" line="69"/>
         <source>Mod Organizer %1 is available.  The current version is %2.  Updating will not affect your mods or profiles.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UsvfsConnector</name>
-    <message>
-        <location filename="win32/usvfsconnector.cpp" line="201"/>
-        <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

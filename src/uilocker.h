@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <mutex>
 
+#ifdef __unix__
+#include "linux/compatibility.h"
+#endif
+
 class UILockerInterface;
 
 class UILocker

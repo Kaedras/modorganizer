@@ -50,7 +50,7 @@ bool Module::interesting() const
 HandlePtr Process::openHandleForWait() const
 {
   STUB();
-  return -1;
+  return HandlePtr{-1};
 }
 
 // whether this process can be accessed; fails if the current process doesn't
