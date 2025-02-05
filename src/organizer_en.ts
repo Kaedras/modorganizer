@@ -2611,47 +2611,47 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
 <context>
     <name>LogList</name>
     <message>
-        <location filename="loglist.cpp" line="250"/>
+        <location filename="loglist.cpp" line="256"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="253"/>
+        <location filename="loglist.cpp" line="259"/>
         <source>&amp;Copy all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="257"/>
+        <location filename="loglist.cpp" line="263"/>
         <source>C&amp;lear all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="260"/>
+        <location filename="loglist.cpp" line="266"/>
         <source>&amp;Open logs folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="264"/>
+        <location filename="loglist.cpp" line="270"/>
         <source>&amp;Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="284"/>
+        <location filename="loglist.cpp" line="290"/>
         <source>&amp;Debug</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="285"/>
+        <location filename="loglist.cpp" line="291"/>
         <source>&amp;Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="286"/>
+        <location filename="loglist.cpp" line="292"/>
         <source>&amp;Warnings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="287"/>
+        <location filename="loglist.cpp" line="293"/>
         <source>&amp;Errors</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7295,7 +7295,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="384"/>
+        <location filename="loglist.cpp" line="390"/>
         <location filename="loot.cpp" line="214"/>
         <location filename="organizercore.cpp" line="396"/>
         <location filename="settingsdialogdiagnostics.cpp" line="40"/>
@@ -7306,7 +7306,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loglist.cpp" line="385"/>
+        <location filename="loglist.cpp" line="391"/>
         <location filename="organizercore.cpp" line="397"/>
         <source>Failed to create &quot;%1&quot;. Your user account probably lacks permission.</source>
         <translation type="unfinished"></translation>
@@ -7399,13 +7399,13 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/main.cpp" line="67"/>
+        <location filename="linux/main.cpp" line="70"/>
         <location filename="win32/main.cpp" line="63"/>
         <source>Mod Organizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/main.cpp" line="68"/>
+        <location filename="linux/main.cpp" line="71"/>
         <location filename="win32/main.cpp" line="64"/>
         <source>An instance of Mod Organizer is already running</source>
         <translation type="unfinished"></translation>
@@ -9432,6 +9432,14 @@ On Windows XP:
     <message>
         <location filename="updatedialog.cpp" line="69"/>
         <source>Mod Organizer %1 is available.  The current version is %2.  Updating will not affect your mods or profiles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UsvfsConnector</name>
+    <message>
+        <location filename="win32/usvfsconnector.cpp" line="201"/>
+        <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -22,6 +22,12 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "env.h"
 #include "organizercore.h"
 
+#ifdef __unix__
+static constexpr const char* userEnvVariable = "USER";
+#else
+static constexpr const char* userEnvVariable = "USERNAME";
+#endif
+
 using namespace MOBase;
 
 static LogModel* g_instance = nullptr;
@@ -368,9 +374,9 @@ void initLogging()
     LogModel::instance().add(e);
   });
 
-  log::getDefault().addToBlacklist(std::string("\\") + getenv("USERNAME"),
+  log::getDefault().addToBlacklist(std::string("\\") + getenv(userEnvVariable),
                                    "\\USERNAME");
-  log::getDefault().addToBlacklist(std::string("/") + getenv("USERNAME"), "/USERNAME");
+  log::getDefault().addToBlacklist(std::string("/") + getenv(userEnvVariable), "/USERNAME");
 
   qInstallMessageHandler(qtLogCallback);
 }
