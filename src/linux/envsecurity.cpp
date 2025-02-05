@@ -4,6 +4,7 @@
 #include "envmodule.h"
 #include <log.h>
 #include <utility.h>
+#include "stub.h"
 
 namespace env
 {

@@ -324,7 +324,7 @@ void Instance::getProfile(const Settings& s)
   }
 
   // profile missing from ini, use the default
-  m_profile = QString::fromStdWString(AppConfig::defaultProfileName());
+  m_profile = AppConfig::defaultProfileName();
 
   log::warn("no profile found in ini {}, using default '{}'", iniPath(), m_profile);
 }
@@ -412,8 +412,8 @@ std::vector<Instance::Object> Instance::objectsForDeletion() const
       settings.paths().cache(),
       settings.paths().profiles(),
       settings.paths().overwrite(),
-      QDir(m_dir).filePath(QString::fromStdWString(AppConfig::dumpsDir())),
-      QDir(m_dir).filePath(QString::fromStdWString(AppConfig::logPath())),
+      QDir(m_dir).filePath(AppConfig::dumpsDir()),
+      QDir(m_dir).filePath(AppConfig::logPath()),
   };
 
   // all the files that are part of an instance
@@ -560,7 +560,7 @@ QString InstanceManager::globalInstancesRootPath() const
 
 QString InstanceManager::iniPath(const QString& instanceDir) const
 {
-  return QDir(instanceDir).filePath(QString::fromStdWString(AppConfig::iniFileName()));
+  return QDir(instanceDir).filePath(AppConfig::iniFileName());
 }
 
 std::vector<QString> InstanceManager::globalInstancePaths() const
@@ -596,13 +596,13 @@ QString InstanceManager::portablePath() const
 bool InstanceManager::portableInstanceExists() const
 {
   return QFile::exists(qApp->applicationDirPath() + "/" +
-                       QString::fromStdWString(AppConfig::iniFileName()));
+                       AppConfig::iniFileName());
 }
 
 bool InstanceManager::allowedToChangeInstance() const
 {
   const auto lockFile = qApp->applicationDirPath() + "/" +
-                        QString::fromStdWString(AppConfig::portableLockFileName());
+                        AppConfig::portableLockFileName();
 
   return !QFile::exists(lockFile);
 }

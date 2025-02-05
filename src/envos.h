@@ -59,6 +59,8 @@ public:
   virtual QString toString() const = 0;
 };
 
+OsInfo* CreateInfo();
+
 }  // namespace env
 
 #endif  // ENV_OS_H

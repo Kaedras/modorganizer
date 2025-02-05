@@ -7,7 +7,7 @@
 
 #include <QAbstractItemModel>
 #include <QTimer>
-#include <unordered_set>
+#include <QSet>
 
 class OrganizerCore;
 
@@ -127,13 +127,13 @@ private:
   void removeDisappearingDirectories(FileTreeItem& parentItem,
                                      const MOShared::DirectoryEntry& parentEntry,
                                      const QString& parentPath,
-                                     std::unordered_set<QStringView>& seen,
+                                     QSet<QString>& seen,
                                      bool forFetching);
 
   bool addNewDirectories(FileTreeItem& parentItem,
                          const MOShared::DirectoryEntry& parentEntry,
                          const QString& parentPath,
-                         const std::unordered_set<QStringView>& seen);
+                         const QSet<QString>& seen);
 
   bool updateFiles(FileTreeItem& parentItem, const QString& path,
                    const MOShared::DirectoryEntry& parentEntry);

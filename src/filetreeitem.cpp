@@ -3,6 +3,7 @@
 #include "modinfo.h"
 #include "modinfodialogfwd.h"
 #include "shared/util.h"
+#include <QMimeDatabase>
 #include <log.h>
 #include <utility.h>
 
@@ -15,22 +16,12 @@ constexpr bool AlwaysSortDirectoriesFirst = true;
 const QString& directoryFileType()
 {
   static const QString name = [] {
-    const DWORD flags = SHGFI_TYPENAME;
-    SHFILEINFOW sfi   = {};
-
+    // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase every time you need to perform a lookup.
+    QMimeDatabase db;
     // "." for the current directory, which should always exist
-    const auto r = SHGetFileInfoW(L".", 0, &sfi, sizeof(sfi), flags);
+    QMimeType mimeType = db.mimeTypeForFile(QFileInfo("."));
 
-    if (!r) {
-      const auto e = GetLastError();
-
-      log::error("SHGetFileInfoW failed for folder file type, {}",
-                 formatSystemMessage(e));
-
-      return QString("File folder");
-    } else {
-      return QString::fromWCharArray(sfi.szTypeName);
-    }
+    return mimeType.comment();
   }();
 
   return name;
@@ -39,84 +30,57 @@ const QString& directoryFileType()
 const QString& cachedFileTypeNoExtension()
 {
   static const QString name = [] {
-    const DWORD flags = SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES;
-    SHFILEINFOW sfi   = {};
-
+    // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase every time you need to perform a lookup.
+    QMimeDatabase db;
     // dummy filename with no extension
-    const auto r = SHGetFileInfoW(L"file", 0, &sfi, sizeof(sfi), flags);
+    QMimeType mimeType = db.mimeTypeForFile(QFileInfo("file"));
 
-    if (!r) {
-      const auto e = GetLastError();
-
-      log::error("SHGetFileInfoW failed for file without extension, {}",
-                 formatSystemMessage(e));
-
-      return QString("File");
-    } else {
-      return QString::fromWCharArray(sfi.szTypeName);
-    }
+    return mimeType.comment();
   }();
 
   return name;
 }
 
-const QString& cachedFileType(const std::wstring& file, bool isOnFilesystem)
+const QString& cachedFileType(const QString& file, bool isOnFilesystem)
 {
-  static std::map<std::wstring, QString, std::less<>> map;
+  static std::map<QString, QString, std::less<>> map;
   static std::mutex mutex;
 
-  const auto dot = file.find_last_of(L'.');
-  if (dot == std::wstring::npos) {
+  QFileInfo info(file);
+  const auto ext = info.suffix();
+
+  if (ext.isEmpty()) {
     return cachedFileTypeNoExtension();
   }
 
   std::scoped_lock lock(mutex);
-  const auto sv = std::wstring_view(file.c_str() + dot, file.size() - dot);
 
-  auto itor = map.find(sv);
+  auto itor = map.find(ext);
   if (itor != map.end()) {
     return itor->second;
   }
+  // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase every time you need to perform a lookup.
+  QMimeDatabase db;
+  QMimeType mimeType = db.mimeTypeForFile(info);
 
-  DWORD flags = SHGFI_TYPENAME;
+  QString s = mimeType.comment();
 
-  if (!isOnFilesystem) {
-    // files from archives are not on the filesystem; this flag forces
-    // SHGetFileInfoW() to only work with the filename
-    flags |= SHGFI_USEFILEATTRIBUTES;
-  }
-
-  SHFILEINFOW sfi = {};
-  const auto r    = SHGetFileInfoW(file.c_str(), 0, &sfi, sizeof(sfi), flags);
-
-  QString s;
-
-  if (!r) {
-    const auto e = GetLastError();
-
-    log::error("SHGetFileInfoW failed for '{}', {}", file, formatSystemMessage(e));
-
-    s = cachedFileTypeNoExtension();
-  } else {
-    s = QString::fromWCharArray(sfi.szTypeName);
-  }
-
-  return map.emplace(sv, s).first->second;
+  return map.emplace(ext, s).first->second;
 }
 
 FileTreeItem::FileTreeItem(FileTreeModel* model, FileTreeItem* parent,
-                           std::wstring dataRelativeParentPath, bool isDirectory,
-                           std::wstring file)
+                           QString dataRelativeParentPath, bool isDirectory,
+                           QString file)
     : m_model(model), m_parent(parent), m_indexGuess(NoIndexGuess),
-      m_virtualParentPath(QString::fromStdWString(dataRelativeParentPath)),
-      m_wsFile(file), m_wsLcFile(ToLowerCopy(file)), m_key(m_wsLcFile),
-      m_file(QString::fromStdWString(file)), m_isDirectory(isDirectory), m_originID(-1),
+      m_virtualParentPath(dataRelativeParentPath),
+      m_wsFile(file), m_wsLcFile(file.toLower()), m_key(m_wsLcFile),
+      m_file(file), m_isDirectory(isDirectory), m_originID(-1),
       m_flags(NoFlags), m_loaded(false), m_expanded(false), m_sortingStale(true)
 {}
 
 FileTreeItem::Ptr FileTreeItem::createFile(FileTreeModel* model, FileTreeItem* parent,
-                                           std::wstring dataRelativeParentPath,
-                                           std::wstring file)
+                                           QString dataRelativeParentPath,
+                                           QString file)
 {
   return std::unique_ptr<FileTreeItem>(new FileTreeItem(
       model, parent, std::move(dataRelativeParentPath), false, std::move(file)));
@@ -124,21 +88,21 @@ FileTreeItem::Ptr FileTreeItem::createFile(FileTreeModel* model, FileTreeItem* p
 
 FileTreeItem::Ptr FileTreeItem::createDirectory(FileTreeModel* model,
                                                 FileTreeItem* parent,
-                                                std::wstring dataRelativeParentPath,
-                                                std::wstring file)
+                                                QString dataRelativeParentPath,
+                                                QString file)
 {
   return std::unique_ptr<FileTreeItem>(new FileTreeItem(
       model, parent, std::move(dataRelativeParentPath), true, std::move(file)));
 }
 
-void FileTreeItem::setOrigin(int originID, const std::wstring& realPath, Flags flags,
-                             const std::wstring& mod)
+void FileTreeItem::setOrigin(int originID, const QString& realPath, Flags flags,
+                             const QString& mod)
 {
   m_originID   = originID;
-  m_wsRealPath = realPath;
-  m_realPath   = QString::fromStdWString(realPath);
+  m_realPath   = realPath;
+  m_realPath   = realPath;
   m_flags      = flags;
-  m_mod        = QString::fromStdWString(mod);
+  m_mod        = mod;
 
   m_fileSize.reset();
   m_lastModified.reset();
@@ -324,7 +288,7 @@ std::optional<uint64_t> FileTreeItem::fileSize() const
 {
   if (m_fileSize.empty() && !m_isDirectory) {
     std::error_code ec;
-    const auto size = fs::file_size(fs::path(m_wsRealPath), ec);
+    const auto size = fs::file_size(fs::path(m_realPath.toStdWString()), ec);
 
     if (ec) {
       log::error("can't get file size for '{}', {}", m_realPath, ec.message());
@@ -379,7 +343,7 @@ void FileTreeItem::getFileType() const
     return;
   }
 
-  const auto& t = cachedFileType(m_wsRealPath, !isFromArchive());
+  const auto& t = cachedFileType(m_realPath, !isFromArchive());
   if (t.isEmpty()) {
     m_fileType.fail();
   } else {

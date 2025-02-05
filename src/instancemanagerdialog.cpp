@@ -8,9 +8,14 @@
 #include "shared/appconfig.h"
 #include "shared/util.h"
 #include "ui_instancemanagerdialog.h"
+
 #include <iplugingame.h>
 #include <report.h>
 #include <utility.h>
+
+#ifdef __unix__
+#include "linux/compatibility.h"
+#endif
 
 using namespace MOBase;
 

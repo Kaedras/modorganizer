@@ -113,19 +113,19 @@ Directory getFilesAndDirs(const QString& path)
 
   env::forEachEntry(
       path, &cx,
-      [](void* pcx, QString path) {
+      [](void* pcx, const QString& path) {
         Context* cx = static_cast<Context*>(pcx);
 
         cx->current.top()->dirs.push_back(Directory(path));
         cx->current.push(&cx->current.top()->dirs.back());
       },
 
-      [](void* pcx, [[maybe_unused]] QString path) {
+      [](void* pcx, [[maybe_unused]] const QString& path) {
         Context* cx = (Context*)pcx;
         cx->current.pop();
       },
 
-      [](void* pcx, QString path, QDateTime ft, qint64 s) {
+      [](void* pcx, const QString& path, QDateTime ft, uint64_t s) {
         Context* cx = (Context*)pcx;
 
         cx->current.top()->files.push_back(File(path, ft, s));
@@ -134,13 +134,13 @@ Directory getFilesAndDirs(const QString& path)
   return root;
 }
 
-File::File(QString n, QDateTime ft, qint64 s)
+File::File(const QString& n, QDateTime ft, uint64_t s)
   : name(n), lcname(n.toLower()), lastModified(ft),
     size(s) {}
 
 Directory::Directory() {}
 
-Directory::Directory(QString n)
+Directory::Directory(const QString& n)
   : name(n), lcname(n.toLower()) {}
 
 void getFilesAndDirsWithFindImpl(const std::filesystem::path& path, Directory& d)

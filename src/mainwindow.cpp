@@ -77,7 +77,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <uibase/tutorialmanager.h>
 #include <uibase/utility.h>
 #include <uibase/versioninfo.h>
-#include <usvfs/usvfs.h>
 
 #include "directoryrefresher.h"
 #include "shared/directoryentry.h"
@@ -104,7 +103,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QEvent>
-#include <QFIleIconProvider>
+#include <QFileIconProvider>
 #include <QFileDialog>
 #include <QFont>
 #include <QFuture>
@@ -163,8 +162,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/thread.hpp>
 #endif
 
-#include <shlobj.h>
-
 #include <exception>
 #include <functional>
 #include <limits.h>
@@ -179,6 +176,21 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef TEST_MODELS
 #include "modeltest.h"
 #endif  // TEST_MODELS
+
+#ifdef __unix__
+#include <overlayfs/overlayfs.h>
+inline QString formatSystemMessageToQString(int e)
+{
+  return QString::fromLocal8Bit(strerror(e));
+}
+#else
+#include <usvfs/usvfs.h>
+#include <shlobj.h>
+inline QString formatSystemMessageToQString(int e)
+{
+  return QString::fromStdWString(formatSystemMessage(e));
+}
+#endif
 
 #pragma warning(disable : 4428)
 
@@ -979,7 +991,7 @@ void MainWindow::updateProblemsButton()
 bool MainWindow::errorReported(QString& logFile)
 {
   QDir dir(qApp->property("dataPath").toString() + "/" +
-           QString::fromStdWString(AppConfig::logPath()));
+           AppConfig::logPath());
   QFileInfoList files =
       dir.entryInfoList(QStringList("ModOrganizer_??_??_??_??_??.log"), QDir::Files,
                         QDir::Name | QDir::Reversed);
@@ -1240,7 +1252,7 @@ void MainWindow::showEvent(QShowEvent* event)
     hookUpWindowTutorials();
 
     if (m_OrganizerCore.settings().firstStart()) {
-      QString firstStepsTutorial = ToQString(AppConfig::firstStepsTutorial());
+      QString firstStepsTutorial = AppConfig::firstStepsTutorial();
       if (TutorialManager::instance().hasTutorial(firstStepsTutorial)) {
         if (shouldStartTutorial()) {
           TutorialManager::instance().activateTutorial("MainWindow",
@@ -1887,8 +1899,8 @@ void MainWindow::refreshExecutablesList()
   ui->executablesListBox->setEnabled(true);
 }
 
-static bool BySortValue(const std::pair<UINT32, QTreeWidgetItem*>& LHS,
-                        const std::pair<UINT32, QTreeWidgetItem*>& RHS)
+static bool BySortValue(const std::pair<uint32_t, QTreeWidgetItem*>& LHS,
+                        const std::pair<uint32_t, QTreeWidgetItem*>& RHS)
 {
   return LHS.first < RHS.first;
 }
@@ -1909,7 +1921,7 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
   m_DefaultArchives = defaultArchives;
   ui->bsaList->clear();
   ui->bsaList->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-  std::vector<std::pair<UINT32, QTreeWidgetItem*>> items;
+  std::vector<std::pair<uint32_t, QTreeWidgetItem*>> items;
 
   auto invalidation = m_OrganizerCore.gameFeatures().gameFeature<BSAInvalidation>();
   std::vector<FileEntryPtr> files = m_OrganizerCore.directoryStructure()->getFiles();
@@ -1935,7 +1947,7 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
   };
 
   for (FileEntryPtr current : files) {
-    QFileInfo fileInfo(ToQString(current->getName().c_str()));
+    QFileInfo fileInfo(current->getName());
 
     if (fileInfo.suffix().toLower() == "bsa" || fileInfo.suffix().toLower() == "ba2") {
       int index = activeArchives.indexOf(fileInfo.fileName());
@@ -1955,7 +1967,7 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
           m_OrganizerCore.directoryStructure()->getOriginByID(originId);
 
       QTreeWidgetItem* newItem = new QTreeWidgetItem(
-          QStringList() << fileInfo.fileName() << ToQString(origin.getName()));
+          QStringList() << fileInfo.fileName() << origin.getName());
       newItem->setData(0, Qt::UserRole, index);
       newItem->setData(1, Qt::UserRole, originId);
       newItem->setFlags(newItem->flags() &
@@ -1980,7 +1992,7 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
       if (index < 0)
         index = 0;
 
-      UINT32 sortValue = ((origin.getPriority() & 0xFFFF) << 16) | (index & 0xFFFF);
+      uint32_t sortValue = ((origin.getPriority() & 0xFFFF) << 16) | (index & 0xFFFF);
       items.push_back(std::make_pair(sortValue, newItem));
     }
   }
@@ -1993,7 +2005,7 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
         m_OrganizerCore.directoryStructure()->getOriginByID(originID);
 
     QString modName;
-    const unsigned int modIndex = ModInfo::getIndex(ToQString(origin.getName()));
+    const unsigned int modIndex = ModInfo::getIndex(origin.getName());
 
     if (modIndex == UINT_MAX) {
       modName = UnmanagedModName();
@@ -2468,10 +2480,10 @@ void MainWindow::modRenamed(const QString& oldName, const QString& newName)
 
   // also fix the directory structure
   try {
-    if (m_OrganizerCore.directoryStructure()->originExists(ToWString(oldName))) {
+    if (m_OrganizerCore.directoryStructure()->originExists(oldName)) {
       FilesOrigin& origin =
-          m_OrganizerCore.directoryStructure()->getOriginByName(ToWString(oldName));
-      origin.setName(ToWString(newName));
+          m_OrganizerCore.directoryStructure()->getOriginByName(oldName);
+      origin.setName(newName);
     } else {
     }
   } catch (const std::exception& e) {
@@ -2483,25 +2495,24 @@ void MainWindow::fileMoved(const QString& filePath, const QString& oldOriginName
                            const QString& newOriginName)
 {
   const FileEntryPtr filePtr =
-      m_OrganizerCore.directoryStructure()->findFile(ToWString(filePath));
+      m_OrganizerCore.directoryStructure()->findFile(filePath);
   if (filePtr.get() != nullptr) {
     try {
       if (m_OrganizerCore.directoryStructure()->originExists(
-              ToWString(newOriginName))) {
+              newOriginName)) {
         FilesOrigin& newOrigin = m_OrganizerCore.directoryStructure()->getOriginByName(
-            ToWString(newOriginName));
+            newOriginName);
 
-        QString fullNewPath = ToQString(newOrigin.getPath()) + "\\" + filePath;
-        WIN32_FIND_DATAW findData;
-        HANDLE hFind;
-        hFind = ::FindFirstFileW(ToWString(fullNewPath).c_str(), &findData);
-        filePtr->addOrigin(newOrigin.getID(), findData.ftCreationTime, L"", -1);
-        FindClose(hFind);
+        QString fullNewPath = newOrigin.getPath() + "/" + filePath;
+        // TODO: check if the result differs with this implementation
+        QFileInfo fileInfo(fullNewPath);
+
+        filePtr->addOrigin(newOrigin.getID(), fileInfo.birthTime(), "", -1);
       }
       if (m_OrganizerCore.directoryStructure()->originExists(
-              ToWString(oldOriginName))) {
+              oldOriginName)) {
         FilesOrigin& oldOrigin = m_OrganizerCore.directoryStructure()->getOriginByName(
-            ToWString(oldOriginName));
+            oldOriginName);
         filePtr->removeOrigin(oldOrigin.getID());
       }
     } catch (const std::exception& e) {
@@ -2582,14 +2593,14 @@ void MainWindow::openInstallFolder()
 void MainWindow::openPluginsFolder()
 {
   QString pluginsPath =
-      QCoreApplication::applicationDirPath() + "/" + ToQString(AppConfig::pluginPath());
+      QCoreApplication::applicationDirPath() + "/" + AppConfig::pluginPath();
   shell::Explore(pluginsPath);
 }
 
 void MainWindow::openStylesheetsFolder()
 {
   QString ssPath = QCoreApplication::applicationDirPath() + "/" +
-                   ToQString(AppConfig::stylesheetsPath());
+                   AppConfig::stylesheetsPath();
   shell::Explore(ssPath);
 }
 
@@ -2887,7 +2898,7 @@ void MainWindow::languageChange(const QString& newLanguage)
 
   installTranslator("qt");
   installTranslator("qtbase");
-  installTranslator(ToQString(AppConfig::translationPrefix()));
+  installTranslator(AppConfig::translationPrefix());
   installTranslator("uibase");
 
   // TODO: this will probably be changed once extension come out
@@ -3594,14 +3605,14 @@ void MainWindow::extractBSATriggered(QTreeWidgetItem* item)
         archives.append(item->child(i)->text(0));
       }
       origin = QDir::fromNativeSeparators(
-          ToQString(m_OrganizerCore.directoryStructure()
-                        ->getOriginByName(ToWString(item->text(0)))
-                        .getPath()));
+          m_OrganizerCore.directoryStructure()
+                        ->getOriginByName(item->text(0))
+                        .getPath());
     } else {
       origin = QDir::fromNativeSeparators(
-          ToQString(m_OrganizerCore.directoryStructure()
-                        ->getOriginByName(ToWString(item->text(1)))
-                        .getPath()));
+          m_OrganizerCore.directoryStructure()
+                        ->getOriginByName(item->text(1))
+                        .getPath());
       archives = QStringList({item->text(0)});
     }
 
@@ -3807,15 +3818,27 @@ void MainWindow::on_restoreButton_clicked()
   if (!choice.isEmpty()) {
     QString loadOrderName = m_OrganizerCore.currentProfile()->getLoadOrderFileName();
     QString lockedName    = m_OrganizerCore.currentProfile()->getLockedOrderFileName();
-    if (!shellCopy(pluginName + "." + choice, pluginName, true, this) ||
-        !shellCopy(loadOrderName + "." + choice, loadOrderName, true, this) ||
-        !shellCopy(lockedName + "." + choice, lockedName, true, this)) {
 
-      const auto e = GetLastError();
+    using FileError = QFileDevice::FileError;
+
+    auto r1 = shellCopy(pluginName + "." + choice, pluginName, true, this);
+    auto r2 = shellCopy(loadOrderName + "." + choice, loadOrderName, true, this);
+    auto r3 = shellCopy(lockedName + "." + choice, lockedName, true, this);
+
+    if (r1 != FileError::NoError || r2 != FileError::NoError || r3 != FileError::NoError) {
+
+      QFileDevice::FileError e;
+      if (!(bool)r1) {
+        e = r1;
+      } else if (!(bool)r2) {
+        e = r2;
+      } else {
+        e = r3;
+      }
 
       QMessageBox::critical(this, tr("Restore failed"),
                             tr("Failed to restore the backup. Errorcode: %1")
-                                .arg(QString::fromStdWString(formatSystemMessage(e))));
+                                .arg(formatSystemMessageToQString(e)));
     }
     m_OrganizerCore.refreshESPList(true);
   }
@@ -3835,11 +3858,11 @@ void MainWindow::on_restoreModsButton_clicked()
   QString modlistName = m_OrganizerCore.currentProfile()->getModlistFileName();
   QString choice      = queryRestore(modlistName);
   if (!choice.isEmpty()) {
-    if (!shellCopy(modlistName + "." + choice, modlistName, true, this)) {
-      const auto e = GetLastError();
+    auto e = shellCopy(modlistName + "." + choice, modlistName, true, this);
+    if (e != QFileDevice::FileError::NoError) {
       QMessageBox::critical(this, tr("Restore failed"),
                             tr("Failed to restore the backup. Errorcode: %1")
-                                .arg(formatSystemMessage(e)));
+                                .arg(formatSystemMessageToQString(e)));
     }
     m_OrganizerCore.refresh(false);
   }
@@ -3925,15 +3948,14 @@ void MainWindow::dropLocalFile(const QUrl& url, const QString& outputDir, bool m
     }
   }
 
-  bool success = false;
+  QFileDevice::FileError success = QFileDevice::FileError::NoError;
   if (move) {
     success = shellMove(file.absoluteFilePath(), target, true, this);
   } else {
     success = shellCopy(file.absoluteFilePath(), target, true, this);
   }
-  if (!success) {
-    const auto e = GetLastError();
-    log::error("file operation failed: {}", formatSystemMessage(e));
+  if (success != QFileDevice::FileError::NoError) {
+    log::error("file operation failed: {}", shell::formatError(success));
   }
 }
 

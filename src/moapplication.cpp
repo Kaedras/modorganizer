@@ -37,7 +37,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFile>
 #include <QPainter>
 #include <QProxyStyle>
-#include <QSSLSocket>
+#include <QSslSocket>
 #include <QStringList>
 #include <QStyleFactory>
 #include <QStyleOption>
@@ -200,7 +200,7 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
     return 1;
   }
 
-  log::debug("command line: '{}'", QString::fromWCharArray(GetCommandLineW()));
+  log::debug("command line: '{}'", QApplication::arguments().join(' '));
 
   log::info("starting Mod Organizer version {} revision {} in {}, usvfs: {}",
             createVersionInfo().string(), GITID, QCoreApplication::applicationDirPath(),
@@ -326,7 +326,7 @@ int MOApplication::run(MOMultiProcess& multiProcess)
   // tutorials
   log::debug("initializing tutorials");
   TutorialManager::init(qApp->applicationDirPath() + "/" +
-                            QString::fromStdWString(AppConfig::tutorialsPath()) + "/",
+                            AppConfig::tutorialsPath() + "/",
                         m_core.get());
 
   // styling
@@ -500,7 +500,7 @@ void MOApplication::purgeOldFiles()
 
   // cycle log file
   removeOldFiles(qApp->property("dataPath").toString() + "/" +
-                     QString::fromStdWString(AppConfig::logPath()),
+                     AppConfig::logPath(),
                  "usvfs*.log", 5, QDir::Name);
 }
 
@@ -533,7 +533,7 @@ bool MOApplication::setStyleFile(const QString& styleName)
   // set new stylesheet or clear it
   if (styleName.length() != 0) {
     QString styleSheetName = applicationDirPath() + "/" +
-                             MOBase::ToQString(AppConfig::stylesheetsPath()) + "/" +
+                             AppConfig::stylesheetsPath() + "/" +
                              styleName;
     if (QFile::exists(styleSheetName)) {
       m_styleWatcher.addPath(styleSheetName);

@@ -239,7 +239,7 @@ void LogList::clear()
 void LogList::openLogsFolder()
 {
   QString logsPath = qApp->property("dataPath").toString() + "/" +
-                     QString::fromStdWString(AppConfig::logPath());
+                     AppConfig::logPath();
   shell::Explore(logsPath);
 }
 
@@ -375,10 +375,10 @@ void initLogging()
   qInstallMessageHandler(qtLogCallback);
 }
 
-bool createAndMakeWritable(const std::wstring& subPath)
+bool createAndMakeWritable(const QString& subPath)
 {
   QString const dataPath = qApp->property("dataPath").toString();
-  QString fullPath       = dataPath + "/" + QString::fromStdWString(subPath);
+  QString fullPath       = dataPath + "/" + subPath;
 
   if (!QDir(fullPath).exists() && !QDir().mkdir(fullPath)) {
     QMessageBox::critical(nullptr, QObject::tr("Error"),
@@ -393,8 +393,8 @@ bool createAndMakeWritable(const std::wstring& subPath)
 
 bool setLogDirectory(const QString& dir)
 {
-  const auto logFile = dir + "/" + QString::fromStdWString(AppConfig::logPath()) + "/" +
-                       QString::fromStdWString(AppConfig::logFileName());
+  const auto logFile = dir + "/" + AppConfig::logPath() + "/" +
+                       AppConfig::logFileName();
 
   if (!createAndMakeWritable(AppConfig::logPath())) {
     return false;

@@ -50,15 +50,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTextDocument>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <Shellapi.h>
-
-#include <boost/assign.hpp>
-#include <boost/scoped_ptr.hpp>
-
 #include "archivefiletree.h"
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace std::chrono_literals;
 
 InstallationResult::InstallationResult(IPluginInstaller::EInstallResult result)
     : m_result(result), m_name(), m_iniTweaks(false), m_backup(false), m_merged(false),
@@ -134,9 +130,9 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
 
   // Callback for errors:
   QString errorMessage;
-  auto errorCallback = [&errorMessage, this](std::wstring const& message) {
+  auto errorCallback = [&errorMessage, this](QString const& message) {
     m_ArchiveHandler->cancel();
-    errorMessage = QString::fromStdWString(message);
+    errorMessage = message;
   };
 
   // The future that will hold the result:
@@ -200,11 +196,11 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
       }
     };
     Archive::FileChangeCallback fileChangeCallback =
-        [this, &currentFileName, &mutex](auto changeType, std::wstring const& file) {
+        [this, &currentFileName, &mutex](auto changeType, std::filesystem::path const& file) {
           if (changeType == Archive::FileChangeType::EXTRACTION_START) {
             {
               std::scoped_lock guard(mutex);
-              currentFileName = QString::fromStdWString(file);
+              currentFileName = QFileInfo(file).fileName();;
             }
             emit progressUpdate();
           }
@@ -434,9 +430,9 @@ InstallationResult InstallationManager::testOverwrite(GuessedValue<QString>& mod
         // remove the directory with all content, then recreate it empty
         shellDelete(QStringList(targetDirectory));
         if (!QDir().mkdir(targetDirectory)) {
-          // windows may keep the directory around for a moment, preventing its
+          // the os may keep the directory around for a moment, preventing its
           // re-creation. Not sure if this still happens with shellDelete
-          Sleep(100);
+          std::this_thread::sleep_for(100ms);
           QDir().mkdir(targetDirectory);
         }
         // restore the saved settings
@@ -726,7 +722,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
   // open the archive and construct the directory tree the installers work on
 
   bool archiveOpen =
-      m_ArchiveHandler->open(fileName.toStdWString(), [this]() -> std::wstring {
+      m_ArchiveHandler->open(QFileInfo(fileName).filesystemFilePath(), [this]() -> QString {
         m_Password = QString();
 
         // Note: If we are not in the Qt event thread, we cannot use queryPassword()
@@ -739,7 +735,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
         } else {
           queryPassword();
         }
-        return m_Password.toStdWString();
+        return m_Password;
       });
   if (!archiveOpen) {
     log::debug("integrated archiver can't open {}: {} ({})", fileName,

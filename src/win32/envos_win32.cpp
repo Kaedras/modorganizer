@@ -279,4 +279,9 @@ std::optional<bool> WindowsInfo::getElevated() const
   return (e.TokenIsElevated != 0);
 }
 
+OsInfo* CreateInfo()
+{
+  return new WindowsInfo();
+}
+
 }  // namespace env

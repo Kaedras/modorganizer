@@ -762,36 +762,38 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
                          directoryStructure.getOriginByID(originid).getPath()))
                      .arg(esp.name);
 
-      HANDLE file =
-          ::CreateFile(ToWString(fileName).c_str(), GENERIC_READ | GENERIC_WRITE, 0,
-                       nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-      if (file == INVALID_HANDLE_VALUE) {
-        if (::GetLastError() == ERROR_SHARING_VIOLATION) {
+      QFile file(fileName);
+      QLockFile lockFile(fileName);
+      if (!lockFile.tryLock()) {
           // file is locked, probably the game is running
           return false;
-        } else {
-          throw os_error(
-              QObject::tr("failed to access %1").arg(fileName).toUtf8().constData());
-        }
+      }
+      lockFile.unlock();
+      if (!file.isOpen()) {
+        throw std::runtime_error(
+              QObject::tr("failed to access %1: %2").arg(fileName, file.errorString()).toUtf8().constData());
       }
 
-      ULONGLONG temp = 0;
-      temp           = (145731ULL + esp.priority) * 24 * 60 * 60 * 10000000ULL;
+      // TODO: check if the calculation is correct
+      uint64_t temp = (145731ULL + esp.priority) * 24 * 60 * 60 * 10000000ULL;
 
-      FILETIME newWriteTime;
+      // QDateTime uses the epoch starting from January 1, 1970
+      // FILETIME uses the epoch starting from January 1, 1601
+      // There are 11644473600 seconds between these two dates
+      const uint64_t epochDifference = 116444736000000000ULL; // 11644473600 seconds in 100-nanosecond intervals
 
-      newWriteTime.dwLowDateTime  = (DWORD)(temp & 0xFFFFFFFF);
-      newWriteTime.dwHighDateTime = (DWORD)(temp >> 32);
-      esp.time                    = newWriteTime;
+      QDateTime newWriteTime = QDateTime::fromMSecsSinceEpoch((temp - epochDifference) / 10'000);
+
+      esp.time = newWriteTime;
       fileEntry->setFileTime(newWriteTime);
-      if (!::SetFileTime(file, nullptr, nullptr, &newWriteTime)) {
-        throw os_error(QObject::tr("failed to set file time %1")
+      bool result = file.setFileTime(newWriteTime, QFileDevice::FileModificationTime);
+      if (!result) {
+        throw std::runtime_error(QObject::tr("failed to set file time %1: %2")
                                 .arg(fileName)
+                                .arg(file.errorString())
                                 .toUtf8()
                                 .constData());
       }
-
-      CloseHandle(file);
     }
   }
   return true;

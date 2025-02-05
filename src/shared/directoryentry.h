@@ -268,7 +268,7 @@ private:
   static void onDirectoryEnd(Context* cx, const QString& path);
   static void onFile(Context* cx, const QString& path, QDateTime ft);
 
-  void dump(std::FILE* f, const QString& parentPath) const;
+  void dump(QFile* f, const QString& parentPath) const;
 };
 
 }  // namespace MOShared

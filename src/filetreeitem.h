@@ -232,7 +232,6 @@ private:
 
   int m_originID;
   QString m_realPath;
-  QString m_wsRealPath;
   Flags m_flags;
   QString m_mod;
 

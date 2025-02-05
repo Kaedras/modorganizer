@@ -20,8 +20,17 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef UTIL_H
 #define UTIL_H
 
-#ifdef __WIN32
+#ifdef __unix__
+inline QString NativeToQString(const std::string& str)
+{
+  return QString::fromStdString(str);
+}
+#else
 #include "win32/util_win32.h"
+inline QString NativeToQString(const std::wstring& str)
+{
+  return QString::fromStdWString(str);
+}
 #endif
 
 #include <filesystem>

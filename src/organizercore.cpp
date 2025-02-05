@@ -37,7 +37,6 @@
 #include <uibase/report.h>
 #include <uibase/scopeguard.h>
 #include <uibase/utility.h>
-#include <usvfs/usvfs.h>
 
 #include <QApplication>
 #include <QCoreApplication>
@@ -53,11 +52,6 @@
 #include <QtDebug>
 #include <QtGlobal>  // for qUtf8Printable, etc
 
-#include <Psapi.h>
-#include <Shlobj.h>
-#include <tchar.h>  // for _tcsicmp
-#include <tlhelp32.h>
-
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>  // for memset, wcsrchr
@@ -71,7 +65,18 @@
 #include <tuple>
 #include <utility>
 
-#include <libbsarch/bs_archive.h>
+#include <libbsarchpp/Bsa.h>
+
+#ifdef __unix__
+#include <overlayfs/overlayfs.h>
+#else
+#include <usvfs/usvfs.h>
+#include <Psapi.h>
+#include <Shlobj.h>
+#include <tchar.h>  // for _tcsicmp
+#include <tlhelp32.h>
+
+#endif
 
 #include "organizerproxy.h"
 
@@ -1069,11 +1074,9 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
       auto archiveFile = directoryStructure()->searchFile(archiveName);
       if (archiveFile.get() != nullptr) {
         try {
-          libbsarch::bs_archive archiveLoader;
-          archiveLoader.load_from_disk(archiveFile->getFullPath());
-          libbsarch::memory_blob fileData =
-              archiveLoader.extract_to_memory(fileName.toStdWString());
-          QByteArray convertedFileData((char*)(fileData.data), fileData.size);
+          libbsarchpp::Bsa bsa(QFileInfo(archiveFile->getFullPath()).filesystemFilePath());
+          std::vector<uint8_t> data = bsa.extractFileData(QFileInfo(fileName).filesystemFilePath());
+          QByteArray convertedFileData(data);
           QWidget* wid = m_PluginContainer->previewGenerator().genArchivePreview(
               convertedFileData, filePath);
           if (wid == nullptr) {
@@ -1089,9 +1092,9 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
 
   if (selectedOrigin == -1) {
     // don't bother with the vector of origins, just add them as they come
-    addFunc(file->getOrigin(), file->isFromArchive() ? file->getArchive().name() : L"");
+    addFunc(file->getOrigin(), file->isFromArchive() ? file->getArchive().name() : "");
     for (const auto& alt : file->getAlternatives()) {
-      addFunc(alt.originID(), alt.isFromArchive() ? alt.archive().name() : L"");
+      addFunc(alt.originID(), alt.isFromArchive() ? alt.archive().name() : "");
     }
   } else {
     std::vector<int> origins;

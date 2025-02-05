@@ -5,15 +5,12 @@
 #include "modinfodialogfwd.h"
 
 class QTreeView;
-namespace MOShared
-{
-class FileEntry;
-}
-
-class OrganizerCore;
-class PluginContainer;
 class FileTreeModel;
 class FileTreeItem;
+
+#include "shared/fileentry.h"
+#include "organizercore.h"
+#include "plugincontainer.h"
 
 class FileTree : public QObject
 {

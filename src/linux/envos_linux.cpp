@@ -156,4 +156,9 @@ void LinuxInfo::getVersion()
   }
 }
 
+OsInfo* CreateInfo()
+{
+  return new LinuxInfo();
+}
+
 }

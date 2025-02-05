@@ -21,16 +21,6 @@ void IconFetcher::Waiter::wakeUp()
   m_wakeUp.notify_one();
 }
 
-IconFetcher::IconFetcher() : m_iconSize(GetSystemMetrics(SM_CXSMICON)), m_stop(false)
-{
-  m_quickCache.file      = getPixmapIcon(QFileIconProvider::File);
-  m_quickCache.directory = getPixmapIcon(QFileIconProvider::Folder);
-
-  m_thread = MOShared::startSafeThread([&] {
-    threadFun();
-  });
-}
-
 IconFetcher::~IconFetcher()
 {
   stop();

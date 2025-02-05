@@ -21,7 +21,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "ui_messagedialog.h"
 #include <QResizeEvent>
 #include <QTimer>
-#include <Windows.h>
 #include <log.h>
 
 using namespace MOBase;

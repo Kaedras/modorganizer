@@ -334,7 +334,7 @@ private:
     int priority;
     QString index;
     int loadOrder;
-    FILETIME time;
+    QDateTime time;
     QString originName;
     bool hasMasterExtension;
     bool hasLightExtension;

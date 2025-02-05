@@ -1,26 +1,24 @@
 #ifndef MODORGANIZER_DATATAB_INCLUDED
 #define MODORGANIZER_DATATAB_INCLUDED
 
+#include "filetree.h"
 #include "modinfo.h"
 #include "modinfodialogfwd.h"
+#include "organizercore.h"
+#include "plugincontainer.h"
+#include "settings.h"
+
 #include <QCheckBox>
 #include <QPushButton>
 #include <QTreeWidget>
 #include <filterwidget.h>
+#include <memory>
 
 namespace Ui
 {
 class MainWindow;
 }
-class OrganizerCore;
-class Settings;
-class PluginContainer;
-class FileTree;
 
-namespace MOShared
-{
-class DirectoryEntry;
-}
 
 class DataTab : public QObject
 {

@@ -32,6 +32,7 @@ set_target_properties(organizer PROPERTIES
 # disable translations because we want to be able to install somewhere else if
 # required
 mo2_configure_target(organizer NO_SOURCES WARNINGS 4 TRANSLATIONS OFF)
+target_include_directories(organizer PRIVATE .)
 
 file(GLOB_RECURSE SOURCES *.cpp *.h *.qrc *.rc *.ui *.rule)
 if (WIN32)

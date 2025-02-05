@@ -16,7 +16,7 @@ namespace env
 class Module;
 class Process;
 class SecurityProduct;
-class WindowsInfo;
+class OsInfo;
 class Metrics;
 
 // creates a console in the constructor and destroys it in the destructor,
@@ -83,7 +83,7 @@ public:
 
   // information about the operating system
   //
-  const WindowsInfo& windowsInfo() const;
+  const OsInfo& getOsInfo() const;
 
   // information about the installed security products
   //
@@ -109,7 +109,7 @@ public:
 
 private:
   mutable std::vector<Module> m_modules;
-  mutable std::unique_ptr<WindowsInfo> m_windows;
+  mutable std::unique_ptr<OsInfo> m_os;
   mutable std::vector<SecurityProduct> m_security;
   mutable std::unique_ptr<Metrics> m_metrics;
 

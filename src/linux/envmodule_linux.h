@@ -21,6 +21,8 @@ typedef struct tagVS_FIXEDFILEINFO {
   DWORD dwFileDateLS;
 } VS_FIXEDFILEINFO;
 
+namespace env
+{
 // compatibility class for HandlePtr
 // TODO: this is a first draft
 class PidfdCloser
@@ -37,10 +39,18 @@ public:
 
   int get() { return m_pidfd; }
 
+  int release()
+  {
+    int tmp = m_pidfd;
+    m_pidfd = -1;
+    return tmp;
+  }
+
 private:
   int m_pidfd = -1;
 };
 
 using HandlePtr = PidfdCloser;
 
+}
 #endif  // ENVMODULE_LINUX_H

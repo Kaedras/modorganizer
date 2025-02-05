@@ -875,28 +875,28 @@ struct DumpFailed : public std::runtime_error
 void DirectoryEntry::dump(const QString& file) const
 {
   try {
-    std::FILE* f = nullptr;
-    auto e       = _wfopen_s(&f, file.c_str(), L"wb");
+    QFile f(file);
 
-    if (e != 0 || !f) {
-      throw DumpFailed(std::format("failed to open, {} ({})", std::strerror(e), e));
+    if (!f.open(QIODeviceBase::WriteOnly)) {
+      throw DumpFailed(std::format("failed to open, {} ({})", f.errorString(), (int)f.error()));
     }
 
     Guard g([&] {
-      std::fclose(f);
+      f.close();
     });
 
-    dump(f, "Data");
+    dump(&f, "Data");
   } catch (DumpFailed& e) {
     log::error("failed to write list to '{}': {}",
                file.toStdString(), e.what());
   }
 }
 
-void DirectoryEntry::dump(std::FILE* f, const QString& parentPath) const
+void DirectoryEntry::dump(QFile* f, const QString& parentPath) const
 {
   {
     std::scoped_lock lock(m_FilesMutex);
+    QDataStream stream(f);
 
     for (auto&& index : m_Files) {
       const auto file = m_FileRegister->getFile(index.second);
@@ -915,9 +915,8 @@ void DirectoryEntry::dump(std::FILE* f, const QString& parentPath) const
 
       const auto lineu8 = line.toStdString();
 
-      if (std::fwrite(lineu8.data(), lineu8.size(), 1, f) != 1) {
-        const auto e = errno;
-        throw DumpFailed(std::format("failed to write, {} ({})", std::strerror(e), e));
+      if (stream.writeRawData(lineu8.data(), lineu8.size()) == -1) {
+        throw DumpFailed(std::format("failed to write, {} ({})", f->errorString(), (int)f->error()));
       }
     }
   }

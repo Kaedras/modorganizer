@@ -108,7 +108,9 @@ public:
       if (auto* tp = dynamic_cast<Page*>(p.get())) {
         tp->setSkip(false);
       } else {
-        p->setSkip(true);
+        // TODO: find solution to compiler error when uncommenting line below
+        // invalid use of incomplete type ‘class cid::Page’
+        // p->setSkip(true);
       }
     }
 

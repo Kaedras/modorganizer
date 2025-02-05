@@ -206,7 +206,7 @@ bool CommandLine::forwardToPrimary(MOMultiProcess& multiProcess)
   } else if (m_nxmLink) {
     multiProcess.sendMessage(*m_nxmLink);
   } else if (m_command && m_command->canForwardToPrimary()) {
-    multiProcess.sendMessage(QString::fromWCharArray(GetCommandLineW()));
+    multiProcess.sendMessage(QApplication::arguments().join(' '));
   } else {
     return false;
   }
