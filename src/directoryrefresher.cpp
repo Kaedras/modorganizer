@@ -43,6 +43,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 using namespace MOBase;
 using namespace MOShared;
 
+#ifdef __unix__
+static constexpr std::string statsFile("/tmp/data.csv");
+#else
+static constexpr std::string statsFile("c:\\tmp\\data.csv");
+#endif
+
+
 DirectoryStats::DirectoryStats()
 {
   std::memset(this, 0, sizeof(DirectoryStats));
@@ -136,10 +143,9 @@ std::string DirectoryStats::toCsv() const
 void dumpStats(std::vector<DirectoryStats>& stats)
 {
   static int run = 0;
-  static const std::string file("c:\\tmp\\data.csv");
 
   if (run == 0) {
-    std::ofstream out(file, std::ios::out | std::ios::trunc);
+    std::ofstream out(statsFile, std::ios::out | std::ios::trunc);
     out << std::format("what,run,{}", DirectoryStats::csvHeader()) << "\n";
   }
 
@@ -148,7 +154,7 @@ void dumpStats(std::vector<DirectoryStats>& stats)
                            QString::fromStdString(b.mod)) < 0);
   });
 
-  std::ofstream out(file, std::ios::app);
+  std::ofstream out(statsFile, std::ios::app);
 
   DirectoryStats total;
   for (const auto& s : stats) {

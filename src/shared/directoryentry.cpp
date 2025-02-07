@@ -367,9 +367,9 @@ const FileEntryPtr DirectoryEntry::searchFile(const QString& path,
     return FileEntryPtr();
   }
 
-  const size_t len = path.split('/').first().size();
+  const auto len = path.indexOf('/');
 
-  if (len == path.size()) {
+  if (len == -1) {
     // no more path components
     auto iter = m_Files.find(path.toLower());
 
@@ -406,9 +406,9 @@ void DirectoryEntry::removeFile(FileIndex index)
 
 bool DirectoryEntry::removeFile(const QString& filePath, int* origin)
 {
-  size_t pos = filePath.split('/').first().size();
+  const auto pos = filePath.indexOf('/');
 
-  if (pos == filePath.size()) {
+  if (pos == -1) {
     return this->remove(filePath, origin);
   }
 
@@ -427,9 +427,9 @@ bool DirectoryEntry::removeFile(const QString& filePath, int* origin)
 
 void DirectoryEntry::removeDir(const QString& path)
 {
-  size_t pos = path.split('/').first().size();
+  const auto pos = path.indexOf('/');
 
-  if (pos == path.size()) {
+  if (pos == -1) {
     for (auto iter = m_SubDirectories.begin(); iter != m_SubDirectories.end(); ++iter) {
       DirectoryEntry* entry = *iter;
 
@@ -559,7 +559,7 @@ FileEntryPtr DirectoryEntry::insert(env::File& file, FilesOrigin& origin,
     FilesMap::iterator itor;
 
     elapsed(stats.filesLookupTimes, [&] {
-      itor = m_Files.find(file.lcname);
+      itor = m_Files.find(file.lowerName);
     });
 
     if (itor != m_Files.end()) {
@@ -568,11 +568,11 @@ FileEntryPtr DirectoryEntry::insert(env::File& file, FilesOrigin& origin,
       fe = m_FileRegister->getFile(itor->second);
     } else {
       ++stats.fileCreate;
-      fe = m_FileRegister->createFile(std::move(file.name), this, stats);
+      fe = m_FileRegister->createFile(file.name, this, stats);
       // file.name has been moved from this point
 
       elapsed(stats.addFileTimes, [&] {
-        addFileToList(std::move(file.lcname), fe->getIndex());
+        addFileToList(std::move(file.lowerName), fe->getIndex());
       });
 
       // file.lcname has been moved from this point
@@ -717,7 +717,7 @@ DirectoryEntry* DirectoryEntry::getSubDirectory(env::Directory& dir, bool create
   std::scoped_lock lock(m_SubDirMutex);
 
   elapsed(stats.subdirLookupTimes, [&] {
-    itor = m_SubDirectoriesLookup.find(dir.lcname);
+    itor = m_SubDirectoriesLookup.find(dir.lowerName);
   });
 
   if (itor != m_SubDirectoriesLookup.end()) {
@@ -733,7 +733,7 @@ DirectoryEntry* DirectoryEntry::getSubDirectory(env::Directory& dir, bool create
     // dir.name is moved from this point
 
     elapsed(stats.addDirectoryTimes, [&] {
-      addDirectoryToList(entry, std::move(dir.lcname));
+      addDirectoryToList(entry, std::move(dir.lowerName));
     });
 
     // dir.lcname is moved from this point
@@ -754,9 +754,9 @@ DirectoryEntry* DirectoryEntry::getSubDirectoryRecursive(const QString& path,
     return this;
   }
 
-  const size_t pos = path.split('/').first().size();
+  const auto pos = path.indexOf('/');
 
-  if (pos == path.size()) {
+  if (pos == -1) {
     return getSubDirectory(path, create, stats);
   } else {
     DirectoryEntry* nextChild =

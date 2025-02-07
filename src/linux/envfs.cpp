@@ -71,7 +71,7 @@ void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
                       DirStartF* dirStartF,
                       DirEndF* dirEndF, FileF* fileF)
 {
-  for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path())) {
+  for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path(), QDirListing::IteratorFlag::Recursive)) {
     if (dirEntry.isDir()) {
       if (dirStartF && dirEndF) {
         dirStartF(cx, dirEntry.filePath());
@@ -135,15 +135,15 @@ Directory getFilesAndDirs(const QString& path)
 }
 
 File::File(const QString& n, QDateTime ft, uint64_t s)
-  : name(n), lcname(n.toLower()), lastModified(ft),
+  : name(n), lowerName(n.toLower()), lastModified(ft),
     size(s) {}
 
 Directory::Directory() {}
 
 Directory::Directory(const QString& n)
-  : name(n), lcname(n.toLower()) {}
+  : name(n), lowerName(n.toLower()) {}
 
-void getFilesAndDirsWithFindImpl(const std::filesystem::path& path, Directory& d)
+void getFilesAndDirsWithFindImpl(const QString& path, Directory& d)
 {
   for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path())) {
     if (dirEntry.isDir()) {
@@ -155,7 +155,7 @@ void getFilesAndDirsWithFindImpl(const std::filesystem::path& path, Directory& d
   }
 }
 
-Directory getFilesAndDirsWithFind(const std::wstring& path)
+Directory getFilesAndDirsWithFind(const QString& path)
 {
   Directory d;
   getFilesAndDirsWithFindImpl(path, d);

@@ -159,11 +159,9 @@ void onTerminate() noexcept
   } else {
     log::error("ModOrganizer has crashed, core dump failed");
   }
-  if (g_prevTerminateHandler) {
-    g_prevTerminateHandler();
-  } else {
-    std::abort();
-  }
+  try { throw; }
+  catch(const std::exception& e) { log::error(e.what()); }
+  catch(...) {}
 }
 
 void setExceptionHandlers()

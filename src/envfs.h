@@ -12,7 +12,7 @@ namespace env
 struct File
 {
   QString name;
-  QString lcname;
+  QString lowerName;
   QDateTime lastModified;
   uint64_t size;
 
@@ -22,7 +22,7 @@ struct File
 struct Directory
 {
   QString name;
-  QString lcname;
+  QString lowerName;
 
   std::vector<Directory> dirs;
   std::vector<File> files;

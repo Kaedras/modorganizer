@@ -29,7 +29,7 @@ FileEntryPtr FileRegister::createFile(const QString& name, DirectoryEntry* paren
                                       DirectoryStats& stats)
 {
   const auto index = generateIndex();
-  auto p           = FileEntryPtr(new FileEntry(index, std::move(name), parent));
+  auto p           = FileEntryPtr(new FileEntry(index, name, parent));
 
   {
     std::scoped_lock lock(m_Mutex);
