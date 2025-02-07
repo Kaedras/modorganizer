@@ -18,4 +18,8 @@ add_subdirectory(src)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT organizer)
 
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/dump_running_process.bat DESTINATION ${_bin})
+if (UNIX)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/dump_running_process.sh DESTINATION ${_bin})
+else ()
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/dump_running_process.bat DESTINATION ${_bin})
+endif()
