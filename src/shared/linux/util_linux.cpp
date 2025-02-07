@@ -1,5 +1,6 @@
 #include "shared/util.h"
 #include "linux/stub.h"
+#include <pthread.h>
 
 namespace MOShared
 {
@@ -17,7 +18,8 @@ QString getUsvfsVersionString()
 
 void SetThisThreadName(const QString& s)
 {
-  STUB();
+  pthread_t self = pthread_self();
+  pthread_setname_np(self, s.toStdString().c_str());
 }
 
 }  // namespace MOShared
