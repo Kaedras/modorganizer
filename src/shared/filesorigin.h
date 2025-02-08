@@ -12,8 +12,8 @@ class FilesOrigin
 public:
   FilesOrigin();
 
-  FilesOrigin(OriginID ID, const QString& name, const QString& path,
-              int priority, boost::shared_ptr<FileRegister> fileRegister,
+  FilesOrigin(OriginID ID, const QString& name, const QString& path, int priority,
+              boost::shared_ptr<FileRegister> fileRegister,
               boost::shared_ptr<OriginConnection> originConnection);
 
   // noncopyable

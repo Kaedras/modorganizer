@@ -204,7 +204,6 @@ QMessageBox::StandardButton startSteamFailed(QWidget* parent, const QString& key
       .exec();
 }
 
-
 bool confirmRestartAsAdmin(QWidget* parent, const SpawnParameters& sp)
 {
   const auto details = makeDetails(sp, ERROR_ELEVATION_REQUIRED);
@@ -722,8 +721,8 @@ FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& t
 namespace helper
 {
 
-bool helperExec(QWidget* parent, const QString& moDirectory,
-                const QString& commandLine, BOOL async)
+bool helperExec(QWidget* parent, const QString& moDirectory, const QString& commandLine,
+                BOOL async)
 {
   const std::wstring fileName = moDirectory.toStdWString() + L"\\helper.exe";
 
@@ -788,11 +787,11 @@ bool helperExec(QWidget* parent, const QString& moDirectory,
   return (exitCode == 0);
 }
 
-
-bool adminLaunch(QWidget* parent, const QString& moPath,
-                 const QString& moFile, const QString& workingDir)
+bool adminLaunch(QWidget* parent, const QString& moPath, const QString& moFile,
+                 const QString& workingDir)
 {
-  const QString commandLine = QString(R"(adminLaunch %1 "%2" "%3")").arg(::GetCurrentProcessId(), moFile, workingDir);
+  const QString commandLine = QString(R"(adminLaunch %1 "%2" "%3")")
+                                  .arg(::GetCurrentProcessId(), moFile, workingDir);
 
   return helperExec(parent, moPath, commandLine, true);
 }

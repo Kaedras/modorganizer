@@ -8,9 +8,9 @@ class QTreeView;
 class FileTreeModel;
 class FileTreeItem;
 
-#include "shared/fileentry.h"
 #include "organizercore.h"
 #include "plugincontainer.h"
+#include "shared/fileentry.h"
 
 class FileTree : public QObject
 {

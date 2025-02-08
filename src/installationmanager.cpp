@@ -196,11 +196,13 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
       }
     };
     Archive::FileChangeCallback fileChangeCallback =
-        [this, &currentFileName, &mutex](auto changeType, std::filesystem::path const& file) {
+        [this, &currentFileName, &mutex](auto changeType,
+                                         std::filesystem::path const& file) {
           if (changeType == Archive::FileChangeType::EXTRACTION_START) {
             {
               std::scoped_lock guard(mutex);
-              currentFileName = QFileInfo(file).fileName();;
+              currentFileName = QFileInfo(file).fileName();
+              ;
             }
             emit progressUpdate();
           }
@@ -721,8 +723,8 @@ InstallationResult InstallationManager::install(const QString& fileName,
 
   // open the archive and construct the directory tree the installers work on
 
-  bool archiveOpen =
-      m_ArchiveHandler->open(QFileInfo(fileName).filesystemFilePath(), [this]() -> QString {
+  bool archiveOpen = m_ArchiveHandler->open(
+      QFileInfo(fileName).filesystemFilePath(), [this]() -> QString {
         m_Password = QString();
 
         // Note: If we are not in the Qt event thread, we cannot use queryPassword()

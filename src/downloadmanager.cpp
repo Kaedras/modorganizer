@@ -389,13 +389,12 @@ void DownloadManager::refreshList()
 
     for (auto&& d : m_ActiveDownloads) {
       cx.seen.insert(d->m_FileName.toLower());
-      cx.seen.insert(
-          QFileInfo(d->m_Output.fileName()).fileName().toLower());
+      cx.seen.insert(QFileInfo(d->m_Output.fileName()).fileName().toLower());
     }
 
     env::forEachEntry(
-        QDir::toNativeSeparators(m_OutputDirectory), &cx, nullptr,
-        nullptr, [](void* data, const QString& f, QDateTime, uint64_t size) {
+        QDir::toNativeSeparators(m_OutputDirectory), &cx, nullptr, nullptr,
+        [](void* data, const QString& f, QDateTime, uint64_t size) {
           auto& cx = *static_cast<Context*>(data);
 
           QString lc = f.toLower();
@@ -416,8 +415,8 @@ void DownloadManager::refreshList()
             return;
           }
 
-          QString fileName = QDir::fromNativeSeparators(cx.self.m_OutputDirectory) +
-                             "/" + f;
+          QString fileName =
+              QDir::fromNativeSeparators(cx.self.m_OutputDirectory) + "/" + f;
 
           DownloadInfo* info = DownloadInfo::createFromMeta(
               fileName, cx.self.m_ShowHidden, cx.self.m_OutputDirectory, size);
@@ -428,8 +427,7 @@ void DownloadManager::refreshList()
 
           cx.self.m_ActiveDownloads.push_front(info);
           cx.seen.insert(std::move(lc));
-          cx.seen.insert(
-              QFileInfo(info->m_Output.fileName()).fileName().toLower());
+          cx.seen.insert(QFileInfo(info->m_Output.fileName()).fileName().toLower());
         });
 
     log::debug("saw {} downloads", m_ActiveDownloads.size());
@@ -1114,8 +1112,7 @@ void DownloadManager::queryInfoMd5(int index)
 
   QFile downloadFile(info->m_FileName);
   if (!downloadFile.exists()) {
-    downloadFile.setFileName(m_OrganizerCore->downloadsPath() + "/" +
-                             info->m_FileName);
+    downloadFile.setFileName(m_OrganizerCore->downloadsPath() + "/" + info->m_FileName);
   }
   if (!downloadFile.exists()) {
     log::error("Can't find download file '{}'", info->m_FileName);

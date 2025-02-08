@@ -105,12 +105,11 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
   }
   for (const auto& origin : m_Core.managedGame()->secondaryDataDirectories().keys()) {
     if (m_Core.directoryStructure()->originExists(origin)) {
-      dataIDs.push_back(
-          m_Core.directoryStructure()->getOriginByName(origin).getID());
+      dataIDs.push_back(m_Core.directoryStructure()->getOriginByName(origin).getID());
     }
   }
 
-  QString name          = this->name();
+  QString name = this->name();
 
   if (m_Core.directoryStructure()->originExists(name)) {
     FilesOrigin& origin = m_Core.directoryStructure()->getOriginByName(name);

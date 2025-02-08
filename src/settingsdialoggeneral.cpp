@@ -87,8 +87,8 @@ void GeneralSettingsTab::update()
 void GeneralSettingsTab::addLanguages()
 {
   // matches the end of filenames for something like "_en.qm" or "_zh_CN.qm"
-  const QString pattern = AppConfig::translationPrefix() +
-                          "_([a-z]{2,3}(_[A-Z]{2,2})?).qm";
+  const QString pattern =
+      AppConfig::translationPrefix() + "_([a-z]{2,3}(_[A-Z]{2,2})?).qm";
 
   const QRegularExpression exp(QRegularExpression::anchoredPattern(pattern));
 

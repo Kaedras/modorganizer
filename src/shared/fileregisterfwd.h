@@ -42,7 +42,7 @@ constexpr OriginID InvalidOriginID   = -1;
 class DataArchiveOrigin
 {
   QString name_ = "";
-  int order_         = -1;
+  int order_    = -1;
 
 public:
   int order() const { return order_; }
@@ -50,9 +50,7 @@ public:
 
   bool isValid() const { return name_.size() > 0; }
 
-  DataArchiveOrigin(QString name, int order)
-      : name_(std::move(name)), order_(order)
-  {}
+  DataArchiveOrigin(QString name, int order) : name_(std::move(name)), order_(order) {}
 
   DataArchiveOrigin() = default;
 };

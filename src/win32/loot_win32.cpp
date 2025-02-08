@@ -1,5 +1,5 @@
-#include "loot.h"
 #include "json.h"
+#include "loot.h"
 #include "lootdialog.h"
 #include "organizercore.h"
 #include "spawn.h"

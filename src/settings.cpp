@@ -1667,32 +1667,28 @@ QString PathSettings::base() const
 
 QString PathSettings::downloads(bool resolve) const
 {
-  return getConfigurablePath("download_directory", AppConfig::downloadPath(),
-                             resolve);
+  return getConfigurablePath("download_directory", AppConfig::downloadPath(), resolve);
 }
 
 QString PathSettings::cache(bool resolve) const
 {
-  return getConfigurablePath("cache_directory", AppConfig::cachePath(),
-                             resolve);
+  return getConfigurablePath("cache_directory", AppConfig::cachePath(), resolve);
 }
 
 QString PathSettings::mods(bool resolve) const
 {
-  return getConfigurablePath("mod_directory", AppConfig::modsPath(),
-                             resolve);
+  return getConfigurablePath("mod_directory", AppConfig::modsPath(), resolve);
 }
 
 QString PathSettings::profiles(bool resolve) const
 {
-  return getConfigurablePath("profiles_directory", AppConfig::profilesPath(),
-                             resolve);
+  return getConfigurablePath("profiles_directory", AppConfig::profilesPath(), resolve);
 }
 
 QString PathSettings::overwrite(bool resolve) const
 {
-  return getConfigurablePath("overwrite_directory",
-                             AppConfig::overwritePath(), resolve);
+  return getConfigurablePath("overwrite_directory", AppConfig::overwritePath(),
+                             resolve);
 }
 
 void PathSettings::setBase(const QString& path)
@@ -1985,8 +1981,8 @@ void NexusSettings::setCategoryMappings(bool b) const
 
 void NexusSettings::registerAsNXMHandler(bool force)
 {
-  const auto nxmPath = QCoreApplication::applicationDirPath() + "/" +
-                       AppConfig::nxmHandlerExe();
+  const auto nxmPath =
+      QCoreApplication::applicationDirPath() + "/" + AppConfig::nxmHandlerExe();
 
   const auto executable = QCoreApplication::applicationFilePath();
 

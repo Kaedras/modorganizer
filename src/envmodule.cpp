@@ -174,7 +174,6 @@ const QString& Process::name() const
   return *m_name;
 }
 
-
 void Process::addChild(Process p)
 {
   m_children.push_back(p);
@@ -189,7 +188,6 @@ const std::vector<Process>& Process::children() const
 {
   return m_children;
 }
-
 
 void findChildren(Process& parent, const std::vector<Process>& processes)
 {

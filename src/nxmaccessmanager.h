@@ -31,7 +31,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QWebSocket>
 #include <set>
 
-
 namespace Ui
 {
 class ValidationProgressDialog;

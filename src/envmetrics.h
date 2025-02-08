@@ -1,8 +1,8 @@
 #ifndef ENV_METRICS_H
 #define ENV_METRICS_H
 
-#include <QScreen>
 #include <QList>
+#include <QScreen>
 
 namespace env
 {

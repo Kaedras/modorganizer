@@ -82,18 +82,16 @@ public:
 
   // add files to this directory (and subdirectories) from the specified origin.
   // That origin may exist or not
-  void addFromOrigin(const QString& originName, const QString& directory,
-                     int priority, DirectoryStats& stats);
-
-  void addFromOrigin(env::DirectoryWalker& walker, const QString& originName,
-                     const QString& directory, int priority,
+  void addFromOrigin(const QString& originName, const QString& directory, int priority,
                      DirectoryStats& stats);
 
-  void addFromAllBSAs(const QString& originName, const QString& directory,
-                      int priority, const std::vector<QString>& archives,
+  void addFromOrigin(env::DirectoryWalker& walker, const QString& originName,
+                     const QString& directory, int priority, DirectoryStats& stats);
+
+  void addFromAllBSAs(const QString& originName, const QString& directory, int priority,
+                      const std::vector<QString>& archives,
                       const std::set<QString>& enabledArchives,
-                      const std::vector<QString>& loadOrder,
-                      DirectoryStats& stats);
+                      const std::vector<QString>& loadOrder, DirectoryStats& stats);
 
   void addFromBSA(const QString& originName, const QString& directory,
                   const QString& archivePath, int priority, int order,
@@ -165,8 +163,7 @@ public:
    * @param name name of the file
    * @return fileentry object for the file or nullptr if no file matches
    */
-  const FileEntryPtr findFile(const QString& name,
-                              bool alreadyLowerCase = false) const;
+  const FileEntryPtr findFile(const QString& name, bool alreadyLowerCase = false) const;
   const FileEntryPtr findFile(const DirectoryEntryFileKey& key) const;
 
   bool hasFile(const QString& name) const;
@@ -197,9 +194,8 @@ public:
 
   bool hasContentsFromOrigin(OriginID originID) const;
 
-  FilesOrigin& createOrigin(const QString& originName,
-                            const QString& directory, int priority,
-                            DirectoryStats& stats);
+  FilesOrigin& createOrigin(const QString& originName, const QString& directory,
+                            int priority, DirectoryStats& stats);
 
   void removeFiles(const std::set<FileIndex>& indices);
 
@@ -227,15 +223,14 @@ private:
   mutable std::mutex m_FilesMutex;
   mutable std::mutex m_OriginsMutex;
 
-  FileEntryPtr insert(const QString& fileName, FilesOrigin& origin,
-                      QDateTime fileTime, const QString& archive, int order,
-                      DirectoryStats& stats);
+  FileEntryPtr insert(const QString& fileName, FilesOrigin& origin, QDateTime fileTime,
+                      const QString& archive, int order, DirectoryStats& stats);
 
   FileEntryPtr insert(env::File& file, FilesOrigin& origin, const QString& archive,
                       int order, DirectoryStats& stats);
 
-  void addFiles(env::DirectoryWalker& walker, FilesOrigin& origin,
-                const QString& path, DirectoryStats& stats);
+  void addFiles(env::DirectoryWalker& walker, FilesOrigin& origin, const QString& path,
+                DirectoryStats& stats);
 
   void addFiles(FilesOrigin& origin, BSA::Folder::Ptr archiveFolder, QDateTime fileTime,
                 const QString& archiveName, int order, DirectoryStats& stats);

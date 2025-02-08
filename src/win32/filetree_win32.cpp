@@ -11,7 +11,6 @@
 using namespace MOShared;
 using namespace MOBase;
 
-
 bool FileTree::showShellMenu(QPoint pos)
 {
   auto* mw = getMainWindow(m_tree);
@@ -89,8 +88,9 @@ bool FileTree::showShellMenu(QPoint pos)
         }
 
         if (!QFile::exists(fullPath)) {
-          log::error("{}", tr("File '%1' does not exist, you may need to refresh.")
-                               .arg(fullPath));
+          log::error(
+              "{}",
+              tr("File '%1' does not exist, you may need to refresh.").arg(fullPath));
         }
 
         itor->second.addFile(QFileInfo(fullPath));

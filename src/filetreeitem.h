@@ -246,8 +246,7 @@ private:
   Children m_children;
 
   FileTreeItem(FileTreeModel* model, FileTreeItem* parent,
-               QString dataRelativeParentPath, bool isDirectory,
-               QString file);
+               QString dataRelativeParentPath, bool isDirectory, QString file);
 
   void getFileType() const;
   void queueSort();

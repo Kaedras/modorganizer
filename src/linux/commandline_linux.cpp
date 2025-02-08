@@ -22,8 +22,9 @@ int LaunchCommand::SpawnWaitProcess(LPCWSTR workingDirectory, LPCWSTR commandLin
   return 0;
 }
 
-LPCWSTR LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
-                                        std::vector<std::wstring>& parsedArgs)
+LPCWSTR
+LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
+                                             std::vector<std::wstring>& parsedArgs)
 {
   STUB();
   return nullptr;

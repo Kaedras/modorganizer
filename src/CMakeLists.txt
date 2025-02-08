@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.16)
 
 find_package(mo2-cmake CONFIG REQUIRED)
 
-if(WIN32)
-	find_package(usvfs CONFIG REQUIRED)
-else()
-	# TODO: add this package
-	#	find_package(overlayfs CONFIG REQUIRED)
-endif()
+if (WIN32)
+    find_package(usvfs CONFIG REQUIRED)
+else ()
+    # TODO: add this package
+    #	find_package(overlayfs CONFIG REQUIRED)
+endif ()
 
 find_package(directx-headers CONFIG REQUIRED)
 find_package(mo2-uibase CONFIG REQUIRED)
@@ -27,8 +27,8 @@ find_package(ZLIB REQUIRED)
 
 add_executable(organizer)
 set_target_properties(organizer PROPERTIES
-	OUTPUT_NAME "ModOrganizer"
-	WIN32_EXECUTABLE TRUE)
+        OUTPUT_NAME "ModOrganizer"
+        WIN32_EXECUTABLE TRUE)
 
 # disable translations because we want to be able to install somewhere else if
 # required
@@ -37,73 +37,73 @@ target_include_directories(organizer PRIVATE .)
 
 file(GLOB_RECURSE SOURCES *.cpp *.h *.qrc *.rc *.ui *.rule)
 if (WIN32)
-	list(FILTER SOURCES EXCLUDE REGEX "linux")
-else()
-	list(FILTER SOURCES EXCLUDE REGEX "win32")
-endif()
+    list(FILTER SOURCES EXCLUDE REGEX "linux")
+else ()
+    list(FILTER SOURCES EXCLUDE REGEX "win32")
+endif ()
 mo2_target_sources(organizer PRIVATE ${SOURCES})
 
 # we add translations "manually" to handle MO2_INSTALL_IS_BIN
 mo2_add_translations(organizer
-	INSTALL_RELEASE
-	INSTALL_DIRECTORY "${_bin}/translations"
-	SOURCES ${CMAKE_CURRENT_SOURCE_DIR})
+        INSTALL_RELEASE
+        INSTALL_DIRECTORY "${_bin}/translations"
+        SOURCES ${CMAKE_CURRENT_SOURCE_DIR})
 
 mo2_set_project_to_run_from_install(
-	organizer EXECUTABLE ${CMAKE_INSTALL_PREFIX}/${_bin}/ModOrganizer.exe)
+        organizer EXECUTABLE ${CMAKE_INSTALL_PREFIX}/${_bin}/ModOrganizer.exe)
 
 set(PRIVATE_LIBS
-		mo2::uibase mo2::archive libbsarchpp
-		mo2::bsatk mo2::esptk mo2::lootcli-header
-		Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
-		spdlog::spdlog spdlog::spdlog_header_only
-		Qt6::WebEngineWidgets Qt6::WebSockets Qt6::Test
+        mo2::uibase mo2::archive libbsarchpp
+        mo2::bsatk mo2::esptk mo2::lootcli-header
+        Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
+        spdlog::spdlog spdlog::spdlog_header_only
+        Qt6::WebEngineWidgets Qt6::WebSockets Qt6::Test
 )
 
 set(PRIVATE_WIN32_LIBS
-		Shlwapi Bcrypt
-		usvfs::usvfs Version Dbghelp)
+        Shlwapi Bcrypt
+        usvfs::usvfs Version Dbghelp)
 
 set(PRIVATE_UNIX_LIBS
-		# TODO: add this library
-		#		overlayfs
+        # TODO: add this library
+        #		overlayfs
 )
 
 if (UNIX)
-	target_link_libraries(organizer PRIVATE
-			${PRIVATE_LIBS}
-			${PRIVATE_UNIX_LIBS}
-	)
-else()
-	target_link_libraries(organizer PRIVATE
-			${PRIVATE_LIBS}
-			${PRIVATE_WIN32_LIBS}
-	)
-endif()
+    target_link_libraries(organizer PRIVATE
+            ${PRIVATE_LIBS}
+            ${PRIVATE_UNIX_LIBS}
+    )
+else ()
+    target_link_libraries(organizer PRIVATE
+            ${PRIVATE_LIBS}
+            ${PRIVATE_WIN32_LIBS}
+    )
+endif ()
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
-		DESTINATION ${_bin}/dlls
-		CONFIGURATIONS Release RelWithDebInfo
-		RENAME dlls.manifest)
+        DESTINATION ${_bin}/dlls
+        CONFIGURATIONS Release RelWithDebInfo
+        RENAME dlls.manifest)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.debug.qt6"
-		DESTINATION ${_bin}/dlls
-		CONFIGURATIONS Debug
-		RENAME dlls.manifest)
+        DESTINATION ${_bin}/dlls
+        CONFIGURATIONS Debug
+        RENAME dlls.manifest)
 
 if (NOT MO2_SKIP_STYLESHEETS_INSTALL)
-	install(
-		DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/stylesheets"
-		DESTINATION ${_bin})
-endif()
+    install(
+            DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/stylesheets"
+            DESTINATION ${_bin})
+endif ()
 
 if (NOT MO2_SKIP_TUTORIALS_INSTALL)
-	install(
-		DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorials"
-		DESTINATION ${_bin})
-endif()
+    install(
+            DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tutorials"
+            DESTINATION ${_bin})
+endif ()
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
-	DESTINATION ${_bin}/resources)
+        DESTINATION ${_bin}/resources)
 
 # install ModOrganizer.exe itself
 install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
@@ -114,269 +114,269 @@ install(FILES $<TARGET_FILE:mo2::archive> DESTINATION ${_bin}/dlls)
 install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
 
 if (WIN32)
-	# this may copy over the ones from uibase/usvfs
-	# - when building with mob, this should not matter as the files should be identical
-	# - when building standalone, this should help having matching USVFS DLL between the
-	#   build and the installation
-	# - this may cause issue with uibase in standalone mode if the installed version does
-	#   not match the one used for the build, but there would be other issue anyway (e.g.
-	#   different uibase.dll between modorganizer and plugins)
-	#
-	install(FILES
-			$<TARGET_FILE:mo2::uibase>
-			$<TARGET_FILE:usvfs_x64::usvfs_dll>
-			$<TARGET_FILE:usvfs_x86::usvfs_dll>
-			$<TARGET_FILE:usvfs_x64::usvfs_proxy>
-			$<TARGET_FILE:usvfs_x86::usvfs_proxy>
-			DESTINATION ${_bin})
+    # this may copy over the ones from uibase/usvfs
+    # - when building with mob, this should not matter as the files should be identical
+    # - when building standalone, this should help having matching USVFS DLL between the
+    #   build and the installation
+    # - this may cause issue with uibase in standalone mode if the installed version does
+    #   not match the one used for the build, but there would be other issue anyway (e.g.
+    #   different uibase.dll between modorganizer and plugins)
+    #
+    install(FILES
+            $<TARGET_FILE:mo2::uibase>
+            $<TARGET_FILE:usvfs_x64::usvfs_dll>
+            $<TARGET_FILE:usvfs_x86::usvfs_dll>
+            $<TARGET_FILE:usvfs_x64::usvfs_proxy>
+            $<TARGET_FILE:usvfs_x86::usvfs_proxy>
+            DESTINATION ${_bin})
 
 
-	# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
-	if (NOT MO2_INSTALL_IS_BIN)
-		install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
-	endif()
+    # do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
+    if (NOT MO2_INSTALL_IS_BIN)
+        install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
+    endif ()
 
-	mo2_deploy_qt(
-			DIRECTORY ${_bin}
-			BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
-endif()
+    mo2_deploy_qt(
+            DIRECTORY ${_bin}
+            BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
+endif ()
 
 # set source groups for VS
 mo2_add_filter(NAME src/application GROUPS
-	iuserinterface
-	commandline
-	main
-	moapplication
-	moshortcut
-	multiprocess
-	sanitychecks
-	selfupdater
-	updatedialog
+        iuserinterface
+        commandline
+        main
+        moapplication
+        moshortcut
+        multiprocess
+        sanitychecks
+        selfupdater
+        updatedialog
 )
 
 mo2_add_filter(NAME src/browser GROUPS
-	browserdialog
-	browserview
+        browserdialog
+        browserview
 )
 
 mo2_add_filter(NAME src/categories GROUPS
-	categories
-	categoriestable
-	categoriesdialog
-	categoryimportdialog
+        categories
+        categoriestable
+        categoriesdialog
+        categoryimportdialog
 )
 
 mo2_add_filter(NAME src/core GROUPS
-	archivefiletree
-	githubpp
-	installationmanager
-	nexusinterface
-	nxmaccessmanager
-	organizercore
-	game_features
-	plugincontainer
-	apiuseraccount
-	processrunner
-	qdirfiletree
-	virtualfiletree
-	uilocker
+        archivefiletree
+        githubpp
+        installationmanager
+        nexusinterface
+        nxmaccessmanager
+        organizercore
+        game_features
+        plugincontainer
+        apiuseraccount
+        processrunner
+        qdirfiletree
+        virtualfiletree
+        uilocker
 )
 
 mo2_add_filter(NAME src/dialogs GROUPS
-	aboutdialog
-	activatemodsdialog
-	credentialsdialog
-	filedialogmemory
-	forcedloaddialog
-	forcedloaddialogwidget
-	listdialog
-	messagedialog
-	motddialog
-	overwriteinfodialog
-	queryoverwritedialog
-	problemsdialog
-	savetextasdialog
-	selectiondialog
-	syncoverwritedialog
-	transfersavesdialog
-	waitingonclosedialog
+        aboutdialog
+        activatemodsdialog
+        credentialsdialog
+        filedialogmemory
+        forcedloaddialog
+        forcedloaddialogwidget
+        listdialog
+        messagedialog
+        motddialog
+        overwriteinfodialog
+        queryoverwritedialog
+        problemsdialog
+        savetextasdialog
+        selectiondialog
+        syncoverwritedialog
+        transfersavesdialog
+        waitingonclosedialog
 )
 
 mo2_add_filter(NAME src/downloads GROUPS
-	downloadlist
-	downloadlistview
-	downloadmanager
+        downloadlist
+        downloadlistview
+        downloadmanager
 )
 
 mo2_add_filter(NAME src/env GROUPS
-	env
-	envdump
-	envfs
-	envmetrics
-	envmodule
-	envsecurity
-	envshell
-	envshortcut
-	envwindows
+        env
+        envdump
+        envfs
+        envmetrics
+        envmodule
+        envsecurity
+        envshell
+        envshortcut
+        envwindows
 )
 
 mo2_add_filter(NAME src/executables GROUPS
-	executableslist
-	editexecutablesdialog
+        executableslist
+        editexecutablesdialog
 )
 
 mo2_add_filter(NAME src/instances GROUPS
-	createinstancedialog
-	createinstancedialogpages
-	instancemanager
-	instancemanagerdialog
+        createinstancedialog
+        createinstancedialogpages
+        instancemanager
+        instancemanagerdialog
 )
 
 mo2_add_filter(NAME src/loot GROUPS
-	loot
-	lootdialog
+        loot
+        lootdialog
 )
 
 mo2_add_filter(NAME src/mainwindow GROUPS
-	datatab
-	downloadstab
-	iconfetcher
-	filetree
-	filetreeitem
-	filetreemodel
-	mainwindow
-	savestab
-	statusbar
+        datatab
+        downloadstab
+        iconfetcher
+        filetree
+        filetreeitem
+        filetreemodel
+        mainwindow
+        savestab
+        statusbar
 )
 
 mo2_add_filter(NAME src/modinfo GROUPS
-	modinfo
-	modinfobackup
-	modinfoforeign
-	modinfooverwrite
-	modinforegular
-	modinfoseparator
-	modinfowithconflictinfo
+        modinfo
+        modinfobackup
+        modinfoforeign
+        modinfooverwrite
+        modinforegular
+        modinfoseparator
+        modinfowithconflictinfo
 )
 
 mo2_add_filter(NAME src/modinfo/dialog GROUPS
-	modinfodialog
-	modinfodialogcategories
-	modinfodialogconflicts
-	modinfodialogconflictsmodels
-	modinfodialogesps
-	modinfodialogfiletree
-	modinfodialogfwd
-	modinfodialogimages
-	modinfodialognexus
-	modinfodialogtab
-	modinfodialogtextfiles
+        modinfodialog
+        modinfodialogcategories
+        modinfodialogconflicts
+        modinfodialogconflictsmodels
+        modinfodialogesps
+        modinfodialogfiletree
+        modinfodialogfwd
+        modinfodialogimages
+        modinfodialognexus
+        modinfodialogtab
+        modinfodialogtextfiles
 )
 
 mo2_add_filter(NAME src/modinfo/dialog/widgets GROUPS
-	modidlineedit
+        modidlineedit
 )
 
 mo2_add_filter(NAME src/modlist GROUPS
-	modlist
-	modlistdropinfo
-	modlistsortproxy
-	modlistbypriorityproxy
+        modlist
+        modlistdropinfo
+        modlistsortproxy
+        modlistbypriorityproxy
 )
 
 mo2_add_filter(NAME src/modlist/view GROUPS
-	filterlist
-	modlistview
-	modlistviewactions
-	modlistcontextmenu
-	modflagicondelegate
-	modcontenticondelegate
-	modconflicticondelegate
-	modlistversiondelegate
+        filterlist
+        modlistview
+        modlistviewactions
+        modlistcontextmenu
+        modflagicondelegate
+        modcontenticondelegate
+        modconflicticondelegate
+        modlistversiondelegate
 )
 
 mo2_add_filter(NAME src/plugins GROUPS
-	pluginlist
-	pluginlistsortproxy
-	pluginlistview
-	pluginlistcontextmenu
+        pluginlist
+        pluginlistsortproxy
+        pluginlistview
+        pluginlistcontextmenu
 )
 
 mo2_add_filter(NAME src/previews GROUPS
-	previewdialog
-	previewgenerator
+        previewdialog
+        previewgenerator
 )
 
 mo2_add_filter(NAME src/profiles GROUPS
-	profile
-	profileinputdialog
-	profilesdialog
+        profile
+        profileinputdialog
+        profilesdialog
 )
 
 mo2_add_filter(NAME src/proxies GROUPS
-	downloadmanagerproxy
-	gamefeaturesproxy
-	modlistproxy
-	organizerproxy
-	pluginlistproxy
-	proxyutils
+        downloadmanagerproxy
+        gamefeaturesproxy
+        modlistproxy
+        organizerproxy
+        pluginlistproxy
+        proxyutils
 )
 
 mo2_add_filter(NAME src/register GROUPS
-	shared/directoryentry
-	shared/fileentry
-	shared/filesorigin
-	shared/fileregister
-	shared/fileregisterfwd
-	shared/originconnection
-	directoryrefresher
+        shared/directoryentry
+        shared/fileentry
+        shared/filesorigin
+        shared/fileregister
+        shared/fileregisterfwd
+        shared/originconnection
+        directoryrefresher
 )
 
 mo2_add_filter(NAME src/settings GROUPS
-	settings
-	settingsutilities
+        settings
+        settingsutilities
 )
 
 mo2_add_filter(NAME src/settingsdialog GROUPS
-	settingsdialog
-	settingsdialogdiagnostics
-	settingsdialoggeneral
-	settingsdialognexus
-	settingsdialogpaths
-	settingsdialogplugins
-	settingsdialogworkarounds
-	settingsdialogmodlist
-	settingsdialogtheme
-	disableproxyplugindialog
+        settingsdialog
+        settingsdialogdiagnostics
+        settingsdialoggeneral
+        settingsdialognexus
+        settingsdialogpaths
+        settingsdialogplugins
+        settingsdialogworkarounds
+        settingsdialogmodlist
+        settingsdialogtheme
+        disableproxyplugindialog
 )
 
 mo2_add_filter(NAME src/utilities GROUPS
-	shared/appconfig
-	bbcode
-	csvbuilder
-	persistentcookiejar
-	serverinfo
-	spawn
-	shared/util
-	usvfsconnector
-	shared/os_error
-	thread_utils
-	json
-	glob_matching
+        shared/appconfig
+        bbcode
+        csvbuilder
+        persistentcookiejar
+        serverinfo
+        spawn
+        shared/util
+        usvfsconnector
+        shared/os_error
+        thread_utils
+        json
+        glob_matching
 )
 
 mo2_add_filter(NAME src/widgets GROUPS
-	colortable
-	genericicondelegate
-	filerenamer
-	icondelegate
-	lcdnumber
-	loglist
-	loghighlighter
-	noeditdelegate
-	qtgroupingproxy
-	texteditor
-	viewmarkingscrollbar
-	modelutils
-	copyeventfilter
+        colortable
+        genericicondelegate
+        filerenamer
+        icondelegate
+        lcdnumber
+        loglist
+        loghighlighter
+        noeditdelegate
+        qtgroupingproxy
+        texteditor
+        viewmarkingscrollbar
+        modelutils
+        copyeventfilter
 )

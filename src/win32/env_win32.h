@@ -1,7 +1,6 @@
 #ifndef ENV_WIN32_H
 #define ENV_WIN32_H
 
-
 // used by DesktopDCPtr, calls ReleaseDC(0, dc) as the deleter
 //
 struct DesktopDCReleaser
@@ -101,5 +100,4 @@ struct CoTaskMemFreer
 template <class T>
 using CoTaskMemPtr = std::unique_ptr<T, CoTaskMemFreer<T>>;
 
-
-#endif //ENV_WIN32_H
+#endif  // ENV_WIN32_H

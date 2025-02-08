@@ -19,8 +19,8 @@ FilesOrigin::FilesOrigin()
     : m_ID(0), m_Disabled(false), m_Name(), m_Path(), m_Priority(0)
 {}
 
-FilesOrigin::FilesOrigin(OriginID ID, const QString& name,
-                         const QString& path, int priority,
+FilesOrigin::FilesOrigin(OriginID ID, const QString& name, const QString& path,
+                         int priority,
                          boost::shared_ptr<MOShared::FileRegister> fileRegister,
                          boost::shared_ptr<MOShared::OriginConnection> originConnection)
     : m_ID(ID), m_Disabled(false), m_Name(name), m_Path(path), m_Priority(priority),

@@ -8,12 +8,10 @@
 #include "linux/compatibility.h"
 #endif
 
-
 using namespace MOBase;
 
 namespace env
 {
-
 
 class HandleCloserThread
 {
@@ -194,8 +192,8 @@ std::wstring makeNtPath(const std::wstring& path)
   }
 }
 
-void DirectoryWalker::forEachEntry(const QString& path, void* cx,
-                                   DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)
+void DirectoryWalker::forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
+                                   DirEndF* dirEndF, FileF* fileF)
 {
   auto& hc = g_handleClosers.request();
 
@@ -222,8 +220,8 @@ void DirectoryWalker::forEachEntry(const QString& path, void* cx,
   hc.wakeup();
 }
 
-void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
-                  DirEndF* dirEndF, FileF* fileF)
+void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF, DirEndF* dirEndF,
+                  FileF* fileF)
 {
   DirectoryWalker().forEachEntry(path, cx, dirStartF, dirEndF, fileF);
 }

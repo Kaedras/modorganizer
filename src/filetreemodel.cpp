@@ -360,8 +360,7 @@ void FileTreeModel::doFetchMore(const QModelIndex& parent, bool forFetch, bool d
 
   const auto path = item->dataRelativeFilePath();
 
-  auto* parentEntry =
-      m_core.directoryStructure()->findSubDirectoryRecursive(path);
+  auto* parentEntry = m_core.directoryStructure()->findSubDirectoryRecursive(path);
 
   if (!parentEntry) {
     log::error("FileTreeModel::fetchMore(): directory '{}' not found", path);
@@ -590,8 +589,7 @@ bool FileTreeModel::updateDirectories(FileTreeItem& parentItem,
 
 void FileTreeModel::removeDisappearingDirectories(
     FileTreeItem& parentItem, const MOShared::DirectoryEntry& parentEntry,
-    const QString& parentPath, QSet<QString>& seen,
-    bool forFetching)
+    const QString& parentPath, QSet<QString>& seen, bool forFetching)
 {
   auto& children = parentItem.children();
   auto itor      = children.begin();
@@ -727,8 +725,7 @@ bool FileTreeModel::addNewDirectories(FileTreeItem& parentItem,
   return added;
 }
 
-bool FileTreeModel::updateFiles(FileTreeItem& parentItem,
-                                const QString& parentPath,
+bool FileTreeModel::updateFiles(FileTreeItem& parentItem, const QString& parentPath,
                                 const MOShared::DirectoryEntry& parentEntry)
 {
   // removeDisappearingFiles() will add files that are in the tree and still on
@@ -979,8 +976,7 @@ bool FileTreeModel::shouldShowFile(const FileEntry& file) const
     return false;
   }
 
-  if (!showHiddenFiles() &&
-      file.getName().endsWith(ModInfo::s_HiddenExt)) {
+  if (!showHiddenFiles() && file.getName().endsWith(ModInfo::s_HiddenExt)) {
     // hidden files shouldn't be shown, but this file is hidden
     return false;
   }
@@ -991,8 +987,7 @@ bool FileTreeModel::shouldShowFile(const FileEntry& file) const
 bool FileTreeModel::shouldShowFolder(const DirectoryEntry& dir,
                                      const FileTreeItem* item) const
 {
-  if (!showHiddenFiles() &&
-      dir.getName().endsWith(ModInfo::s_HiddenExt)) {
+  if (!showHiddenFiles() && dir.getName().endsWith(ModInfo::s_HiddenExt)) {
     return false;
   }
 
@@ -1104,8 +1099,7 @@ QVariant FileTreeModel::displayData(const FileTreeItem* item, int column) const
   }
 }
 
-QString FileTreeModel::makeModName(const MOShared::FileEntry& file,
-                                        int originID) const
+QString FileTreeModel::makeModName(const MOShared::FileEntry& file, int originID) const
 {
   static const QString Unmanaged = UnmanagedModName();
 
@@ -1157,8 +1151,8 @@ QString FileTreeModel::makeTooltip(const FileTreeItem& item) const
   QString s = line(tr("Virtual path"), item.virtualPath()) +
               line(tr("Real path"), item.realPath()) + line(tr("From"), item.mod());
 
-  const auto file = m_core.directoryStructure()->searchFile(
-      item.dataRelativeFilePath(), nullptr);
+  const auto file =
+      m_core.directoryStructure()->searchFile(item.dataRelativeFilePath(), nullptr);
 
   if (file) {
     const auto alternatives = file->getAlternatives();

@@ -595,14 +595,13 @@ QString InstanceManager::portablePath() const
 
 bool InstanceManager::portableInstanceExists() const
 {
-  return QFile::exists(qApp->applicationDirPath() + "/" +
-                       AppConfig::iniFileName());
+  return QFile::exists(qApp->applicationDirPath() + "/" + AppConfig::iniFileName());
 }
 
 bool InstanceManager::allowedToChangeInstance() const
 {
-  const auto lockFile = qApp->applicationDirPath() + "/" +
-                        AppConfig::portableLockFileName();
+  const auto lockFile =
+      qApp->applicationDirPath() + "/" + AppConfig::portableLockFileName();
 
   return !QFile::exists(lockFile);
 }

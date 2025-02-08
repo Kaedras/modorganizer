@@ -244,8 +244,7 @@ void LogList::clear()
 
 void LogList::openLogsFolder()
 {
-  QString logsPath = qApp->property("dataPath").toString() + "/" +
-                     AppConfig::logPath();
+  QString logsPath = qApp->property("dataPath").toString() + "/" + AppConfig::logPath();
   shell::Explore(logsPath);
 }
 
@@ -376,7 +375,8 @@ void initLogging()
 
   log::getDefault().addToBlacklist(std::string("\\") + getenv(userEnvVariable),
                                    "\\USERNAME");
-  log::getDefault().addToBlacklist(std::string("/") + getenv(userEnvVariable), "/USERNAME");
+  log::getDefault().addToBlacklist(std::string("/") + getenv(userEnvVariable),
+                                   "/USERNAME");
 
   qInstallMessageHandler(qtLogCallback);
 }
@@ -399,8 +399,8 @@ bool createAndMakeWritable(const QString& subPath)
 
 bool setLogDirectory(const QString& dir)
 {
-  const auto logFile = dir + "/" + AppConfig::logPath() + "/" +
-                       AppConfig::logFileName();
+  const auto logFile =
+      dir + "/" + AppConfig::logPath() + "/" + AppConfig::logFileName();
 
   if (!createAndMakeWritable(AppConfig::logPath())) {
     return false;

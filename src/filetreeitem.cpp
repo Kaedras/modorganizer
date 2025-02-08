@@ -16,7 +16,8 @@ constexpr bool AlwaysSortDirectoriesFirst = true;
 const QString& directoryFileType()
 {
   static const QString name = [] {
-    // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase every time you need to perform a lookup.
+    // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase
+    // every time you need to perform a lookup.
     QMimeDatabase db;
     // "." for the current directory, which should always exist
     QMimeType mimeType = db.mimeTypeForFile(QFileInfo("."));
@@ -30,7 +31,8 @@ const QString& directoryFileType()
 const QString& cachedFileTypeNoExtension()
 {
   static const QString name = [] {
-    // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase every time you need to perform a lookup.
+    // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase
+    // every time you need to perform a lookup.
     QMimeDatabase db;
     // dummy filename with no extension
     QMimeType mimeType = db.mimeTypeForFile(QFileInfo("file"));
@@ -59,7 +61,8 @@ const QString& cachedFileType(const QString& file, bool isOnFilesystem)
   if (itor != map.end()) {
     return itor->second;
   }
-  // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase every time you need to perform a lookup.
+  // from qt documentation: It is perfectly OK to create an instance of QMimeDatabase
+  // every time you need to perform a lookup.
   QMimeDatabase db;
   QMimeType mimeType = db.mimeTypeForFile(info);
 
@@ -72,15 +75,14 @@ FileTreeItem::FileTreeItem(FileTreeModel* model, FileTreeItem* parent,
                            QString dataRelativeParentPath, bool isDirectory,
                            QString file)
     : m_model(model), m_parent(parent), m_indexGuess(NoIndexGuess),
-      m_virtualParentPath(dataRelativeParentPath),
-      m_wsFile(file), m_wsLcFile(file.toLower()), m_key(m_wsLcFile),
-      m_file(file), m_isDirectory(isDirectory), m_originID(-1),
-      m_flags(NoFlags), m_loaded(false), m_expanded(false), m_sortingStale(true)
+      m_virtualParentPath(dataRelativeParentPath), m_wsFile(file),
+      m_wsLcFile(file.toLower()), m_key(m_wsLcFile), m_file(file),
+      m_isDirectory(isDirectory), m_originID(-1), m_flags(NoFlags), m_loaded(false),
+      m_expanded(false), m_sortingStale(true)
 {}
 
 FileTreeItem::Ptr FileTreeItem::createFile(FileTreeModel* model, FileTreeItem* parent,
-                                           QString dataRelativeParentPath,
-                                           QString file)
+                                           QString dataRelativeParentPath, QString file)
 {
   return std::unique_ptr<FileTreeItem>(new FileTreeItem(
       model, parent, std::move(dataRelativeParentPath), false, std::move(file)));
@@ -98,11 +100,11 @@ FileTreeItem::Ptr FileTreeItem::createDirectory(FileTreeModel* model,
 void FileTreeItem::setOrigin(int originID, const QString& realPath, Flags flags,
                              const QString& mod)
 {
-  m_originID   = originID;
-  m_realPath   = realPath;
-  m_realPath   = realPath;
-  m_flags      = flags;
-  m_mod        = mod;
+  m_originID = originID;
+  m_realPath = realPath;
+  m_realPath = realPath;
+  m_flags    = flags;
+  m_mod      = mod;
 
   m_fileSize.reset();
   m_lastModified.reset();

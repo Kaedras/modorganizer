@@ -1,5 +1,5 @@
-#include "envshortcut.h"
 #include "env.h"
+#include "envshortcut.h"
 #include "executableslist.h"
 #include "filesystemutilities.h"
 #include "instancemanager.h"
@@ -10,7 +10,6 @@ namespace env
 {
 
 using namespace MOBase;
-
 
 class ShellLinkException
 {
@@ -198,6 +197,5 @@ bool Shortcut::remove(Locations loc)
 
   return true;
 }
-
 
 }  // namespace env

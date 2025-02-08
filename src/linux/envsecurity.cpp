@@ -2,9 +2,9 @@
 #include "compatibility.h"
 #include "env.h"
 #include "envmodule.h"
+#include "stub.h"
 #include <log.h>
 #include <utility.h>
-#include "stub.h"
 
 namespace env
 {
@@ -84,7 +84,6 @@ public:
 private:
   QString m_what;
 };
-
 
 QString getUsername(int owner)
 {

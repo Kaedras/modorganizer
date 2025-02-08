@@ -35,7 +35,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 class OverlayfsConnector;
 class OverlayfsConnectorException;
 
-using UsvfsConnector = OverlayfsConnector;
+using UsvfsConnector          = OverlayfsConnector;
 using UsvfsConnectorException = OverlayfsConnectorException;
 
 // TODO: this class currently contains mostly placeholders

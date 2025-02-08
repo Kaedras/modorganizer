@@ -264,9 +264,9 @@ void PluginList::refresh(const QString& profileName,
       }
 
       m_ESPs.emplace_back(filename, forceLoaded, forceEnabled, forceDisabled,
-                          originName, current->getFullPath(), hasIni,
-                          loadedArchives, lightPluginsAreSupported,
-                          mediumPluginsAreSupported, blueprintPluginsAreSupported);
+                          originName, current->getFullPath(), hasIni, loadedArchives,
+                          lightPluginsAreSupported, mediumPluginsAreSupported,
+                          blueprintPluginsAreSupported);
       m_ESPs.rbegin()->priority = -1;
     } catch (const std::exception& e) {
       reportError(tr("failed to update esp info for file %1 (source id: %2), error: %3")
@@ -765,13 +765,15 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
       QFile file(fileName);
       QLockFile lockFile(fileName);
       if (!lockFile.tryLock()) {
-          // file is locked, probably the game is running
-          return false;
+        // file is locked, probably the game is running
+        return false;
       }
       lockFile.unlock();
       if (!file.isOpen()) {
-        throw std::runtime_error(
-              QObject::tr("failed to access %1: %2").arg(fileName, file.errorString()).toUtf8().constData());
+        throw std::runtime_error(QObject::tr("failed to access %1: %2")
+                                     .arg(fileName, file.errorString())
+                                     .toUtf8()
+                                     .constData());
       }
 
       // TODO: check if the calculation is correct
@@ -780,19 +782,21 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
       // QDateTime uses the epoch starting from January 1, 1970
       // FILETIME uses the epoch starting from January 1, 1601
       // There are 11644473600 seconds between these two dates
-      const uint64_t epochDifference = 116444736000000000ULL; // 11644473600 seconds in 100-nanosecond intervals
+      const uint64_t epochDifference =
+          116444736000000000ULL;  // 11644473600 seconds in 100-nanosecond intervals
 
-      QDateTime newWriteTime = QDateTime::fromMSecsSinceEpoch((temp - epochDifference) / 10'000);
+      QDateTime newWriteTime =
+          QDateTime::fromMSecsSinceEpoch((temp - epochDifference) / 10'000);
 
       esp.time = newWriteTime;
       fileEntry->setFileTime(newWriteTime);
       bool result = file.setFileTime(newWriteTime, QFileDevice::FileModificationTime);
       if (!result) {
         throw std::runtime_error(QObject::tr("failed to set file time %1: %2")
-                                .arg(fileName)
-                                .arg(file.errorString())
-                                .toUtf8()
-                                .constData());
+                                     .arg(fileName)
+                                     .arg(file.errorString())
+                                     .toUtf8()
+                                     .constData());
       }
     }
   }

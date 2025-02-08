@@ -5,8 +5,8 @@ namespace cl
 
 using namespace MOBase;
 
-
-int LaunchCommand::SpawnWaitProcess(const QString& workingDirectory, const QString& commandLine)
+int LaunchCommand::SpawnWaitProcess(const QString& workingDirectory,
+                                    const QString& commandLine)
 {
   PROCESS_INFORMATION pi{0};
   STARTUPINFO si{0};
@@ -21,7 +21,7 @@ int LaunchCommand::SpawnWaitProcess(const QString& workingDirectory, const QStri
     ost << L"CreateProcess failed: " << commandLine << ", " << GetLastError();
     OutputDebugStringW(ost.str().c_str());
     return -1;
-                      }
+  }
 
   WaitForSingleObject(pi.hProcess, INFINITE);
 
@@ -34,9 +34,8 @@ int LaunchCommand::SpawnWaitProcess(const QString& workingDirectory, const QStri
 
 // Parses the first parseArgCount arguments of the current process command line and
 // returns them in parsedArgs, the rest of the command line is returned untouched.
-QString
-LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
-                                             std::vector<QString>& parsedArgs)
+QString LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
+                                                     std::vector<QString>& parsedArgs)
 {
   LPCWSTR cmd = GetCommandLineW();
   LPCWSTR arg = nullptr;  // to skip executable name

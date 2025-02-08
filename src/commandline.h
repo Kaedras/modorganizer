@@ -1,9 +1,9 @@
 #ifndef MODORGANIZER_COMMANDLINE_INCLUDED
 #define MODORGANIZER_COMMANDLINE_INCLUDED
 #include "moshortcut.h"
+#include <boost/program_options.hpp>
 #include <memory>
 #include <vector>
-#include <boost/program_options.hpp>
 
 #ifdef __unix__
 #include "linux/compatibility.h"

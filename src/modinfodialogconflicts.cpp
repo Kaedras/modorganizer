@@ -636,9 +636,8 @@ bool GeneralConflictsTab::update()
 
     for (const auto& file : m_tab->origin()->getFiles()) {
       // careful: these two strings are moved into createXItem() below
-      QString relativeName =
-          QDir::fromNativeSeparators(file->getRelativePath());
-      QString fileName = rootPath + relativeName;
+      QString relativeName = QDir::fromNativeSeparators(file->getRelativePath());
+      QString fileName     = rootPath + relativeName;
 
       bool archive         = false;
       const int fileOrigin = file->getOrigin(archive);
@@ -957,9 +956,8 @@ void AdvancedConflictsTab::update()
 
     for (const auto& file : files) {
       // careful: these two strings are moved into createItem() below
-      QString relativeName =
-          QDir::fromNativeSeparators(file->getRelativePath());
-      QString fileName = rootPath + relativeName;
+      QString relativeName = QDir::fromNativeSeparators(file->getRelativePath());
+      QString fileName     = rootPath + relativeName;
 
       bool archive             = false;
       const int fileOrigin     = file->getOrigin(archive);
@@ -1095,7 +1093,6 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
     }
   }
 
-  return ConflictItem(before, std::move(relativeName), after,
-                      index, std::move(fileName), hasAlts, QString(),
-                      isCurrOrigArchive);
+  return ConflictItem(before, std::move(relativeName), after, index,
+                      std::move(fileName), hasAlts, QString(), isCurrOrigArchive);
 }

@@ -325,8 +325,8 @@ int MOApplication::run(MOMultiProcess& multiProcess)
 
   // tutorials
   log::debug("initializing tutorials");
-  TutorialManager::init(qApp->applicationDirPath() + "/" +
-                            AppConfig::tutorialsPath() + "/",
+  TutorialManager::init(qApp->applicationDirPath() + "/" + AppConfig::tutorialsPath() +
+                            "/",
                         m_core.get());
 
   // styling
@@ -499,8 +499,7 @@ void MOApplication::purgeOldFiles()
   }
 
   // cycle log file
-  removeOldFiles(qApp->property("dataPath").toString() + "/" +
-                     AppConfig::logPath(),
+  removeOldFiles(qApp->property("dataPath").toString() + "/" + AppConfig::logPath(),
                  "usvfs*.log", 5, QDir::Name);
 }
 
@@ -532,9 +531,8 @@ bool MOApplication::setStyleFile(const QString& styleName)
   }
   // set new stylesheet or clear it
   if (styleName.length() != 0) {
-    QString styleSheetName = applicationDirPath() + "/" +
-                             AppConfig::stylesheetsPath() + "/" +
-                             styleName;
+    QString styleSheetName =
+        applicationDirPath() + "/" + AppConfig::stylesheetsPath() + "/" + styleName;
     if (QFile::exists(styleSheetName)) {
       m_styleWatcher.addPath(styleSheetName);
       updateStyle(styleSheetName);

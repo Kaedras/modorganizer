@@ -20,6 +20,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "overlayfsconnector.h"
 #include "envmodule.h"
 #include "organizercore.h"
+#include "overlayfs/overlayfs.h"
 #include "settings.h"
 #include "shared/util.h"
 #include <QCoreApplication>
@@ -30,7 +31,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <memory>
 #include <qstandardpaths.h>
 #include <sstream>
-#include "overlayfs/overlayfs.h"
 
 static constexpr char SHMID[] = "mod_organizer_instance";
 using namespace MOBase;
@@ -121,7 +121,12 @@ LogLevel toOverlayfsLogLevel(log::Levels level)
 //   }
 // }
 
-OverlayfsConnector::OverlayfsConnector(): m_overlayfsManager(OverlayfsManager::getInstance((qApp->property("dataPath").toString() + QString("/logs/overlayfs-%1.log").arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_hh-mm-ss"))).toStdString()))
+OverlayfsConnector::OverlayfsConnector()
+    : m_overlayfsManager(OverlayfsManager::getInstance(
+          (qApp->property("dataPath").toString() +
+           QString("/logs/overlayfs-%1.log")
+               .arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_hh-mm-ss")))
+              .toStdString()))
 {
   using namespace std::chrono;
 
@@ -129,8 +134,9 @@ OverlayfsConnector::OverlayfsConnector(): m_overlayfsManager(OverlayfsManager::g
 
   const LogLevel logLevel = toOverlayfsLogLevel(s.diagnostics().logLevel());
   // const auto dumpType     = toUsvfsCrashDumpsType(s.diagnostics().coreDumpType());
-  // const auto delay        = duration_cast<milliseconds>(s.diagnostics().spawnDelay());
-  // std::string dumpPath    = OrganizerCore::getGlobalCoreDumpPath().toStdString();
+  // const auto delay        =
+  // duration_cast<milliseconds>(s.diagnostics().spawnDelay()); std::string dumpPath =
+  // OrganizerCore::getGlobalCoreDumpPath().toStdString();
 
   m_overlayfsManager.setLogLevel(logLevel);
   m_overlayfsManager.setDebugMode(false);
@@ -163,7 +169,6 @@ OverlayfsConnector::OverlayfsConnector(): m_overlayfsManager(OverlayfsManager::g
   // connect(&m_LogWorker, SIGNAL(finished()), &m_WorkerThread, SLOT(quit()));
 
   // m_WorkerThread.start(QThread::LowestPriority);
-
 }
 
 OverlayfsConnector::~OverlayfsConnector()
@@ -192,12 +197,14 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
   m_overlayfsManager.clearDirectories();
 
   // TODO: implement missing functionality
-  for (const auto& map:mapping) {
+  for (const auto& map : mapping) {
     if (map.destination != mapping.front().destination) {
-      throw OverlayfsConnectorException("Handling different destination paths is not yet implemented");
+      throw OverlayfsConnectorException(
+          "Handling different destination paths is not yet implemented");
     }
     if (!map.isDirectory) {
-      throw OverlayfsConnectorException("Handling files instead of directories is not yet implemented");
+      throw OverlayfsConnectorException(
+          "Handling files instead of directories is not yet implemented");
     }
   }
 
@@ -224,17 +231,17 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
   const auto end  = std::chrono::high_resolution_clock::now();
   const auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-  log::debug("Overlayfs mappings updated, linked {} dirs and {} files in {}ms", dirs, files,
-             time.count());
+  log::debug("Overlayfs mappings updated, linked {} dirs and {} files in {}ms", dirs,
+             files, time.count());
 }
 
 void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
-                                  env::CoreDumpTypes coreDumpType,
-                                  const QString& crashDumpsPath,
-                                  std::chrono::seconds spawnDelay,
-                                  QString executableBlacklist,
-                                  const QStringList& skipFileSuffixes,
-                                  const QStringList& skipDirectories)
+                                      env::CoreDumpTypes coreDumpType,
+                                      const QString& crashDumpsPath,
+                                      std::chrono::seconds spawnDelay,
+                                      QString executableBlacklist,
+                                      const QStringList& skipFileSuffixes,
+                                      const QStringList& skipDirectories)
 {
   using namespace std::chrono;
 
@@ -266,7 +273,8 @@ void OverlayfsConnector::updateForcedLibraries(
   m_overlayfsManager.clearLibraryForceLoads();
   for (auto setting : forcedLibraries) {
     if (setting.enabled()) {
-      m_overlayfsManager.forceLoadLibrary(setting.process().toStdString(), setting.library().toStdString());
+      m_overlayfsManager.forceLoadLibrary(setting.process().toStdString(),
+                                          setting.library().toStdString());
     }
   }
 }
@@ -284,7 +292,6 @@ std::vector<HANDLE> getRunningOverlayfsProcesses()
   //   }
   //
   // }
-
 
   return pids;
 }

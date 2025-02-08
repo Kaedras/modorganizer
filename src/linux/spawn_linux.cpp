@@ -22,8 +22,7 @@ namespace spawn::dialogs
 void spawnFailed(QWidget* parent, const SpawnParameters& sp, DWORD code);
 
 void helperFailed(QWidget* parent, const QString& error, const QString& why,
-                  const QString& binary, const QString& cwd,
-                  const QString& args)
+                  const QString& binary, const QString& cwd, const QString& args)
 {
   STUB();
 }
@@ -102,8 +101,7 @@ QString makeContent(const SpawnParameters& sp, DWORD code, const QString& messag
 
 QMessageBox::StandardButton badSteamPath(QWidget* parent)
 {
-  const auto details =
-      QString("can't start steam, steam.desktop not exist");
+  const auto details = QString("can't start steam, steam.desktop not exist");
 
   log::error("{}", details);
 
@@ -184,7 +182,8 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 
 std::pair<QString, int> getSteamExecutable(QWidget* parent)
 {
-  QString steam = QStandardPaths::locate(QStandardPaths::ApplicationsLocation, "steam.desktop");
+  QString steam =
+      QStandardPaths::locate(QStandardPaths::ApplicationsLocation, "steam.desktop");
 
   if (steam.isEmpty()) {
     return {{}, dialogs::badSteamPath(parent)};
@@ -203,7 +202,7 @@ QString findJavaInstallation(const QString& jarFile)
     if (!tmp.endsWith('/')) {
       tmp += '/';
     }
-    return tmp  + "bin/java";
+    return tmp + "bin/java";
   }
 
   // not found
@@ -242,8 +241,8 @@ QFileInfo getCmdPath()
 
 namespace helper
 {
-bool helperExec(QWidget* parent, const QString& moDirectory,
-                const QString& commandLine, bool async)
+bool helperExec(QWidget* parent, const QString& moDirectory, const QString& commandLine,
+                bool async)
 {
   const QString fileName = QDir(moDirectory).path() + "/helper";
 
@@ -253,8 +252,8 @@ bool helperExec(QWidget* parent, const QString& moDirectory,
   process.startCommand(fileName + " " + commandLine);
 
   if (!process.waitForStarted(1000)) {
-    spawn::dialogs::helperFailed(parent, process.errorString(), "waitForStarted()", fileName,
-                                 moDirectory, commandLine);
+    spawn::dialogs::helperFailed(parent, process.errorString(), "waitForStarted()",
+                                 fileName, moDirectory, commandLine);
 
     return false;
   }
@@ -264,12 +263,11 @@ bool helperExec(QWidget* parent, const QString& moDirectory,
   }
 
   if (!process.waitForFinished()) {
-    spawn::dialogs::helperFailed(parent, process.errorString(), "waitForFinished()", fileName,
-                                 moDirectory, commandLine);
+    spawn::dialogs::helperFailed(parent, process.errorString(), "waitForFinished()",
+                                 fileName, moDirectory, commandLine);
 
     return false;
   }
-
 
   int exitCode = process.exitCode();
   if (exitCode != 0) {
@@ -283,11 +281,12 @@ bool helperExec(QWidget* parent, const QString& moDirectory,
 }
 
 bool adminLaunch(QWidget* parent, const std::filesystem::path& moPath,
-                 const std::filesystem::path& moFile, const std::filesystem::path& workingDir)
+                 const std::filesystem::path& moFile,
+                 const std::filesystem::path& workingDir)
 {
   STUB();
   // TODO: should this be implemented?
   //  could be done using KDESu
   return false;
 }
-} // namespace helper
+}  // namespace helper

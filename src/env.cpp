@@ -37,7 +37,6 @@ ModuleNotification::ModuleNotification(QObject* o, std::function<void(Module)> f
     : m_cookie(nullptr), m_object(o), m_f(std::move(f))
 {}
 
-
 void ModuleNotification::setCookie(void* c)
 {
   m_cookie = c;
@@ -131,13 +130,13 @@ QString Environment::timezone() const
   const auto now = QDateTime::currentDateTime();
 
   const auto stdName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
-  const auto std = QString("%1, %2").arg(stdName).arg(offsetString(timeZone.offsetFromUtc(now)));
+  const auto std =
+      QString("%1, %2").arg(stdName).arg(offsetString(timeZone.offsetFromUtc(now)));
 
   const auto dstName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
-  const auto dst       = QString("%1, %2").arg(dstName).arg(timeZone.offsetFromUtc(now));
+  const auto dst     = QString("%1, %2").arg(dstName).arg(timeZone.offsetFromUtc(now));
 
-
-  if(timeZone.isDaylightTime(now)) {
+  if (timeZone.isDaylightTime(now)) {
     s = dst + " (dst is active, std is " + std + ")";
   } else {
     s = std + " (std is active, dst is " + dst + ")";
@@ -254,7 +253,9 @@ QString get(const QString& name)
 void set(const QString& n, const QString& v)
 {
   // from qt documentation:
-  // Calling qputenv with an empty value removes the environment variable on Windows, and makes it set (but empty) on Unix. Prefer using qunsetenv() for fully portable behavior.
+  // Calling qputenv with an empty value removes the environment variable on Windows,
+  // and makes it set (but empty) on Unix. Prefer using qunsetenv() for fully portable
+  // behavior.
   if (v.isEmpty()) {
     qunsetenv(n.toStdString().c_str());
   } else {
@@ -352,8 +353,8 @@ DWORD findOtherPid()
   // same one
   auto filename = processFilename();
   if (filename.isEmpty()) {
-    std::cerr << "can't get current process filename, defaulting to " << defaultName.toStdString()
-               << "\n";
+    std::cerr << "can't get current process filename, defaulting to "
+              << defaultName.toStdString() << "\n";
 
     filename = defaultName;
   } else {

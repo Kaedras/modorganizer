@@ -8,7 +8,7 @@
 using namespace MOBase;
 using namespace json;
 
-static QString LootReportPath  = QDir::temp().absoluteFilePath("lootreport.json");
+static QString LootReportPath = QDir::temp().absoluteFilePath("lootreport.json");
 
 log::Levels levelFromLoot(lootcli::LogLevels level)
 {

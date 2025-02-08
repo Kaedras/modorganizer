@@ -19,7 +19,6 @@ namespace Ui
 class MainWindow;
 }
 
-
 class DataTab : public QObject
 {
   Q_OBJECT;

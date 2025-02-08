@@ -5,7 +5,8 @@
 
 // copied from
 // https://learn.microsoft.com/en-us/windows/win32/api/verrsrc/ns-verrsrc-vs_fixedfileinfo
-typedef struct tagVS_FIXEDFILEINFO {
+typedef struct tagVS_FIXEDFILEINFO
+{
   DWORD dwSignature;
   DWORD dwStrucVersion;
   DWORD dwFileVersionMS;
@@ -30,7 +31,8 @@ public:
   explicit PidfdCloser(int pidfd) : m_pidfd(pidfd) {}
   PidfdCloser() = default;
 
-  PidfdCloser& operator=(int pidfd) {
+  PidfdCloser& operator=(int pidfd)
+  {
     if (m_pidfd != -1) {
       close(m_pidfd);
     }
@@ -55,9 +57,7 @@ public:
     return tmp;
   }
 
-  bool isValid() const {
-    return m_pidfd != -1;
-  }
+  bool isValid() const { return m_pidfd != -1; }
 
 private:
   int m_pidfd = -1;
@@ -65,5 +65,5 @@ private:
 
 using HandlePtr = PidfdCloser;
 
-}
+}  // namespace env
 #endif  // ENVMODULE_LINUX_H

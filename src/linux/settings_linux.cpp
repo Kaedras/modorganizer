@@ -1,7 +1,7 @@
-#include "settings.h"
 #include "env.h"
-#include "settingsutilities.h"
 #include "instancemanager.h"
+#include "settings.h"
+#include "settingsutilities.h"
 #include "shared/appconfig.h"
 #include <utility.h>
 
@@ -13,22 +13,27 @@ void NexusSettings::dump() const
 {
   STUB();
 }
-bool SteamSettings::login(QString& username, QString& password) const{
+bool SteamSettings::login(QString& username, QString& password) const
+{
   STUB();
   return false;
 }
-void SteamSettings::setLogin(QString username, QString password){
+void SteamSettings::setLogin(QString username, QString password)
+{
   STUB();
 }
-bool GlobalSettings::nexusApiKey(QString& apiKey){
-  STUB();
-  return false;
-}
-bool GlobalSettings::setNexusApiKey(const QString& apiKey){
+bool GlobalSettings::nexusApiKey(QString& apiKey)
+{
   STUB();
   return false;
 }
-bool GlobalSettings::hasNexusApiKey(){
+bool GlobalSettings::setNexusApiKey(const QString& apiKey)
+{
+  STUB();
+  return false;
+}
+bool GlobalSettings::hasNexusApiKey()
+{
   STUB();
   return false;
 }

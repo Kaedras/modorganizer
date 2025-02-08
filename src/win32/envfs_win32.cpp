@@ -118,7 +118,8 @@ typedef struct _IO_STATUS_BLOCK
   ULONG_PTR Information;
 } IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 
-namespace env{
+namespace env
+{
 
 std::wstring_view toStringView(const UNICODE_STRING* s)
 {
@@ -144,4 +145,4 @@ QString toString(POBJECT_ATTRIBUTES poa)
   return QString::fromWCharArray(sv.data(), static_cast<int>(sv.size()));
 }
 
-}
+}  // namespace env

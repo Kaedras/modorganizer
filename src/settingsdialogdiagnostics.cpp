@@ -23,10 +23,9 @@ DiagnosticsSettingsTab::DiagnosticsSettingsTab(Settings& s, SettingsDialog& d)
       ui->diagnosticsExplainedLabel->text()
           .replace("LOGS_FULL_PATH", logsPath)
           .replace("LOGS_DIR", AppConfig::logPath())
-          .replace("DUMPS_FULL_PATH",
-                   QUrl::fromLocalFile(
-                       OrganizerCore::getGlobalCoreDumpPath())
-                       .toString())
+          .replace(
+              "DUMPS_FULL_PATH",
+              QUrl::fromLocalFile(OrganizerCore::getGlobalCoreDumpPath()).toString())
           .replace("DUMPS_DIR", AppConfig::dumpsDir()));
 }
 

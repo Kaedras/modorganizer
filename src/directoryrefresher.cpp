@@ -49,7 +49,6 @@ static constexpr std::string statsFile("/tmp/data.csv");
 static constexpr std::string statsFile("c:\\tmp\\data.csv");
 #endif
 
-
 DirectoryStats::DirectoryStats()
 {
   std::memset(this, 0, sizeof(DirectoryStats));
@@ -197,7 +196,7 @@ void DirectoryRefresher::setMods(
 void DirectoryRefresher::cleanStructure(DirectoryEntry* structure)
 {
   QStringList files = {"meta.ini", "readme.txt"};
-  for (const auto & file : files) {
+  for (const auto& file : files) {
     structure->removeFile(file);
   }
 
@@ -236,8 +235,7 @@ void DirectoryRefresher::addModBSAToStructure(DirectoryEntry* root,
 
   DirectoryStats dummy;
 
-  root->addFromAllBSAs(modName,
-                       QDir::toNativeSeparators(directory), priority,
+  root->addFromAllBSAs(modName, QDir::toNativeSeparators(directory), priority,
                        archivesW, enabledArchives, lo, dummy);
 }
 
@@ -250,8 +248,8 @@ void DirectoryRefresher::stealModFilesIntoStructure(DirectoryEntry* directoryStr
   // instead of adding all the files of the target directory, we just change the root of
   // the specified files to this mod
   DirectoryStats dummy;
-  FilesOrigin& origin =
-      directoryStructure->createOrigin(modName, QDir::toNativeSeparators(directory), priority, dummy);
+  FilesOrigin& origin = directoryStructure->createOrigin(
+      modName, QDir::toNativeSeparators(directory), priority, dummy);
 
   for (const QString& filename : stealFiles) {
     if (filename.isEmpty()) {
@@ -294,7 +292,8 @@ void DirectoryRefresher::addModFilesToStructure(DirectoryEntry* directoryStructu
     stealModFilesIntoStructure(directoryStructure, modName, priority, directory,
                                stealFiles);
   } else {
-    directoryStructure->addFromOrigin(modName, QDir::toNativeSeparators(directory), priority, dummy);
+    directoryStructure->addFromOrigin(modName, QDir::toNativeSeparators(directory),
+                                      priority, dummy);
   }
 }
 
@@ -312,7 +311,8 @@ void DirectoryRefresher::addModToStructure(DirectoryEntry* directoryStructure,
     stealModFilesIntoStructure(directoryStructure, modName, priority, directory,
                                stealFiles);
   } else {
-    directoryStructure->addFromOrigin(modName, QDir::toNativeSeparators(directory), priority, dummy);
+    directoryStructure->addFromOrigin(modName, QDir::toNativeSeparators(directory),
+                                      priority, dummy);
   }
 
   if (Settings::instance().archiveParsing()) {
@@ -477,10 +477,9 @@ void DirectoryRefresher::refresh()
 
     for (auto directory : game->secondaryDataDirectories().toStdMap()) {
       DirectoryStats dummy;
-      m_Root->addFromOrigin(
-          directory.first,
-          QDir::toNativeSeparators(directory.second.absolutePath()), 0,
-          dummy);
+      m_Root->addFromOrigin(directory.first,
+                            QDir::toNativeSeparators(directory.second.absolutePath()),
+                            0, dummy);
     }
 
     std::sort(m_Mods.begin(), m_Mods.end(), [](auto lhs, auto rhs) {

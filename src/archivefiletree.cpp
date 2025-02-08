@@ -35,9 +35,11 @@ public:
   /**
    * @brief Create a new entry.
    *
-   * @param parent The tree containing this entry.
+   * @param parent The tree containing this
+   * entry.
    * @param name The name of this entry.
-   * @param index The index of the entry in the archive.
+   * @param index The index of the
+   * entry in the archive.
    */
   ArchiveFileEntry(std::shared_ptr<const IFileTree> parent, QString name, int index)
       : FileTreeEntry(parent, name), m_Index(index)
@@ -131,7 +133,8 @@ public:  // Overrides:
 
 protected:
   /**
-   * Overriding makeDirectory and makeFile to create file tree or file entry with index
+   * Overriding makeDirectory and makeFile to create file tree or file entry with
+   * index
    * -1.
    *
    */
@@ -238,11 +241,11 @@ std::shared_ptr<ArchiveFileTree> ArchiveFileTree::makeTree(Archive const& archiv
       continue;
     }
 
-    files.push_back(
-        std::make_tuple(QString::fromStdWString(data[i]->getArchiveFilePath().generic_wstring())
-                            .replace("\\", "/")
-                            .split("/", Qt::SkipEmptyParts),
-                        data[i]->isDirectory(), (int)i));
+    files.push_back(std::make_tuple(
+        QString::fromStdWString(data[i]->getArchiveFilePath().generic_wstring())
+            .replace("\\", "/")
+            .split("/", Qt::SkipEmptyParts),
+        data[i]->isDirectory(), (int)i));
   }
 
   auto tree = std::make_shared<ArchiveFileTreeImpl>(nullptr, "", -1, std::move(files));

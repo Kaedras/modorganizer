@@ -1,6 +1,6 @@
-#include "sanitychecks.h"
 #include "env.h"
 #include "envmodule.h"
+#include "sanitychecks.h"
 #include "settings.h"
 #include <iplugingame.h>
 #include <log.h>

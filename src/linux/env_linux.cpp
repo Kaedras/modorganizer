@@ -1,5 +1,5 @@
-#include "envmodule.h"
 #include "env.h"
+#include "envmodule.h"
 #include "stub.h"
 
 #include "compatibility.h"
@@ -18,18 +18,14 @@ namespace env
 
 using namespace MOBase;
 
-Console::Console() : m_hasConsole(true), m_in(stdin), m_out(stdout), m_err(stderr)
-{
-}
+Console::Console() : m_hasConsole(true), m_in(stdin), m_out(stdout), m_err(stderr) {}
 
-Console::~Console()
-{
-}
+Console::~Console() {}
 
-ModuleNotification::~ModuleNotification(){}
+ModuleNotification::~ModuleNotification() {}
 
-std::unique_ptr<ModuleNotification> Environment::onModuleLoaded(QObject* o,
-    std::function<void(Module)> f)
+std::unique_ptr<ModuleNotification>
+Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
 {
   return std::make_unique<ModuleNotification>(o, f);
 }

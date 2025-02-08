@@ -1,5 +1,5 @@
-#include "compatibility.h"
 #include "envfs.h"
+#include "compatibility.h"
 #include "env.h"
 #include "shared/util.h"
 #include <log.h>
@@ -68,33 +68,31 @@ void setHandleCloserThreadCount(std::size_t n)
 }
 
 void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
-                      DirStartF* dirStartF,
-                      DirEndF* dirEndF, FileF* fileF)
+                      DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)
 {
-  for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path(), QDirListing::IteratorFlag::Recursive)) {
+  for (const QDirListing::DirEntry& dirEntry :
+       QDirListing(QDir(path).path(), QDirListing::IteratorFlag::Recursive)) {
     if (dirEntry.isDir()) {
       if (dirStartF && dirEndF) {
         dirStartF(cx, dirEntry.filePath());
-        forEachEntryImpl(cx, dirEntry.filePath(), depth + 1, dirStartF,
-                         dirEndF,
-                         fileF);
+        forEachEntryImpl(cx, dirEntry.filePath(), depth + 1, dirStartF, dirEndF, fileF);
         dirEndF(cx, dirEntry.filePath());
       }
     } else {
-      fileF(cx, dirEntry.fileName(),
-            dirEntry.lastModified(QTimeZone::LocalTime), dirEntry.size());
+      fileF(cx, dirEntry.fileName(), dirEntry.lastModified(QTimeZone::LocalTime),
+            dirEntry.size());
     }
   }
 }
 
-void DirectoryWalker::forEachEntry(const QString& path, void* cx,
-                                   DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)
+void DirectoryWalker::forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
+                                   DirEndF* dirEndF, FileF* fileF)
 {
   forEachEntryImpl(cx, path, 0, dirStartF, dirEndF, fileF);
 }
 
-void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
-                  DirEndF* dirEndF, FileF* fileF)
+void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF, DirEndF* dirEndF,
+                  FileF* fileF)
 {
   DirectoryWalker().forEachEntry(path, cx, dirStartF, dirEndF, fileF);
 }
@@ -135,22 +133,22 @@ Directory getFilesAndDirs(const QString& path)
 }
 
 File::File(const QString& n, QDateTime ft, uint64_t s)
-  : name(n), lowerName(n.toLower()), lastModified(ft),
-    size(s) {}
+    : name(n), lowerName(n.toLower()), lastModified(ft), size(s)
+{}
 
 Directory::Directory() {}
 
-Directory::Directory(const QString& n)
-  : name(n), lowerName(n.toLower()) {}
+Directory::Directory(const QString& n) : name(n), lowerName(n.toLower()) {}
 
 void getFilesAndDirsWithFindImpl(const QString& path, Directory& d)
 {
   for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path())) {
     if (dirEntry.isDir()) {
-      d.dirs.emplace_back(Directory(dirEntry.filePath()));
-    }else {
-      d.files.emplace_back(File(dirEntry.filePath(), dirEntry.lastModified(QTimeZone::LocalTime),
-                                dirEntry.size()));
+      d.dirs.emplace_back(dirEntry.filePath());
+    } else {
+      d.files.emplace_back(dirEntry.filePath(),
+                           dirEntry.lastModified(QTimeZone::LocalTime),
+                           dirEntry.size());
     }
   }
 }
@@ -162,4 +160,4 @@ Directory getFilesAndDirsWithFind(const QString& path)
   return d;
 }
 
-} // namespace env
+}  // namespace env

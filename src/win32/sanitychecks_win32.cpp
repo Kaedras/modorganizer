@@ -1,11 +1,11 @@
-#include "sanitychecks.h"
 #include "env.h"
 #include "envmodule.h"
+#include "sanitychecks.h"
 #include "settings.h"
+#include <Knownfolders.h>
 #include <iplugingame.h>
 #include <log.h>
 #include <utility.h>
-#include <Knownfolders.h>
 
 namespace sanity
 {
@@ -16,12 +16,12 @@ std::vector<std::pair<QString, QString>> getSystemDirectories()
 {
   // folder ids and display names for logging
   const std::vector<std::pair<GUID, QString>> systemFolderIDs = {
-    {FOLDERID_ProgramFiles, "in Program Files"},
-    {FOLDERID_ProgramFilesX86, "in Program Files"},
-    {FOLDERID_Desktop, "on the desktop"},
-    {FOLDERID_OneDrive, "in OneDrive"},
-    {FOLDERID_Documents, "in Documents"},
-    {FOLDERID_Downloads, "in Downloads"}};
+      {FOLDERID_ProgramFiles, "in Program Files"},
+      {FOLDERID_ProgramFilesX86, "in Program Files"},
+      {FOLDERID_Desktop, "on the desktop"},
+      {FOLDERID_OneDrive, "in OneDrive"},
+      {FOLDERID_Documents, "in Documents"},
+      {FOLDERID_Downloads, "in Downloads"}};
 
   std::vector<std::pair<QString, QString>> systemDirs;
 
@@ -44,9 +44,9 @@ std::vector<std::pair<QString, QString>> getSystemDirectories()
 int checkMicrosoftStore(const QDir& gameDir)
 {
   const QStringList pathsToCheck = {
-    "/ModifiableWindowsApps/",
-    "/WindowsApps/",
-};
+      "/ModifiableWindowsApps/",
+      "/WindowsApps/",
+  };
   for (auto badPath : pathsToCheck) {
     if (gameDir.path().contains(badPath)) {
       log::error("This game is not supported by Mod Organizer.");
@@ -57,6 +57,5 @@ int checkMicrosoftStore(const QDir& gameDir)
 
   return 0;
 }
-
 
 }  // namespace sanity

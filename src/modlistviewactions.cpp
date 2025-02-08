@@ -591,8 +591,7 @@ void ModListViewActions::displayModInformation(ModInfo::Ptr modInfo,
   }
 
   if (m_core.currentProfile()->modEnabled(modIndex) && !modInfo->isForeign()) {
-    FilesOrigin& origin =
-        m_core.directoryStructure()->getOriginByName(modInfo->name());
+    FilesOrigin& origin = m_core.directoryStructure()->getOriginByName(modInfo->name());
     origin.enable(false);
 
     if (m_core.directoryStructure()->originExists(modInfo->name())) {
@@ -1060,9 +1059,9 @@ void ModListViewActions::restoreHiddenFiles(const QModelIndexList& indices) cons
             result = FileRenamer::RESULT_CANCEL;
             break;
           }
-          emit originModified((m_core.directoryStructure()->getOriginByName(
-                                   modInfo->internalName()))
-                                  .getID());
+          emit originModified(
+              (m_core.directoryStructure()->getOriginByName(modInfo->internalName()))
+                  .getID());
         }
       }
     }
@@ -1079,9 +1078,9 @@ void ModListViewActions::restoreHiddenFiles(const QModelIndexList& indices) cons
 
       result = restoreHiddenFilesRecursive(renamer, modDir);
 
-      emit originModified((m_core.directoryStructure()->getOriginByName(
-                               modInfo->internalName()))
-                              .getID());
+      emit originModified(
+          (m_core.directoryStructure()->getOriginByName(modInfo->internalName()))
+              .getID());
     }
   }
 

@@ -70,11 +70,11 @@
 #ifdef __unix__
 #include <overlayfs/overlayfs.h>
 #else
-#include <usvfs/usvfs.h>
 #include <Psapi.h>
 #include <Shlobj.h>
 #include <tchar.h>  // for _tcsicmp
 #include <tlhelp32.h>
+#include <usvfs/usvfs.h>
 
 #endif
 
@@ -444,9 +444,8 @@ bool OrganizerCore::bootstrap()
   }
 
   // log if there are any dmp files
-  const auto hasCrashDumps = !QDir(getGlobalCoreDumpPath())
-                                  .entryList({"*.dmp"}, QDir::Files)
-                                  .empty();
+  const auto hasCrashDumps =
+      !QDir(getGlobalCoreDumpPath()).entryList({"*.dmp"}, QDir::Files).empty();
 
   if (hasCrashDumps) {
     log::debug("there are crash dumps in '{}'", getGlobalCoreDumpPath());
@@ -459,8 +458,8 @@ void OrganizerCore::createDefaultProfile()
 {
   QString profilesPath = settings().paths().profiles();
   if (QDir(profilesPath).entryList(QDir::AllDirs | QDir::NoDotAndDotDot).size() == 0) {
-    Profile newProf(AppConfig::defaultProfileName(),
-                    managedGame(), gameFeatures(), false);
+    Profile newProf(AppConfig::defaultProfileName(), managedGame(), gameFeatures(),
+                    false);
 
     m_ProfileCreated(&newProf);
   }
@@ -489,11 +488,11 @@ void OrganizerCore::setLogLevel(log::Levels level)
 {
   m_Settings.diagnostics().setLogLevel(level);
 
-  updateVFSParams(
-      m_Settings.diagnostics().logLevel(), m_Settings.diagnostics().coreDumpType(),
-      getGlobalCoreDumpPath(),
-      m_Settings.diagnostics().spawnDelay(), m_Settings.executablesBlacklist(),
-      m_Settings.skipFileSuffixes(), m_Settings.skipDirectories());
+  updateVFSParams(m_Settings.diagnostics().logLevel(),
+                  m_Settings.diagnostics().coreDumpType(), getGlobalCoreDumpPath(),
+                  m_Settings.diagnostics().spawnDelay(),
+                  m_Settings.executablesBlacklist(), m_Settings.skipFileSuffixes(),
+                  m_Settings.skipDirectories());
 
   log::getDefault().setLevel(m_Settings.diagnostics().logLevel());
 }
@@ -727,8 +726,7 @@ void OrganizerCore::setPersistent(const QString& pluginName, const QString& key,
 
 QString OrganizerCore::pluginDataPath()
 {
-  return qApp->applicationDirPath() + "/" + AppConfig::pluginPath() +
-         "/data";
+  return qApp->applicationDirPath() + "/" + AppConfig::pluginPath() + "/data";
 }
 
 MOBase::IModInterface* OrganizerCore::installMod(const QString& archivePath,
@@ -915,8 +913,7 @@ QString OrganizerCore::resolvePath(const QString& fileName) const
   if (m_DirectoryStructure == nullptr) {
     return QString();
   }
-  const FileEntryPtr file =
-      m_DirectoryStructure->searchFile(fileName, nullptr);
+  const FileEntryPtr file = m_DirectoryStructure->searchFile(fileName, nullptr);
   if (file.get() != nullptr) {
     return file->getFullPath();
   } else {
@@ -961,8 +958,7 @@ OrganizerCore::findFiles(const QString& path,
 QStringList OrganizerCore::getFileOrigins(const QString& fileName) const
 {
   QStringList result;
-  const FileEntryPtr file =
-      m_DirectoryStructure->searchFile(fileName, nullptr);
+  const FileEntryPtr file = m_DirectoryStructure->searchFile(fileName, nullptr);
 
   if (file.get() != nullptr) {
     result.append(m_DirectoryStructure->getOriginByID(file->getOrigin()).getName());
@@ -1046,8 +1042,7 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
     fileName   = fileName.mid(offset + 1);
   }
 
-  const FileEntryPtr file =
-      directoryStructure()->searchFile(fileName, nullptr);
+  const FileEntryPtr file = directoryStructure()->searchFile(fileName, nullptr);
 
   if (file.get() == nullptr) {
     reportError(tr("file not found: %1").arg(qUtf8Printable(fileName)));
@@ -1059,8 +1054,7 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
 
   auto addFunc = [&](int originId, QString archiveName = "") {
     FilesOrigin& origin = directoryStructure()->getOriginByID(originId);
-    QString filePath =
-        QDir::fromNativeSeparators(origin.getPath()) + "/" + fileName;
+    QString filePath    = QDir::fromNativeSeparators(origin.getPath()) + "/" + fileName;
     if (QFile::exists(filePath)) {
       // it's very possible the file doesn't exist, because it's inside an archive. we
       // don't support that
@@ -1074,8 +1068,10 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
       auto archiveFile = directoryStructure()->searchFile(archiveName);
       if (archiveFile.get() != nullptr) {
         try {
-          libbsarchpp::Bsa bsa(QFileInfo(archiveFile->getFullPath()).filesystemFilePath());
-          std::vector<uint8_t> data = bsa.extractFileData(QFileInfo(fileName).filesystemFilePath());
+          libbsarchpp::Bsa bsa(
+              QFileInfo(archiveFile->getFullPath()).filesystemFilePath());
+          std::vector<uint8_t> data =
+              bsa.extractFileData(QFileInfo(fileName).filesystemFilePath());
           QByteArray convertedFileData(data);
           QWidget* wid = m_PluginContainer->previewGenerator().genArchivePreview(
               convertedFileData, filePath);
@@ -1680,8 +1676,7 @@ void OrganizerCore::modStatusChanged(unsigned int index)
     } else {
       updateModActiveState(index, false);
       if (m_DirectoryStructure->originExists(modInfo->name())) {
-        FilesOrigin& origin =
-            m_DirectoryStructure->getOriginByName(modInfo->name());
+        FilesOrigin& origin = m_DirectoryStructure->getOriginByName(modInfo->name());
         origin.enable(false);
       }
       if (m_UserInterface != nullptr) {
@@ -1731,8 +1726,8 @@ void OrganizerCore::modStatusChanged(QList<unsigned int> index)
       updateModsActiveState(modsToDisable.keys(), false);
       for (auto idx : modsToDisable.keys()) {
         if (m_DirectoryStructure->originExists(modsToDisable[idx]->name())) {
-          FilesOrigin& origin = m_DirectoryStructure->getOriginByName(
-              modsToDisable[idx]->name());
+          FilesOrigin& origin =
+              m_DirectoryStructure->getOriginByName(modsToDisable[idx]->name());
           origin.enable(false);
         }
       }

@@ -1,13 +1,12 @@
 #include "envshortcut.h"
+#include <QtDBus/QtDBus>
 #include <log.h>
 #include <utility.h>
-#include <QtDBus/QtDBus>
 
 namespace env
 {
 
 using namespace MOBase;
-
 
 bool Shortcut::add(Locations loc)
 {
@@ -32,8 +31,8 @@ bool Shortcut::add(Locations loc)
     path = QStandardPaths::standardLocations(QStandardPaths::DesktopLocation).first();
     break;
   case StartMenu:
-    path = QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation).
-        first();
+    path =
+        QStandardPaths::standardLocations(QStandardPaths::ApplicationsLocation).first();
     break;
   default:
     log::error("shortcut: Location is none");
@@ -44,14 +43,14 @@ bool Shortcut::add(Locations loc)
 
   QString fileContent =
       QString("#!/usr/bin/env xdg-open\n"
-          "[Desktop Entry]\n"
-          "Name=%1\n"
-          "Exec=\"%2 %3\"\n"
-          "Icon=\"%4\"\n"
-          "Path=%5\n"
-          "StartupNotify=true\n"
-          "Type=Application\n"
-          ).arg(m_name, m_target, m_arguments, m_icon, m_workingDirectory);
+              "[Desktop Entry]\n"
+              "Name=%1\n"
+              "Exec=\"%2 %3\"\n"
+              "Icon=\"%4\"\n"
+              "Path=%5\n"
+              "StartupNotify=true\n"
+              "Type=Application\n")
+          .arg(m_name, m_target, m_arguments, m_icon, m_workingDirectory);
 
   QFile file(path + "/" + m_name + ".desktop");
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -65,9 +64,13 @@ bool Shortcut::add(Locations loc)
   file.close();
   return true;
 
-  // TODO: use xdg-desktop portal
-  // QDBusMessage message = QDBusMessage::createMethodCall("org.freedesktop.portal.DynamicLauncher.PrepareInstall");
-  // QDBusMessage message = QDBusMessage::createMethodCall("org.freedesktop.portal.Desktop", "org/freedesktop/portal/Desktop", "org.freedesktop.portal.DynamicLauncher", "SupportedLauncherTypes");
+  // TODO: use xdg-desktop portal?
+  // QDBusMessage message =
+  // QDBusMessage::createMethodCall("org.freedesktop.portal.DynamicLauncher.PrepareInstall");
+  // QDBusMessage message =
+  // QDBusMessage::createMethodCall("org.freedesktop.portal.Desktop",
+  // "org/freedesktop/portal/Desktop", "org.freedesktop.portal.DynamicLauncher",
+  // "SupportedLauncherTypes");
 }
 
 bool Shortcut::remove(Locations loc)

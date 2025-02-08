@@ -16,14 +16,13 @@ public:
   OriginConnection& operator=(const OriginConnection&) = delete;
 
   std::pair<FilesOrigin&, bool>
-  getOrCreate(const QString& originName, const QString& directory,
-              int priority, const boost::shared_ptr<FileRegister>& fileRegister,
+  getOrCreate(const QString& originName, const QString& directory, int priority,
+              const boost::shared_ptr<FileRegister>& fileRegister,
               const boost::shared_ptr<OriginConnection>& originConnection,
               DirectoryStats& stats);
 
-  FilesOrigin& createOrigin(const QString& originName,
-                            const QString& directory, int priority,
-                            boost::shared_ptr<FileRegister> fileRegister,
+  FilesOrigin& createOrigin(const QString& originName, const QString& directory,
+                            int priority, boost::shared_ptr<FileRegister> fileRegister,
                             boost::shared_ptr<OriginConnection> originConnection);
 
   bool exists(const QString& name);
@@ -44,8 +43,8 @@ private:
 
   OriginID createID();
 
-  FilesOrigin& createOriginNoLock(const QString& originName,
-                                  const QString& directory, int priority,
+  FilesOrigin& createOriginNoLock(const QString& originName, const QString& directory,
+                                  int priority,
                                   boost::shared_ptr<FileRegister> fileRegister,
                                   boost::shared_ptr<OriginConnection> originConnection);
 };

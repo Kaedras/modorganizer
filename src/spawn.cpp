@@ -21,17 +21,17 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef __unix__
 #include "linux/compatibility.h"
-static constexpr const char* steamName = "steam";
+static constexpr const char* steamName        = "steam";
 static constexpr const char* steamServiceName = "steamwebhelper";
 #else
-static constexpr const char* steamName = "Steam.exe";
+static constexpr const char* steamName        = "Steam.exe";
 static constexpr const char* steamServiceName = "SteamService.exe";
 #endif
 
 #include "env.h"
 #include "envmodule.h"
-#include "envsecurity.h"
 #include "envos.h"
+#include "envsecurity.h"
 #include "settings.h"
 #include "settingsdialogworkarounds.h"
 #include "shared/appconfig.h"
@@ -50,8 +50,10 @@ using namespace MOShared;
 namespace spawn::dialogs
 {
 
-extern QString makeDetails(const SpawnParameters& sp, DWORD code, const QString& more = {});
-extern QString makeContent(const SpawnParameters& sp, DWORD code, const QString& message = {});
+extern QString makeDetails(const SpawnParameters& sp, DWORD code,
+                           const QString& more = {});
+extern QString makeContent(const SpawnParameters& sp, DWORD code,
+                           const QString& message = {});
 
 void spawnFailed(QWidget* parent, const SpawnParameters& sp, DWORD code)
 {
@@ -71,8 +73,7 @@ void spawnFailed(QWidget* parent, const SpawnParameters& sp, DWORD code)
 }
 
 void helperFailed(QWidget* parent, DWORD code, const QString& why,
-                  const QString& binary, const QString& cwd,
-                  const QString& args)
+                  const QString& binary, const QString& cwd, const QString& args)
 {
   SpawnParameters sp;
   sp.binary = QFileInfo(binary);
@@ -338,17 +339,15 @@ bool isJavaFile(const QFileInfo& target)
   return (target.suffix().compare("jar", Qt::CaseInsensitive) == 0);
 }
 
-
 }  // namespace spawn
 
 namespace helper
 {
 
 extern bool helperExec(QWidget* parent, const QString& moDirectory,
-                const QString& commandLine, bool async);
+                       const QString& commandLine, bool async);
 
-bool backdateBSAs(QWidget* parent, const QString& moPath,
-                  const QString& dataPath)
+bool backdateBSAs(QWidget* parent, const QString& moPath, const QString& dataPath)
 {
   const QString commandLine = QString(R"(backdateBSA "%1")").arg(dataPath);
 

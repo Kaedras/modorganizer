@@ -103,8 +103,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QEvent>
-#include <QFileIconProvider>
 #include <QFileDialog>
+#include <QFileIconProvider>
 #include <QFont>
 #include <QFuture>
 #include <QHash>
@@ -184,8 +184,8 @@ inline QString formatSystemMessageToQString(int e)
   return QString::fromLocal8Bit(strerror(e));
 }
 #else
-#include <usvfs/usvfs.h>
 #include <shlobj.h>
+#include <usvfs/usvfs.h>
 inline QString formatSystemMessageToQString(int e)
 {
   return QString::fromStdWString(formatSystemMessage(e));
@@ -990,8 +990,7 @@ void MainWindow::updateProblemsButton()
 
 bool MainWindow::errorReported(QString& logFile)
 {
-  QDir dir(qApp->property("dataPath").toString() + "/" +
-           AppConfig::logPath());
+  QDir dir(qApp->property("dataPath").toString() + "/" + AppConfig::logPath());
   QFileInfoList files =
       dir.entryInfoList(QStringList("ModOrganizer_??_??_??_??_??.log"), QDir::Files,
                         QDir::Name | QDir::Reversed);
@@ -1966,8 +1965,8 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
       FilesOrigin& origin =
           m_OrganizerCore.directoryStructure()->getOriginByID(originId);
 
-      QTreeWidgetItem* newItem = new QTreeWidgetItem(
-          QStringList() << fileInfo.fileName() << origin.getName());
+      QTreeWidgetItem* newItem =
+          new QTreeWidgetItem(QStringList() << fileInfo.fileName() << origin.getName());
       newItem->setData(0, Qt::UserRole, index);
       newItem->setData(1, Qt::UserRole, originId);
       newItem->setFlags(newItem->flags() &
@@ -2494,14 +2493,12 @@ void MainWindow::modRenamed(const QString& oldName, const QString& newName)
 void MainWindow::fileMoved(const QString& filePath, const QString& oldOriginName,
                            const QString& newOriginName)
 {
-  const FileEntryPtr filePtr =
-      m_OrganizerCore.directoryStructure()->findFile(filePath);
+  const FileEntryPtr filePtr = m_OrganizerCore.directoryStructure()->findFile(filePath);
   if (filePtr.get() != nullptr) {
     try {
-      if (m_OrganizerCore.directoryStructure()->originExists(
-              newOriginName)) {
-        FilesOrigin& newOrigin = m_OrganizerCore.directoryStructure()->getOriginByName(
-            newOriginName);
+      if (m_OrganizerCore.directoryStructure()->originExists(newOriginName)) {
+        FilesOrigin& newOrigin =
+            m_OrganizerCore.directoryStructure()->getOriginByName(newOriginName);
 
         QString fullNewPath = newOrigin.getPath() + "/" + filePath;
         // TODO: check if the result differs with this implementation
@@ -2509,10 +2506,9 @@ void MainWindow::fileMoved(const QString& filePath, const QString& oldOriginName
 
         filePtr->addOrigin(newOrigin.getID(), fileInfo.birthTime(), "", -1);
       }
-      if (m_OrganizerCore.directoryStructure()->originExists(
-              oldOriginName)) {
-        FilesOrigin& oldOrigin = m_OrganizerCore.directoryStructure()->getOriginByName(
-            oldOriginName);
+      if (m_OrganizerCore.directoryStructure()->originExists(oldOriginName)) {
+        FilesOrigin& oldOrigin =
+            m_OrganizerCore.directoryStructure()->getOriginByName(oldOriginName);
         filePtr->removeOrigin(oldOrigin.getID());
       }
     } catch (const std::exception& e) {
@@ -2599,8 +2595,8 @@ void MainWindow::openPluginsFolder()
 
 void MainWindow::openStylesheetsFolder()
 {
-  QString ssPath = QCoreApplication::applicationDirPath() + "/" +
-                   AppConfig::stylesheetsPath();
+  QString ssPath =
+      QCoreApplication::applicationDirPath() + "/" + AppConfig::stylesheetsPath();
   shell::Explore(ssPath);
 }
 
@@ -3604,15 +3600,13 @@ void MainWindow::extractBSATriggered(QTreeWidgetItem* item)
       for (int i = 0; i < item->childCount(); ++i) {
         archives.append(item->child(i)->text(0));
       }
-      origin = QDir::fromNativeSeparators(
-          m_OrganizerCore.directoryStructure()
-                        ->getOriginByName(item->text(0))
-                        .getPath());
+      origin = QDir::fromNativeSeparators(m_OrganizerCore.directoryStructure()
+                                              ->getOriginByName(item->text(0))
+                                              .getPath());
     } else {
-      origin = QDir::fromNativeSeparators(
-          m_OrganizerCore.directoryStructure()
-                        ->getOriginByName(item->text(1))
-                        .getPath());
+      origin   = QDir::fromNativeSeparators(m_OrganizerCore.directoryStructure()
+                                                ->getOriginByName(item->text(1))
+                                                .getPath());
       archives = QStringList({item->text(0)});
     }
 
@@ -3834,9 +3828,9 @@ void MainWindow::on_restoreButton_clicked()
         e = r3;
       }
 
-      QMessageBox::critical(this, tr("Restore failed"),
-                            tr("Failed to restore the backup. Errorcode: %1")
-                                .arg(e.message));
+      QMessageBox::critical(
+          this, tr("Restore failed"),
+          tr("Failed to restore the backup. Errorcode: %1").arg(e.message));
     }
     m_OrganizerCore.refreshESPList(true);
   }

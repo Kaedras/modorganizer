@@ -1,5 +1,5 @@
-#include "settingsutilities.h"
 #include "expanderwidget.h"
+#include "settingsutilities.h"
 #include <utility.h>
 
 using namespace MOBase;

@@ -1,4 +1,3 @@
-#include "envos.h"
 #include "env.h"
 #include "envmodule.h"
 #include "envos.h"
@@ -12,7 +11,8 @@ namespace env
 
 using namespace MOBase;
 
-class WindowsInfo final : public OsInfo {
+class WindowsInfo final : public OsInfo
+{
 public:
   struct Release
   {
@@ -57,7 +57,6 @@ private:
   std::optional<bool> getElevated() const;
 }
 
-
 WindowsInfo::WindowsInfo()
 {
   // loading ntdll.dll, the functions will be found with GetProcAddress()
@@ -95,10 +94,10 @@ const WindowsInfo::Version& WindowsInfo::realVersion() const
   return m_real;
 }
 
-//const WindowsInfo::Release& WindowsInfo::release() const
+// const WindowsInfo::Release& WindowsInfo::release() const
 //{
-//  return m_release;
-//}
+//   return m_release;
+// }
 
 std::optional<bool> WindowsInfo::isElevated() const
 {

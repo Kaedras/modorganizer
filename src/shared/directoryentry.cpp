@@ -22,8 +22,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "fileentry.h"
 #include "filesorigin.h"
 #include "originconnection.h"
-#include "util.h"
 #include "os_error.h"
+#include "util.h"
 #include <log.h>
 #include <utility.h>
 
@@ -91,18 +91,16 @@ void DirectoryEntry::clear()
   m_SubDirectoriesLookup.clear();
 }
 
-void DirectoryEntry::addFromOrigin(const QString& originName,
-                                   const QString& directory, int priority,
-                                   DirectoryStats& stats)
+void DirectoryEntry::addFromOrigin(const QString& originName, const QString& directory,
+                                   int priority, DirectoryStats& stats)
 {
   env::DirectoryWalker walker;
   addFromOrigin(walker, originName, directory, priority, stats);
 }
 
 void DirectoryEntry::addFromOrigin(env::DirectoryWalker& walker,
-                                   const QString& originName,
-                                   const QString& directory, int priority,
-                                   DirectoryStats& stats)
+                                   const QString& originName, const QString& directory,
+                                   int priority, DirectoryStats& stats)
 {
   FilesOrigin& origin = createOrigin(originName, directory, priority, stats);
 
@@ -113,9 +111,9 @@ void DirectoryEntry::addFromOrigin(env::DirectoryWalker& walker,
   m_Populated = true;
 }
 
-void DirectoryEntry::addFromList(const QString& originName,
-                                 const QString& directory, env::Directory& root,
-                                 int priority, DirectoryStats& stats)
+void DirectoryEntry::addFromList(const QString& originName, const QString& directory,
+                                 env::Directory& root, int priority,
+                                 DirectoryStats& stats)
 {
   stats = {};
 
@@ -142,9 +140,8 @@ void DirectoryEntry::addDir(FilesOrigin& origin, env::Directory& d,
   m_Populated = true;
 }
 
-void DirectoryEntry::addFromAllBSAs(const QString& originName,
-                                    const QString& directory, int priority,
-                                    const std::vector<QString>& archives,
+void DirectoryEntry::addFromAllBSAs(const QString& originName, const QString& directory,
+                                    int priority, const std::vector<QString>& archives,
                                     const std::set<QString>& enabledArchives,
                                     const std::vector<QString>& loadOrder,
                                     DirectoryStats& stats)
@@ -173,12 +170,11 @@ void DirectoryEntry::addFromAllBSAs(const QString& originName,
   }
 }
 
-void DirectoryEntry::addFromBSA(const QString& originName,
-                                const QString& directory,
-                                const QString& archivePath, int priority,
-                                int order, DirectoryStats& stats)
+void DirectoryEntry::addFromBSA(const QString& originName, const QString& directory,
+                                const QString& archivePath, int priority, int order,
+                                DirectoryStats& stats)
 {
-  FilesOrigin& origin    = createOrigin(originName, directory, priority, stats);
+  FilesOrigin& origin = createOrigin(originName, directory, priority, stats);
   QFileInfo info(archivePath);
   const auto archiveName = info.fileName();
 
@@ -202,7 +198,6 @@ void DirectoryEntry::addFromBSA(const QString& originName,
     log::error("invalid bsa '{}', error {}", archivePath, res);
     return;
   }
-
 
   QDateTime dt = info.lastModified();
   if (!info.exists()) {
@@ -384,7 +379,7 @@ const FileEntryPtr DirectoryEntry::searchFile(const QString& path,
   } else {
     // file is in a subdirectory, recurse into the matching subdirectory
     QString pathComponent = path.sliced(0, len);
-    DirectoryEntry* temp       = findSubDirectory(pathComponent);
+    DirectoryEntry* temp  = findSubDirectory(pathComponent);
 
     if (temp != nullptr) {
       if (len >= path.size()) {
@@ -525,8 +520,7 @@ FileEntryPtr DirectoryEntry::insert(const QString& fileName, FilesOrigin& origin
       fe = m_FileRegister->getFile(itor->second);
     } else {
       ++stats.fileCreate;
-      fe = m_FileRegister->createFile(fileName,
-                                      this, stats);
+      fe = m_FileRegister->createFile(fileName, this, stats);
 
       elapsed(stats.addFileTimes, [&] {
         addFileToList(std::move(key.value), fe->getIndex());
@@ -643,16 +637,16 @@ void DirectoryEntry::onFile(Context* cx, const QString& path, QDateTime ft)
 }
 
 void DirectoryEntry::addFiles(FilesOrigin& origin, const BSA::Folder::Ptr archiveFolder,
-                              QDateTime fileTime, const QString& archiveName,
-                              int order, DirectoryStats& stats)
+                              QDateTime fileTime, const QString& archiveName, int order,
+                              DirectoryStats& stats)
 {
   // add files
   const auto fileCount = archiveFolder->getNumFiles();
   for (unsigned int i = 0; i < fileCount; ++i) {
     const BSA::File::Ptr file = archiveFolder->getFile(i);
 
-    auto f = insert(QString::fromStdString(file->getName()), origin, fileTime, archiveName,
-                    order, stats);
+    auto f = insert(QString::fromStdString(file->getName()), origin, fileTime,
+                    archiveName, order, stats);
 
     if (f) {
       if (file->getUncompressedFileSize() > 0) {
@@ -695,8 +689,8 @@ DirectoryEntry* DirectoryEntry::getSubDirectory(const QString& name, bool create
   if (create) {
     ++stats.subdirCreate;
 
-    auto* entry = new DirectoryEntry(name, this,
-                                     originID, m_FileRegister, m_OriginConnection);
+    auto* entry =
+        new DirectoryEntry(name, this, originID, m_FileRegister, m_OriginConnection);
 
     elapsed(stats.addDirectoryTimes, [&] {
       addDirectoryToList(entry, std::move(nameLc));
@@ -878,7 +872,8 @@ void DirectoryEntry::dump(const QString& file) const
     QFile f(file);
 
     if (!f.open(QIODeviceBase::WriteOnly)) {
-      throw DumpFailed(std::format("failed to open, {} ({})", f.errorString(), (int)f.error()));
+      throw DumpFailed(
+          std::format("failed to open, {} ({})", f.errorString(), (int)f.error()));
     }
 
     Guard g([&] {
@@ -887,8 +882,7 @@ void DirectoryEntry::dump(const QString& file) const
 
     dump(&f, "Data");
   } catch (DumpFailed& e) {
-    log::error("failed to write list to '{}': {}",
-               file.toStdString(), e.what());
+    log::error("failed to write list to '{}': {}", file.toStdString(), e.what());
   }
 }
 
@@ -916,7 +910,8 @@ void DirectoryEntry::dump(QFile* f, const QString& parentPath) const
       const auto lineu8 = line.toStdString();
 
       if (stream.writeRawData(lineu8.data(), lineu8.size()) == -1) {
-        throw DumpFailed(std::format("failed to write, {} ({})", f->errorString(), (int)f->error()));
+        throw DumpFailed(
+            std::format("failed to write, {} ({})", f->errorString(), (int)f->error()));
       }
     }
   }

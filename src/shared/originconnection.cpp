@@ -34,8 +34,8 @@ std::pair<FilesOrigin&, bool> OriginConnection::getOrCreate(
 }
 
 FilesOrigin&
-OriginConnection::createOrigin(const QString& originName,
-                               const QString& directory, int priority,
+OriginConnection::createOrigin(const QString& originName, const QString& directory,
+                               int priority,
                                boost::shared_ptr<FileRegister> fileRegister,
                                boost::shared_ptr<OriginConnection> originConnection)
 {
@@ -80,14 +80,12 @@ FilesOrigin& OriginConnection::getByName(const QString& name)
     return m_Origins[iter->second];
   } else {
     std::ostringstream stream;
-    stream << QObject::tr("invalid origin name: ").toStdString()
-           << name.toStdString();
+    stream << QObject::tr("invalid origin name: ").toStdString() << name.toStdString();
     throw std::runtime_error(stream.str());
   }
 }
 
-void OriginConnection::changeNameLookup(const QString& oldName,
-                                        const QString& newName)
+void OriginConnection::changeNameLookup(const QString& oldName, const QString& newName)
 {
   std::scoped_lock lock(m_Mutex);
 

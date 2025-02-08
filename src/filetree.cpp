@@ -13,7 +13,7 @@ using namespace MOBase;
 
 bool canPreviewFile(const PluginContainer& pc, const FileEntry& file)
 {
-  return canPreviewFile(pc, file.isFromArchive(),file.getName());
+  return canPreviewFile(pc, file.isFromArchive(), file.getName());
 }
 
 bool canRunFile(const FileEntry& file)
@@ -340,7 +340,7 @@ void FileTree::openModInfo(FileTreeItem* item)
   }
 
   const auto& origin = m_core.directoryStructure()->getOriginByID(originID);
-  const auto& name = origin.getName();
+  const auto& name   = origin.getName();
 
   unsigned int index = ModInfo::getIndex(name);
   if (index == UINT_MAX) {
@@ -500,7 +500,6 @@ QMainWindow* getMainWindow(QWidget* w)
 
   return nullptr;
 }
-
 
 void FileTree::addDirectoryMenus(QMenu&, FileTreeItem&)
 {

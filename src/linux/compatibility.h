@@ -2,9 +2,9 @@
 #define COMPATIBILITY_H
 
 #include <cerrno>
+#include <poll.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <poll.h>
 
 extern "C"
 {
@@ -12,15 +12,15 @@ extern "C"
 }
 
 // use pidfd instead of handle
-using HANDLE = int;
-using DWORD = uint32_t;
+using HANDLE     = int;
+using DWORD      = uint32_t;
 using SYSTEMTIME = timespec;
-using LPCWSTR = const wchar_t*;
+using LPCWSTR    = const wchar_t*;
 
 // pidfd_open return -1 on error
 static inline constexpr int INVALID_HANDLE_VALUE = -1;
 static inline constexpr auto ERROR_ACCESS_DENIED = EACCES;
-static inline constexpr auto ERROR_CANCELLED = ECANCELED;
+static inline constexpr auto ERROR_CANCELLED     = ECANCELED;
 
 inline int GetLastError()
 {
@@ -58,4 +58,4 @@ inline DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds)
   return poll(&pfd, 1, dwMilliseconds);
 }
 
-#endif // COMPATIBILITY_H
+#endif  // COMPATIBILITY_H

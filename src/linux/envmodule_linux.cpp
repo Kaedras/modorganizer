@@ -14,7 +14,6 @@ namespace env
 
 using namespace MOBase;
 
-
 Module::FileInfo Module::getFileInfo() const
 {
   STUB();
@@ -30,16 +29,17 @@ QDateTime Module::getTimestamp(const VS_FIXEDFILEINFO& fi) const
   STUB();
   return {};
 }
-VS_FIXEDFILEINFO Module::getFixedFileInfo(std::byte* buffer) const{
+VS_FIXEDFILEINFO Module::getFixedFileInfo(std::byte* buffer) const
+{
   STUB();
   return {};
 }
 
-QString Module::getFileDescription(std::byte* buffer) const{
+QString Module::getFileDescription(std::byte* buffer) const
+{
   STUB();
   return {};
 }
-
 
 bool Module::interesting() const
 {
@@ -59,7 +59,7 @@ HandlePtr Process::openHandleForWait() const
 bool Process::canAccess() const
 {
   fs::path statusPath = "/proc/" + to_string(m_pid) + "/status";
-  fs::perms p = filesystem::status(statusPath).permissions();
+  fs::perms p         = filesystem::status(statusPath).permissions();
   return p == fs::perms::others_read;
 }
 
@@ -68,7 +68,7 @@ std::vector<Process> getRunningProcesses()
   std::vector<Process> v;
   fs::directory_iterator it("/proc");
 
-  for(auto folder :  it) {
+  for (auto folder : it) {
     v.emplace_back(stoi(folder.path().filename()));
   }
 
@@ -90,7 +90,7 @@ Process getProcessTree(HANDLE h)
 QString getProcessName(DWORD pid)
 {
   ifstream comm("/proc/" + to_string(pid) + "/comm");
-  if(!comm.is_open()) {
+  if (!comm.is_open()) {
     log::error("error reading process info for pid {}", pid);
   }
   string name;
@@ -114,7 +114,7 @@ DWORD getProcessParentID(DWORD pid)
     stat >> readPid >> comm >> state >> ppid;
 
     return ppid;
-  } catch (const std::exception & ex) {
+  } catch (const std::exception& ex) {
     log::warn("could not get ppid of pid {}: {}", pid, ex.what());
     return 0;
   }

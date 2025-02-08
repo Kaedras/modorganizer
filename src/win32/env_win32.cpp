@@ -92,7 +92,6 @@ ModuleNotification::~ModuleNotification()
   }
 }
 
-
 std::unique_ptr<ModuleNotification>
 Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
 {
@@ -187,7 +186,6 @@ Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
 
   return context;
 }
-
 
 Service::StartType getServiceStartType(SC_HANDLE s, const QString& name)
 {
@@ -844,6 +842,4 @@ bool coredumpOther(CoreDumpTypes type)
   return createMiniDump(nullptr, handle.get(), type);
 }
 
-
-
-}
+}  // namespace env

@@ -1,5 +1,5 @@
-#include "loot.h"
 #include "json.h"
+#include "loot.h"
 #include "lootdialog.h"
 #include "organizercore.h"
 #include "spawn.h"
@@ -15,7 +15,6 @@ static inline const QString lootExecutable = QStringLiteral("lootcli.exe");
 #else
 static inline const QString lootExecutable = QStringLiteral("lootcli");
 #endif
-
 
 static QString LootReportPath = QDir::temp().absoluteFilePath("lootreport.json");
 

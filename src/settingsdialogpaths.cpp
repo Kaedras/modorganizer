@@ -106,8 +106,7 @@ void PathsSettingsTab::update()
       }
     }
 
-    if (QFileInfo(realPath) !=
-        QFileInfo(basePath + "/" + defaultName)) {
+    if (QFileInfo(realPath) != QFileInfo(basePath + "/" + defaultName)) {
       (settings().paths().*setter)(path);
     } else {
       (settings().paths().*setter)("");

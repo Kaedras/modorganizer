@@ -72,9 +72,8 @@ std::optional<ProcessRunner::Results> singleWait(HANDLE handle, DWORD pid)
   }
 
   // const auto res = WaitForSingleObject(handle, 50);
-  pollfd pfd = {handle, POLLIN, 0};
+  pollfd pfd    = {handle, POLLIN, 0};
   const int res = poll(&pfd, 1, 50);
-
 
   switch (res) {
   case 1: {
@@ -295,9 +294,8 @@ std::optional<ProcessRunner::Results> timedWait(HANDLE handle, DWORD pid,
   return ProcessRunner::ForceUnlocked;
 }
 
-
 ProcessRunner::Results waitForAllChildProcesses(HANDLE job, UILocker::Session* ls,
-                                                  std::atomic<bool>& interrupt)
+                                                std::atomic<bool>& interrupt)
 {
   siginfo_t info;
   while (!interrupt) {
@@ -452,7 +450,6 @@ ProcessRunner::Results waitForProcesses(const std::vector<HANDLE>& initialProces
 
   return results;
 }
-
 
 ProcessRunner::Results waitForProcess(HANDLE initialProcess, LPDWORD exitCode,
                                       UILocker::Session* ls)

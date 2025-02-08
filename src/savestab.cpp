@@ -144,8 +144,8 @@ QDir SavesTab::currentSavesDir() const
     QString path = ini.value("General/SLocalSavePath").toString();
 
     if (!path.isEmpty()) {
-      savesDir.setPath(m_core.managedGame()->documentsDirectory().absoluteFilePath(
-          path));
+      savesDir.setPath(
+          m_core.managedGame()->documentsDirectory().absoluteFilePath(path));
     } else {
       savesDir = m_core.managedGame()->savesDirectory();
     }

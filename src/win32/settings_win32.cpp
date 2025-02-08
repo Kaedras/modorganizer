@@ -1,7 +1,7 @@
-#include "settings.h"
 #include "env.h"
-#include "settingsutilities.h"
 #include "instancemanager.h"
+#include "settings.h"
+#include "settingsutilities.h"
 #include "shared/appconfig.h"
 #include <utility.h>
 
@@ -9,7 +9,6 @@
 
 using namespace MOBase;
 using namespace MOShared;
-
 
 void NexusSettings::dump() const
 {

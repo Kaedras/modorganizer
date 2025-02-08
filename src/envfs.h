@@ -183,8 +183,8 @@ private:
   std::vector<std::unique_ptr<unsigned char[]>> m_buffers;
 };
 
-void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
-                  DirEndF* dirEndF, FileF* fileF);
+void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF, DirEndF* dirEndF,
+                  FileF* fileF);
 
 Directory getFilesAndDirs(const QString& path);
 Directory getFilesAndDirsWithFind(const QString& path);

@@ -303,8 +303,8 @@ void Profile::createTweakedIniFile()
   mergeTweak(getProfileTweaks(), tweakedIni);
 
   bool error = false;
-  if (!MOBase::WriteRegistryValue(QStringLiteral("Archive/bInvalidateOlderFiles"), QString::number(1),
-                                  tweakedIni)) {
+  if (!MOBase::WriteRegistryValue(QStringLiteral("Archive/bInvalidateOlderFiles"),
+                                  QString::number(1), tweakedIni)) {
     error = true;
   }
 
@@ -748,7 +748,7 @@ void Profile::mergeTweak(const QString& tweakName, const QString& tweakedIni) co
   QSettings tweak(tweakName, QSettings::IniFormat);
 
   QStringList keys = tweak.allKeys();
-  for (const auto& key: keys) {
+  for (const auto& key : keys) {
     MOBase::WriteRegistryValue(key, tweak.value(key).toString(), tweakedIni);
   }
 }
@@ -954,8 +954,7 @@ QString Profile::absoluteIniFilePath(QString iniFile) const
 
 QString Profile::getProfileTweaks() const
 {
-  return QDir::cleanPath(
-      m_Directory.absoluteFilePath(AppConfig::profileTweakIni()));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(AppConfig::profileTweakIni()));
 }
 
 QString Profile::absolutePath() const

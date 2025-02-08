@@ -68,9 +68,9 @@ QString LinuxInfo::toString() const
   }
 
   // version
-  sl.push_back("Kernel " + m_version.toString()); // kernel release, e.g. 6.9.9
-  sl.push_back(m_info.machine); // architecture, e.g. x86_64
-  sl.push_back( m_info.version); // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
+  sl.push_back("Kernel " + m_version.toString());  // kernel release, e.g. 6.9.9
+  sl.push_back(m_info.machine);                    // architecture, e.g. x86_64
+  sl.push_back(m_info.version);  // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
 
   // elevated
   QString elevated = "?";
@@ -92,7 +92,6 @@ LinuxInfo::LinuxInfo()
 
 bool LinuxInfo::compatibilityMode() const
 {
-  STUB();
   return false;
 }
 
@@ -142,12 +141,12 @@ LinuxInfo::Release LinuxInfo::getRelease() const
 
 void LinuxInfo::getVersion()
 {
-  if(uname(&m_info) != 0) {
-    log::error("error getting kernel version: {}",errno);
+  if (uname(&m_info) != 0) {
+    log::error("error getting kernel version: {}", errno);
   }
   QString versionString = m_info.release;
-  QStringList list = versionString.split('.');
-  if(list.size() != 3){
+  QStringList list      = versionString.split('.');
+  if (list.size() != 3) {
     log::error("invalid version string size, got '{}'", versionString.toStdString());
   } else {
     m_version.major = list[0].toInt();
@@ -161,4 +160,4 @@ OsInfo* CreateInfo()
   return new LinuxInfo();
 }
 
-}
+}  // namespace env

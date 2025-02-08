@@ -68,16 +68,14 @@ void FileEntry::addOrigin(OriginID origin, QDateTime fileTime, const QString& ar
       if ((m_Parent != nullptr) &&
           (m_Parent->getOriginByID(iter->originID()).getPriority() <
            m_Parent->getOriginByID(origin).getPriority())) {
-        m_Alternatives.insert(
-            iter, {origin, {archive, order}});
+        m_Alternatives.insert(iter, {origin, {archive, order}});
         found = true;
         break;
       }
     }
 
     if (!found) {
-      m_Alternatives.push_back(
-          {origin, {archive, order}});
+      m_Alternatives.push_back({origin, {archive, order}});
     }
   }
 }

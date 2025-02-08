@@ -6,8 +6,8 @@
 #include "shared/fileregisterfwd.h"
 
 #include <QAbstractItemModel>
-#include <QTimer>
 #include <QSet>
+#include <QTimer>
 
 class OrganizerCore;
 
@@ -126,14 +126,12 @@ private:
   // for `forFetching`, see top of filetreemodel.cpp
   void removeDisappearingDirectories(FileTreeItem& parentItem,
                                      const MOShared::DirectoryEntry& parentEntry,
-                                     const QString& parentPath,
-                                     QSet<QString>& seen,
+                                     const QString& parentPath, QSet<QString>& seen,
                                      bool forFetching);
 
   bool addNewDirectories(FileTreeItem& parentItem,
                          const MOShared::DirectoryEntry& parentEntry,
-                         const QString& parentPath,
-                         const QSet<QString>& seen);
+                         const QString& parentPath, const QSet<QString>& seen);
 
   bool updateFiles(FileTreeItem& parentItem, const QString& path,
                    const MOShared::DirectoryEntry& parentEntry);
@@ -152,8 +150,7 @@ private:
                                         const QString& parentPath,
                                         const MOShared::DirectoryEntry& d);
 
-  FileTreeItem::Ptr createFileItem(FileTreeItem& parentItem,
-                                   const QString& parentPath,
+  FileTreeItem::Ptr createFileItem(FileTreeItem& parentItem, const QString& parentPath,
                                    const MOShared::FileEntry& file);
 
   void updateFileItem(FileTreeItem& item, const MOShared::FileEntry& file);

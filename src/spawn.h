@@ -105,8 +105,7 @@ namespace helper
  * @param dataPath the path taht contains the .bsa-files, usually the data directory of
  *the game
  **/
-bool backdateBSAs(QWidget* parent, const QString& moPath,
-                  const QString& dataPath);
+bool backdateBSAs(QWidget* parent, const QString& moPath, const QString& dataPath);
 
 /**
  * @brief waits for the current process to exit and restarts it as an administrator
@@ -114,8 +113,8 @@ bool backdateBSAs(QWidget* parent, const QString& moPath,
  * @param moFile file name of modOrganizer
  * @param workingDir current working directory
  **/
-bool adminLaunch(QWidget* parent, const QString& moPath,
-                 const QString& moFile, const QString& workingDir);
+bool adminLaunch(QWidget* parent, const QString& moPath, const QString& moFile,
+                 const QString& workingDir);
 
 }  // namespace helper
 

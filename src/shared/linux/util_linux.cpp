@@ -1,5 +1,5 @@
-#include "shared/util.h"
 #include "linux/stub.h"
+#include "shared/util.h"
 #include <pthread.h>
 
 namespace MOShared

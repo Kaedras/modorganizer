@@ -276,8 +276,7 @@ void PluginListView::setup(OrganizerCore& core, MainWindow* mw, Ui::MainWindow* 
     for (auto& idx : pluginIndices) {
       QString pluginName = m_core->pluginList()->getName(idx.row());
 
-      const MOShared::FileEntryPtr fileEntry =
-          directoryEntry.findFile(pluginName);
+      const MOShared::FileEntryPtr fileEntry = directoryEntry.findFile(pluginName);
       if (fileEntry.get() != nullptr) {
         QString originName =
             directoryEntry.getOriginByID(fileEntry->getOrigin()).getName();

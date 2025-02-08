@@ -113,9 +113,9 @@
 #include <QDropEvent>
 #include <QElapsedTimer>
 #include <QEvent>
-#include <QFileIconProvider>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QFileSystemModel>
 #include <QFileSystemWatcher>

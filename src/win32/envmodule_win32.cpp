@@ -1,5 +1,5 @@
-#include "envmodule.h"
 #include "env.h"
+#include "envmodule.h"
 #include <log.h>
 #include <utility.h>
 
@@ -7,8 +7,6 @@ namespace env
 {
 
 using namespace MOBase;
-
-
 
 bool isJobHandle(HANDLE h)
 {
@@ -70,7 +68,6 @@ QString getProcessName(HANDLE process)
 
   return s;
 }
-
 
 Module::FileInfo Module::getFileInfo() const
 {
@@ -192,7 +189,6 @@ QString Module::getFileDescription(std::byte* buffer) const
   return QString::fromWCharArray(static_cast<wchar_t*>(valuePointer), valueSize - 1);
 }
 
-
 QString Module::getVersion(const VS_FIXEDFILEINFO& fi) const
 {
   if (fi.dwSignature == 0) {
@@ -280,7 +276,6 @@ bool Module::interesting() const
   return true;
 }
 
-
 HandlePtr Process::openHandleForWait() const
 {
   const auto rights =
@@ -308,7 +303,6 @@ bool Process::canAccess() const
 
   return true;
 }
-
 
 std::vector<Module> getLoadedModules()
 {
@@ -400,7 +394,6 @@ void forEachRunningProcess(F&& f)
   }
 }
 
-
 std::vector<Process> getRunningProcesses()
 {
   std::vector<Process> v;
@@ -414,7 +407,6 @@ std::vector<Process> getRunningProcesses()
 
   return v;
 }
-
 
 std::vector<DWORD> processesInJob(HANDLE h)
 {
@@ -467,7 +459,6 @@ std::vector<DWORD> processesInJob(HANDLE h)
 
   return {};
 }
-
 
 Process getProcessTreeFromJob(HANDLE h)
 {

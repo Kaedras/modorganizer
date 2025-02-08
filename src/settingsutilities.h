@@ -277,5 +277,4 @@ QString checkedSettingName(const QAbstractButton* b);
 
 void warnIfNotCheckable(const QAbstractButton* b);
 
-
 #endif  // SETTINGSUTILITIES_H
