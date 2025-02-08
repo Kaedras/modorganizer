@@ -38,7 +38,12 @@
       "generator": "Visual Studio 17 2022",
       "inherits": ["cmake-dev", "vcpkg"],
       "name": "vs2022-windows",
-      "toolset": "v143"
+      "toolset": "v143",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
     },
     {
       "cacheVariables": {
