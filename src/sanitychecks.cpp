@@ -6,6 +6,21 @@
 #include <log.h>
 #include <utility.h>
 
+#ifdef __unix__
+// executables file types
+static const QStringList FileTypes = {"*.so"};
+// files that are likely to be eaten
+static const QStringList files(
+    {"helper", "nxmhandler", "loot/libloot.so", "loot/lootcli"});
+#else
+// executables file types
+static const QStringList FileTypes = {"*.dll", "*.exe"};
+// files that are likely to be eaten
+static const QStringList files(
+    {"helper.exe", "nxmhandler.exe", "usvfs_proxy_x64.exe", "usvfs_proxy_x86.exe",
+     "usvfs_x64.dll", "usvfs_x86.dll", "loot/loot.dll", "loot/lootcli.exe"});
+#endif
+
 namespace sanity
 {
 
@@ -124,9 +139,6 @@ bool isFileBlocked(const QFileInfo& fi)
 
 int checkBlockedFiles(const QDir& dir)
 {
-  // executables file types
-  const QStringList FileTypes = {"*.dll", "*.exe"};
-
   if (!dir.exists()) {
     // shouldn't happen
     log::error("while checking for blocked files, directory '{}' not found",
@@ -177,11 +189,6 @@ int checkBlocked()
 
 int checkMissingFiles()
 {
-  // files that are likely to be eaten
-  static const QStringList files(
-      {"helper.exe", "nxmhandler.exe", "usvfs_proxy_x64.exe", "usvfs_proxy_x86.exe",
-       "usvfs_x64.dll", "usvfs_x86.dll", "loot/loot.dll", "loot/lootcli.exe"});
-
   log::debug("  . missing files");
   const auto dir = QCoreApplication::applicationDirPath();
 

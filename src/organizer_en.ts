@@ -755,42 +755,42 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="259"/>
+        <location filename="createinstancedialog.cpp" line="262"/>
         <source>Setting up instance %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="260"/>
+        <location filename="createinstancedialog.cpp" line="263"/>
         <source>Setting up an instance %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="306"/>
+        <location filename="createinstancedialog.cpp" line="309"/>
         <source>Creating instance...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="367"/>
+        <location filename="createinstancedialog.cpp" line="370"/>
         <source>Writing %1...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="379"/>
+        <location filename="createinstancedialog.cpp" line="382"/>
         <source>Format error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="383"/>
+        <location filename="createinstancedialog.cpp" line="386"/>
         <source>Error %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="395"/>
+        <location filename="createinstancedialog.cpp" line="398"/>
         <source>Done.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="450"/>
+        <location filename="createinstancedialog.cpp" line="453"/>
         <source>Finish</source>
         <translation type="unfinished"></translation>
     </message>
@@ -831,7 +831,7 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>DirectoryRefresher</name>
     <message>
-        <location filename="directoryrefresher.cpp" line="440"/>
+        <location filename="directoryrefresher.cpp" line="446"/>
         <source>failed to read mod (%1): %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6940,7 +6940,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="createinstancedialog.cpp" line="81"/>
+        <location filename="createinstancedialog.cpp" line="84"/>
         <source>Creating %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7043,7 +7043,7 @@ p, li { white-space: pre-wrap; }
         <location filename="createinstancedialogpages.cpp" line="676"/>
         <location filename="createinstancedialogpages.cpp" line="697"/>
         <location filename="createinstancedialogpages.cpp" line="724"/>
-        <location filename="linux/spawn_linux.cpp" line="119"/>
+        <location filename="linux/spawn_linux.cpp" line="122"/>
         <location filename="settingsdialognexus.cpp" line="270"/>
         <location filename="settingsdialognexus.cpp" line="277"/>
         <location filename="settingsdialogworkarounds.cpp" line="231"/>
@@ -7399,13 +7399,13 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/main.cpp" line="70"/>
+        <location filename="linux/main.cpp" line="84"/>
         <location filename="win32/main.cpp" line="63"/>
         <source>Mod Organizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/main.cpp" line="71"/>
+        <location filename="linux/main.cpp" line="85"/>
         <location filename="win32/main.cpp" line="64"/>
         <source>An instance of Mod Organizer is already running</source>
         <translation type="unfinished"></translation>
@@ -7612,23 +7612,23 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sanitychecks.cpp" line="120"/>
+        <location filename="sanitychecks.cpp" line="135"/>
         <source>&apos;%1&apos;: file is blocked (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sanitychecks.cpp" line="194"/>
+        <location filename="sanitychecks.cpp" line="201"/>
         <source>&apos;%1&apos; seems to be missing, an antivirus may have deleted it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sanitychecks.cpp" line="245"/>
+        <location filename="sanitychecks.cpp" line="252"/>
         <source>%1 is loaded.
 This program is known to cause issues with Mod Organizer, such as freezing or blank windows. Consider uninstalling it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="sanitychecks.cpp" line="273"/>
+        <location filename="sanitychecks.cpp" line="280"/>
         <source>%1 is loaded. This program is known to cause issues with Mod Organizer and its virtual filesystem, such script extenders or others programs refusing to run. Consider uninstalling it.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7637,16 +7637,6 @@ This program is known to cause issues with Mod Organizer, such as freezing or bl
         <location filename="settings.cpp" line="1458"/>
         <location filename="settings.cpp" line="1506"/>
         <source>attempt to store setting for unknown plugin &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="settings.cpp" line="2004"/>
-        <source>Failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="settings.cpp" line="2005"/>
-        <source>Failed to start the helper application: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7902,8 +7892,8 @@ Example:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="110"/>
-        <location filename="linux/spawn_linux.cpp" line="111"/>
+        <location filename="linux/spawn_linux.cpp" line="113"/>
+        <location filename="linux/spawn_linux.cpp" line="114"/>
         <location filename="win32/spawn_win32.cpp" line="170"/>
         <location filename="win32/spawn_win32.cpp" line="171"/>
         <location filename="win32/spawn_win32.cpp" line="196"/>
@@ -7912,13 +7902,13 @@ Example:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="113"/>
+        <location filename="linux/spawn_linux.cpp" line="116"/>
         <location filename="win32/spawn_win32.cpp" line="173"/>
         <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="117"/>
+        <location filename="linux/spawn_linux.cpp" line="120"/>
         <location filename="spawn.cpp" line="112"/>
         <location filename="win32/spawn_win32.cpp" line="177"/>
         <location filename="win32/spawn_win32.cpp" line="201"/>
@@ -7926,7 +7916,7 @@ Example:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="118"/>
+        <location filename="linux/spawn_linux.cpp" line="121"/>
         <location filename="win32/spawn_win32.cpp" line="178"/>
         <location filename="win32/spawn_win32.cpp" line="202"/>
         <source>The program may fail to launch.</source>

@@ -757,7 +757,7 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
       bool archive = false;
       int originid = fileEntry->getOrigin(archive);
 
-      fileName = QString("%1\\%2")
+      fileName = QString("%1/%2")
                      .arg(QDir::toNativeSeparators(
                          directoryStructure.getOriginByID(originid).getPath()))
                      .arg(esp.name);

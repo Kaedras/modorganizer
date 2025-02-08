@@ -9,7 +9,10 @@
 #include <utility.h>
 
 #ifdef __unix__
+static inline constexpr char nativeSeperator = '/';
 #include "linux/compatibility.h"
+#else
+static inline constexpr char nativeSeperator = '\\';
 #endif
 
 using namespace MOBase;
@@ -64,7 +67,7 @@ private:
     try {
       // split on separators
       const QString s      = QDir::toNativeSeparators(target.absolutePath());
-      const QStringList cs = s.split("\\");
+      const QStringList cs = s.split(nativeSeperator);
 
       if (cs.empty()) {
         return;

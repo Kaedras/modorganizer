@@ -81,7 +81,7 @@ void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
         dirEndF(cx, dirEntry.filePath());
       }
     } else {
-      fileF(cx, dirEntry.filePath(),
+      fileF(cx, dirEntry.fileName(),
             dirEntry.lastModified(QTimeZone::LocalTime), dirEntry.size());
     }
   }

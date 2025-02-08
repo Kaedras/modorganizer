@@ -250,10 +250,10 @@ void FileTreeItem::sort(int column, Qt::SortOrder order, bool force)
 
 QString FileTreeItem::virtualPath() const
 {
-  QString s = "Data\\";
+  QString s = "Data/";
 
   if (!m_virtualParentPath.isEmpty()) {
-    s += m_virtualParentPath + "\\";
+    s += m_virtualParentPath + "/";
   }
 
   s += m_file;
@@ -265,7 +265,7 @@ QString FileTreeItem::dataRelativeFilePath() const
 {
   auto path = dataRelativeParentPath();
   if (!path.isEmpty()) {
-    path += "\\";
+    path += "/";
   }
 
   return path += m_file;

@@ -97,7 +97,7 @@ public:  // Overrides:
       if (path == ".") {
         path.clear();
       } else {
-        path.append("\\");
+        path.append("/");
       }
     }
 

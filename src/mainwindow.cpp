@@ -3618,7 +3618,7 @@ void MainWindow::extractBSATriggered(QTreeWidgetItem* item)
 
     for (auto archiveName : archives) {
       BSA::Archive archive;
-      QString archivePath = QString("%1\\%2").arg(origin).arg(archiveName);
+      QString archivePath = QString("%1/%2").arg(origin).arg(archiveName);
       BSA::EErrorCode result =
           archive.read(archivePath.toLocal8Bit().constData(), true);
       if ((result != BSA::ERROR_NONE) && (result != BSA::ERROR_INVALIDHASHES)) {

@@ -105,7 +105,7 @@ LinuxInfo::Release LinuxInfo::getRelease() const
 {
   Release r;
   QFile lsbRelease("/etc/lsb-release");
-  if (!lsbRelease.isOpen()) {
+  if (!lsbRelease.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text)) {
     log::error("error opening /etc/lsb-release: '{}'", lsbRelease.errorString());
   } else {
     while (!lsbRelease.atEnd()) {

@@ -1114,7 +1114,7 @@ void DownloadManager::queryInfoMd5(int index)
 
   QFile downloadFile(info->m_FileName);
   if (!downloadFile.exists()) {
-    downloadFile.setFileName(m_OrganizerCore->downloadsPath() + "\\" +
+    downloadFile.setFileName(m_OrganizerCore->downloadsPath() + "/" +
                              info->m_FileName);
   }
   if (!downloadFile.exists()) {
