@@ -8,12 +8,12 @@ namespace MOShared
 MOBase::Version createVersionInfo()
 {
   STUB();
-  return {0,0,0};
+  return {0, 0, 1};
 }
 QString getUsvfsVersionString()
 {
   STUB();
-  return {};
+  return "0.0.1";
 }
 
 void SetThisThreadName(const QString& s)

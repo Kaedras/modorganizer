@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "shared/util.h"
 #include <log.h>
+#include <sys/resource.h>
 #include <utility.h>
 
 using namespace std;
@@ -105,7 +106,10 @@ void deleteRegistryKeyIfEmpty(const QString& name)
 
 bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
 {
-  STUB();
+  struct rlimit core_limits;
+  core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
+  setrlimit(RLIMIT_CORE, &core_limits);
+
   return true;
 }
 

@@ -4,10 +4,6 @@
 #include <log.h>
 #include <utility.h>
 
-#ifdef __unix__
-#include "linux/compatibility.h"
-#endif
-
 using namespace MOBase;
 
 namespace env

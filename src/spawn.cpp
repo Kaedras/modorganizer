@@ -336,7 +336,19 @@ bool checkBlacklist(QWidget* parent, const SpawnParameters& sp, Settings& settin
 
 bool isJavaFile(const QFileInfo& target)
 {
-  return (target.suffix().compare("jar", Qt::CaseInsensitive) == 0);
+  return target.suffix().compare("jar", Qt::CaseInsensitive) == 0;
+}
+
+extern bool isExeFile(const QFileInfo& target);
+extern bool isBatchFile(const QFileInfo& target);
+
+FileExecutionTypes getFileExecutionType(const QFileInfo& target)
+{
+  if (isExeFile(target) || isBatchFile(target) || isJavaFile(target)) {
+    return FileExecutionTypes::Executable;
+  }
+
+  return FileExecutionTypes::Other;
 }
 
 }  // namespace spawn

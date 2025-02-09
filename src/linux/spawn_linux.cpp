@@ -209,18 +209,6 @@ QString findJavaInstallation(const QString& jarFile)
   return {};
 }
 
-FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& target)
-{
-  STUB();
-  return {};
-}
-
-FileExecutionTypes getFileExecutionType(const QFileInfo& target)
-{
-  STUB();
-  return {};
-}
-
 bool isBatchFile(const QFileInfo& target)
 {
   return target.suffix() == "sh";
@@ -228,13 +216,46 @@ bool isBatchFile(const QFileInfo& target)
 
 bool isExeFile(const QFileInfo& target)
 {
-  STUB();
-  return target.isExecutable();
+  return target.isExecutable() && target.isFile();
 }
 
 QFileInfo getCmdPath()
 {
   return QFileInfo("/bin/sh");
+}
+
+extern bool isJavaFile(const QFileInfo& target);
+
+FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& target)
+{
+  if (isExeFile(target)) {
+    return {target, "", FileExecutionTypes::Executable};
+  }
+
+  if (isBatchFile(target)) {
+    return {
+      getCmdPath(),
+      QString("-c \"%1\"").arg(QDir::toNativeSeparators(target.absoluteFilePath())),
+      FileExecutionTypes::Executable};
+  }
+
+  if (isJavaFile(target)) {
+    auto java = findJavaInstallation(target.absoluteFilePath());
+
+    if (java.isEmpty()) {
+      java =
+          QFileDialog::getOpenFileName(parent, QObject::tr("Select executable"), QString());
+    }
+
+    if (!java.isEmpty()) {
+      return {QFileInfo(java),
+              QString("-jar \"%1\"")
+                  .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
+              FileExecutionTypes::Executable};
+    }
+  }
+
+  return {{}, {}, FileExecutionTypes::Other};
 }
 
 }  // namespace spawn

@@ -11,61 +11,7 @@ using namespace std;
 namespace env
 {
 
-class HandleCloserThread
-{
-public:
-  HandleCloserThread() : m_ready(false) { m_handles.reserve(50000); }
-
-  void shrink() { m_handles.shrink_to_fit(); }
-
-  void add(HANDLE h) { m_handles.push_back(h); }
-
-  void wakeup()
-  {
-    {
-      std::unique_lock lock(m_mutex);
-      m_ready = true;
-    }
-
-    m_cv.notify_one();
-  }
-
-  void run()
-  {
-    MOShared::SetThisThreadName("HandleCloserThread");
-
-    std::unique_lock lock(m_mutex);
-    m_cv.wait(lock, [&] {
-      return m_ready;
-    });
-
-    closeHandles();
-  }
-
-private:
-  std::vector<HANDLE> m_handles;
-  std::condition_variable m_cv;
-  std::mutex m_mutex;
-  bool m_ready;
-
-  void closeHandles()
-  {
-    for (auto& h : m_handles) {
-      close(h);
-    }
-
-    m_handles.clear();
-    m_ready = false;
-  }
-};
-
-constexpr std::size_t AllocSize = 1024 * 1024;
-static ThreadPool<HandleCloserThread> g_handleClosers;
-
-void setHandleCloserThreadCount(std::size_t n)
-{
-  g_handleClosers.setMax(n);
-}
+void setHandleCloserThreadCount(std::size_t n) {}
 
 void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
                       DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)

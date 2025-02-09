@@ -102,7 +102,6 @@ void FileTreeItem::setOrigin(int originID, const QString& realPath, Flags flags,
 {
   m_originID = originID;
   m_realPath = realPath;
-  m_realPath = realPath;
   m_flags    = flags;
   m_mod      = mod;
 
