@@ -16,13 +16,12 @@ void setHandleCloserThreadCount(std::size_t n) {}
 void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
                       DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)
 {
-  for (const QDirListing::DirEntry& dirEntry :
-       QDirListing(QDir(path).path(), QDirListing::IteratorFlag::Recursive)) {
+  for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path())) {
     if (dirEntry.isDir()) {
       if (dirStartF && dirEndF) {
-        dirStartF(cx, dirEntry.filePath());
+        dirStartF(cx, dirEntry.fileName());
         forEachEntryImpl(cx, dirEntry.filePath(), depth + 1, dirStartF, dirEndF, fileF);
-        dirEndF(cx, dirEntry.filePath());
+        dirEndF(cx, dirEntry.fileName());
       }
     } else {
       fileF(cx, dirEntry.fileName(), dirEntry.lastModified(QTimeZone::LocalTime),
@@ -85,25 +84,5 @@ File::File(const QString& n, QDateTime ft, uint64_t s)
 Directory::Directory() {}
 
 Directory::Directory(const QString& n) : name(n), lowerName(n.toLower()) {}
-
-void getFilesAndDirsWithFindImpl(const QString& path, Directory& d)
-{
-  for (const QDirListing::DirEntry& dirEntry : QDirListing(QDir(path).path())) {
-    if (dirEntry.isDir()) {
-      d.dirs.emplace_back(dirEntry.filePath());
-    } else {
-      d.files.emplace_back(dirEntry.filePath(),
-                           dirEntry.lastModified(QTimeZone::LocalTime),
-                           dirEntry.size());
-    }
-  }
-}
-
-Directory getFilesAndDirsWithFind(const QString& path)
-{
-  Directory d;
-  getFilesAndDirsWithFindImpl(path, d);
-  return d;
-}
 
 }  // namespace env

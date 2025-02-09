@@ -187,7 +187,6 @@ void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF, DirEndF* 
                   FileF* fileF);
 
 Directory getFilesAndDirs(const QString& path);
-Directory getFilesAndDirsWithFind(const QString& path);
 
 }  // namespace env
 
