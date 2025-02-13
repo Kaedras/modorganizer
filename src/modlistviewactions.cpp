@@ -1305,7 +1305,7 @@ void ModListViewActions::moveOverwriteContentsTo(const QString& absolutePath) co
   if (successful) {
     MessageDialog::showMessage(tr("Move successful."), m_parent);
   } else {
-    const auto e = GetLastError();
+    const auto e = ::GetLastError();
     log::error("Move operation failed: {}", formatSystemMessage(e));
   }
 
@@ -1402,7 +1402,7 @@ void ModListViewActions::clearOverwrite() const
         emit overwriteCleared();
         m_core.refresh();
       } else {
-        const auto e = GetLastError();
+        const auto e = ::GetLastError();
         log::error("Delete operation failed: {}", formatSystemMessage(e));
       }
     }

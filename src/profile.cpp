@@ -287,7 +287,7 @@ void Profile::createTweakedIniFile()
   QString tweakedIni = m_Directory.absoluteFilePath("initweaks.ini");
 
   if (QFile::exists(tweakedIni) && !shellDelete({tweakedIni})) {
-    const auto e = GetLastError();
+    const auto e = ::GetLastError();
     reportError(tr("failed to update tweaked ini file, wrong settings may be used: %1")
                     .arg(QString::fromStdString(formatSystemMessage(e))));
     return;

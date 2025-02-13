@@ -160,7 +160,7 @@ bool startSteam(QWidget* parent)
 
 HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
-  HANDLE handle = INVALID_HANDLE_VALUE;
+  HANDLE handle = ::INVALID_HANDLE_VALUE;
   const auto e  = spawn::spawn(sp, handle);
 
   switch (e) {
@@ -170,12 +170,12 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 
   case EACCES: {
     startBinaryAdmin(parent, sp);
-    return INVALID_HANDLE_VALUE;
+    return ::INVALID_HANDLE_VALUE;
   }
 
   default: {
     dialogs::spawnFailed(parent, sp, e);
-    return INVALID_HANDLE_VALUE;
+    return ::INVALID_HANDLE_VALUE;
   }
   }
 }

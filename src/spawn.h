@@ -55,8 +55,10 @@ struct SpawnParameters
   QDir currentDirectory;
   QString steamAppID;
   bool hooked   = false;
+#ifdef _win32
   HANDLE stdOut = INVALID_HANDLE_VALUE;
   HANDLE stdErr = INVALID_HANDLE_VALUE;
+#endif
 };
 
 bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDirectory,

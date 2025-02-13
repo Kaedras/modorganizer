@@ -68,7 +68,7 @@ std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
 
 // returns the filename of the given process or the current one
 //
-QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
+QString processPath(HANDLE process = ::INVALID_HANDLE_VALUE)
 {
   if (process == 0) {
     return {};
@@ -77,7 +77,7 @@ QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
   return QString::fromStdString(read_symlink(exe));
 }
 
-QString processFilename(HANDLE process = INVALID_HANDLE_VALUE)
+QString processFilename(HANDLE process = ::INVALID_HANDLE_VALUE)
 {
   const auto p = processPath(process);
   if (p.isEmpty()) {

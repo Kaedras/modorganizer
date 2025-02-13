@@ -67,7 +67,7 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
 
 std::optional<ProcessRunner::Results> singleWait(HANDLE handle, DWORD pid)
 {
-  if (handle == INVALID_HANDLE_VALUE) {
+  if (handle == ::INVALID_HANDLE_VALUE) {
     return ProcessRunner::Error;
   }
 
@@ -474,7 +474,7 @@ ProcessRunner::Results waitForProcess(HANDLE initialProcess, LPDWORD exitCode,
 
 ProcessRunner::ProcessRunner(OrganizerCore& core, IUserInterface* ui)
     : m_core(core), m_ui(ui), m_lockReason(UILocker::NoReason), m_waitFlags(NoFlags),
-      m_handle(INVALID_HANDLE_VALUE), m_exitCode(-1)
+      m_handle(-1), m_exitCode(-1)
 {
   // all processes started in ProcessRunner are hooked by default
   setHooked(true);
@@ -769,7 +769,7 @@ std::optional<ProcessRunner::Results> ProcessRunner::runShell()
     return Error;
   }
 
-  m_handle = pidfd_open((pid_t)r.stealProcessHandle()->processId(), 0);
+  m_handle = r.stealProcessHandle();
 
   // not all files will return a valid handle even if opening them was
   // successful, such as inproc handlers (like the photo viewer); in this
