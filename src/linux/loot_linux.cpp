@@ -6,6 +6,8 @@
 #include <log.h>
 #include <report.h>
 
+#include <utility>
+
 using namespace MOBase;
 using namespace json;
 using namespace std::string_literals;
@@ -49,26 +51,20 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   const auto logLevel = m_core.settings().diagnostics().lootLogLevel();
 
   QStringList parameters;
-  parameters << "--game" << m_core.managedGame()->lootGameName()
-
-             << "--gamePath"
-             << QString("\"%1\"").arg(
-                    m_core.managedGame()->gameDirectory().absolutePath())
-
-             << "--pluginListPath"
-             << QString("\"%1/loadorder.txt\"").arg(m_core.profilePath())
-
-             << "--logLevel"
-             << QString::fromStdString(lootcli::logLevelToString(logLevel))
-
-             << "--out" << QString("\"%1\"").arg(LootReportPath)
-
-             << "--language" << m_core.settings().interface().language();
 
   if (didUpdateMasterList) {
     parameters << "--skipUpdateMasterlist";
   }
-
+  parameters << "--game" << m_core.managedGame()->lootGameName()
+             << "--gamePath"
+             << QString("\"%1\"").arg(
+                    m_core.managedGame()->gameDirectory().absolutePath())
+             << "--pluginListPath"
+             << QString("\"%1/loadorder.txt\"").arg(m_core.profilePath())
+             << "--logLevel"
+             << QString::fromStdString(lootcli::logLevelToString(logLevel))
+             << "--out" << QString("\"%1\"").arg(LootReportPath)
+             << "--language" << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
   QString program = qApp->applicationDirPath() + "/loot/" + lootExecutable;
   lootHandle->setWorkingDirectory(qApp->applicationDirPath() + "/loot");
@@ -76,18 +72,22 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   lootHandle->setProgram(program);
 
   if (!OverlayfsManager::getInstance().mount()) {
-    emit log(log::Levels::Error, tr("failed to start loot"));
+    emit log(log::Levels::Error, tr("failed to start loot: error mounting overlayfs"));
+    return false;
   }
 
   lootHandle->start();
 
   // wait for up to 2sec
   if (!lootHandle->waitForStarted(2000)) {
-    emit log(log::Levels::Error, tr("failed to start loot"));
+    emit log(log::Levels::Error, tr("failed to start loot: %1").arg(lootHandle->errorString()));
+    log::error("failed to start loot: {}", lootHandle->errorString().toStdString());
     return false;
   }
 
-  m_lootProcess.reset(lootHandle.get());
+  emit log(log::Levels::Debug, "loot started");
+
+  m_lootProcess = std::move(lootHandle);
   connect(m_lootProcess.get(), SIGNAL(readyReadStandardOutput()), this,
           SLOT(processStdout()));
 

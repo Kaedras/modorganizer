@@ -1986,19 +1986,30 @@ void NexusSettings::registerAsNXMHandler(bool force)
 
   const auto executable = QCoreApplication::applicationFilePath();
 
-  QString mode       = force ? "forcereg" : "reg";
-  QString parameters = mode + " " + m_Parent.game().plugin()->gameShortName();
+  QStringList parameters;
+
+  QString mode = force ? "forcereg" : "reg";
+
+  parameters << mode;
+  QString game = m_Parent.game().plugin()->gameShortName();
   for (const QString& altGame : m_Parent.game().plugin()->validShortNames()) {
-    parameters += "," + altGame;
+    game += "," + altGame;
   }
-  parameters += " \"" + executable + "\"";
+  parameters << game;
+  parameters << executable;
 
-  const auto r = shell::Execute(nxmPath, parameters);
+  log::debug("running nxmhandler with arguments: {}", parameters.join(' '));
 
-  if (!r.success()) {
+  QProcess p;
+  p.setProgram(nxmPath);
+  p.setArguments(parameters);
+
+  auto result = p.startDetached();
+
+  if (!result) {
     QMessageBox::critical(
         nullptr, QObject::tr("Failed"),
-        QObject::tr("Failed to start the helper application: %1").arg(r.toString()));
+        QObject::tr("Failed to start the helper application: %1").arg(p.errorString()));
   }
 }
 

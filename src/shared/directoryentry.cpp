@@ -157,8 +157,10 @@ void DirectoryEntry::addFromAllBSAs(const QString& originName, const QString& di
     int order = -1;
 
     for (const auto& plugin : loadOrder) {
-      if (filename.startsWith(plugin + " - ", Qt::CaseInsensitive) ||
-          filename.startsWith(plugin + ".", Qt::CaseInsensitive)) {
+      QFileInfo pluginInfo(plugin);
+      QString baseName = pluginInfo.baseName();
+      if (filename.startsWith(baseName + " - ", Qt::CaseInsensitive) ||
+          filename.startsWith(baseName + ".", Qt::CaseInsensitive)) {
         auto itor = std::ranges::find(loadOrder, plugin);
         if (itor != loadOrder.end()) {
           order = std::distance(loadOrder.begin(), itor);

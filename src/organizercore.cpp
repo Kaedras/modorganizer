@@ -2032,7 +2032,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
   QStringList dataPaths;
   dataPaths.append(QDir::toNativeSeparators(game->dataDirectory().absolutePath()));
 
-  for (auto directory : game->secondaryDataDirectories()) {
+  for (const auto& directory : game->secondaryDataDirectories()) {
     dataPaths.append(directory.absolutePath());
   }
 
@@ -2051,7 +2051,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
     overwriteActive |= createTarget;
 
     if (modPtr->isRegular()) {
-      for (auto dataPath : dataPaths) {
+      for (const auto& dataPath : dataPaths) {
         result.insert(result.end(), {QDir::toNativeSeparators(std::get<1>(mod)),
                                      dataPath, true, createTarget});
       }
@@ -2075,7 +2075,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
     }
   }
 
-  for (auto dataPath : dataPaths) {
+  for (const auto& dataPath : dataPaths) {
     result.insert(result.end(),
                   {QDir::toNativeSeparators(m_Settings.paths().overwrite()), dataPath,
                    true, customOverwrite.isEmpty()});
@@ -2102,7 +2102,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
 {
   std::vector<Mapping> result;
 
-  for (FileEntryPtr current : directoryEntry->getFiles()) {
+  for (const FileEntryPtr& current : directoryEntry->getFiles()) {
     bool isArchive = false;
     int origin     = current->getOrigin(isArchive);
     if (isArchive || (origin == 0)) {
@@ -2111,7 +2111,6 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
 
     QString originPath = base->getOriginByID(origin).getPath();
     QString fileName   = current->getName();
-    //    QString fileName = ToQString(current->getName());
     QString source = originPath + relPath + fileName;
     QString target = dataPath + relPath + fileName;
     if (source != target) {
@@ -2124,7 +2123,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
     int origin = d->anyOrigin();
 
     QString originPath = base->getOriginByID(origin).getPath();
-    QString dirName    = d->getName();
+    const QString& dirName    = d->getName();
     QString source     = originPath + relPath + dirName;
     QString target     = dataPath + relPath + dirName;
 
@@ -2132,7 +2131,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
 
     result.push_back({source, target, true, writeDestination});
     std::vector<Mapping> subRes =
-        fileMapping(dataPath, relPath + dirName + "\\", base, d, createDestination);
+        fileMapping(dataPath, relPath + dirName + "/", base, d, createDestination);
     result.insert(result.end(), subRes.begin(), subRes.end());
   }
   return result;

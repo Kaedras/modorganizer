@@ -184,7 +184,7 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
   const auto start = std::chrono::high_resolution_clock::now();
 
   QProgressDialog progress(qApp->activeWindow());
-  progress.setLabelText(tr("Preparing vfs"));
+  progress.setLabelText(tr("Preparing overlayfs"));
   progress.setMaximum(static_cast<int>(mapping.size()));
   progress.show();
 
@@ -194,23 +194,11 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
 
   log::debug("Updating Overlayfs mappings...");
 
-  m_overlayfsManager.clearDirectories();
+  m_overlayfsManager.clearMappings();
 
-  // TODO: implement missing functionality
   for (const auto& map : mapping) {
-    if (map.destination != mapping.front().destination) {
-      throw OverlayfsConnectorException(
-          "Handling different destination paths is not yet implemented");
-    }
-    if (!map.isDirectory) {
-      throw OverlayfsConnectorException(
-          "Handling files instead of directories is not yet implemented");
-    }
-  }
-
-  for (auto map : mapping) {
     if (progress.wasCanceled()) {
-      m_overlayfsManager.clearDirectories();
+      m_overlayfsManager.clearMappings();
       throw OverlayfsConnectorException("Overlayfs mapping canceled by user");
     }
     progress.setValue(value++);
@@ -219,12 +207,12 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
     }
 
     if (map.isDirectory) {
-      m_overlayfsManager.addDirectory(map.source.toStdString());
+      m_overlayfsManager.addDirectory(map.source.toStdString(), map.destination.toStdString());
       ++dirs;
     } else {
-      // usvfsVirtualLinkFile(map.source.toStdWString().c_str(),
-      //                      map.destination.toStdWString().c_str(), 0);
-      // ++files;
+      m_overlayfsManager.addFile(map.source.toStdString(),
+      map.destination.toStdString(), 0);
+      ++files;
     }
   }
 

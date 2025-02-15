@@ -8,6 +8,7 @@ namespace env
 Metrics::Metrics()
 {
   getDisplays();
+  calculateGeometry();
 }
 
 const QList<QScreen*>& Metrics::displays() const

@@ -27,11 +27,11 @@ inline QString GETENV(const char* varName)
 namespace env
 {
 
-using namespace MOBase;
-
 extern QString processPath(HANDLE process = INVALID_HANDLE_VALUE);
 extern QString processFilename(HANDLE process = INVALID_HANDLE_VALUE);
 extern bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
+
+using namespace MOBase;
 
 ModuleNotification::ModuleNotification(QObject* o, std::function<void(Module)> f)
     : m_cookie(nullptr), m_object(o), m_f(std::move(f))
@@ -147,7 +147,7 @@ QString Environment::timezone() const
 
 void Environment::dump(const Settings& s) const
 {
-  log::debug("windows: {}", getOsInfo().toString());
+  log::debug("os: {}", getOsInfo().toString());
 
   log::debug("time zone: {}", timezone());
 
@@ -179,7 +179,7 @@ void Environment::dump(const Settings& s) const
 
   log::debug("displays:");
   for (const auto& d : metrics().displays()) {
-    log::debug(" . {}", d->name());
+    log::debug(" . {} - {}", d->name(), d->model());
   }
 
   const auto r = metrics().desktopGeometry();

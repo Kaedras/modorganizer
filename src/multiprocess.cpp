@@ -25,7 +25,7 @@ MOMultiProcess::MOMultiProcess(bool allowMultiple, QObject* parent)
 
     if ((m_SharedMem.error() != QSharedMemory::NoError) &&
         (m_SharedMem.error() != QSharedMemory::AlreadyExists)) {
-      throw MOBase::MyException(tr("SHM error: %1").arg(m_SharedMem.errorString()));
+      throw MOBase::MyException(tr("SHM error %1: %2").arg(QString::number(m_SharedMem.error()), m_SharedMem.errorString()));
     }
   } else {
     m_OwnsSM = true;

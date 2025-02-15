@@ -651,7 +651,7 @@ ProcessRunner& ProcessRunner::setFromFileOrExecutable(
   setCurrentDirectory(cwd);
   setProfileName(profileOverride);
 
-  if (executable.contains('\\') || executable.contains('/')) {
+  if (executable.contains('/')) {
     // file path
 
     if (m_sp.binary.isRelative()) {
