@@ -207,11 +207,12 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
     }
 
     if (map.isDirectory) {
-      m_overlayfsManager.addDirectory(map.source.toStdString(), map.destination.toStdString());
+      m_overlayfsManager.addDirectory(map.source.toStdString(),
+                                      map.destination.toStdString());
       ++dirs;
     } else {
       m_overlayfsManager.addFile(map.source.toStdString(),
-      map.destination.toStdString(), 0);
+                                 map.destination.toStdString(), 0);
       ++files;
     }
   }

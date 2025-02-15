@@ -234,17 +234,17 @@ FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& t
 
   if (isBatchFile(target)) {
     return {
-      getCmdPath(),
-      QString("-c \"%1\"").arg(QDir::toNativeSeparators(target.absoluteFilePath())),
-      FileExecutionTypes::Executable};
+        getCmdPath(),
+        QString("-c \"%1\"").arg(QDir::toNativeSeparators(target.absoluteFilePath())),
+        FileExecutionTypes::Executable};
   }
 
   if (isJavaFile(target)) {
     auto java = findJavaInstallation(target.absoluteFilePath());
 
     if (java.isEmpty()) {
-      java =
-          QFileDialog::getOpenFileName(parent, QObject::tr("Select executable"), QString());
+      java = QFileDialog::getOpenFileName(parent, QObject::tr("Select executable"),
+                                          QString());
     }
 
     if (!java.isEmpty()) {

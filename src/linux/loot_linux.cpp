@@ -2,7 +2,6 @@
 #include "loot.h"
 #include "lootdialog.h"
 #include "organizercore.h"
-#include "spawn.h"
 #include <log.h>
 #include <report.h>
 
@@ -11,6 +10,7 @@
 using namespace MOBase;
 using namespace json;
 using namespace std::string_literals;
+using namespace Qt::StringLiterals;
 
 #ifdef _WIN32
 static inline const QString lootExecutable = QStringLiteral("lootcli.exe");
@@ -18,7 +18,7 @@ static inline const QString lootExecutable = QStringLiteral("lootcli.exe");
 static inline const QString lootExecutable = QStringLiteral("lootcli");
 #endif
 
-static QString LootReportPath = QDir::temp().absoluteFilePath("lootreport.json");
+static QString LootReportPath = QDir::temp().absoluteFilePath(u"lootreport.json"_s);
 
 extern log::Levels levelFromLoot(lootcli::LogLevels level);
 
@@ -55,17 +55,15 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   if (didUpdateMasterList) {
     parameters << "--skipUpdateMasterlist";
   }
-  parameters << "--game" << m_core.managedGame()->lootGameName()
-             << "--gamePath"
+  parameters << "--game" << m_core.managedGame()->lootGameName() << "--gamePath"
              << m_core.managedGame()->gameDirectory().absolutePath()
              << "--pluginListPath"
-             << QString("%1/loadorder.txt").arg(m_core.profilePath())
-             << "--logLevel"
-             << QString::fromStdString(lootcli::logLevelToString(logLevel))
-             << "--out" << LootReportPath
-             << "--language" << m_core.settings().interface().language();
+             << QString(u"%1/loadorder.txt"_s).arg(m_core.profilePath()) << "--logLevel"
+             << QString::fromStdString(lootcli::logLevelToString(logLevel)) << "--out"
+             << LootReportPath << "--language"
+             << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
-  QString program = qApp->applicationDirPath() + "/loot/" + lootExecutable;
+  QString program = qApp->applicationDirPath() % u"/loot/"_s % lootExecutable;
   lootHandle->setWorkingDirectory(qApp->applicationDirPath() + "/loot");
   lootHandle->setArguments(parameters);
   lootHandle->setProgram(program);
@@ -79,12 +77,13 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
 
   // wait for up to 2sec
   if (!lootHandle->waitForStarted(2000)) {
-    emit log(log::Levels::Error, tr("failed to start loot: %1").arg(lootHandle->errorString()));
+    emit log(log::Levels::Error,
+             tr("failed to start loot: %1").arg(lootHandle->errorString()));
     log::error("failed to start loot: {}", lootHandle->errorString().toStdString());
     return false;
   }
 
-  emit log(log::Levels::Debug, "loot started");
+  emit log(log::Levels::Debug, u"loot started"_s);
 
   m_lootProcess = std::move(lootHandle);
   connect(m_lootProcess.get(), SIGNAL(readyReadStandardOutput()), this,

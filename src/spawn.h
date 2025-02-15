@@ -54,7 +54,7 @@ struct SpawnParameters
   QString arguments;
   QDir currentDirectory;
   QString steamAppID;
-  bool hooked   = false;
+  bool hooked = false;
 #ifdef _win32
   HANDLE stdOut = INVALID_HANDLE_VALUE;
   HANDLE stdErr = INVALID_HANDLE_VALUE;

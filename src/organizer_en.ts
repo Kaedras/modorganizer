@@ -1819,22 +1819,6 @@ Right now the only case I know of where this needs to be overwritten is for the 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/filetree_win32.cpp" line="52"/>
-        <location filename="win32/filetree_win32.cpp" line="93"/>
-        <source>File &apos;%1&apos; does not exist, you may need to refresh.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/filetree_win32.cpp" line="126"/>
-        <source>(only has %1 file(s))</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/filetree_win32.cpp" line="134"/>
-        <source>%1 file(s) selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="filetree.cpp" line="520"/>
         <source>&amp;Add as Executable</source>
         <translation type="unfinished"></translation>
@@ -1988,6 +1972,22 @@ Right now the only case I know of where this needs to be overwritten is for the 
     <message>
         <location filename="filetree.cpp" line="671"/>
         <source>&amp;Collapse All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/filetree_win32.cpp" line="52"/>
+        <location filename="win32/filetree_win32.cpp" line="93"/>
+        <source>File &apos;%1&apos; does not exist, you may need to refresh.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/filetree_win32.cpp" line="126"/>
+        <source>(only has %1 file(s))</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/filetree_win32.cpp" line="134"/>
+        <source>%1 file(s) selected</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2659,6 +2659,22 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
 <context>
     <name>Loot</name>
     <message>
+        <location filename="linux/loot_linux.cpp" line="74"/>
+        <source>failed to start loot: error mounting overlayfs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/loot_linux.cpp" line="82"/>
+        <source>failed to start loot: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/loot_linux.cpp" line="144"/>
+        <location filename="win32/loot_win32.cpp" line="325"/>
+        <source>Loot failed. Exit code was: 0x%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="loot.cpp" line="41"/>
         <source>Loot failed to run</source>
         <translation type="unfinished"></translation>
@@ -2682,22 +2698,6 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
     <message>
         <location filename="win32/loot_win32.cpp" line="264"/>
         <source>failed to start loot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/loot_linux.cpp" line="75"/>
-        <source>failed to start loot: error mounting overlayfs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/loot_linux.cpp" line="83"/>
-        <source>failed to start loot: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/loot_linux.cpp" line="145"/>
-        <location filename="win32/loot_win32.cpp" line="325"/>
-        <source>Loot failed. Exit code was: 0x%1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2787,7 +2787,6 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
     <message>
         <location filename="multiprocess.cpp" line="28"/>
         <source>SHM error %1: %2</source>
-        <oldsource>SHM error: %1</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3135,6 +3134,12 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="mainwindow.ui" line="1195"/>
+        <location filename="mainwindow.ui" line="1414"/>
+        <source>Hidden files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="mainwindow.ui" line="1205"/>
         <location filename="mainwindow.ui" line="1208"/>
         <source>Filter the Data tree.</source>
@@ -3189,12 +3194,6 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
         <location filename="mainwindow.ui" line="1408"/>
         <location filename="mainwindow.ui" line="1411"/>
         <source>Show downloads marked as hidden.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="mainwindow.ui" line="1195"/>
-        <location filename="mainwindow.ui" line="1414"/>
-        <source>Hidden files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4117,13 +4116,11 @@ You will have to visit the mod page on the %1 Nexus site to change your mind.</s
         <location filename="modinfodialog.ui" line="318"/>
         <location filename="modinfodialog.ui" line="343"/>
         <source>Optional Plugins</source>
-        <oldsource>Optional ESPs</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="350"/>
         <source>List of esps, esms, and esls that will not be loaded by the game.</source>
-        <oldsource>List of esps, esms, and esls that can not be loaded by the game.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4132,52 +4129,41 @@ You will have to visit the mod page on the %1 Nexus site to change your mind.</s
 They usually contain optional functionality, see the readme.
 
 Most mods do not have optional plugins, so chances are good you are looking at an empty list.</source>
-        <oldsource>List of esps, esms, and esls contained in this plugin that currently can not be loaded by the game. They will not even appear in the esp-list in the main MO-window.
-They usually contain optional functionality, see the readme.
-
-Most mods do not have optional esps, so chances are good you are looking at an empty list.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="400"/>
         <source>Move a plugin to the data directory.</source>
-        <oldsource>Move a file to the data directory.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="403"/>
         <source>This moves a plugin to the data directory so it can be enabled in the main window. Please note that the plugin merely becomes &quot;available&quot;, it will not necessarily be loaded! That is configured in the main window of MO.</source>
-        <oldsource>This moves a esp to the esp directory so it can be enabled in the main window. Please note that the ESP merely becomes &quot;available&quot;, it will not necessarily be loaded! That is configured in the main window of MO.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="423"/>
         <source>Make the selected plugin in the right list unavailable.</source>
-        <oldsource>Make the selected mod in the right list unavailable.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="426"/>
         <source>The selected plugin (in the right list) will be pushed into a subdirectory of the mod and will thus become &quot;invisible&quot; to the game. It can then no longer be activated.</source>
-        <oldsource>The selected esp (in the right list) will be pushed into a subdirectory of the mod and will thus become &quot;invisible&quot; to the game. It can then no longer be activated.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="476"/>
         <source>Available Plugins</source>
-        <oldsource>Available ESPs</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="483"/>
         <source>Plugins in the data directory and thus visible to the game.</source>
-        <oldsource>ESPs in the data directory and thus visible to the game.</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="modinfodialog.ui" line="486"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;These are the plugins that are in the (virtual) data directory of your game and will thus be selectable in the plugin list in the main window.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <oldsource>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;These are the mod files that are in the (virtual) data directory of your game and will thus be selectable in the esp list in the main window.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5874,7 +5860,6 @@ Continue?</source>
     <message>
         <location filename="linux/overlayfsconnector.cpp" line="187"/>
         <source>Preparing overlayfs</source>
-        <oldsource>Preparing vfs</oldsource>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6906,7 +6891,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="colortable.cpp" line="236"/>
         <source>Mod contains selected file</source>
-        <oldsource>Mod contains selected plugin</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7218,16 +7202,6 @@ p, li { white-space: pre-wrap; }
         </translation>
     </message>
     <message>
-        <location filename="win32/envshell.cpp" line="307"/>
-        <source>No menu available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/envshell.cpp" line="346"/>
-        <source>Selected files must be in the same directory</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="filerenamer.cpp" line="110"/>
         <source>The hidden file &quot;%1&quot; already exists. Replace it?</source>
         <translation type="unfinished"></translation>
@@ -7302,6 +7276,76 @@ Destination:<byte value="xd"/>
     <message>
         <location filename="instancemanagerdialog.cpp" line="122"/>
         <source>An instance with this name already exists.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/main.cpp" line="74"/>
+        <location filename="win32/main.cpp" line="63"/>
+        <source>Mod Organizer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/main.cpp" line="75"/>
+        <location filename="win32/main.cpp" line="64"/>
+        <source>An instance of Mod Organizer is already running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/processrunner.cpp" line="579"/>
+        <location filename="linux/processrunner.cpp" line="646"/>
+        <location filename="linux/processrunner.cpp" line="792"/>
+        <location filename="win32/processrunner.cpp" line="549"/>
+        <location filename="win32/processrunner.cpp" line="616"/>
+        <location filename="win32/processrunner.cpp" line="762"/>
+        <source>No profile set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/processrunner.cpp" line="612"/>
+        <location filename="win32/processrunner.cpp" line="582"/>
+        <source>This shortcut is for instance &apos;%1&apos; but Mod Organizer is currently running for &apos;%2&apos;. Exit Mod Organizer before running the shortcut or change the active instance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/processrunner.cpp" line="629"/>
+        <location filename="win32/processrunner.cpp" line="599"/>
+        <source>Executable &apos;%1&apos; does not exist in instance &apos;%2&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="108"/>
+        <location filename="linux/spawn_linux.cpp" line="109"/>
+        <location filename="win32/spawn_win32.cpp" line="170"/>
+        <location filename="win32/spawn_win32.cpp" line="171"/>
+        <location filename="win32/spawn_win32.cpp" line="196"/>
+        <location filename="win32/spawn_win32.cpp" line="197"/>
+        <source>Cannot start Steam</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="111"/>
+        <location filename="win32/spawn_win32.cpp" line="173"/>
+        <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="115"/>
+        <location filename="spawn.cpp" line="113"/>
+        <location filename="win32/spawn_win32.cpp" line="177"/>
+        <location filename="win32/spawn_win32.cpp" line="201"/>
+        <source>Continue without starting Steam</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="116"/>
+        <location filename="win32/spawn_win32.cpp" line="178"/>
+        <location filename="win32/spawn_win32.cpp" line="202"/>
+        <source>The program may fail to launch.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="247"/>
+        <source>Select executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7406,18 +7450,6 @@ Destination:<byte value="xd"/>
     <message>
         <location filename="lootdialog.cpp" line="22"/>
         <source>Done</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/main.cpp" line="77"/>
-        <location filename="win32/main.cpp" line="63"/>
-        <source>Mod Organizer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/main.cpp" line="78"/>
-        <location filename="win32/main.cpp" line="64"/>
-        <source>An instance of Mod Organizer is already running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7590,25 +7622,13 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/processrunner.cpp" line="579"/>
-        <location filename="linux/processrunner.cpp" line="646"/>
-        <location filename="linux/processrunner.cpp" line="792"/>
-        <location filename="win32/processrunner.cpp" line="549"/>
-        <location filename="win32/processrunner.cpp" line="616"/>
-        <location filename="win32/processrunner.cpp" line="762"/>
-        <source>No profile set</source>
+        <location filename="pluginlist.cpp" line="773"/>
+        <source>failed to access %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/processrunner.cpp" line="612"/>
-        <location filename="win32/processrunner.cpp" line="582"/>
-        <source>This shortcut is for instance &apos;%1&apos; but Mod Organizer is currently running for &apos;%2&apos;. Exit Mod Organizer before running the shortcut or change the active instance.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/processrunner.cpp" line="629"/>
-        <location filename="win32/processrunner.cpp" line="599"/>
-        <source>Executable &apos;%1&apos; does not exist in instance &apos;%2&apos;.</source>
+        <location filename="pluginlist.cpp" line="795"/>
+        <source>failed to set file time %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7892,62 +7912,6 @@ Example:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/spawn_win32.cpp" line="137"/>
-        <source>This error typically happens because an antivirus has deleted critical files from Mod Organizer&apos;s installation folder or has made them generally inaccessible. Add an exclusion for Mod Organizer&apos;s installation folder in your antivirus, reinstall Mod Organizer and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="144"/>
-        <source>This error typically happens because an antivirus is preventing Mod Organizer from starting programs. Add an exclusion for Mod Organizer&apos;s installation folder in your antivirus and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="149"/>
-        <source>The file &apos;%1&apos; does not exist.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="153"/>
-        <source>The working directory &apos;%1&apos; does not exist.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/spawn_linux.cpp" line="108"/>
-        <location filename="linux/spawn_linux.cpp" line="109"/>
-        <location filename="win32/spawn_win32.cpp" line="170"/>
-        <location filename="win32/spawn_win32.cpp" line="171"/>
-        <location filename="win32/spawn_win32.cpp" line="196"/>
-        <location filename="win32/spawn_win32.cpp" line="197"/>
-        <source>Cannot start Steam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/spawn_linux.cpp" line="111"/>
-        <location filename="win32/spawn_win32.cpp" line="173"/>
-        <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/spawn_linux.cpp" line="115"/>
-        <location filename="spawn.cpp" line="113"/>
-        <location filename="win32/spawn_win32.cpp" line="177"/>
-        <location filename="win32/spawn_win32.cpp" line="201"/>
-        <source>Continue without starting Steam</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/spawn_linux.cpp" line="116"/>
-        <location filename="win32/spawn_win32.cpp" line="178"/>
-        <location filename="win32/spawn_win32.cpp" line="202"/>
-        <source>The program may fail to launch.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/spawn_linux.cpp" line="247"/>
-        <source>Select executable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="spawn.cpp" line="63"/>
         <source>Cannot launch program</source>
         <translation type="unfinished"></translation>
@@ -7962,31 +7926,6 @@ Example:
     <message>
         <location filename="spawn.cpp" line="86"/>
         <source>Cannot launch helper</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="spawn.cpp" line="123"/>
-        <location filename="win32/spawn_win32.cpp" line="213"/>
-        <source>Elevation required</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="217"/>
-        <source>This program is requesting to run as administrator but Mod Organizer itself is not running as administrator. Running programs as administrator is typically unnecessary as long as the game and Mod Organizer have been installed outside &quot;Program Files&quot;.<byte value="xd"/>
-<byte value="xd"/>
-You can restart Mod Organizer as administrator and try launching the program again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="spawn.cpp" line="137"/>
-        <location filename="win32/spawn_win32.cpp" line="233"/>
-        <source>Restart Mod Organizer as administrator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="spawn.cpp" line="138"/>
-        <location filename="win32/spawn_win32.cpp" line="234"/>
-        <source>You must allow &quot;helper.exe&quot; to make changes to the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8016,6 +7955,12 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="spawn.cpp" line="123"/>
+        <location filename="win32/spawn_win32.cpp" line="213"/>
+        <source>Elevation required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="spawn.cpp" line="124"/>
         <source>Steam is running as administrator</source>
         <translation type="unfinished"></translation>
@@ -8028,31 +7973,22 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="spawn.cpp" line="137"/>
+        <location filename="win32/spawn_win32.cpp" line="233"/>
+        <source>Restart Mod Organizer as administrator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="spawn.cpp" line="138"/>
+        <location filename="win32/spawn_win32.cpp" line="234"/>
+        <source>You must allow &quot;helper.exe&quot; to make changes to the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="spawn.cpp" line="140"/>
         <location filename="spawn.cpp" line="169"/>
         <location filename="win32/spawn_win32.cpp" line="260"/>
         <source>Continue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="246"/>
-        <source>Event Log not running</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="247"/>
-        <source>The Event Log service is not running</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="248"/>
-        <source>The Windows Event Log service is not running. This can prevent USVFS from running properly and your mods may not be recognized by the program being launched.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="spawn.cpp" line="170"/>
-        <location filename="win32/spawn_win32.cpp" line="260"/>
-        <source>Your mods might not work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8071,28 +8007,14 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="spawn.cpp" line="170"/>
+        <location filename="win32/spawn_win32.cpp" line="260"/>
+        <source>Your mods might not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="spawn.cpp" line="171"/>
         <source>Change the blacklist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="435"/>
-        <source>Waiting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="436"/>
-        <source>Please press OK once you&apos;re logged into steam.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="695"/>
-        <source>Select binary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="win32/spawn_win32.cpp" line="696"/>
-        <source>Binary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8151,13 +8073,75 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="773"/>
-        <source>failed to access %1: %2</source>
+        <location filename="win32/envshell.cpp" line="307"/>
+        <source>No menu available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="795"/>
-        <source>failed to set file time %1: %2</source>
+        <location filename="win32/envshell.cpp" line="346"/>
+        <source>Selected files must be in the same directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="137"/>
+        <source>This error typically happens because an antivirus has deleted critical files from Mod Organizer&apos;s installation folder or has made them generally inaccessible. Add an exclusion for Mod Organizer&apos;s installation folder in your antivirus, reinstall Mod Organizer and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="144"/>
+        <source>This error typically happens because an antivirus is preventing Mod Organizer from starting programs. Add an exclusion for Mod Organizer&apos;s installation folder in your antivirus and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="149"/>
+        <source>The file &apos;%1&apos; does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="153"/>
+        <source>The working directory &apos;%1&apos; does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="217"/>
+        <source>This program is requesting to run as administrator but Mod Organizer itself is not running as administrator. Running programs as administrator is typically unnecessary as long as the game and Mod Organizer have been installed outside &quot;Program Files&quot;.<byte value="xd"/>
+<byte value="xd"/>
+You can restart Mod Organizer as administrator and try launching the program again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="246"/>
+        <source>Event Log not running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="247"/>
+        <source>The Event Log service is not running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="248"/>
+        <source>The Windows Event Log service is not running. This can prevent USVFS from running properly and your mods may not be recognized by the program being launched.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="435"/>
+        <source>Waiting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="436"/>
+        <source>Please press OK once you&apos;re logged into steam.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="695"/>
+        <source>Select binary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="win32/spawn_win32.cpp" line="696"/>
+        <source>Binary</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -9119,6 +9103,11 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="settingsdialog.ui" line="2034"/>
+        <source>Back-date BSAs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="settingsdialog.ui" line="2076"/>
         <source>Add executables to the blacklist to prevent them from
 accessing the virtual file system. This is useful to prevent
@@ -9135,11 +9124,6 @@ programs you are intentionally running.</source>
     <message>
         <location filename="settingsdialog.ui" line="2086"/>
         <source>Executables Blacklist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="settingsdialog.ui" line="2034"/>
-        <source>Back-date BSAs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9447,14 +9431,6 @@ On Windows XP:
     <message>
         <location filename="updatedialog.cpp" line="69"/>
         <source>Mod Organizer %1 is available.  The current version is %2.  Updating will not affect your mods or profiles.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UsvfsConnector</name>
-    <message>
-        <location filename="win32/usvfsconnector.cpp" line="201"/>
-        <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

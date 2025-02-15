@@ -2111,8 +2111,8 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
 
     QString originPath = base->getOriginByID(origin).getPath();
     QString fileName   = current->getName();
-    QString source = originPath + relPath + fileName;
-    QString target = dataPath + relPath + fileName;
+    QString source     = originPath + relPath + fileName;
+    QString target     = dataPath + relPath + fileName;
     if (source != target) {
       result.push_back({source, target, false, false});
     }
@@ -2122,10 +2122,10 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
   for (const auto& d : directoryEntry->getSubDirectories()) {
     int origin = d->anyOrigin();
 
-    QString originPath = base->getOriginByID(origin).getPath();
-    const QString& dirName    = d->getName();
-    QString source     = originPath + relPath + dirName;
-    QString target     = dataPath + relPath + dirName;
+    QString originPath     = base->getOriginByID(origin).getPath();
+    const QString& dirName = d->getName();
+    QString source         = originPath + relPath + dirName;
+    QString target         = dataPath + relPath + dirName;
 
     bool writeDestination = (base == directoryEntry) && (origin == createDestination);
 

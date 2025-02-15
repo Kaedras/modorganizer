@@ -386,47 +386,47 @@ ProcessRunner::Results waitForProcesses(const std::vector<HANDLE>& initialProces
     // nothing to wait for
     return ProcessRunner::Completed;
   }
-/*
-  // using a job so any child process started by any of those processes can also
-  // be captured and monitored
-  env::HandlePtr job(CreateJobObjectW(nullptr, nullptr));
-  if (!job) {
-    const auto e = GetLastError();
-
-    log::error("failed to create job to wait for processes, {}",
-               formatSystemMessage(e));
-
-    return ProcessRunner::Error;
-  }
-
-  bool oneWorked = false;
-
-  for (auto&& h : initialProcesses) {
-    if (::AssignProcessToJobObject(job.get(), h)) {
-      oneWorked = true;
-    } else {
+  /*
+    // using a job so any child process started by any of those processes can also
+    // be captured and monitored
+    env::HandlePtr job(CreateJobObjectW(nullptr, nullptr));
+    if (!job) {
       const auto e = GetLastError();
 
-      // this happens when closing MO while multiple processes are running,
-      // so the logging is disabled until it gets fixed
+      log::error("failed to create job to wait for processes, {}",
+                 formatSystemMessage(e));
 
-      // log::error(
-      //  "can't assign process to job to wait for processes, {}",
-      //  formatSystemMessage(e));
-
-      // keep going
+      return ProcessRunner::Error;
     }
-  }
 
-  HANDLE monitor = INVALID_HANDLE_VALUE;
+    bool oneWorked = false;
 
-  if (oneWorked) {
-    monitor = job.get();
-  } else {
-    // none of the handles could be added to the job, just monitor the first one
-    monitor = initialProcesses[0];
-  }
-*/
+    for (auto&& h : initialProcesses) {
+      if (::AssignProcessToJobObject(job.get(), h)) {
+        oneWorked = true;
+      } else {
+        const auto e = GetLastError();
+
+        // this happens when closing MO while multiple processes are running,
+        // so the logging is disabled until it gets fixed
+
+        // log::error(
+        //  "can't assign process to job to wait for processes, {}",
+        //  formatSystemMessage(e));
+
+        // keep going
+      }
+    }
+
+    HANDLE monitor = INVALID_HANDLE_VALUE;
+
+    if (oneWorked) {
+      monitor = job.get();
+    } else {
+      // none of the handles could be added to the job, just monitor the first one
+      monitor = initialProcesses[0];
+    }
+  */
   auto results = ProcessRunner::Running;
   std::atomic<bool> interrupt(false);
 
