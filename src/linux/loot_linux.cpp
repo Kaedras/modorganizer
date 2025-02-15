@@ -57,13 +57,12 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   }
   parameters << "--game" << m_core.managedGame()->lootGameName()
              << "--gamePath"
-             << QString("\"%1\"").arg(
-                    m_core.managedGame()->gameDirectory().absolutePath())
+             << m_core.managedGame()->gameDirectory().absolutePath()
              << "--pluginListPath"
-             << QString("\"%1/loadorder.txt\"").arg(m_core.profilePath())
+             << QString("%1/loadorder.txt").arg(m_core.profilePath())
              << "--logLevel"
              << QString::fromStdString(lootcli::logLevelToString(logLevel))
-             << "--out" << QString("\"%1\"").arg(LootReportPath)
+             << "--out" << LootReportPath
              << "--language" << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
   QString program = qApp->applicationDirPath() + "/loot/" + lootExecutable;
