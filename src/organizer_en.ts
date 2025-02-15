@@ -2659,44 +2659,43 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
 <context>
     <name>Loot</name>
     <message>
-        <location filename="linux/loot_linux.cpp" line="74"/>
-        <source>failed to start loot: error mounting overlayfs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="linux/loot_linux.cpp" line="82"/>
+        <location filename="linux/loot_linux.cpp" line="301"/>
         <source>failed to start loot: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot_linux.cpp" line="144"/>
-        <location filename="win32/loot_win32.cpp" line="325"/>
+        <location filename="linux/loot_linux.cpp" line="366"/>
+        <location filename="win32/loot_win32.cpp" line="607"/>
         <source>Loot failed. Exit code was: 0x%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="41"/>
+        <location filename="linux/loot_linux.cpp" line="48"/>
+        <location filename="win32/loot_win32.cpp" line="223"/>
         <source>Loot failed to run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="44"/>
+        <location filename="linux/loot_linux.cpp" line="51"/>
+        <location filename="win32/loot_win32.cpp" line="226"/>
         <source>No errors were reported. The log below might have more information.
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="98"/>
+        <location filename="linux/loot_linux.cpp" line="105"/>
+        <location filename="win32/loot_win32.cpp" line="280"/>
         <source>Errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="110"/>
+        <location filename="linux/loot_linux.cpp" line="117"/>
+        <location filename="win32/loot_win32.cpp" line="292"/>
         <source>Warnings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/loot_win32.cpp" line="264"/>
+        <location filename="win32/loot_win32.cpp" line="495"/>
         <source>failed to start loot</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2785,22 +2784,22 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
 <context>
     <name>MOMultiProcess</name>
     <message>
-        <location filename="multiprocess.cpp" line="28"/>
+        <location filename="multiprocess.cpp" line="29"/>
         <source>SHM error %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="multiprocess.cpp" line="64"/>
+        <location filename="multiprocess.cpp" line="66"/>
         <source>failed to connect to running process: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="multiprocess.cpp" line="71"/>
+        <location filename="multiprocess.cpp" line="73"/>
         <source>failed to communicate with running process: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="multiprocess.cpp" line="97"/>
+        <location filename="multiprocess.cpp" line="99"/>
         <source>failed to receive data from secondary process: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7344,18 +7343,19 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="247"/>
+        <location filename="linux/spawn_linux.cpp" line="246"/>
         <source>Select executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="linux/loot_linux.cpp" line="221"/>
         <location filename="loglist.cpp" line="390"/>
-        <location filename="loot.cpp" line="214"/>
         <location filename="organizercore.cpp" line="396"/>
         <location filename="settingsdialogdiagnostics.cpp" line="39"/>
         <location filename="settingsdialogdiagnostics.cpp" line="65"/>
         <location filename="settingsdialogpaths.cpp" line="100"/>
         <location filename="settingsdialogpaths.cpp" line="235"/>
+        <location filename="win32/loot_win32.cpp" line="396"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7366,49 +7366,58 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="62"/>
+        <location filename="linux/loot_linux.cpp" line="69"/>
+        <location filename="win32/loot_win32.cpp" line="244"/>
         <source>General messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="74"/>
+        <location filename="linux/loot_linux.cpp" line="81"/>
+        <location filename="win32/loot_win32.cpp" line="256"/>
         <source>Plugins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="85"/>
+        <location filename="linux/loot_linux.cpp" line="92"/>
+        <location filename="win32/loot_win32.cpp" line="267"/>
         <source>No messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="133"/>
+        <location filename="linux/loot_linux.cpp" line="140"/>
+        <location filename="win32/loot_win32.cpp" line="315"/>
         <source>Incompatibilities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="148"/>
+        <location filename="linux/loot_linux.cpp" line="155"/>
+        <location filename="win32/loot_win32.cpp" line="330"/>
         <source>Missing masters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="180"/>
+        <location filename="linux/loot_linux.cpp" line="187"/>
+        <location filename="win32/loot_win32.cpp" line="362"/>
         <source>Verified clean by %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="200"/>
+        <location filename="linux/loot_linux.cpp" line="207"/>
+        <location filename="win32/loot_win32.cpp" line="382"/>
         <source>%1 found %2 ITM record(s), %3 deleted reference(s) and %4 deleted navmesh(es).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="219"/>
+        <location filename="linux/loot_linux.cpp" line="226"/>
         <location filename="settingsdialogdiagnostics.cpp" line="38"/>
         <location filename="settingsdialogdiagnostics.cpp" line="64"/>
+        <location filename="win32/loot_win32.cpp" line="401"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="loot.cpp" line="566"/>
+        <location filename="linux/loot_linux.cpp" line="678"/>
+        <location filename="win32/loot_win32.cpp" line="916"/>
         <source>failed to run loot: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9431,6 +9440,14 @@ On Windows XP:
     <message>
         <location filename="updatedialog.cpp" line="69"/>
         <source>Mod Organizer %1 is available.  The current version is %2.  Updating will not affect your mods or profiles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UsvfsConnector</name>
+    <message>
+        <location filename="win32/usvfsconnector.cpp" line="201"/>
+        <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

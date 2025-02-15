@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef __unix__
-#include "linux/loot.h"
+#include "linux/loot_linux.h"
 #else
-#include "win32/loot.h"
+#include "win32/loot_win32.h"
 #endif

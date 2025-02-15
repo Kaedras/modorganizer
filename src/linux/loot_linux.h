@@ -1,9 +1,9 @@
 #ifndef MODORGANIZER_LOOT_H
 #define MODORGANIZER_LOOT_H
 
-#include <QWidget>
-#include <log.h>
 #include <lootcli/lootcli.h>
+#include <uibase/log.h>
+#include <QWidget>
 
 Q_DECLARE_METATYPE(lootcli::Progress);
 Q_DECLARE_METATYPE(MOBase::log::Levels);
@@ -99,23 +99,21 @@ signals:
   void log(MOBase::log::Levels level, const QString& s) const;
   void finished();
 
-private slots:
-  void processStdout();
+public slots:
+  void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
   OrganizerCore& m_core;
-  std::unique_ptr<QThread> m_thread;
-  std::atomic<bool> m_cancel;
-  std::atomic<bool> m_result;
+  // std::unique_ptr<QThread> m_thread;
+  bool m_cancel;
+  bool m_result;
   std::unique_ptr<QProcess> m_lootProcess;
   std::vector<QString> m_errors, m_warnings;
   Report m_report;
 
   bool spawnLootcli(QWidget* parent, bool didUpdateMasterList);
 
-  void lootThread();
-  bool waitForCompletion();
-
+  void processStdout();
   void processMessage(const lootcli::Message& m);
 
   Report createReport() const;
