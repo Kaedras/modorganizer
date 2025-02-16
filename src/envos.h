@@ -59,7 +59,7 @@ public:
   virtual QString toString() const = 0;
 };
 
-OsInfo* CreateInfo();
+std::unique_ptr<OsInfo> CreateInfo();
 
 }  // namespace env
 

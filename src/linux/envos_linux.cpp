@@ -145,9 +145,9 @@ void LinuxInfo::getVersion()
   }
 }
 
-OsInfo* CreateInfo()
+std::unique_ptr<OsInfo> CreateInfo()
 {
-  return new LinuxInfo();
+  return std::make_unique<LinuxInfo>();
 }
 
 }  // namespace env

@@ -278,9 +278,9 @@ std::optional<bool> WindowsInfo::getElevated() const
   return (e.TokenIsElevated != 0);
 }
 
-OsInfo* CreateInfo()
+std::unique_ptr<OsInfo> CreateInfo()
 {
-  return new WindowsInfo();
+  return std::make_unique<WindowsInfo>();
 }
 
 }  // namespace env
