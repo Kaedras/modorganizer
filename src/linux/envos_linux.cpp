@@ -1,10 +1,10 @@
 #include "envos.h"
-#include "stub.h"
 #include <sys/utsname.h>
 
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 namespace env
 {
@@ -59,28 +59,28 @@ QString LinuxInfo::toString() const
 
   // distro
   if (!m_release.name.isEmpty()) {
-    sl.push_back(m_release.name);
+    sl << m_release.name;
   } else {
-    sl.push_back("Unknown linux distribution");
+    sl << u"Unknown linux distribution"_s;
   }
   if (!m_release.version.isEmpty()) {
-    sl.push_back(m_release.version);
+    sl << m_release.version;
   }
 
   // version
-  sl.push_back("Kernel " + m_version.toString());  // kernel release, e.g. 6.9.9
-  sl.push_back(m_info.machine);                    // architecture, e.g. x86_64
-  sl.push_back(m_info.version);  // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
+  sl << u"Kernel "_s % m_version.toString();  // kernel release, e.g. 6.9.9
+  sl << m_info.machine;                       // architecture, e.g. x86_64
+  sl << m_info.version;  // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
 
   // elevated
-  QString elevated = "?";
+  QString elevated = u"?"_s;
   if (m_elevated.has_value()) {
-    elevated = m_elevated.value() ? "yes" : "no";
+    elevated = m_elevated.value() ? u"yes"_s : u"no"_s;
   }
 
-  sl.push_back("elevated: " + elevated);
+  sl << u"elevated: "_s % elevated;
 
-  return sl.join(", ");
+  return sl.join(u", "_s);
 }
 
 LinuxInfo::LinuxInfo()
@@ -103,46 +103,36 @@ std::optional<bool> LinuxInfo::getElevated() const
 LinuxInfo::Release LinuxInfo::getRelease() const
 {
   Release r;
-  QFile lsbRelease("/etc/lsb-release");
-  if (!lsbRelease.open(QIODeviceBase::ReadOnly | QIODeviceBase::Text)) {
-    log::error("error opening /etc/lsb-release: '{}'", lsbRelease.errorString());
-  } else {
-    while (!lsbRelease.atEnd()) {
-      QString line = lsbRelease.readLine();
 
-      if (line.startsWith("PRETTY_NAME=")) {
-        line.remove(0, strlen("PRETTY_NAME="));
-        // remove "
-        if (line.startsWith('"')) {
-          line.removeFirst();
-        }
-        // remove trailing "
-        if (line.endsWith('"')) {
-          line.removeLast();
-        }
-        r.name = line;
-      } else if (line.startsWith("VERSION_ID=")) {
-        line.remove(0, strlen("VERSION_ID="));
-        // remove "
-        if (line.startsWith('"')) {
-          line.removeFirst();
-        }
-        // remove trailing "
-        if (line.endsWith('"')) {
-          line.removeLast();
-        }
+  QProcess p;
+  p.startCommand(u"lsb_release -d"_s);
+  p.waitForFinished();
 
-        r.version = line;
-      }
-    }
+  if (p.exitCode() != 0) {
+    return r;
   }
+
+  QString description = p.readAll();
+  description.remove(u"Description:\t"_s);
+  r.name = description.trimmed();
+
+  p.startCommand(u"lsb_release -r"_s);
+  p.waitForFinished();
+
+  if (p.exitCode() == 0) {
+    QString version = p.readAll();
+    version.remove(u"Release:\t"_s);
+    r.version = version.trimmed();
+  }
+
   return r;
 }
 
 void LinuxInfo::getVersion()
 {
   if (uname(&m_info) != 0) {
-    log::error("error getting kernel version: {}", errno);
+    const int error = errno;
+    log::error("error getting kernel version: {}", strerror(error));
   }
   QString versionString = m_info.release;
   QStringList list      = versionString.split('.');
