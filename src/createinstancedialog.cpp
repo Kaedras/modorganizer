@@ -71,7 +71,11 @@ private:
       }
 
       // root directory
+#ifdef __unix__
+      QDir d(QStringLiteral("/"));
+#else
       QDir d(cs[0]);
+#endif
 
       // for each directory after the root
       for (int i = 1; i < cs.size(); ++i) {
