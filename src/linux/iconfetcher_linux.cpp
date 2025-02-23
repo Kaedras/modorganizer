@@ -14,7 +14,7 @@ IconFetcher::IconFetcher() : m_iconSize(iconSize), m_stop(false)
   });
 }
 
-template<>
+template <>
 QPixmap IconFetcher::getPixmapIcon(const QString& t) const
 {
   static QMimeDatabase db;

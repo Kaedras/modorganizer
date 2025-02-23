@@ -1,5 +1,5 @@
-#include "loot.h"
 #include "json.h"
+#include "loot.h"
 #include "lootdialog.h"
 #include "organizercore.h"
 #include <log.h>
@@ -241,7 +241,7 @@ Loot::Loot(OrganizerCore& core) : m_core(core), m_cancel(false), m_result(false)
 
 Loot::~Loot()
 {
-  if(m_lootProcess) {
+  if (m_lootProcess) {
     if (m_lootProcess->state() == QProcess::Running) {
       m_lootProcess->waitForFinished(-1);
     }
@@ -306,8 +306,8 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   emit log(log::Levels::Debug, u"loot started"_s);
 
   m_lootProcess = std::move(lootHandle);
-  connect(m_lootProcess.get(), &QProcess::finished, this,
-          &Loot::onFinished, Qt::QueuedConnection);
+  connect(m_lootProcess.get(), &QProcess::finished, this, &Loot::onFinished,
+          Qt::QueuedConnection);
 
   return true;
 }
