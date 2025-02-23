@@ -31,6 +31,7 @@ private:
   utsname m_info{};
   Release m_release;
   Version m_version;
+  QString m_versionString;
   std::optional<bool> m_elevated;
 
   std::optional<bool> getElevated() const;
@@ -68,9 +69,10 @@ QString LinuxInfo::toString() const
   }
 
   // version
-  sl << u"Kernel "_s % m_version.toString();  // kernel release, e.g. 6.9.9
-  sl << m_info.machine;                       // architecture, e.g. x86_64
-  sl << m_info.version;  // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
+  sl << u"Kernel "_s % m_versionString;  // kernel release including local version,
+                                         // e.g. 6.9.9-gentoo
+  sl << m_info.machine;                  // architecture, e.g. x86_64
+  sl << m_info.version;                  // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
 
   // elevated
   QString elevated = u"?"_s;
@@ -139,9 +141,19 @@ void LinuxInfo::getVersion()
   if (list.size() != 3) {
     log::error("invalid version string size, got '{}'", versionString.toStdString());
   } else {
+    // remove local version string
+    for (int i = 0; i < list[2].length(); i++) {
+      if (!list[2][i].isDigit()) {
+        list[2].truncate(i);
+        break;
+      }
+    }
+
     m_version.major = list[0].toInt();
     m_version.minor = list[1].toInt();
     m_version.build = list[2].toInt();
+
+    m_versionString = versionString;
   }
 }
 
