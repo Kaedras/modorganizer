@@ -155,7 +155,7 @@ bool ModListChangeCategoryMenu::populate(QMenu* menu, CategoryFactory* factory,
       if (enabled) {
         childEnabled = true;
       }
-      checkBox->setChecked(enabled ? Qt::Checked : Qt::Unchecked);
+      checkBox->setChecked(enabled);
 
       QScopedPointer<QWidgetAction> checkableAction(new QWidgetAction(targetMenu));
       checkableAction->setDefaultWidget(checkBox.take());

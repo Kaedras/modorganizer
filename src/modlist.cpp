@@ -473,6 +473,7 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
   } else {
     return QVariant();
   }
+  return QVariant();
 }
 
 bool ModList::renameMod(int index, const QString& newName)
