@@ -44,7 +44,7 @@ QString Module::getFileDescription(std::byte* buffer) const
 bool Module::interesting() const
 {
   STUB();
-  return {};
+  return false;
 }
 
 HandlePtr Process::openHandleForWait() const
@@ -68,8 +68,9 @@ std::vector<Process> getRunningProcesses()
   std::vector<Process> v;
   fs::directory_iterator it("/proc");
 
-  for (auto folder : it) {
-    v.emplace_back(stoi(folder.path().filename()));
+  for (const auto& folder : it) {
+    pid_t pid = stoi(folder.path().filename());
+    v.emplace_back(pid, getProcessParentID((DWORD)pid), getProcessName((DWORD)pid));
   }
 
   return v;
@@ -102,7 +103,6 @@ DWORD getProcessParentID(DWORD pid)
 {
   // see proc_pid_stat(5) manpage for documentation
 
-  // QFile can't be used because it can't handle virtual files
   ifstream stat(format("/proc/{}/stat", pid));
   stat.exceptions(std::ios::failbit);
   try {
