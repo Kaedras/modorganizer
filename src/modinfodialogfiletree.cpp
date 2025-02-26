@@ -8,11 +8,11 @@
 #include <utility.h>
 
 using namespace MOBase;
-namespace shell = MOBase::shell;
+using namespace Qt::StringLiterals;
 
 // if there are more than 50 selected items in the filetree, don't bother
 // checking whether menu items apply to them, just show all of them
-const int max_scan_for_context_menu = 50;
+static inline constexpr int max_scan_for_context_menu = 50;
 
 FileTreeTab::FileTreeTab(ModInfoDialogTabContext cx)
     : ModInfoDialogTab(std::move(cx)), m_fs(nullptr)
@@ -144,7 +144,7 @@ void FileTreeTab::onCreateDirectory()
   index             = index.sibling(index.row(), 0);
 
   QString name = tr("New Folder");
-  QString path = m_fs->filePath(index).append("/");
+  QString path = m_fs->filePath(index).append(u"/"_s);
 
   QModelIndex existingIndex = m_fs->index(path + name);
   int suffix                = 1;

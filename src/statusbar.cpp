@@ -5,6 +5,8 @@
 #include "settings.h"
 #include "ui_mainwindow.h"
 
+using namespace Qt::StringLiterals;
+
 StatusBar::StatusBar(QWidget* parent)
     : QStatusBar(parent), ui(nullptr), m_normal(new QLabel),
       m_progress(new QProgressBar), m_progressSpacer1(new QWidget),
@@ -39,7 +41,7 @@ void StatusBar::setup(Ui::MainWindow* mainWindowUI, const Settings& settings)
   m_update->set(false);
   m_notifications->set(false);
 
-  m_api->setObjectName("apistats");
+  m_api->setObjectName(u"apistats"_s);
   m_api->setToolTip(QObject::tr(
       "This tracks the number of queued Nexus API requests, as well as the "
       "remaining daily and hourly requests. The Nexus API limits you to a pool "
@@ -86,46 +88,44 @@ void StatusBar::setAPI(const APIStats& stats, const APIUserAccount& user)
   QString backgroundColor;
 
   if (user.type() == APIUserAccountTypes::None) {
-    text            = "API: not logged in";
-    textColor       = "";
-    backgroundColor = "";
+    text            = u"API: not logged in"_s;
   } else {
-    text = QString("API: Queued: %1 | Daily: %2 | Hourly: %3")
+    text = QStringLiteral("API: Queued: %1 | Daily: %2 | Hourly: %3")
                .arg(stats.requestsQueued)
                .arg(user.limits().remainingDailyRequests)
                .arg(user.limits().remainingHourlyRequests);
 
     if (user.remainingRequests() > 500) {
-      textColor       = "white";
-      backgroundColor = "darkgreen";
+      textColor       = u"white"_s;
+      backgroundColor = u"darkgreen"_s;
     } else if (user.remainingRequests() > 200) {
-      textColor       = "black";
-      backgroundColor = "rgb(226, 192, 0)";  // yellow
+      textColor       = u"black"_s;
+      backgroundColor = u"rgb(226, 192, 0)"_s;  // yellow
     } else {
-      textColor       = "white";
-      backgroundColor = "darkred";
+      textColor       = u"white"_s;
+      backgroundColor = u"darkred"_s;
     }
   }
 
   m_api->setText(text);
 
-  QString ss(R"(
+  QString ss(uR"(
     QLabel
     {
       padding-left: 0.1em;
       padding-right: 0.1em;
       padding-top: 0;
-      padding-bottom: 0;)");
+      padding-bottom: 0;)"_s);
 
   if (!textColor.isEmpty()) {
-    ss += QString("\ncolor: %1;").arg(textColor);
+    ss += QStringLiteral("\ncolor: %1;").arg(textColor);
   }
 
   if (!backgroundColor.isEmpty()) {
-    ss += QString("\nbackground-color: %2;").arg(backgroundColor);
+    ss += QStringLiteral("\nbackground-color: %2;").arg(backgroundColor);
   }
 
-  ss += "\n}";
+  ss += u"\n}"_s;
 
   m_api->setStyleSheet(ss);
   m_api->setAutoFillBackground(true);
@@ -151,13 +151,13 @@ void StatusBar::updateNormalMessage(OrganizerCore& core)
     game = tr("Unknown game");
   }
 
-  QString instance = "?";
+  QString instance = u"?"_s;
   if (auto i = InstanceManager::singleton().currentInstance())
     instance = i->displayName();
 
   QString profile = core.profileName();
 
-  const auto s = QString("%1 - %2 - %3").arg(game).arg(instance).arg(profile);
+  const auto s = QStringLiteral("%1 - %2 - %3").arg(game, instance, profile);
 
   m_normal->setText(s);
 }
@@ -223,10 +223,12 @@ QString StatusBarAction::cleanupActionText(const QString& original) const
 {
   QString s = original;
 
-  s.replace(QRegularExpression("\\&([^&])"), "\\1");  // &Item -> Item
-  s.replace("&&", "&");                               // &&Item -> &Item
+  static const QRegularExpression regex(u"\\&([^&])"_s);
 
-  if (s.endsWith("...")) {
+  s.replace(regex, u"\\1"_s);  // &Item -> Item
+  s.replace(u"&&"_s, u"&"_s);                               // &&Item -> &Item
+
+  if (s.endsWith("..."_L1)) {
     s = s.left(s.size() - 3);
   }
 

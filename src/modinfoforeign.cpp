@@ -47,22 +47,22 @@ ModInfoForeign::ModInfoForeign(const QString& modName, const QString& referenceF
   IPluginGame const* game = core.managedGame();
   QList<QDir> directories = {game->dataDirectory()};
   directories.append(game->secondaryDataDirectories().values());
-  for (QDir directory : directories) {
+  for (const QDir& directory : directories) {
     if (referenceFile.startsWith(directory.absolutePath(), Qt::CaseInsensitive)) {
       m_BaseDirectory = directory.absolutePath();
     }
   }
   switch (modType) {
   case ModInfo::EModType::MOD_DLC:
-    m_Name         = tr("DLC: ") + modName;
-    m_InternalName = QString("DLC: ") + modName;
+    m_Name         = tr("DLC: %1").arg(modName);
+    m_InternalName = QStringLiteral("DLC: %1").arg(modName);
     break;
   case ModInfo::EModType::MOD_CC:
-    m_Name         = tr("Creation Club: ") + modName;
-    m_InternalName = QString("Creation Club: ") + modName;
+    m_Name         = tr("Creation Club: %1").arg(modName);
+    m_InternalName = QStringLiteral("Creation Club: %1").arg(modName);
     break;
   default:
-    m_Name         = tr("Unmanaged: ") + modName;
-    m_InternalName = QString("Unmanaged: ") + modName;
+    m_Name         = tr("Unmanaged: %1").arg(modName);
+    m_InternalName = QStringLiteral("Unmanaged: %1").arg(modName);
   }
 }

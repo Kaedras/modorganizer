@@ -9,6 +9,7 @@
 #include <versioninfo.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 bool isValidModID(int id)
 {
@@ -101,7 +102,7 @@ void NexusTab::update()
     ui->sourceGame->setDisabled(true);
   } else {
     for (auto game : plugin().plugins<MOBase::IPluginGame>()) {
-      for (QString gameName : core().managedGame()->validShortNames()) {
+      for (const QString& gameName : core().managedGame()->validShortNames()) {
         if (game->gameShortName().compare(gameName, Qt::CaseInsensitive) == 0) {
           ui->sourceGame->addItem(game->gameName(), game->gameShortName());
           break;
@@ -112,7 +113,7 @@ void NexusTab::update()
 
   ui->sourceGame->setCurrentIndex(ui->sourceGame->findData(gameName));
 
-  ui->category->setText(QString("%1").arg(mod().getNexusCategory()));
+  ui->category->setText(QStringLiteral("%1").arg(mod().getNexusCategory()));
 
   auto* page = new NexusTabWebpage(ui->browser);
   ui->browser->setPage(page);
@@ -151,11 +152,11 @@ bool NexusTab::usesOriginFiles() const
 void NexusTab::updateVersionColor()
 {
   if (mod().version() != mod().newestVersion()) {
-    ui->version->setStyleSheet("color: red");
+    ui->version->setStyleSheet(u"color: red"_s);
     ui->version->setToolTip(
         tr("Current Version: %1").arg(mod().newestVersion().canonicalString()));
   } else {
-    ui->version->setStyleSheet("color: green");
+    ui->version->setStyleSheet(u"color: green"_s);
     ui->version->setToolTip(tr("No update available"));
   }
 }
@@ -222,7 +223,7 @@ void NexusTab::onModChanged()
 
   const QString nexusDescription = mod().getNexusDescription();
 
-  QString descriptionAsHTML = R"(
+  QString descriptionAsHTML = uR"(
 <html>
   <head>
     <style class="nexus-description">
@@ -301,7 +302,7 @@ void NexusTab::onModChanged()
     </style>
   </head>
   <body>%1</body>
-</html>)";
+</html>)"_s;
 
   if (nexusDescription.isEmpty()) {
     descriptionAsHTML = descriptionAsHTML.arg(tr(R"(

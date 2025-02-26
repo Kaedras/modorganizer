@@ -5,6 +5,7 @@
 #include <QWebChannel>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 UpdateDialog::UpdateDialog(QWidget* parent)
     : QDialog(parent, Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
@@ -33,7 +34,7 @@ UpdateDialog::UpdateDialog(QWidget* parent)
   channel->registerObject("content", &m_changeLogs);
   page->setWebChannel(channel);
 
-  const QString path = QApplication::applicationDirPath() + "/resources/markdown.html";
+  const QString path = QApplication::applicationDirPath() % u"/resources/markdown.html"_s;
   QFile f(path);
 
   if (f.open(QFile::ReadOnly)) {

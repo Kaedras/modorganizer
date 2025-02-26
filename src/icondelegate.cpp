@@ -59,7 +59,7 @@ void IconDelegate::paintIcons(QPainter* painter, const QStyleOptionViewItem& opt
       continue;
     }
     QPixmap icon;
-    QString fullIconId = QString("%1_%2").arg(iconId).arg(iconWidth);
+    QString fullIconId = QStringLiteral("%1_%2").arg(iconId).arg(iconWidth);
     if (!QPixmapCache::find(fullIconId, &icon)) {
       icon = QIcon(iconId).pixmap(iconWidth, iconWidth);
       if (icon.isNull()) {

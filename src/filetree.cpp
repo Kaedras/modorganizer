@@ -10,6 +10,7 @@
 
 using namespace MOShared;
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 bool canPreviewFile(const PluginContainer& pc, const FileEntry& file)
 {
@@ -96,17 +97,17 @@ private:
     QString s = m_tooltip.trimmed();
 
     if (!s.isEmpty()) {
-      if (!s.endsWith(".")) {
-        s += ".";
+      if (!s.endsWith('.')) {
+        s += '.';
       }
 
-      s += "\n";
+      s += '\n';
     }
 
-    s += QObject::tr("Disabled because") + ": " + m_disabledHint.trimmed();
+    s += QObject::tr("Disabled because") % u": "_s % m_disabledHint.trimmed();
 
-    if (!s.endsWith(".")) {
-      s += ".";
+    if (!s.endsWith('.')) {
+      s += '.';
     }
 
     m_action->setStatusTip(s);

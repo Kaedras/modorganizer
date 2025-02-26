@@ -24,6 +24,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 MessageDialog::MessageDialog(const QString& text, QWidget* reference)
     : QDialog(reference), ui(new Ui::MessageDialog)
@@ -34,22 +35,22 @@ MessageDialog::MessageDialog(const QString& text, QWidget* reference)
   // window. ellide in the center if necessary
   QFontMetrics metrics(ui->message->font());
   QString restrictedText;
-  QStringList lines = text.split("\n");
+  QStringList lines = text.split('\n');
   foreach (const QString& line, lines) {
     QString newLine;
-    QStringList words = line.split(" ");
+    QStringList words = line.split(' ');
     foreach (const QString& word, words) {
       if (word.length() > 10) {
         newLine +=
-            "<span style=\"nobreak\">" +
-            metrics.elidedText(word, Qt::ElideMiddle, ui->message->maximumWidth()) +
-            "</span>";
+            u"<span style=\"nobreak\">"_s %
+            metrics.elidedText(word, Qt::ElideMiddle, ui->message->maximumWidth()) %
+            u"</span>"_s;
       } else {
         newLine += word;
       }
-      newLine += " ";
+      newLine += u" "_s;
     }
-    restrictedText += newLine + "\n";
+    restrictedText += newLine % u"\n"_s;
   }
 
   ui->message->setText(restrictedText);

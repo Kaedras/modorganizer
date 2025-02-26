@@ -3,6 +3,8 @@
 #include "ui_settingsdialog.h"
 #include <iplugingame.h>
 
+using namespace Qt::StringLiterals;
+
 PathsSettingsTab::PathsSettingsTab(Settings& s, SettingsDialog& d)
     : SettingsTab(s, d), m_gameDir(settings().game().plugin()->gameDirectory())
 {
@@ -106,7 +108,7 @@ void PathsSettingsTab::update()
       }
     }
 
-    if (QFileInfo(realPath) != QFileInfo(basePath + "/" + defaultName)) {
+    if (QFileInfo(realPath) != QFileInfo(basePath % u"/"_s % defaultName)) {
       (settings().paths().*setter)(path);
     } else {
       (settings().paths().*setter)("");
@@ -203,9 +205,11 @@ void PathsSettingsTab::on_browseGameDirBtn_clicked()
   // spaces in the name are interpreted as separators ";" in the filter,
   // so we replace them with the single character matching wildcard "?"
   //
+
+  static const QRegularExpression regex(u" "_s);
   QString temp = QFileDialog::getOpenFileName(
       &dialog(), QObject::tr("Select game executable"), oldGameExe.absolutePath(),
-      oldGameExe.fileName().replace(QRegularExpression(" "), "?"));
+      oldGameExe.fileName().replace(regex, u"?"_s));
 
   if (temp.isEmpty()) {
     return;

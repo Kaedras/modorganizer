@@ -1,7 +1,9 @@
 #include "moshortcut.h"
 
+using namespace Qt::StringLiterals;
+
 MOShortcut::MOShortcut(const QString& link)
-    : m_valid(link.startsWith("moshortcut://")), m_hasInstance(false),
+    : m_valid(link.startsWith("moshortcut://"_L1)), m_hasInstance(false),
       m_hasExecutable(false)
 {
   if (m_valid) {
@@ -35,7 +37,7 @@ bool MOShortcut::hasExecutable() const
 
 QString MOShortcut::instanceDisplayName() const
 {
-  return (m_instance == "" ? QObject::tr("Portable") : m_instance);
+  return (m_instance == ""_L1 ? QObject::tr("Portable") : m_instance);
 }
 
 const QString& MOShortcut::instanceName() const
@@ -66,8 +68,8 @@ bool MOShortcut::isForInstance(const Instance& i) const
 QString MOShortcut::toString() const
 {
   if (m_hasInstance) {
-    return "moshortcut://" + m_instance + ":" + m_executable;
+    return u"moshortcut://"_s % m_instance % u":"_s % m_executable;
   } else {
-    return "moshortcut://" + m_executable;
+    return u"moshortcut://"_s % m_executable;
   }
 }

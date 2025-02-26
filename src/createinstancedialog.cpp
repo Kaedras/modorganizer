@@ -417,7 +417,7 @@ void CreateInstanceDialog::finish()
 
 void CreateInstanceDialog::logCreation(const QString& s)
 {
-  ui->creationLog->insertPlainText(s + "\n");
+  ui->creationLog->insertPlainText(s % '\n');
 }
 
 void CreateInstanceDialog::logCreation(const std::wstring& s)
@@ -508,7 +508,7 @@ CreateInstanceDialog::CreationInfo CreateInstanceDialog::rawCreationInfo() const
   }
 
   ci.dataPath = QDir::toNativeSeparators(ci.dataPath);
-  ci.iniPath  = ci.dataPath + "/" + iniFilename;
+  ci.iniPath  = ci.dataPath % '/' % iniFilename;
 
   return ci;
 }

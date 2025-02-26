@@ -5,6 +5,7 @@
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ForcedLoadDialogWidget::ForcedLoadDialogWidget(const IPluginGame* game, QWidget* parent)
     : QWidget(parent), ui(new Ui::ForcedLoadDialogWidget), m_GamePlugin(game)
@@ -71,13 +72,13 @@ void ForcedLoadDialogWidget::on_libraryPathBrowseButton_clicked()
   QDir gameDir(m_GamePlugin->gameDirectory());
   QString startPath = gameDir.absolutePath();
   QString result    = QFileDialog::getOpenFileName(
-      nullptr, "Select a library...", startPath, "Dynamic link library (*.dll)",
+      nullptr, u"Select a library..."_s, startPath, u"Dynamic link library (*.dll)"_s,
       nullptr, QFileDialog::ReadOnly);
   if (!result.isEmpty()) {
     QFileInfo fileInfo(result);
     QString relativePath = gameDir.relativeFilePath(fileInfo.filePath());
     QString filePath     = fileInfo.filePath();
-    if (!relativePath.startsWith("..")) {
+    if (!relativePath.startsWith(u".."_s)) {
       filePath = relativePath;
     }
 
@@ -93,8 +94,8 @@ void ForcedLoadDialogWidget::on_processBrowseButton_clicked()
 {
   QDir gameDir(m_GamePlugin->gameDirectory());
   QString startPath = gameDir.absolutePath();
-  QString result    = QFileDialog::getOpenFileName(nullptr, "Select a process...",
-                                                   startPath, "Executable (*.exe)",
+  QString result    = QFileDialog::getOpenFileName(nullptr, u"Select a process..."_s,
+                                                   startPath, u"Executable (*.exe)"_s,
                                                    nullptr, QFileDialog::ReadOnly);
   if (!result.isEmpty()) {
     QFileInfo fileInfo(result);

@@ -6,6 +6,8 @@
 #include <log.h>
 #include <report.h>
 
+using namespace Qt::StringLiterals;
+
 WorkaroundsSettingsTab::WorkaroundsSettingsTab(Settings& s, SettingsDialog& d)
     : SettingsTab(s, d)
 {
@@ -108,20 +110,20 @@ WorkaroundsSettingsTab::changeBlacklistLater(QWidget* parent, const QString& cur
                   "Example:\n"
                   "    Chrome.exe\n"
                   "    Firefox.exe"),
-      current.split(";").join("\n"), &ok);
+      current.split(';').join('\n'), &ok);
 
   if (!ok) {
     return {};
   }
 
   QStringList blacklist;
-  for (auto exec : result.split("\n")) {
-    if (exec.trimmed().endsWith(".exe", Qt::CaseInsensitive)) {
+  for (auto exec : result.split('\n')) {
+    if (exec.trimmed().endsWith(".exe"_L1, Qt::CaseInsensitive)) {
       blacklist << exec.trimmed();
     }
   }
 
-  return blacklist.join(";");
+  return blacklist.join(';');
 }
 
 std::optional<QStringList>
@@ -141,14 +143,14 @@ WorkaroundsSettingsTab::changeSkipFileSuffixes(QWidget* parent,
           "  .txt - Would skip all files that end with .txt, <any text>.txt\n"
           "  some_file.txt - Would skip all files that end with some_file.txt, <any "
           "text>some_file.txt"),
-      current.join("\n"), &ok);
+      current.join('\n'), &ok);
 
   if (!ok) {
     return {};
   }
 
   QStringList fileSuffixes;
-  for (auto& suffix : result.split("\n")) {
+  for (auto& suffix : result.split('\n')) {
     auto trimmed = suffix.trimmed();
     if (!trimmed.isEmpty()) {
       fileSuffixes << trimmed;
@@ -172,14 +174,14 @@ WorkaroundsSettingsTab::changeSkipDirectories(QWidget* parent,
           "Example:\n"
           "  .git\n"
           "  instructions"),
-      current.join("\n"), &ok);
+      current.join('\n'), &ok);
 
   if (!ok) {
     return {};
   }
 
   QStringList directories;
-  for (auto& dir : result.split("\n")) {
+  for (auto& dir : result.split('\n')) {
     auto trimmed = dir.trimmed();
     if (!trimmed.isEmpty()) {
       directories << trimmed;

@@ -6,6 +6,8 @@
 #include <QApplication>
 #include <QDirIterator>
 
+using namespace Qt::StringLiterals;
+
 ModInfoOverwrite::ModInfoOverwrite(OrganizerCore& core) : ModInfoWithConflictInfo(core)
 {}
 
@@ -15,7 +17,7 @@ bool ModInfoOverwrite::isEmpty() const
   if (!iter.hasNext())
     return true;
   iter.next();
-  if ((iter.fileName() == "meta.ini") && !iter.hasNext())
+  if ((iter.fileName() == "meta.ini"_L1) && !iter.hasNext())
     return true;
   return false;
 }
@@ -66,8 +68,8 @@ QStringList ModInfoOverwrite::archives(bool checkOnDisk)
 {
   QStringList result;
   QDir dir(this->absolutePath());
-  for (const QString& archive : dir.entryList(QStringList({"*.bsa", "*.ba2"}))) {
-    result.append(this->absolutePath() + "/" + archive);
+  for (const QString& archive : dir.entryList(QStringList({u"*.bsa"_s, u"*.ba2"_s}))) {
+    result.append(this->absolutePath() % u"/"_s % archive);
   }
   return result;
 }

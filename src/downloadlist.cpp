@@ -30,6 +30,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 DownloadList::DownloadList(OrganizerCore& core, QObject* parent)
     : QAbstractTableModel(parent), m_manager(*core.downloadManager()),
@@ -101,7 +102,7 @@ Qt::ItemFlags DownloadList::flags(const QModelIndex& idx) const
 QMimeData* DownloadList::mimeData(const QModelIndexList& indexes) const
 {
   QMimeData* result = QAbstractItemModel::mimeData(indexes);
-  result->setData("text/plain", ModListDropInfo::DownloadText);
+  result->setData(u"text/plain"_s, ModListDropInfo::DownloadText);
   return result;
 }
 
@@ -151,14 +152,14 @@ QVariant DownloadList::data(const QModelIndex& index, int role) const
         if (m_manager.isInfoIncomplete(index.row())) {
           return {};
         } else {
-          return QString("%1").arg(m_manager.getModID(index.row()));
+          return QStringLiteral("%1").arg(m_manager.getModID(index.row()));
         }
       }
       case COL_SOURCEGAME: {
         if (m_manager.isInfoIncomplete(index.row())) {
           return {};
         } else {
-          return QString("%1").arg(m_manager.getDisplayGameName(index.row()));
+          return QStringLiteral("%1").arg(m_manager.getDisplayGameName(index.row()));
         }
       }
       case COL_SIZE:
@@ -211,13 +212,13 @@ QVariant DownloadList::data(const QModelIndex& index, int role) const
     if (pendingDownload) {
       return tr("Pending download");
     } else {
-      QString text = m_manager.getFileName(index.row()) + "\n";
+      QString text = m_manager.getFileName(index.row()) % u"\n"_s;
       if (m_manager.isInfoIncomplete(index.row())) {
         text += tr("Information missing, please select \"Query Info\" from the context "
                    "menu to re-retrieve.");
       } else {
         const MOBase::ModRepositoryFileInfo* info = m_manager.getFileInfo(index.row());
-        return QString("%1 (ID %2) %3<br><span>%4</span>")
+        return QStringLiteral("%1 (ID %2) %3<br><span>%4</span>")
             .arg(info->modName)
             .arg(m_manager.getModID(index.row()))
             .arg(info->version.canonicalString())
@@ -229,7 +230,7 @@ QVariant DownloadList::data(const QModelIndex& index, int role) const
     if (!pendingDownload &&
         m_manager.getState(index.row()) >= DownloadManager::STATE_READY &&
         m_manager.isInfoIncomplete(index.row()))
-      return QIcon(":/MO/gui/warning_16");
+      return QIcon(u":/MO/gui/warning_16"_s);
   } else if (role == Qt::TextAlignmentRole) {
     if (index.column() == COL_SIZE)
       return QVariant(Qt::AlignVCenter | Qt::AlignRight);

@@ -7,6 +7,7 @@
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 GeneralSettingsTab::GeneralSettingsTab(Settings& s, SettingsDialog& d)
     : SettingsTab(s, d)
@@ -88,11 +89,11 @@ void GeneralSettingsTab::addLanguages()
 {
   // matches the end of filenames for something like "_en.qm" or "_zh_CN.qm"
   const QString pattern =
-      AppConfig::translationPrefix() + "_([a-z]{2,3}(_[A-Z]{2,2})?).qm";
+      AppConfig::translationPrefix() % u"_([a-z]{2,3}(_[A-Z]{2,2})?).qm"_s;
 
   const QRegularExpression exp(QRegularExpression::anchoredPattern(pattern));
 
-  QDirIterator iter(QCoreApplication::applicationDirPath() + "/translations",
+  QDirIterator iter(QCoreApplication::applicationDirPath() % u"/translations"_s,
                     QDir::Files);
 
   std::vector<std::pair<QString, QString>> languages;
@@ -109,23 +110,23 @@ void GeneralSettingsTab::addLanguages()
     const QString languageCode = match.captured(1);
     const QLocale locale(languageCode);
 
-    QString languageString = QString("%1 (%2)")
+    QString languageString = QStringLiteral("%1 (%2)")
                                  .arg(locale.nativeLanguageName())
                                  .arg(locale.nativeTerritoryName());
 
     if (locale.language() == QLocale::Chinese) {
-      if (languageCode == "zh_TW") {
-        languageString = "Chinese (Traditional)";
+      if (languageCode == "zh_TW"_L1) {
+        languageString = u"Chinese (Traditional)"_s;
       } else {
-        languageString = "Chinese (Simplified)";
+        languageString = u"Chinese (Simplified)"_s;
       }
     }
 
     languages.push_back({languageString, match.captured(1)});
   }
 
-  if (!ui->languageBox->findText("English")) {
-    languages.push_back({QString("English"), QString("en_US")});
+  if (!ui->languageBox->findText(u"English"_s)) {
+    languages.push_back({QStringLiteral("English"), QStringLiteral("en_US")});
   }
 
   std::sort(languages.begin(), languages.end());

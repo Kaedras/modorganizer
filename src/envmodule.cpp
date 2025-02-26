@@ -7,6 +7,7 @@ namespace env
 {
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 // the rationale for logging md5 was to make sure the various files were the
 // same as in the released version; this turned out to be of dubious interest,
@@ -65,7 +66,7 @@ const QString& Module::md5() const
 QString Module::timestampString() const
 {
   if (!m_timestamp.isValid()) {
-    return "(no timestamp)";
+    return u"(no timestamp)"_s;
   }
 
   return m_timestamp.toString(Qt::DateFormat::ISODate);
@@ -77,11 +78,11 @@ QString Module::toString() const
 
   // file size
   sl.push_back(displayPath());
-  sl.push_back(QString("%1 B").arg(m_fileSize));
+  sl.push_back(QStringLiteral("%1 B").arg(m_fileSize));
 
   // version
   if (m_version.isEmpty() && m_versionString.isEmpty()) {
-    sl.push_back("(no version)");
+    sl.push_back(u"(no version)"_s);
   } else {
     if (!m_version.isEmpty()) {
       sl.push_back(m_version);
@@ -96,7 +97,7 @@ QString Module::toString() const
   if (m_timestamp.isValid()) {
     sl.push_back(m_timestamp.toString(Qt::DateFormat::ISODate));
   } else {
-    sl.push_back("(no timestamp)");
+    sl.push_back(u"(no timestamp)"_s);
   }
 
   // md5
@@ -104,13 +105,13 @@ QString Module::toString() const
     sl.push_back(m_md5);
   }
 
-  return sl.join(", ");
+  return sl.join(u", "_s);
 }
 
 QString Module::getMD5() const
 {
   static const std::set<QString> ignore = {
-      "\\windows\\", "\\program files\\", "\\program files (x86)\\", "\\programdata\\"};
+      u"\\windows\\"_s, u"\\program files\\"_s, u"\\program files (x86)\\"_s, u"\\programdata\\"_s};
 
   // don't calculate md5 for system files, it's not really relevant and
   // it takes a while

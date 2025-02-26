@@ -3,6 +3,7 @@
 #include <QDirIterator>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 class QDirFileTreeImpl : public QDirFileTree
 {
@@ -86,7 +87,7 @@ protected:
       if (info.isDir()) {
         entries.push_back(
             std::make_shared<QDirFileTreeImpl>(parent, QDir(info.absoluteFilePath())));
-      } else if (info.fileName().compare("meta.ini", Qt::CaseInsensitive) != 0) {
+      } else if (info.fileName().compare("meta.ini"_L1, Qt::CaseInsensitive) != 0) {
         entries.push_back(createFileEntry(parent, info.fileName()));
       }
     }

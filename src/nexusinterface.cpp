@@ -39,6 +39,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 void throttledWarning(const APIUserAccount& user)
 {
@@ -120,18 +121,18 @@ void NexusBridge::nxmFilesAvailable(QString gameName, int modID, QVariant userDa
     QList<ModRepositoryFileInfo*> fileInfoList;
 
     QVariantMap resultInfo = resultData.toMap();
-    QList resultList       = resultInfo["files"].toList();
+    QList resultList       = resultInfo[u"files"_s].toList();
 
     for (const QVariant& file : resultList) {
       ModRepositoryFileInfo temp;
       QVariantMap fileInfo = file.toMap();
-      temp.uri             = fileInfo["file_name"].toString();
-      temp.name            = fileInfo["name"].toString();
-      temp.description     = BBCode::convertToHTML(fileInfo["description"].toString());
-      temp.version         = VersionInfo(fileInfo["version"].toString());
-      temp.categoryID      = fileInfo["category_id"].toInt();
-      temp.fileID          = fileInfo["file_id"].toInt();
-      temp.fileSize        = fileInfo["size"].toInt();
+      temp.uri             = fileInfo[u"file_name"_s].toString();
+      temp.name            = fileInfo[u"name"_s].toString();
+      temp.description     = BBCode::convertToHTML(fileInfo[u"description"_s].toString());
+      temp.version         = VersionInfo(fileInfo[u"version"_s].toString());
+      temp.categoryID      = fileInfo[u"category_id"_s].toInt();
+      temp.fileID          = fileInfo[u"file_id"_s].toInt();
+      temp.fileSize        = fileInfo[u"size"_s].toInt();
       fileInfoList.append(&temp);
     }
 
@@ -253,13 +254,13 @@ NexusInterface::parseLimits(const QList<QNetworkReply::RawHeaderPair>& headers)
   for (const auto& pair : headers) {
     const auto name = QString(pair.first).toLower();
 
-    if (name == "x-rl-daily-limit") {
+    if (name == "x-rl-daily-limit"_L1) {
       limits.maxDailyRequests = pair.second.toInt();
-    } else if (name == "x-rl-daily-remaining") {
+    } else if (name == "x-rl-daily-remaining"_L1) {
       limits.remainingDailyRequests = pair.second.toInt();
-    } else if (name == "x-rl-hourly-limit") {
+    } else if (name == "x-rl-hourly-limit"_L1) {
       limits.maxHourlyRequests = pair.second.toInt();
-    } else if (name == "x-rl-hourly-remaining") {
+    } else if (name == "x-rl-hourly-remaining"_L1) {
       limits.remainingHourlyRequests = pair.second.toInt();
     }
   }
@@ -328,7 +329,7 @@ void NexusInterface::interpretNexusFileName(const QString& fileName, QString& mo
 {
   // guess the mod name from the file name
   static const QRegularExpression complex(
-      R"(^([a-zA-Z0-9_'"\-.() ]*?)([-_ ][VvRr]+[0-9]+(?:(?:[\.][0-9]+){0,2}|(?:[_][0-9]+){0,2}|(?:[-.][0-9]+){0,2})?[ab]?)??-([1-9][0-9]+)?-.*?\.(zip|rar|7z))");
+      uR"(^([a-zA-Z0-9_'"\-.() ]*?)([-_ ][VvRr]+[0-9]+(?:(?:[\.][0-9]+){0,2}|(?:[_][0-9]+){0,2}|(?:[-.][0-9]+){0,2})?[ab]?)??-([1-9][0-9]+)?-.*?\.(zip|rar|7z))"_s);
   // complex regex explanation:
   // group 1: modname.
   // group 2: optional version,
@@ -336,7 +337,7 @@ void NexusInterface::interpretNexusFileName(const QString& fileName, QString& mo
   // group 3: NexusId,
   //  assumed wrapped in "-", will miss single digit IDs for better accuracy.
   // If no id is present the whole regex does not match.
-  static const QRegularExpression simple(R"(^[^a-zA-Z]*([a-zA-Z_ ]+))");
+  static const QRegularExpression simple(uR"(^[^a-zA-Z]*([a-zA-Z_ ]+))"_s);
   auto complexMatch = complex.match(fileName);
   auto simpleMatch  = simple.match(fileName);
 
@@ -357,14 +358,15 @@ void NexusInterface::interpretNexusFileName(const QString& fileName, QString& mo
   if (query) {
     SelectionDialog selection(tr("Please pick the mod ID for \"%1\"").arg(fileName));
     int index   = 0;
-    auto splits = fileName.split(QRegularExpression("[^0-9]"), Qt::KeepEmptyParts);
-    for (auto substr : splits) {
+    static const QRegularExpression regex(u"[^0-9]"_s);
+    auto splits = fileName.split(regex, Qt::KeepEmptyParts);
+    for (const auto& substr : splits) {
       bool ok   = false;
       int value = substr.toInt(&ok);
       if (ok) {
         QString highlight(fileName);
-        highlight.insert(index, " *");
-        highlight.insert(index + substr.length() + 2, "* ");
+        highlight.insert(index, u" *"_s);
+        highlight.insert(index + substr.length() + 2, u"* "_s);
 
         QStringList choice;
         choice << substr;
@@ -393,8 +395,8 @@ void NexusInterface::interpretNexusFileName(const QString& fileName, QString& mo
 bool NexusInterface::isURLGameRelated(const QUrl& url) const
 {
   QString const name(url.toString());
-  return name.startsWith(getGameURL("") + "/") ||
-         name.startsWith(getOldModsURL("") + "/");
+  return name.startsWith(getGameURL(u""_s) % '/') ||
+         name.startsWith(getOldModsURL(u""_s) % '/');
 }
 
 QString NexusInterface::getGameURL(QString gameName) const
@@ -405,7 +407,7 @@ QString NexusInterface::getGameURL(QString gameName) const
     if (gameNexusName.isEmpty()) {
       return "";
     } else {
-      return "https://www.nexusmods.com/" + gameNexusName;
+      return u"https://www.nexusmods.com/"_s % gameNexusName;
     }
   } else {
     log::error("getGameURL can't find plugin for {}", gameName);
@@ -417,7 +419,7 @@ QString NexusInterface::getOldModsURL(QString gameName) const
 {
   IPluginGame* game = getGame(gameName);
   if (game != nullptr) {
-    return "https://" + game->gameNexusName().toLower() + ".nexusmods.com/mods";
+    return u"https://"_s % game->gameNexusName().toLower() % u".nexusmods.com/mods"_s;
   } else {
     log::error("getOldModsURL can't find plugin for {}", gameName);
     return "";
@@ -426,7 +428,7 @@ QString NexusInterface::getOldModsURL(QString gameName) const
 
 QString NexusInterface::getModURL(int modID, QString gameName = "") const
 {
-  return QString("%1/mods/%2").arg(getGameURL(gameName)).arg(modID);
+  return QStringLiteral("%1/mods/%2").arg(getGameURL(gameName)).arg(modID);
 }
 
 std::vector<std::pair<QString, QString>>
@@ -435,7 +437,7 @@ NexusInterface::getGameChoices(const MOBase::IPluginGame* game)
   std::vector<std::pair<QString, QString>> choices;
   choices.push_back(
       std::pair<QString, QString>(game->gameShortName(), game->gameName()));
-  for (QString gameName : game->validShortNames()) {
+  for (const QString& gameName : game->validShortNames()) {
     for (auto gamePlugin : m_PluginContainer->plugins<IPluginGame>()) {
       if (gamePlugin->gameShortName().compare(gameName, Qt::CaseInsensitive) == 0) {
         choices.push_back(std::pair<QString, QString>(gamePlugin->gameShortName(),
@@ -453,7 +455,7 @@ bool NexusInterface::isModURL(int modID, const QString& url) const
     return true;
   }
   // Try the alternate (old style) mod name
-  QString alt = QString("%1/%2").arg(getOldModsURL("")).arg(modID);
+  QString alt = QStringLiteral("%1/%2").arg(getOldModsURL("")).arg(modID);
   return QUrl(alt) == QUrl(url);
 }
 
@@ -576,16 +578,16 @@ void NexusInterface::fakeFiles()
 
   QVariantList result;
   QVariantMap fileMap;
-  fileMap["uri"]         = "fakeURI";
-  fileMap["name"]        = "fakeName";
-  fileMap["description"] = "fakeDescription";
-  fileMap["version"]     = "1.0.0";
-  fileMap["category_id"] = "1";
-  fileMap["id"]          = "1";
-  fileMap["size"]        = "512";
+  fileMap[u"uri"_s]         = u"fakeURI"_s;
+  fileMap[u"name"_s]        = u"fakeName"_s;
+  fileMap[u"description"_s] = u"fakeDescription"_s;
+  fileMap[u"version"_s]     = u"1.0.0"_s;
+  fileMap[u"category_id"_s] = u"1"_s;
+  fileMap[u"id"_s]          = u"1"_s;
+  fileMap[u"size"_s]        = u"512"_s;
   result.append(fileMap);
 
-  emit nxmFilesAvailable("fakeGame", 1234, "fake", result, id++);
+  emit nxmFilesAvailable(u"fakeGame"_s, 1234, u"fake"_s, result, id++);
 }
 
 int NexusInterface::requestFiles(QString gameName, int modID, QObject* receiver,
@@ -880,9 +882,8 @@ void NexusInterface::nextRequest()
     switch (info.m_Type) {
     case NXMRequestInfo::TYPE_DESCRIPTION:
     case NXMRequestInfo::TYPE_MODINFO: {
-      url = QString("%1/games/%2/mods/%3")
-                .arg(info.m_URL)
-                .arg(info.m_GameName)
+      url = QStringLiteral("%1/games/%2/mods/%3")
+                .arg(info.m_URL, info.m_GameName)
                 .arg(info.m_ModID);
     } break;
     case NXMRequestInfo::TYPE_CHECKUPDATES: {
@@ -898,22 +899,18 @@ void NexusInterface::nextRequest()
         period = "1m";
         break;
       }
-      url = QString("%1/games/%2/mods/updated?period=%3")
-                .arg(info.m_URL)
-                .arg(info.m_GameName)
-                .arg(period);
+      url = QStringLiteral("%1/games/%2/mods/updated?period=%3")
+                .arg(info.m_URL, info.m_GameName, period);
     } break;
     case NXMRequestInfo::TYPE_FILES:
     case NXMRequestInfo::TYPE_GETUPDATES: {
-      url = QString("%1/games/%2/mods/%3/files")
-                .arg(info.m_URL)
-                .arg(info.m_GameName)
+      url = QStringLiteral("%1/games/%2/mods/%3/files")
+                .arg(info.m_URL, info.m_GameName)
                 .arg(info.m_ModID);
     } break;
     case NXMRequestInfo::TYPE_FILEINFO: {
-      url = QString("%1/games/%2/mods/%3/files/%4")
-                .arg(info.m_URL)
-                .arg(info.m_GameName)
+      url = QStringLiteral("%1/games/%2/mods/%3/files/%4")
+                .arg(info.m_URL, info.m_GameName)
                 .arg(info.m_ModID)
                 .arg(info.m_FileID);
     } break;
@@ -921,16 +918,14 @@ void NexusInterface::nextRequest()
       ModRepositoryFileInfo* fileInfo = qobject_cast<ModRepositoryFileInfo*>(
           qvariant_cast<QObject*>(info.m_UserData));
       if (m_User.type() == APIUserAccountTypes::Premium) {
-        url = QString("%1/games/%2/mods/%3/files/%4/download_link")
-                  .arg(info.m_URL)
-                  .arg(info.m_GameName)
+        url = QStringLiteral("%1/games/%2/mods/%3/files/%4/download_link")
+                  .arg(info.m_URL, info.m_GameName)
                   .arg(info.m_ModID)
                   .arg(info.m_FileID);
       } else if (!fileInfo->nexusKey.isEmpty() && fileInfo->nexusExpires &&
                  fileInfo->nexusDownloadUser == m_User.id().toInt()) {
-        url = QString("%1/games/%2/mods/%3/files/%4/download_link?key=%5&expires=%6")
-                  .arg(info.m_URL)
-                  .arg(info.m_GameName)
+        url = QStringLiteral("%1/games/%2/mods/%3/files/%4/download_link?key=%5&expires=%6")
+                  .arg(info.m_URL, info.m_GameName)
                   .arg(info.m_ModID)
                   .arg(info.m_FileID)
                   .arg(fileInfo->nexusKey)
@@ -944,23 +939,21 @@ void NexusInterface::nextRequest()
       }
     } break;
     case NXMRequestInfo::TYPE_ENDORSEMENTS: {
-      url = QString("%1/user/endorsements").arg(info.m_URL);
+      url = QStringLiteral("%1/user/endorsements").arg(info.m_URL);
     } break;
     case NXMRequestInfo::TYPE_TOGGLEENDORSEMENT: {
-      QString endorse = info.m_Endorse ? "endorse" : "abstain";
-      url             = QString("%1/games/%2/mods/%3/%4")
-                .arg(info.m_URL)
-                .arg(info.m_GameName)
+      QString endorse = info.m_Endorse ? u"endorse"_s : u"abstain"_s;
+      url             = QStringLiteral("%1/games/%2/mods/%3/%4")
+                .arg(info.m_URL, info.m_GameName)
                 .arg(info.m_ModID)
                 .arg(endorse);
-      postObject.insert("Version", info.m_ModVersion);
+      postObject.insert(u"Version"_s, info.m_ModVersion);
       postData.setObject(postObject);
     } break;
     case NXMRequestInfo::TYPE_TOGGLETRACKING: {
       url = QStringLiteral("%1/user/tracked_mods?domain_name=%2")
-                .arg(info.m_URL)
-                .arg(info.m_GameName);
-      postObject.insert("mod_id", info.m_ModID);
+                .arg(info.m_URL, info.m_GameName);
+      postObject.insert(u"mod_id"_s, info.m_ModID);
       postData.setObject(postObject);
       requestIsDelete = !info.m_Track;
     } break;
@@ -969,12 +962,10 @@ void NexusInterface::nextRequest()
     } break;
     case NXMRequestInfo::TYPE_FILEINFO_MD5: {
       url = QStringLiteral("%1/games/%2/mods/md5_search/%3")
-                .arg(info.m_URL)
-                .arg(info.m_GameName)
-                .arg(QString(info.m_Hash.toHex()));
+                .arg(info.m_URL, info.m_GameName, QString(info.m_Hash.toHex()));
     } break;
     case NXMRequestInfo::TYPE_GAMEINFO: {
-      url = QStringLiteral("%1/games/%2").arg(info.m_URL).arg(info.m_GameName);
+      url = QStringLiteral("%1/games/%2").arg(info.m_URL, info.m_GameName);
     }
     }
   } else {
@@ -984,14 +975,14 @@ void NexusInterface::nextRequest()
   request.setAttribute(QNetworkRequest::CacheSaveControlAttribute, false);
   request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
                        QNetworkRequest::AlwaysNetwork);
-  request.setRawHeader("APIKEY", m_User.apiKey().toUtf8());
+  request.setRawHeader(QByteArrayLiteral("APIKEY"), m_User.apiKey().toUtf8());
   request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader,
                     m_AccessManager->userAgent(info.m_SubModule));
   request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader,
                     "application/json");
-  request.setRawHeader("Protocol-Version", "1.0.0");
-  request.setRawHeader("Application-Name", "MO2");
-  request.setRawHeader("Application-Version",
+  request.setRawHeader(QByteArrayLiteral("Protocol-Version"), QByteArrayLiteral("1.0.0"));
+  request.setRawHeader(QByteArrayLiteral("Application-Name"), QByteArrayLiteral("MO2"));
+  request.setRawHeader(QByteArrayLiteral("Application-Version"),
                        QApplication::applicationVersion().toUtf8());
 
   if (postData.object().isEmpty()) {
@@ -1006,7 +997,7 @@ void NexusInterface::nextRequest()
     // Qt doesn't support DELETE with a payload as that's technically against the HTTP
     // standard...
     info.m_Reply =
-        m_AccessManager->sendCustomRequest(request, "DELETE", postData.toJson());
+        m_AccessManager->sendCustomRequest(request, QByteArrayLiteral("DELETE"), postData.toJson());
   }
 
   connect(info.m_Reply, SIGNAL(finished()), this, SLOT(requestFinished()));
@@ -1054,9 +1045,9 @@ void NexusInterface::requestFinished(std::list<NXMRequestInfo>::iterator iter)
         QJsonDocument responseDoc = QJsonDocument::fromJson(data);
         if (!responseDoc.isNull()) {
           auto result = responseDoc.toVariant().toMap();
-          auto error  = result.find("error");
+          auto error  = result.find(u"error"_s);
           if (error != result.end())
-            errorMsg = result.value("error").toString();
+            errorMsg = result.value(u"error"_s).toString();
         }
       }
     }
@@ -1075,7 +1066,7 @@ void NexusInterface::requestFinished(std::list<NXMRequestInfo>::iterator iter)
     }
     QByteArray data = reply->readAll();
     if (data.isNull() || data.isEmpty() || (strcmp(data.constData(), "null") == 0)) {
-      QString nexusError(reply->rawHeader("NexusErrorInfo"));
+      QString nexusError(reply->rawHeader(u"NexusErrorInfo"_s));
       if (nexusError.length() == 0) {
         nexusError = tr("empty response");
       }
@@ -1124,17 +1115,20 @@ void NexusInterface::requestFinished(std::list<NXMRequestInfo>::iterator iter)
         } break;
         case NXMRequestInfo::TYPE_TOGGLETRACKING: {
           auto results = result.toMap();
-          auto message = results["message"].toString();
-          if (message.contains(
-                  QRegularExpression("User [0-9]+ is already Tracking Mod: [0-9]+")) ||
-              message.contains(
-                  QRegularExpression("User [0-9]+ is now Tracking Mod: [0-9]+"))) {
+          auto message = results[u"message"_s].toString();
+
+          static const QRegularExpression alreadyTracking(u"User [0-9]+ is already Tracking Mod: [0-9]+"_s);
+          static const QRegularExpression nowTracking(u"User [0-9]+ is now Tracking Mod: [0-9]+"_s);
+          static const QRegularExpression noLongerTracking(u"User [0-9]+ is no longer tracking [0-9]+"_s);
+          static const QRegularExpression notTracking(u"User is not tracking mod. Unable to untrack."_s);
+
+
+          if (message.contains(alreadyTracking) ||
+              message.contains(nowTracking)) {
             emit nxmTrackingToggled(iter->m_GameName, iter->m_ModID, iter->m_UserData,
                                     true, iter->m_ID);
-          } else if (message.contains(QRegularExpression(
-                         "User [0-9]+ is no longer tracking [0-9]+")) ||
-                     message.contains(QRegularExpression(
-                         "Users is not tracking mod. Unable to untrack."))) {
+          } else if (message.contains(noLongerTracking) ||
+                     message.contains(notTracking)) {
             emit nxmTrackingToggled(iter->m_GameName, iter->m_ModID, iter->m_UserData,
                                     false, iter->m_ID);
           }

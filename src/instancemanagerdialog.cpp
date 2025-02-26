@@ -18,6 +18,7 @@
 #endif
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 // returns the icon for the given instance or an empty 32x32 icon if the game
 // plugin couldn't be found
@@ -440,7 +441,7 @@ void InstanceManagerDialog::rename()
   // renaming
   const QString src = i->directory();
   const QString dest =
-      QDir::toNativeSeparators(QFileInfo(src).dir().path() + "/" + newName);
+      QDir::toNativeSeparators(QFileInfo(src).dir().path() % u"/"_s % newName);
 
   log::info("renaming {} to {}", src, dest);
 

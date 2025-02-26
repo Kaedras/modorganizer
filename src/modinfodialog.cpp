@@ -37,6 +37,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 using namespace MOBase;
 using namespace MOShared;
 namespace fs = std::filesystem;
+using namespace Qt::StringLiterals;
 
 const int max_scan_for_context_menu = 50;
 
@@ -49,7 +50,7 @@ bool canPreviewFile(const PluginContainer& pluginContainer, bool isArchive,
 
 bool isExecutableFilename(const QString& filename)
 {
-  static const std::set<QString> exeExtensions = {"exe", "cmd", "bat"};
+  static const std::set<QString> exeExtensions = {u"exe"_s, u"cmd"_s, u"bat"_s};
 
   const auto ext = QFileInfo(filename).suffix().toLower();
 
@@ -122,7 +123,7 @@ FileRenamer::RenameResults restoreHiddenFilesRecursive(FileRenamer& renamer,
   FileRenamer::RenameResults results = FileRenamer::RESULT_OK;
   QDir currentDir                    = targetDir;
   for (QString hiddenFile :
-       currentDir.entryList((QStringList() << "*" + ModInfo::s_HiddenExt),
+       currentDir.entryList((QStringList() << u"*"_s % ModInfo::s_HiddenExt),
                             QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
 
     QString oldName = currentDir.absoluteFilePath(hiddenFile);
@@ -684,7 +685,7 @@ void ModInfoDialog::saveTabOrder() const
 
   for (int i = 0; i < ui->tabWidget->count(); ++i) {
     if (!names.isEmpty()) {
-      names += " ";
+      names += u" "_s;
     }
 
     names += ui->tabWidget->widget(i)->objectName();

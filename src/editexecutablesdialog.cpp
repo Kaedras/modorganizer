@@ -31,6 +31,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 class IgnoreChanges
 {
@@ -51,7 +52,7 @@ private:
 
 EditExecutablesDialog::EditExecutablesDialog(OrganizerCore& oc, int sel,
                                              QWidget* parent)
-    : TutorableDialog("EditExecutables", parent), ui(new Ui::EditExecutablesDialog),
+    : TutorableDialog(u"EditExecutables"_s, parent), ui(new Ui::EditExecutablesDialog),
       m_organizerCore(oc), m_originalExecutables(*oc.executablesList()),
       m_executablesList(*oc.executablesList()), m_settingUI(false)
 {
@@ -138,7 +139,7 @@ void EditExecutablesDialog::loadCustomOverwrites()
   const auto* p = m_organizerCore.currentProfile();
 
   for (const auto& e : m_executablesList) {
-    const auto s = p->setting("custom_overwrites", e.title()).toString();
+    const auto s = p->setting(u"custom_overwrites"_s, e.title()).toString();
 
     if (!s.isEmpty()) {
       m_customOverwrites.set(e.title(), true, s);
@@ -237,7 +238,7 @@ bool EditExecutablesDialog::commitChanges()
 
   // remove all the custom overwrites and forced libraries
   for (const auto& e : m_originalExecutables) {
-    profile->removeSetting("custom_overwrites", e.title());
+    profile->removeSetting(u"custom_overwrites"_s, e.title());
     profile->removeForcedLibraries(e.title());
   }
 
@@ -245,7 +246,7 @@ bool EditExecutablesDialog::commitChanges()
   for (const auto& e : newExecutables) {
     if (auto modName = m_customOverwrites.find(e.title())) {
       if (modName && modName->enabled) {
-        profile->storeSetting("custom_overwrites", e.title(), modName->value);
+        profile->storeSetting(u"custom_overwrites"_s, e.title(), modName->value);
       }
     }
 
@@ -783,7 +784,7 @@ void EditExecutablesDialog::addNew(Executable e)
 void EditExecutablesDialog::setBinary(const QFileInfo& binary)
 {
   // setting binary
-  if (binary.suffix().compare("jar", Qt::CaseInsensitive) == 0) {
+  if (binary.suffix().compare(u"jar"_s, Qt::CaseInsensitive) == 0) {
     // special case for jar files, uses the system java installation
     setJarBinary(binary);
   } else {
@@ -804,7 +805,7 @@ void EditExecutablesDialog::setBinary(const QFileInfo& binary)
 void EditExecutablesDialog::on_browseWorkingDirectory_clicked()
 {
   QString dirName = FileDialogMemory::getExistingDirectory(
-      "editExecutableDirectory", this, tr("Select a directory"),
+      u"editExecutableDirectory"_s, this, tr("Select a directory"),
       ui->workingDirectory->text());
 
   if (dirName.isNull()) {
@@ -851,10 +852,10 @@ void EditExecutablesDialog::on_buttons_clicked(QAbstractButton* b)
 QFileInfo EditExecutablesDialog::browseBinary(const QString& initial)
 {
   const QString Filters =
-      tr("Executables (*.exe *.bat *.jar)") + ";;" + tr("All Files (*.*)");
+      tr("Executables (*.exe *.bat *.jar)") % u";;"_s % tr("All Files (*.*)");
 
   const auto f = FileDialogMemory::getOpenFileName(
-      "editExecutableBinary", this, tr("Select an executable"), initial, Filters);
+      u"editExecutableBinary"_s, this, tr("Select an executable"), initial, Filters);
 
   if (f.isNull()) {
     return {};
@@ -881,8 +882,8 @@ void EditExecutablesDialog::setJarBinary(const QFileInfo& binary)
 
     ui->binary->setText(java);
     ui->workingDirectory->setText(QDir::toNativeSeparators(binary.absolutePath()));
-    ui->arguments->setText("-jar \"" +
-                           QDir::toNativeSeparators(binary.absoluteFilePath()) + "\"");
+    ui->arguments->setText(u"-jar \""_s %
+                           QDir::toNativeSeparators(binary.absoluteFilePath()) % u"\""_s);
   }
 
   save();

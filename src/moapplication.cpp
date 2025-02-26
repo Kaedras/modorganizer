@@ -47,6 +47,12 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <scopeguard.h>
 #include <utility.h>
 
+#ifdef __unix__
+static const QString usvfs = QStringLiteral("overlayfs");
+#else
+static const QString usvfs = QStringLiteral("usvfs");
+#endif
+
 // see addDllsToPath() below
 #pragma comment(linker, "/manifestDependency:\""                                       \
                         "name='dlls' "                                                 \
@@ -56,6 +62,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 // style proxy that changes the appearance of drop indicators
 //
@@ -136,7 +143,7 @@ public:
 void addDllsToPath()
 {
   const auto dllsPath =
-      QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/dlls");
+      QDir::toNativeSeparators(QCoreApplication::applicationDirPath() % u"/dlls"_s);
 
   QCoreApplication::setLibraryPaths(QStringList(dllsPath) +
                                     QCoreApplication::libraryPaths());
@@ -146,16 +153,16 @@ void addDllsToPath()
 
 MOApplication::MOApplication(int& argc, char** argv) : QApplication(argc, argv)
 {
-  TimeThis tt("MOApplication()");
+  TimeThis tt(u"MOApplication()"_s);
 
-  qputenv("QML_DISABLE_DISK_CACHE", "true");
+  qputenv("QML_DISABLE_DISK_CACHE", QByteArrayLiteral("true"));
 
   connect(&m_styleWatcher, &QFileSystemWatcher::fileChanged, [&](auto&& file) {
     log::debug("style file '{}' changed, reloading", file);
     updateStyle(file);
   });
 
-  m_defaultStyle = "windowsvista";
+  m_defaultStyle = u"windowsvista"_s;
   updateStyle(m_defaultStyle);
   addDllsToPath();
 }
@@ -177,7 +184,7 @@ void MOApplication::firstTimeSetup(MOMultiProcess& multiProcess)
 
 int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
 {
-  TimeThis tt("MOApplication setup()");
+  TimeThis tt(u"MOApplication setup()"_s);
 
   // makes plugin data path available to plugins, see
   // IOrganizer::getPluginDataPath()
@@ -202,8 +209,9 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
 
   log::debug("command line: '{}'", QApplication::arguments().join(' '));
 
-  log::info("starting Mod Organizer version {} revision {} in {}, usvfs: {}",
+  log::info("starting Mod Organizer version {} revision {} in {}, {}: {}",
             createVersionInfo().string(), GITID, QCoreApplication::applicationDirPath(),
+            usvfs,
             MOShared::getUsvfsVersionString());
 
   if (multiProcess.secondary()) {
@@ -249,12 +257,12 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
              sslVersion);
 
   // nexus interface
-  tt.start("MOApplication::doOneRun() NexusInterface");
+  tt.start(u"MOApplication::doOneRun() NexusInterface"_s);
   log::debug("initializing nexus interface");
   m_nexus.reset(new NexusInterface(m_settings.get()));
 
   // organizer core
-  tt.start("MOApplication::doOneRun() OrganizerCore");
+  tt.start(u"MOApplication::doOneRun() OrganizerCore"_s);
   log::debug("initializing core");
 
   m_core.reset(new OrganizerCore(*m_settings));
@@ -265,7 +273,7 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
   }
 
   // plugins
-  tt.start("MOApplication::doOneRun() plugins");
+  tt.start(u"MOApplication::doOneRun() plugins"_s);
   log::debug("initializing plugins");
 
   m_plugins = std::make_unique<PluginContainer>(m_core.get());
@@ -280,7 +288,7 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
     log::debug("this is a portable instance");
   }
 
-  tt.start("MOApplication::doOneRun() OrganizerCore setup");
+  tt.start(u"MOApplication::doOneRun() OrganizerCore setup"_s);
 
   sanity::checkPaths(*m_instance->gamePlugin(), *m_settings);
 
@@ -308,14 +316,14 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
 int MOApplication::run(MOMultiProcess& multiProcess)
 {
   // checking command line
-  TimeThis tt("MOApplication::run()");
+  TimeThis tt(u"MOApplication::run()"_s);
 
   // show splash
-  tt.start("MOApplication::doOneRun() splash");
+  tt.start(u"MOApplication::doOneRun() splash"_s);
 
   MOSplash splash(*m_settings, m_instance->directory(), m_instance->gamePlugin());
 
-  tt.start("MOApplication::doOneRun() finishing");
+  tt.start(u"MOApplication::doOneRun() finishing"_s);
 
   // start an api check
   QString apiKey;
@@ -325,8 +333,8 @@ int MOApplication::run(MOMultiProcess& multiProcess)
 
   // tutorials
   log::debug("initializing tutorials");
-  TutorialManager::init(qApp->applicationDirPath() + "/" + AppConfig::tutorialsPath() +
-                            "/",
+  TutorialManager::init(qApp->applicationDirPath() % u"/"_s + AppConfig::tutorialsPath() %
+                            u"/"_s,
                         m_core.get());
 
   // styling
@@ -338,7 +346,7 @@ int MOApplication::run(MOMultiProcess& multiProcess)
   int res = 1;
 
   {
-    tt.start("MOApplication::doOneRun() MainWindow setup");
+    tt.start(u"MOApplication::doOneRun() MainWindow setup"_s);
     MainWindow mainWindow(*m_settings, *m_core, *m_plugins);
 
     // the nexus interface can show dialogs, make sure they're parented to the
@@ -493,14 +501,14 @@ void MOApplication::purgeOldFiles()
 {
   // remove the temporary backup directory in case we're restarting after an
   // update
-  QString backupDirectory = qApp->applicationDirPath() + "/update_backup";
+  QString backupDirectory = qApp->applicationDirPath() % u"/update_backup"_s;
   if (QDir(backupDirectory).exists()) {
     shellDelete(QStringList(backupDirectory));
   }
 
   // cycle log file
-  removeOldFiles(qApp->property("dataPath").toString() + "/" + AppConfig::logPath(),
-                 "usvfs*.log", 5, QDir::Name);
+  removeOldFiles(qApp->property("dataPath").toString() % u"/"_s % AppConfig::logPath(),
+                 usvfs % u"*.log"_s, 5, QDir::Name);
 }
 
 void MOApplication::resetForRestart()
@@ -532,7 +540,7 @@ bool MOApplication::setStyleFile(const QString& styleName)
   // set new stylesheet or clear it
   if (styleName.length() != 0) {
     QString styleSheetName =
-        applicationDirPath() + "/" + AppConfig::stylesheetsPath() + "/" + styleName;
+        applicationDirPath() % u"/"_s % AppConfig::stylesheetsPath() % u"/"_s % styleName;
     if (QFile::exists(styleSheetName)) {
       m_styleWatcher.addPath(styleSheetName);
       updateStyle(styleSheetName);
@@ -591,7 +599,7 @@ QStringList extractTopStyleSheetComments(QFile& stylesheet)
     }
 
     // only handle single line comments
-    if (!line.startsWith("/*")) {
+    if (!line.startsWith(u"/*"_s)) {
       break;
     }
 
@@ -612,7 +620,7 @@ QString extractBaseStyleFromStyleSheet(QFile& stylesheet, const QString& default
   QString style = defaultStyle;
 
   for (const auto& line : topLines) {
-    if (!line.startsWith("mo2-base-style")) {
+    if (!line.startsWith(u"mo2-base-style"_s)) {
       continue;
     }
 
@@ -651,7 +659,7 @@ void MOApplication::updateStyle(const QString& fileName)
     if (stylesheet.exists()) {
       setStyle(new ProxyStyle(QStyleFactory::create(
           extractBaseStyleFromStyleSheet(stylesheet, m_defaultStyle))));
-      setStyleSheet(QString("file:///%1").arg(fileName));
+      setStyleSheet(QStringLiteral("file:///%1").arg(fileName));
     } else {
       log::warn("invalid stylesheet: {}", fileName);
     }
@@ -696,8 +704,8 @@ QString MOSplash::getSplashPath(const Settings& settings, const QString& dataPat
   }
 
   // try splash from instance directory
-  const QString splashPath = dataPath + "/splash.png";
-  if (QFile::exists(dataPath + "/splash.png")) {
+  const QString splashPath = dataPath % u"/splash.png"_s;
+  if (QFile::exists(splashPath)) {
     QImage image(splashPath);
     if (!image.isNull()) {
       return splashPath;
@@ -705,7 +713,7 @@ QString MOSplash::getSplashPath(const Settings& settings, const QString& dataPat
   }
 
   // try splash from plugin
-  QString pluginSplash = QString(":/%1/splash").arg(game->gameShortName());
+  QString pluginSplash = QStringLiteral(":/%1/splash").arg(game->gameShortName());
   if (QFile::exists(pluginSplash)) {
     QImage image(pluginSplash);
     if (!image.isNull()) {
@@ -715,7 +723,7 @@ QString MOSplash::getSplashPath(const Settings& settings, const QString& dataPat
   }
 
   // try default splash from resource
-  QString defaultSplash = ":/MO/gui/splash";
+  QString defaultSplash = u":/MO/gui/splash"_s;
   if (QFile::exists(defaultSplash)) {
     QImage image(defaultSplash);
     if (!image.isNull()) {

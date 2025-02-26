@@ -36,6 +36,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ModListSortProxy::ModListSortProxy(Profile* profile, OrganizerCore* organizer)
     : QSortFilterProxyModel(organizer), m_Organizer(organizer), m_Profile(profile),
@@ -436,14 +437,14 @@ bool ModListSortProxy::filterMatchesMod(ModInfo::Ptr info, bool enabled) const
   if (!m_Filter.isEmpty()) {
     bool display       = false;
     QString filterCopy = QString(m_Filter);
-    filterCopy.replace("||", ";").replace("OR", ";").replace("|", ";");
-    QStringList ORList = filterCopy.split(";", Qt::SkipEmptyParts);
+    filterCopy.replace(u"||"_s, u";"_s).replace(u"OR"_s, u";"_s).replace('|', ';');
+    QStringList ORList = filterCopy.split(';', Qt::SkipEmptyParts);
 
     bool segmentGood = true;
 
     // split in ORSegments that internally use AND logic
     for (auto& ORSegment : ORList) {
-      QStringList ANDKeywords = ORSegment.split(" ", Qt::SkipEmptyParts);
+      QStringList ANDKeywords = ORSegment.split(' ', Qt::SkipEmptyParts);
       segmentGood             = true;
       bool foundKeyword       = false;
 
@@ -467,7 +468,7 @@ bool ModListSortProxy::filterMatchesMod(ModInfo::Ptr info, bool enabled) const
 
         // Search by categories
         if (!foundKeyword && m_EnabledColumns[ModList::COL_CATEGORY]) {
-          for (auto category : info->categories()) {
+          for (const auto& category : info->categories()) {
             if (category.contains(currentKeyword, Qt::CaseInsensitive)) {
               foundKeyword = true;
               break;

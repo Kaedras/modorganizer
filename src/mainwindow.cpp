@@ -196,6 +196,7 @@ inline QString formatSystemMessageToQString(int e)
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 const QSize SmallToolbarSize(24, 24);
 const QSize MediumToolbarSize(32, 32);
@@ -361,11 +362,11 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
   resizeLists(pluginListAdjusted);
 
   QMenu* linkMenu = new QMenu(this);
-  m_LinkToolbar   = linkMenu->addAction(QIcon(":/MO/gui/link"), tr("Toolbar and Menu"),
+  m_LinkToolbar   = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Toolbar and Menu"),
                                         this, SLOT(linkToolbar()));
-  m_LinkDesktop   = linkMenu->addAction(QIcon(":/MO/gui/link"), tr("Desktop"), this,
+  m_LinkDesktop   = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Desktop"), this,
                                         SLOT(linkDesktop()));
-  m_LinkStartMenu = linkMenu->addAction(QIcon(":/MO/gui/link"), tr("Start Menu"), this,
+  m_LinkStartMenu = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Start Menu"), this,
                                         SLOT(linkMenu()));
   ui->linkButton->setMenu(linkMenu);
 
@@ -485,8 +486,8 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
 
   m_StartTime = QTime::currentTime();
 
-  m_Tutorial.expose("modList", m_OrganizerCore.modList());
-  m_Tutorial.expose("espList", m_OrganizerCore.pluginList());
+  m_Tutorial.expose(u"modList"_s, m_OrganizerCore.modList());
+  m_Tutorial.expose(u"espList"_s, m_OrganizerCore.pluginList());
 
   m_OrganizerCore.setUserInterface(this);
   connect(m_OrganizerCore.modList(), &ModList::showMessage, [=](auto&& message) {
@@ -652,13 +653,13 @@ void MainWindow::updateWindowTitle(const APIUserAccount& user)
 {
   //"\xe2\x80\x93" is an "em dash", a longer "-"
   QString title =
-      QString("%1 \xe2\x80\x93 Mod Organizer v%2")
+      QStringLiteral("%1 \xe2\x80\x93 Mod Organizer v%2")
           .arg(m_OrganizerCore.managedGame()->displayGameName(),
                m_OrganizerCore.getVersion().string(Version::FormatCondensed));
 
   if (!user.name().isEmpty()) {
-    const QString premium = (user.type() == APIUserAccountTypes::Premium ? "*" : "");
-    title.append(QString(" (%1%2)").arg(user.name(), premium));
+    const QString premium = (user.type() == APIUserAccountTypes::Premium ? u"*"_s : "");
+    title.append(QStringLiteral(" (%1%2)").arg(user.name(), premium));
   }
 
   this->setWindowTitle(title);
@@ -753,7 +754,7 @@ void MainWindow::setupActionMenu(QAction* a)
 void MainWindow::updatePinnedExecutables()
 {
   for (auto* a : ui->toolBar->actions()) {
-    if (a->objectName().startsWith("custom__")) {
+    if (a->objectName().startsWith(u"custom__"_s)) {
       ui->toolBar->removeAction(a);
       a->deleteLater();
     }
@@ -770,7 +771,7 @@ void MainWindow::updatePinnedExecutables()
       QAction* exeAction =
           new QAction(iconForExecutable(exe.binaryInfo().filePath()), exe.title());
 
-      exeAction->setObjectName(QString("custom__") + exe.title());
+      exeAction->setObjectName(u"custom__"_s % exe.title());
       exeAction->setStatusTip(exe.binaryInfo().filePath());
 
       if (!connect(exeAction, SIGNAL(triggered()), this, SLOT(startExeAction()))) {
@@ -931,7 +932,7 @@ void MainWindow::scheduleCheckForProblems()
 void MainWindow::updateProblemsButton()
 {
   // if the current stylesheet doesn't provide an icon, this is used instead
-  const char* DefaultIconName = ":/MO/gui/warning";
+  static const QString DefaultIconName = u":/MO/gui/warning"_s;
 
   const std::size_t numProblems = m_NumberOfProblems;
 
@@ -990,9 +991,9 @@ void MainWindow::updateProblemsButton()
 
 bool MainWindow::errorReported(QString& logFile)
 {
-  QDir dir(qApp->property("dataPath").toString() + "/" + AppConfig::logPath());
+  QDir dir(qApp->property("dataPath").toString() % '/' % AppConfig::logPath());
   QFileInfoList files =
-      dir.entryInfoList(QStringList("ModOrganizer_??_??_??_??_??.log"), QDir::Files,
+      dir.entryInfoList(QStringList(u"ModOrganizer_??_??_??_??_??.log"_s), QDir::Files,
                         QDir::Name | QDir::Reversed);
 
   if (files.count() > 0) {
@@ -1034,7 +1035,7 @@ void MainWindow::checkForProblemsImpl()
   // another thread might already have checked while this one was waiting on the lock
   if (m_ProblemsCheckRequired) {
     m_ProblemsCheckRequired = false;
-    TimeThis tt("MainWindow::checkForProblemsImpl()");
+    TimeThis tt(u"MainWindow::checkForProblemsImpl()"_s);
     size_t numProblems = 0;
     for (QObject* pluginObj : m_PluginContainer.plugins<QObject>()) {
       IPlugin* plugin = qobject_cast<IPlugin*>(pluginObj);
@@ -1078,9 +1079,9 @@ void MainWindow::createHelpMenu()
 {
   //: Translation strings for tutorial names
   static std::map<QString, const char*> translate = {
-      {"First Steps", QT_TR_NOOP("First Steps")},
-      {"Conflict Resolution", QT_TR_NOOP("Conflict Resolution")},
-      {"Overview", QT_TR_NOOP("Overview")}};
+      {u"First Steps"_s, QT_TR_NOOP("First Steps")},
+      {u"Conflict Resolution"_s, QT_TR_NOOP("Conflict Resolution")},
+      {u"Overview"_s, QT_TR_NOOP("Overview")}};
 
   auto* menu = ui->actionHelp->menu();
   if (!menu) {
@@ -1119,8 +1120,8 @@ void MainWindow::createHelpMenu()
 
   ActionList tutorials;
 
-  QDirIterator dirIter(QApplication::applicationDirPath() + "/tutorials",
-                       QStringList("*.js"), QDir::Files);
+  QDirIterator dirIter(QApplication::applicationDirPath() % u"/tutorials"_s,
+                       QStringList(u"*.js"_s), QDir::Files);
   while (dirIter.hasNext()) {
     dirIter.next();
     QString fileName = dirIter.fileName();
@@ -1131,7 +1132,7 @@ void MainWindow::createHelpMenu()
       continue;
     }
     QString firstLine = QString::fromUtf8(file.readLine());
-    if (firstLine.startsWith("//TL")) {
+    if (firstLine.startsWith(u"//TL"_s)) {
       QStringList params = firstLine.mid(4).trimmed().split('#');
       if (params.size() != 2) {
         log::error("invalid header line for tutorial {}, expected 2 parameters",
@@ -1161,7 +1162,7 @@ void MainWindow::createHelpMenu()
 
 bool MainWindow::addProfile()
 {
-  QComboBox* profileBox = findChild<QComboBox*>("profileBox");
+  QComboBox* profileBox = findChild<QComboBox*>(u"profileBox"_s);
   bool okClicked        = false;
 
   QString name = QInputDialog::getText(this, tr("Name"),
@@ -1183,8 +1184,8 @@ bool MainWindow::addProfile()
 
 void MainWindow::hookUpWindowTutorials()
 {
-  QDirIterator dirIter(QApplication::applicationDirPath() + "/tutorials",
-                       QStringList("*.js"), QDir::Files);
+  QDirIterator dirIter(QApplication::applicationDirPath() % u"/tutorials"_s,
+                       QStringList(u"*.js"_s), QDir::Files);
   while (dirIter.hasNext()) {
     dirIter.next();
     QString fileName = dirIter.fileName();
@@ -1194,7 +1195,7 @@ void MainWindow::hookUpWindowTutorials()
       continue;
     }
     QString firstLine = QString::fromUtf8(file.readLine());
-    if (firstLine.startsWith("//WIN")) {
+    if (firstLine.startsWith(u"//WIN"_s)) {
       QString windowName = firstLine.mid(6).trimmed();
       if (!m_OrganizerCore.settings().interface().isTutorialCompleted(windowName)) {
         TutorialManager::instance().activateTutorial(windowName, fileName);
@@ -1254,7 +1255,7 @@ void MainWindow::showEvent(QShowEvent* event)
       QString firstStepsTutorial = AppConfig::firstStepsTutorial();
       if (TutorialManager::instance().hasTutorial(firstStepsTutorial)) {
         if (shouldStartTutorial()) {
-          TutorialManager::instance().activateTutorial("MainWindow",
+          TutorialManager::instance().activateTutorial(u"MainWindow"_s,
                                                        firstStepsTutorial);
         }
       } else {
@@ -1309,7 +1310,7 @@ void MainWindow::showEvent(QShowEvent* event)
       if (m_LastVersion < QVersionNumber(2, 5) &&
           !GlobalSettings::hideCategoryReminder()) {
         QMessageBox migrateCatDialog;
-        migrateCatDialog.setWindowTitle("Category Migration");
+        migrateCatDialog.setWindowTitle(u"Category Migration"_s);
         migrateCatDialog.setText(
             tr("This is your first time running version 2.5 or higher with an old MO2 "
                "instance. The category system now relies on an updated system to map "
@@ -1510,7 +1511,7 @@ void MainWindow::registerPluginTool(IPluginTool* tool, QString name, QMenu* menu
           tool->display();
         } catch (const std::exception& e) {
           reportError(
-              tr("Plugin \"%1\" failed: %2").arg(tool->localizedName()).arg(e.what()));
+              tr("Plugin \"%1\" failed: %2").arg(tool->localizedName(), e.what()));
         } catch (...) {
           reportError(tr("Plugin \"%1\" failed").arg(tool->localizedName()));
         }
@@ -1543,18 +1544,18 @@ void MainWindow::updateToolMenu()
   // Group the plugins into submenus
   QMap<QString, QList<QPair<QString, IPluginTool*>>> submenuMap;
   for (auto toolPlugin : toolPlugins) {
-    QStringList toolName = toolPlugin->displayName().split("/");
+    QStringList toolName = toolPlugin->displayName().split('/');
     QString submenu      = toolName[0];
     toolName.pop_front();
     submenuMap[submenu].append(
-        QPair<QString, IPluginTool*>(toolName.join("/"), toolPlugin));
+        QPair<QString, IPluginTool*>(toolName.join('/'), toolPlugin));
   }
 
   // Start registering plugins
-  for (auto submenuKey : submenuMap.keys()) {
+  for (const auto& submenuKey : submenuMap.keys()) {
     if (submenuMap[submenuKey].length() > 1) {
       QMenu* submenu = new QMenu(submenuKey, this);
-      for (auto info : submenuMap[submenuKey]) {
+      for (const auto& info : submenuMap[submenuKey]) {
         registerPluginTool(info.second, info.first, submenu);
       }
       ui->actionTool->menu()->addMenu(submenu);
@@ -2698,8 +2699,8 @@ void MainWindow::on_linkButton_pressed()
     return;
   }
 
-  const QIcon addIcon(":/MO/gui/link");
-  const QIcon removeIcon(":/MO/gui/remove");
+  const QIcon addIcon(u":/MO/gui/link"_s);
+  const QIcon removeIcon(u":/MO/gui/remove"_s);
 
   env::Shortcut shortcut(*exe);
 
@@ -2850,7 +2851,7 @@ void MainWindow::refreshNexusCategories(CategoriesDialog* dialog)
 
 void MainWindow::categoriesSaved()
 {
-  for (auto modName : m_OrganizerCore.modList()->allMods()) {
+  for (const auto& modName : m_OrganizerCore.modList()->allMods()) {
     auto mod = ModInfo::getByName(modName);
     for (auto category : mod->getCategories()) {
       if (!m_CategoryFactory.categoryExists(category))
@@ -3892,7 +3893,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
         if (url.isLocalFile()) {
           QString local = url.toLocalFile();
           bool fok      = false;
-          for (auto ext : extensions) {
+          for (const auto& ext : extensions) {
             if (local.endsWith(ext, Qt::CaseInsensitive)) {
               fok = true;
               break;
@@ -3918,7 +3919,7 @@ void MainWindow::dropLocalFile(const QUrl& url, const QString& outputDir, bool m
     log::warn("invalid source file: {}", file.absoluteFilePath());
     return;
   }
-  QString target = outputDir + "/" + file.fileName();
+  QString target = outputDir % '/' % file.fileName();
   if (QFile::exists(target)) {
     QMessageBox box(QMessageBox::Question, file.fileName(),
                     tr("A file with the same name has already been downloaded. "

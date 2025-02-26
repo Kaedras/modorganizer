@@ -12,17 +12,21 @@
 
 #ifdef __unix__
 static inline const QString defaultName = QStringLiteral("ModOrganizer");
+static inline const char pathSeparator = ':';
 inline QString GETENV(const char* varName)
 {
   return qgetenv(varName);
 }
 #else
 static inline const QString defaultName = QStringLiteral("ModOrganizer.exe");
+static inline const char pathSeparator = ';';
 inline QString GETENV(const char* varName)
 {
   return qEnvironmentVariable(varName);
 }
 #endif
+
+using namespace Qt::StringLiterals;
 
 namespace env
 {
@@ -120,7 +124,7 @@ QString Environment::timezone() const
   QTimeZone timeZone(QTimeZone::LocalTime);
 
   auto offsetString = [](int o) {
-    return QString("%1%2:%3")
+    return QStringLiteral("%1%2:%3")
         .arg(o < 0 ? "" : "+")
         .arg(QString::number(o / 60), 2, QChar::fromLatin1('0'))
         .arg(QString::number(o % 60), 2, QChar::fromLatin1('0'));
@@ -131,15 +135,15 @@ QString Environment::timezone() const
 
   const auto stdName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
   const auto std =
-      QString("%1, %2").arg(stdName).arg(offsetString(timeZone.offsetFromUtc(now)));
+      QStringLiteral("%1, %2").arg(stdName).arg(offsetString(timeZone.offsetFromUtc(now)));
 
   const auto dstName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
   const auto dst     = QString("%1, %2").arg(dstName).arg(timeZone.offsetFromUtc(now));
 
   if (timeZone.isDaylightTime(now)) {
-    s = dst + " (dst is active, std is " + std + ")";
+    s = dst % u" (dst is active, std is "_s % std % ')';
   } else {
-    s = std + " (std is active, dst is " + dst + ")";
+    s = std % u" (std is active, dst is "_s % dst % ')';
   }
 
   return s;
@@ -223,26 +227,26 @@ void Environment::dumpDisks(const Settings& s) const
 
 QString path()
 {
-  return get("PATH");
+  return get(u"PATH"_s);
 }
 
 QString appendToPath(const QString& s)
 {
   auto old = path();
-  set("PATH", old + ";" + s);
+  set(u"PATH"_s, old % pathSeparator % s);
   return old;
 }
 
 QString prependToPath(const QString& s)
 {
   auto old = path();
-  set("PATH", s + ";" + old);
+  set(u"PATH"_s, s % pathSeparator % old);
   return old;
 }
 
 void setPath(const QString& s)
 {
-  set("PATH", s);
+  set(u"PATH"_s, s);
 }
 
 QString get(const QString& name)
@@ -304,16 +308,16 @@ QString toString(Service::StartType st)
 
   switch (st) {
   case ST::None:
-    return "none";
+    return u"none"_s;
 
   case ST::Disabled:
-    return "disabled";
+    return u"disabled"_s;
 
   case ST::Enabled:
-    return "enabled";
+    return u"enabled"_s;
 
   default:
-    return QString("unknown %1").arg(static_cast<int>(st));
+    return QStringLiteral("unknown %1").arg(static_cast<int>(st));
   }
 }
 
@@ -323,16 +327,16 @@ QString toString(Service::Status st)
 
   switch (st) {
   case S::None:
-    return "none";
+    return u"none"_s;
 
   case S::Stopped:
-    return "stopped";
+    return u"stopped"_s;
 
   case S::Running:
-    return "running";
+    return u"running"_s;
 
   default:
-    return QString("unknown %1").arg(static_cast<int>(st));
+    return QStringLiteral("unknown %1").arg(static_cast<int>(st));
   }
 }
 

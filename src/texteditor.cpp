@@ -4,6 +4,7 @@
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 TextEditor::TextEditor(QWidget* parent)
     : QPlainTextEdit(parent), m_toolbar(nullptr), m_lineNumbers(nullptr),
@@ -111,7 +112,11 @@ bool TextEditor::save()
     return false;
   QStringEncoder encoder(codec.value());
 
-  QString data = toPlainText().replace("\n", "\r\n");
+#ifdef __unix__
+  QString data = toPlainText();
+#else
+  QString data = toPlainText().replace("\n"_L1, "\r\n"_L1);
+#endif
 
   file.write(encoder.encode(data));
   document()->setModified(false);
@@ -168,7 +173,7 @@ void TextEditor::setBackgroundColor(const QColor& c)
 
   m_highlighter->setBackgroundColor(c);
 
-  setStyleSheet(QString("QPlainTextEdit{ background-color: rgba(%1, %2, %3, %4); }")
+  setStyleSheet(QStringLiteral("QPlainTextEdit{ background-color: rgba(%1, %2, %3, %4); }")
                     .arg(c.redF() * 255)
                     .arg(c.greenF() * 255)
                     .arg(c.blueF() * 255)
@@ -461,14 +466,14 @@ TextEditorToolbar::TextEditorToolbar(TextEditor& editor)
     : m_editor(editor), m_save(nullptr), m_wordWrap(nullptr), m_explore(nullptr),
       m_path(nullptr)
 {
-  m_save = new QAction(QIcon(":/MO/gui/save"), QObject::tr("&Save"), &editor);
+  m_save = new QAction(QIcon(u":/MO/gui/save"_s), QObject::tr("&Save"), &editor);
 
   m_save->setShortcutContext(Qt::WidgetWithChildrenShortcut);
   m_save->setShortcut(Qt::CTRL + Qt::Key_S);
   m_editor.addAction(m_save);
 
   m_wordWrap =
-      new QAction(QIcon(":/MO/gui/word-wrap"), QObject::tr("&Word wrap"), &editor);
+      new QAction(QIcon(u":/MO/gui/word-wrap"_s), QObject::tr("&Word wrap"), &editor);
 
   m_wordWrap->setCheckable(true);
 

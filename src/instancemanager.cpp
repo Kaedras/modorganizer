@@ -41,6 +41,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdint>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 Instance::Instance(QString dir, bool portable, QString profileName)
     : m_dir(std::move(dir)), m_portable(portable), m_plugin(nullptr),
@@ -336,8 +337,8 @@ std::vector<Instance::Object> Instance::objectsForDeletion() const
 {
   // native separators and ending slash
   auto prettyDir = [](auto s) {
-    if (!s.endsWith("/") || !s.endsWith("\\")) {
-      s += "/";
+    if (!s.endsWith('/') || !s.endsWith('\\')) {
+      s += u"/"_s;
     }
 
     return QDir::toNativeSeparators(s);
@@ -352,8 +353,8 @@ std::vector<Instance::Object> Instance::objectsForDeletion() const
   auto canonicalDir = [](QString s) {
     s = s.toLower();
 
-    if (!s.endsWith("/") || !s.endsWith("\\")) {
-      s += "/";
+    if (!s.endsWith('/') || !s.endsWith('\\')) {
+      s += u"/"_s;
     }
 
     return QDir::toNativeSeparators(s);
@@ -549,7 +550,7 @@ void InstanceManager::setCurrentInstance(const QString& name)
 
 QString InstanceManager::instancePath(const QString& instanceName) const
 {
-  return QDir::fromNativeSeparators(globalInstancesRootPath() + "/" + instanceName);
+  return QDir::fromNativeSeparators(globalInstancesRootPath() % u"/"_s % instanceName);
 }
 
 QString InstanceManager::globalInstancesRootPath() const
@@ -571,7 +572,7 @@ std::vector<QString> InstanceManager::globalInstancePaths() const
   std::vector<QString> list;
 
   for (auto&& d : dirs) {
-    const QFileInfo iniFile(QDir(root.filePath(d)), "ModOrganizer.ini");
+    const QFileInfo iniFile(QDir(root.filePath(d)), u"ModOrganizer.ini"_s);
     log::debug("Checking for INI at path '{}'", iniFile.absoluteFilePath());
 
     if (iniFile.exists()) {
@@ -595,13 +596,13 @@ QString InstanceManager::portablePath() const
 
 bool InstanceManager::portableInstanceExists() const
 {
-  return QFile::exists(qApp->applicationDirPath() + "/" + AppConfig::iniFileName());
+  return QFile::exists(qApp->applicationDirPath() % u"/"_s % AppConfig::iniFileName());
 }
 
 bool InstanceManager::allowedToChangeInstance() const
 {
   const auto lockFile =
-      qApp->applicationDirPath() + "/" + AppConfig::portableLockFileName();
+      qApp->applicationDirPath() % u"/"_s % AppConfig::portableLockFileName();
 
   return !QFile::exists(lockFile);
 }
@@ -683,7 +684,7 @@ QString InstanceManager::makeUniqueName(const QString& instanceName) const
       return name;
     }
 
-    name = QString("%1 (%2)").arg(sanitized).arg(i);
+    name = QStringLiteral("%1 (%2)").arg(sanitized).arg(i);
   }
 
   return {};

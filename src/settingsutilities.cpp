@@ -3,11 +3,12 @@
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 bool shouldLogSetting(const QString& displayName)
 {
   // don't log Geometry/ and Widgets/, too noisy and not very useful
-  static const QStringList ignorePrefixes = {"Geometry/", "Widgets/"};
+  static const QStringList ignorePrefixes = {u"Geometry/"_s, u"Widgets/"_s};
 
   for (auto&& prefix : ignorePrefixes) {
     if (displayName.startsWith(prefix, Qt::CaseInsensitive)) {
@@ -34,10 +35,10 @@ QString settingName(const QString& section, const QString& key)
   } else if (key.isEmpty()) {
     return section;
   } else {
-    if (section.compare("General", Qt::CaseInsensitive) == 0) {
+    if (section.compare("General"_L1, Qt::CaseInsensitive) == 0) {
       return key;
     } else {
-      return section + "/" + key;
+      return section % u"/"_s % key;
     }
   }
 }
@@ -155,10 +156,10 @@ QString widgetNameWithTopLevel(const QWidget* widget)
 
   if (components.isEmpty()) {
     // can't do much
-    return "unknown_widget";
+    return u"unknown_widget"_s;
   }
 
-  return components.join("_");
+  return components.join('_');
 }
 
 QString widgetName(const QMainWindow* w)
@@ -183,17 +184,17 @@ QString widgetName(const QWidget* w)
 
 QString dockSettingName(const QDockWidget* dock)
 {
-  return "MainWindow_docks_" + dock->objectName() + "_size";
+  return u"MainWindow_docks_"_s % dock->objectName() % u"_size"_s;
 }
 
 QString indexSettingName(const QWidget* widget)
 {
-  return widgetNameWithTopLevel(widget) + "_index";
+  return widgetNameWithTopLevel(widget) % u"_index"_s;
 }
 
 QString checkedSettingName(const QAbstractButton* b)
 {
-  return widgetNameWithTopLevel(b) + "_checked";
+  return widgetNameWithTopLevel(b) % u"_checked"_s;
 }
 
 void warnIfNotCheckable(const QAbstractButton* b)
@@ -207,5 +208,5 @@ void warnIfNotCheckable(const QAbstractButton* b)
 
 QString credentialName(const QString& key)
 {
-  return "ModOrganizer2_" + key;
+  return u"ModOrganizer2_"_s % key;
 }

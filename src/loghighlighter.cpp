@@ -19,28 +19,30 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "loghighlighter.h"
 
+using namespace Qt::StringLiterals;
+
 LogHighlighter::LogHighlighter(QObject* parent) : QSyntaxHighlighter(parent) {}
 
 void LogHighlighter::highlightBlock(const QString& text)
 {
-  int spacePos = text.indexOf(" ");
+  int spacePos = text.indexOf(" "_L1);
   if (spacePos != -1) {
     QString type = text.mid(0, spacePos);
-    if (type == "DEBUG") {
+    if (type == "DEBUG"_L1) {
       setFormat(0, text.length(), Qt::gray);
-    } else if (type == "INFO") {
+    } else if (type == "INFO"_L1) {
       setFormat(0, text.length(), Qt::darkGreen);
-    } else if (type == "ERROR") {
+    } else if (type == "ERROR"_L1) {
       setFormat(0, text.length(), Qt::red);
     }
   }
 
-  int markPos = text.indexOf("injecting to");
+  int markPos = text.indexOf("injecting to"_L1);
   if (markPos != -1) {
     setFormat(markPos + 12, text.length(), Qt::blue);
   }
 
-  markPos = text.indexOf("using profile");
+  markPos = text.indexOf("using profile"_L1);
   if (markPos != -1) {
     setFormat(markPos + 13, text.length(), Qt::blue);
   }

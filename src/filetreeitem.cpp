@@ -9,6 +9,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 namespace fs = std::filesystem;
 
 constexpr bool AlwaysSortDirectoriesFirst = true;
@@ -20,7 +21,7 @@ const QString& directoryFileType()
     // every time you need to perform a lookup.
     QMimeDatabase db;
     // "." for the current directory, which should always exist
-    QMimeType mimeType = db.mimeTypeForFile(QFileInfo("."));
+    QMimeType mimeType = db.mimeTypeForFile(QFileInfo(u"."_s));
 
     return mimeType.comment();
   }();
@@ -35,7 +36,7 @@ const QString& cachedFileTypeNoExtension()
     // every time you need to perform a lookup.
     QMimeDatabase db;
     // dummy filename with no extension
-    QMimeType mimeType = db.mimeTypeForFile(QFileInfo("file"));
+    QMimeType mimeType = db.mimeTypeForFile(QFileInfo(u"file"_s));
 
     return mimeType.comment();
   }();
@@ -251,10 +252,10 @@ void FileTreeItem::sort(int column, Qt::SortOrder order, bool force)
 
 QString FileTreeItem::virtualPath() const
 {
-  QString s = "Data/";
+  QString s = u"Data/"_s;
 
   if (!m_virtualParentPath.isEmpty()) {
-    s += m_virtualParentPath + "/";
+    s += m_virtualParentPath % '/';
   }
 
   s += m_file;
@@ -266,10 +267,10 @@ QString FileTreeItem::dataRelativeFilePath() const
 {
   auto path = dataRelativeParentPath();
   if (!path.isEmpty()) {
-    path += "/";
+    path += '/';
   }
 
-  return path += m_file;
+  return path % m_file;
 }
 
 QFont FileTreeItem::font() const
@@ -390,7 +391,7 @@ bool FileTreeItem::areChildrenVisible() const
 
 QString FileTreeItem::debugName() const
 {
-  return QString("%1(ld=%2,cs=%3)")
+  return QStringLiteral("%1(ld=%2,cs=%3)")
       .arg(virtualPath())
       .arg(m_loaded)
       .arg(m_children.size());

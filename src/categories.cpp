@@ -32,12 +32,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "nexusinterface.h"
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 CategoryFactory* CategoryFactory::s_Instance = nullptr;
 
 QString CategoryFactory::categoriesFilePath()
 {
-  return qApp->property("dataPath").toString() + "/categories.dat";
+  return qApp->property("dataPath").toString() % u"/categories.dat"_s;
 }
 
 CategoryFactory::CategoryFactory() : QObject()
@@ -47,7 +48,7 @@ CategoryFactory::CategoryFactory() : QObject()
 
 QString CategoryFactory::nexusMappingFilePath()
 {
-  return qApp->property("dataPath").toString() + "/nexuscatmap.dat";
+  return qApp->property("dataPath").toString() % u"/nexuscatmap.dat"_s;
 }
 
 void CategoryFactory::loadCategories()
@@ -76,7 +77,7 @@ void CategoryFactory::loadCategories()
             if (!ok) {
               log::error(tr("invalid category id {0}"), iter->constData());
             }
-            nexusCats.push_back(NexusCategory("Unknown", temp));
+            nexusCats.push_back(NexusCategory(u"Unknown"_s, temp));
           }
         }
         bool cell0Ok = true;
@@ -153,7 +154,7 @@ void CategoryFactory::reset()
   m_Categories.clear();
   m_NexusMap.clear();
   m_IDMap.clear();
-  addCategory(0, "None", std::vector<NexusCategory>(), 0);
+  addCategory(0, u"None"_s, std::vector<NexusCategory>(), 0);
 }
 
 void CategoryFactory::setParents()
@@ -290,63 +291,63 @@ void CategoryFactory::loadDefaultCategories()
 {
   // the order here is relevant as it defines the order in which the
   // mods appear in the combo box
-  addCategory(1, "Animations", 0);
-  addCategory(52, "Poses", 1);
-  addCategory(2, "Armour", 0);
-  addCategory(53, "Power Armor", 2);
-  addCategory(3, "Audio", 0);
-  addCategory(38, "Music", 0);
-  addCategory(39, "Voice", 0);
-  addCategory(5, "Clothing", 0);
-  addCategory(41, "Jewelry", 5);
-  addCategory(42, "Backpacks", 5);
-  addCategory(6, "Collectables", 0);
-  addCategory(28, "Companions", 0);
-  addCategory(7, "Creatures, Mounts, & Vehicles", 0);
-  addCategory(8, "Factions", 0);
-  addCategory(9, "Gameplay", 0);
-  addCategory(27, "Combat", 9);
-  addCategory(43, "Crafting", 9);
-  addCategory(48, "Overhauls", 9);
-  addCategory(49, "Perks", 9);
-  addCategory(54, "Radio", 9);
-  addCategory(55, "Shouts", 9);
-  addCategory(22, "Skills & Levelling", 9);
-  addCategory(58, "Weather & Lighting", 9);
-  addCategory(44, "Equipment", 43);
-  addCategory(45, "Home/Settlement", 43);
-  addCategory(10, "Body, Face, & Hair", 0);
-  addCategory(39, "Tattoos", 10);
-  addCategory(40, "Character Presets", 0);
-  addCategory(11, "Items", 0);
-  addCategory(32, "Mercantile", 0);
-  addCategory(37, "Ammo", 11);
-  addCategory(19, "Weapons", 11);
-  addCategory(36, "Weapon & Armour Sets", 11);
-  addCategory(23, "Player Homes", 0);
-  addCategory(25, "Castles & Mansions", 23);
-  addCategory(51, "Settlements", 23);
-  addCategory(12, "Locations", 0);
-  addCategory(4, "Cities", 12);
-  addCategory(31, "Landscape Changes", 0);
-  addCategory(29, "Environment", 0);
-  addCategory(30, "Immersion", 0);
-  addCategory(20, "Magic", 0);
-  addCategory(21, "Models & Textures", 0);
-  addCategory(33, "Modders resources", 0);
-  addCategory(13, "NPCs", 0);
-  addCategory(24, "Bugfixes", 0);
-  addCategory(14, "Patches", 24);
-  addCategory(35, "Utilities", 0);
-  addCategory(26, "Cheats", 0);
-  addCategory(15, "Quests", 0);
-  addCategory(16, "Races & Classes", 0);
-  addCategory(34, "Stealth", 0);
-  addCategory(17, "UI", 0);
-  addCategory(18, "Visuals", 0);
-  addCategory(50, "Pip-Boy", 18);
-  addCategory(46, "Shader Presets", 0);
-  addCategory(47, "Miscellaneous", 0);
+  addCategory(1, u"Animations"_s, 0);
+  addCategory(52,u"Poses"_s, 1);
+  addCategory(2, u"Armour"_s, 0);
+  addCategory(53, u"Power Armor"_s, 2);
+  addCategory(3, u"Audio"_s, 0);
+  addCategory(38, u"Music"_s, 0);
+  addCategory(39, u"Voice"_s, 0);
+  addCategory(5, u"Clothing"_s, 0);
+  addCategory(41,u"Jewelry"_s, 5);
+  addCategory(42, u"Backpacks"_s, 5);
+  addCategory(6, u"Collectables"_s, 0);
+  addCategory(28, u"Companions"_s, 0);
+  addCategory(7, u"Creatures, Mounts, & Vehicles"_s, 0);
+  addCategory(8, u"Factions"_s, 0);
+  addCategory(9, u"Gameplay"_s, 0);
+  addCategory(27, u"Combat"_s, 9);
+  addCategory(43, u"Crafting"_s, 9);
+  addCategory(48, u"Overhauls"_s, 9);
+  addCategory(49, u"Perks"_s, 9);
+  addCategory(54, u"Radio"_s, 9);
+  addCategory(55, u"Shouts"_s, 9);
+  addCategory(22, u"Skills & Levelling"_s, 9);
+  addCategory(58, u"Weather & Lighting"_s, 9);
+  addCategory(44, u"Equipment"_s, 43);
+  addCategory(45, u"Home/Settlement"_s, 43);
+  addCategory(10, u"Body, Face, & Hair"_s, 0);
+  addCategory(39, u"Tattoos"_s, 10);
+  addCategory(40, u"Character Presets"_s, 0);
+  addCategory(11, u"Items"_s, 0);
+  addCategory(32, u"Mercantile"_s, 0);
+  addCategory(37, u"Ammo"_s, 11);
+  addCategory(19, u"Weapons"_s, 11);
+  addCategory(36, u"Weapon & Armour Sets"_s, 11);
+  addCategory(23, u"Player Homes"_s, 0);
+  addCategory(25, u"Castles & Mansions"_s, 23);
+  addCategory(51, u"Settlements"_s, 23);
+  addCategory(12, u"Locations"_s, 0);
+  addCategory(4, u"Cities"_s, 12);
+  addCategory(31, u"Landscape Changes"_s, 0);
+  addCategory(29, u"Environment"_s, 0);
+  addCategory(30, u"Immersion"_s, 0);
+  addCategory(20, u"Magic"_s, 0);
+  addCategory(21, u"Models & Textures"_s, 0);
+  addCategory(33, u"Modders resources"_s, 0);
+  addCategory(13, u"NPCs"_s, 0);
+  addCategory(24, u"Bugfixes"_s, 0);
+  addCategory(14, u"Patches"_s, 24);
+  addCategory(35, u"Utilities"_s, 0);
+  addCategory(26, u"Cheats"_s, 0);
+  addCategory(15, u"Quests"_s, 0);
+  addCategory(16, u"Races & Classes"_s, 0);
+  addCategory(34, u"Stealth"_s, 0);
+  addCategory(17, u"UI"_s, 0);
+  addCategory(18, u"Visuals"_s, 0);
+  addCategory(50, u"Pip-Boy"_s, 18);
+  addCategory(46, u"Shader Presets"_s, 0);
+  addCategory(47, u"Miscellaneous"_s, 0);
 }
 
 int CategoryFactory::getParentID(unsigned int index) const
@@ -453,7 +454,7 @@ QString CategoryFactory::getSpecialCategoryName(SpecialCategories type) const
   default:
     return {};
   }
-  return QString("<%1>").arg(label);
+  return QStringLiteral("<%1>").arg(label);
 }
 
 QString CategoryFactory::getCategoryNameByID(int id) const

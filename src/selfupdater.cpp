@@ -65,6 +65,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 SelfUpdater::SelfUpdater(NexusInterface* nexusInterface)
     : m_Parent(nullptr), m_MOVersion(createVersionInfo()), m_Interface(nexusInterface),
@@ -99,7 +100,7 @@ void SelfUpdater::testForUpdate(const Settings& settings)
   // directly
   try {
     m_GitHub.releases(
-        GitHub::Repository("Modorganizer2", "modorganizer"),
+        GitHub::Repository(u"Modorganizer2"_s, u"modorganizer"_s),
         [this](const QJsonArray& releases) {
           if (releases.isEmpty()) {
             // error message already logged
@@ -110,9 +111,9 @@ void SelfUpdater::testForUpdate(const Settings& settings)
           CandidatesMap mreleases;
           for (const QJsonValue& releaseVal : releases) {
             QJsonObject release = releaseVal.toObject();
-            if (!release["draft"].toBool() && (Settings::instance().usePrereleases() ||
-                                               !release["prerelease"].toBool())) {
-              auto version       = Version::parse(release["tag_name"].toString(),
+            if (!release[u"draft"_s].toBool() && (Settings::instance().usePrereleases() ||
+                                               !release[u"prerelease"_s].toBool())) {
+              auto version       = Version::parse(release[u"tag_name"_s].toString(),
                                                   Version::ParseMode::MO2);
               mreleases[version] = release;
             }
@@ -156,7 +157,7 @@ void SelfUpdater::startUpdate()
 
   UpdateDialog dialog(m_Parent);
   dialog.setVersions(MOShared::createVersionInfo().string(),
-                     latestRelease["tag_name"].toString());
+                     latestRelease[u"tag_name"_s].toString());
 
   // We concatenate release details. We only include pre-release if those are
   // the latest release:
@@ -166,17 +167,17 @@ void SelfUpdater::startUpdate()
     auto& release = p.second;
 
     // Ignore details for pre-release after a release has been found:
-    if (release["prerelease"].toBool() && !includePreRelease) {
+    if (release[u"prerelease"_s].toBool() && !includePreRelease) {
       continue;
     }
 
     // Stop including pre-release as soon as we find a non-prerelease:
-    if (!release["prerelease"].toBool()) {
+    if (!release[u"prerelease"_s].toBool()) {
       includePreRelease = false;
     }
 
-    details += "\n## " + release["name"].toString() + "\n---\n";
-    details += release["body"].toString();
+    details += u"\n## "_s % release[u"name"_s].toString() % u"\n---\n"_s;
+    details += release[u"body"_s].toString();
   }
 
   // Need to call setDetailedText to create the QTextEdit and then be able to retrieve
@@ -187,11 +188,11 @@ void SelfUpdater::startUpdate()
 
   if (dialog.result() == QDialog::Accepted) {
     bool found = false;
-    for (const QJsonValue& assetVal : latestRelease["assets"].toArray()) {
+    for (const QJsonValueRef& assetVal : latestRelease[u"assets"_s].toArray()) {
       QJsonObject asset = assetVal.toObject();
-      if (asset["content_type"].toString() == "application/x-msdownload") {
-        openOutputFile(asset["name"].toString());
-        download(asset["browser_download_url"].toString());
+      if (asset[u"content_type"_s].toString() == "application/x-msdownload"_L1) {
+        openOutputFile(asset[u"name"_s].toString());
+        download(asset[u"browser_download_url"_s].toString());
         found = true;
         break;
       }
@@ -229,7 +230,7 @@ void SelfUpdater::closeProgress()
 void SelfUpdater::openOutputFile(const QString& fileName)
 {
   QString outputPath =
-      QDir::fromNativeSeparators(qApp->property("dataPath").toString()) + "/" +
+      QDir::fromNativeSeparators(qApp->property("dataPath").toString()) % u"/"_s %
       fileName;
   log::debug("downloading to {}", outputPath);
   m_UpdateFile.setFileName(outputPath);
@@ -291,7 +292,7 @@ void SelfUpdater::downloadFinished()
 
     if (m_Reply->header(QNetworkRequest::ContentTypeHeader)
             .toString()
-            .startsWith("text", Qt::CaseInsensitive)) {
+            .startsWith("text"_L1, Qt::CaseInsensitive)) {
       m_Canceled = true;
     }
 
@@ -328,7 +329,7 @@ void SelfUpdater::downloadCancel()
 
 void SelfUpdater::installUpdate()
 {
-  const QString parameters = "/DIR=\"" + qApp->applicationDirPath() + "\" ";
+  const QString parameters = u"/DIR=\""_s % qApp->applicationDirPath() % u"\" "_s;
   const auto r             = shell::Execute(m_UpdateFile.fileName(), parameters);
 
   if (r.success()) {

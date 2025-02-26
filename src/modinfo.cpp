@@ -47,6 +47,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 const std::set<unsigned int> ModInfo::s_EmptySet;
 std::vector<ModInfo::Ptr> ModInfo::s_Collection;
@@ -56,7 +57,7 @@ std::map<std::pair<QString, int>, std::vector<unsigned int>> ModInfo::s_ModsByMo
 int ModInfo::s_NextID;
 QRecursiveMutex ModInfo::s_Mutex;
 
-QString ModInfo::s_HiddenExt(".mohidden");
+QString ModInfo::s_HiddenExt(u".mohidden"_s);
 
 bool ModInfo::ByName(const ModInfo::Ptr& LHS, const ModInfo::Ptr& RHS)
 {
@@ -66,14 +67,14 @@ bool ModInfo::ByName(const ModInfo::Ptr& LHS, const ModInfo::Ptr& RHS)
 bool ModInfo::isSeparatorName(const QString& name)
 {
   static QRegularExpression separatorExp(
-      QRegularExpression::anchoredPattern(".*_separator"));
+      QRegularExpression::anchoredPattern(u".*_separator"_s));
   return separatorExp.match(name).hasMatch();
 }
 
 bool ModInfo::isBackupName(const QString& name)
 {
   static QRegularExpression backupExp(
-      QRegularExpression::anchoredPattern(".*backup[0-9]*"));
+      QRegularExpression::anchoredPattern(u".*backup[0-9]*"_s));
   return backupExp.match(name).hasMatch();
 }
 
@@ -134,7 +135,7 @@ ModInfo::Ptr ModInfo::getByIndex(unsigned int index)
     throw MyException(tr("invalid mod index: %1").arg(index));
   }
   if (index == ULONG_MAX)
-    return s_Collection[ModInfo::getIndex("Overwrite")];
+    return s_Collection[ModInfo::getIndex(u"Overwrite"_s)];
   return s_Collection[index];
 }
 
@@ -336,7 +337,7 @@ bool ModInfo::checkAllForUpdate(PluginContainer* pluginContainer, QObject* recei
 
   if (latest < QDateTime::currentDateTimeUtc().addMonths(-1)) {
     std::set<std::pair<QString, int>> organizedGames;
-    for (auto mod : s_Collection) {
+    for (const auto& mod : s_Collection) {
       if (mod->canBeUpdated() &&
           mod->getLastNexusUpdate() < QDateTime::currentDateTimeUtc().addMonths(-1)) {
         organizedGames.insert(
@@ -397,11 +398,11 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
     std::copy_if(s_Collection.begin(), s_Collection.end(),
                  std::inserter(finalMods, finalMods.end()),
                  [=](QSharedPointer<ModInfo> info) -> bool {
-                   if (info->nexusId() == update["mod_id"].toInt() &&
+                   if (info->nexusId() == update[u"mod_id"_s].toInt() &&
                        info->gameName().compare(gameName, Qt::CaseInsensitive) == 0)
                      if (info->getLastNexusUpdate().addSecs(-3600) <
                          QDateTime::fromSecsSinceEpoch(
-                             update["latest_file_update"].toInt(), Qt::UTC))
+                             update[u"latest_file_update"_s].toInt(), Qt::UTC))
                        return true;
                    return false;
                  });

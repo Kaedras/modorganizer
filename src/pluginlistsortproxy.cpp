@@ -25,6 +25,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTreeView>
 #include <QWidgetAction>
 
+using namespace Qt::StringLiterals;
+
 PluginListSortProxy::PluginListSortProxy(QObject* parent)
     : QSortFilterProxyModel(parent), m_SortIndex(0), m_SortOrder(Qt::AscendingOrder)
 {
@@ -94,7 +96,7 @@ bool PluginListSortProxy::dropMimeData(const QMimeData* data, Qt::DropAction act
 {
   if ((sortColumn() != PluginList::COL_PRIORITY) &&
       (sortColumn() != PluginList::COL_MODINDEX)) {
-    QWidget* wid = qApp->activeWindow()->findChild<QTreeView*>("espList");
+    QWidget* wid = qApp->activeWindow()->findChild<QTreeView*>(u"espList"_s);
     MessageDialog::showMessage(
         tr("Drag&Drop is only supported when sorting by priority or mod index"), wid);
     return false;
@@ -122,14 +124,14 @@ bool PluginListSortProxy::filterMatchesPlugin(const QString& plugin) const
 
     bool display       = false;
     QString filterCopy = QString(m_CurrentFilter);
-    filterCopy.replace("||", ";").replace("OR", ";").replace("|", ";");
-    QStringList ORList = filterCopy.split(";", Qt::SkipEmptyParts);
+    filterCopy.replace(u"||"_s, u";"_s).replace(u"OR"_s, u";"_s).replace('|', ';');
+    QStringList ORList = filterCopy.split(';', Qt::SkipEmptyParts);
 
     bool segmentGood = true;
 
     // split in ORSegments that internally use AND logic
     for (auto& ORSegment : ORList) {
-      QStringList ANDKeywords = ORSegment.split(" ", Qt::SkipEmptyParts);
+      QStringList ANDKeywords = ORSegment.split(' ', Qt::SkipEmptyParts);
       segmentGood             = true;
 
       // check each word in the segment for match, each word needs to be matched but it

@@ -4,6 +4,8 @@
 #include <QMenuBar>
 #include <QStatusBar>
 
+using namespace Qt::StringLiterals;
+
 class UILockerInterface
 {
 public:
@@ -87,9 +89,9 @@ public:
     QString s;
 
     if (labels.size() > MaxLabels) {
-      s = labels.mid(0, MaxLabels).join(", ") + "...";
+      s = labels.mid(0, MaxLabels).join(", "_L1) % u"..."_s;
     } else {
-      s = labels.join(", ");
+      s = labels.join(", "_L1);
     }
 
     m_info->setText(s);
@@ -275,7 +277,7 @@ private:
 
   void createInfoLabel()
   {
-    m_info = new QLabel(" ");
+    m_info = new QLabel(u" "_s);
     m_info->setAlignment(Qt::AlignCenter | Qt::AlignHCenter);
   }
 
@@ -507,7 +509,7 @@ void UILocker::updateLabel()
 
   for (auto itor = m_sessions.rbegin(); itor != m_sessions.rend(); ++itor) {
     if (auto ss = itor->lock()) {
-      labels.push_back(QString("%1 (%2)").arg(ss->name()).arg(ss->pid()));
+      labels.push_back(QStringLiteral("%1 (%2)").arg(ss->name()).arg(ss->pid()));
     }
   }
 

@@ -9,6 +9,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 // in mainwindow.cpp
 QString UnmanagedModName();
@@ -201,7 +202,7 @@ FileTreeModel::FileTreeModel(OrganizerCore& core, QObject* parent)
 
 void FileTreeModel::refresh()
 {
-  TimeThis tt("FileTreeModel::refresh()");
+  TimeThis tt(u"FileTreeModel::refresh()"_s);
 
   m_fullyLoaded = false;
   update(*m_root, *m_core.directoryStructure(), "", false);
@@ -231,7 +232,7 @@ void FileTreeModel::recursiveFetchMore(const QModelIndex& m)
 void FileTreeModel::ensureFullyLoaded()
 {
   if (!m_fullyLoaded) {
-    TimeThis tt("FileTreeModel:: fully loading for search");
+    TimeThis tt(u"FileTreeModel:: fully loading for search"_s);
     recursiveFetchMore(QModelIndex());
     sortItem(*m_root, false);
     m_fullyLoaded = true;
@@ -542,7 +543,7 @@ void FileTreeModel::update(FileTreeItem& parentItem,
   auto path = parentPath;
   if (!parentEntry.isTopLevel()) {
     if (!path.isEmpty()) {
-      path += "/";
+      path += u"/"_s;
     }
 
     path += parentEntry.getName();
@@ -1076,7 +1077,7 @@ QVariant FileTreeModel::displayData(const FileTreeItem* item, int column) const
       }
 
       if (auto n = item->compressedFileSize()) {
-        return QString("%1 (%2)").arg(fs).arg(localizedByteSize(*n));
+        return QStringLiteral("%1 (%2)").arg(fs).arg(localizedByteSize(*n));
       } else {
         return fs;
       }
@@ -1113,7 +1114,7 @@ QString FileTreeModel::makeModName(const MOShared::FileEntry& file, int originID
 
   const auto& archive = file.getArchive();
   if (!archive.name().isEmpty()) {
-    name += " (" + archive.name() + ")";
+    name += u" ("_s % archive.name() % u")"_s;
   }
 
   return name;
@@ -1122,34 +1123,34 @@ QString FileTreeModel::makeModName(const MOShared::FileEntry& file, int originID
 QString FileTreeModel::makeTooltip(const FileTreeItem& item) const
 {
   auto nowrap = [&](auto&& s) {
-    return "<p style=\"white-space: pre; margin: 0; padding: 0;\">" + s + "</p>";
+    return u"<p style=\"white-space: pre; margin: 0; padding: 0;\">"_s + s + u"</p>"_s;
   };
 
   auto line = [&](auto&& caption, auto&& value) {
     if (value.isEmpty()) {
-      return nowrap("<b>" + caption + ":</b>\n");
+      return nowrap(u"<b>"_s + caption + u":</b>\n"_s);
     } else {
-      return nowrap("<b>" + caption + ":</b> " + value.toHtmlEscaped()) + "\n";
+      return nowrap(u"<b>"_s + caption + u":</b> "_s % value.toHtmlEscaped()) + u"\n"_s;
     }
   };
 
   if (item.isDirectory()) {
-    return line(tr("Directory"), item.filename()) +
+    return line(tr("Directory"), item.filename()) %
            line(tr("Virtual path"), item.virtualPath());
   }
 
-  static const QString ListStart = "<ul style=\""
+  static const QString ListStart = u"<ul style=\""
                                    "margin-left: 20px; "
                                    "margin-top: 0; "
                                    "margin-bottom: 0; "
                                    "padding: 0; "
                                    "-qt-list-indent: 0;"
-                                   "\">";
+                                   "\">"_s;
 
-  static const QString ListEnd = "</ul>";
+  static const QString ListEnd = u"</ul>"_s;
 
-  QString s = line(tr("Virtual path"), item.virtualPath()) +
-              line(tr("Real path"), item.realPath()) + line(tr("From"), item.mod());
+  QString s = line(tr("Virtual path"), item.virtualPath()) %
+              line(tr("Real path"), item.realPath()) % line(tr("From"), item.mod());
 
   const auto file =
       m_core.directoryStructure()->searchFile(item.dataRelativeFilePath(), nullptr);
@@ -1166,10 +1167,10 @@ QString FileTreeModel::makeTooltip(const FileTreeItem& item) const
     if (list.size() == 1) {
       s += line(tr("Also in"), list[0]);
     } else if (list.size() >= 2) {
-      s += line(tr("Also in"), QString()) + ListStart;
+      s += line(tr("Also in"), QString()) % ListStart;
 
       for (auto&& alt : list) {
-        s += "<li>" + alt + "</li>";
+        s += u"<li>"_s % alt % u"</li>"_s;
       }
 
       s += ListEnd;

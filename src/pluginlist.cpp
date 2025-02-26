@@ -57,6 +57,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 static QString TruncateString(const QString& text)
 {
@@ -64,7 +65,7 @@ static QString TruncateString(const QString& text)
 
   if (new_text.length() > 1024) {
     new_text.truncate(1024);
-    new_text += "...";
+    new_text += u"..."_s;
   }
 
   return new_text;
@@ -131,9 +132,9 @@ void PluginList::highlightPlugins(const std::vector<unsigned int>& modIndices,
     ModInfo::Ptr selectedMod = ModInfo::getByIndex(modIndex);
     if (!selectedMod.isNull() && profile->modEnabled(modIndex)) {
       QDir dir(selectedMod->absolutePath());
-      QStringList plugins = dir.entryList(QStringList() << "*.esp"
-                                                        << "*.esm"
-                                                        << "*.esl");
+      QStringList plugins = dir.entryList(QStringList() << u"*.esp"_s
+                                                        << u"*.esm"_s
+                                                        << u"*.esl"_s);
       const MOShared::FilesOrigin& origin =
           directoryEntry.getOriginByName(selectedMod->internalName());
       if (plugins.size() > 0) {
@@ -184,7 +185,7 @@ void PluginList::refresh(const QString& profileName,
                          const DirectoryEntry& baseDirectory,
                          const QString& lockedOrderFile, bool force)
 {
-  TimeThis tt("PluginList::refresh()");
+  TimeThis tt(u"PluginList::refresh()"_s);
 
   if (force) {
     m_ESPs.clear();
@@ -211,18 +212,18 @@ void PluginList::refresh(const QString& profileName,
   std::unordered_map<QString, FileEntryPtr> availablePlugins;
   QStringList archiveCandidates;
 
-  for (FileEntryPtr current : baseDirectory.getFiles()) {
+  for (const FileEntryPtr& current : baseDirectory.getFiles()) {
     if (current.get() == nullptr) {
       continue;
     }
     const QString& filename = current->getName();
 
-    if (filename.endsWith(".esp", Qt::CaseInsensitive) ||
-        filename.endsWith(".esm", Qt::CaseInsensitive) ||
-        filename.endsWith(".esl", Qt::CaseInsensitive)) {
+    if (filename.endsWith(".esp"_L1, Qt::CaseInsensitive) ||
+        filename.endsWith(".esm"_L1, Qt::CaseInsensitive) ||
+        filename.endsWith(".esl"_L1, Qt::CaseInsensitive)) {
       availablePlugins.insert(std::make_pair(filename, current));
-    } else if (filename.endsWith(".bsa", Qt::CaseInsensitive) ||
-               filename.endsWith("ba2", Qt::CaseInsensitive)) {
+    } else if (filename.endsWith(".bsa"_L1, Qt::CaseInsensitive) ||
+               filename.endsWith("ba2"_L1, Qt::CaseInsensitive)) {
       archiveCandidates.append(filename);
     }
   }
@@ -236,7 +237,7 @@ void PluginList::refresh(const QString& profileName,
                        primaryPlugins.contains(filename, Qt::CaseInsensitive);
     bool forceEnabled  = enabledPlugins.contains(filename, Qt::CaseInsensitive);
     bool forceDisabled = loadOrderMechanismNone && !forceLoaded && !forceEnabled;
-    if (!lightPluginsAreSupported && filename.endsWith(".esl")) {
+    if (!lightPluginsAreSupported && filename.endsWith(".esl"_L1)) {
       forceDisabled = true;
     }
 
@@ -247,7 +248,7 @@ void PluginList::refresh(const QString& profileName,
       // name without extension
       QString baseName = QFileInfo(filename).completeBaseName();
 
-      QString iniPath = baseName + ".ini";
+      QString iniPath = baseName % u".ini"_s;
       bool hasIni     = baseDirectory.findFile(iniPath).get() != nullptr;
       std::set<QString> loadedArchives;
       for (const auto& archiveName : archiveCandidates) {
@@ -278,7 +279,7 @@ void PluginList::refresh(const QString& profileName,
 
   for (const auto& espName : m_ESPsByName) {
     if (!availablePlugins.contains(espName.first)) {
-      m_ESPs[espName.second].name = "";
+      m_ESPs[espName.second].name.clear();
     }
   }
 
@@ -327,11 +328,11 @@ void PluginList::fixPrimaryPlugins()
   int prio                   = 0;
   int prioBlueprint          = 0;
   bool somethingChanged      = false;
-  for (auto esp : m_ESPs) {
+  for (const auto& esp : m_ESPs) {
     if (!esp.isBlueprintFlagged)
       prioBlueprint++;
   }
-  for (QString plugin : primaryPlugins) {
+  for (const QString& plugin : primaryPlugins) {
     std::map<QString, int>::iterator iter = m_ESPsByName.find(plugin);
     // Plugin is present?
     if (iter != m_ESPsByName.end()) {
@@ -362,13 +363,13 @@ void PluginList::fixPrimaryPlugins()
 
 void PluginList::fixPluginRelationships()
 {
-  TimeThis timer("PluginList::fixPluginRelationships");
+  TimeThis timer(u"PluginList::fixPluginRelationships"_s);
 
   // Count the types of plugins
   int standardCount        = 0;
   int masterCount          = 0;
   int blueprintMasterCount = 0;
-  for (auto plugin : m_ESPs) {
+  for (const auto& plugin : m_ESPs) {
     if (plugin.hasLightExtension || plugin.hasMasterExtension ||
         plugin.isMasterFlagged) {
       if (plugin.isBlueprintFlagged) {
@@ -417,7 +418,7 @@ void PluginList::fixPluginRelationships()
   for (int i = 0; i < m_ESPs.size(); i++) {
     ESPInfo& plugin = m_ESPs[i];
     int newPriority = plugin.priority;
-    for (auto master : plugin.masters) {
+    for (const auto& master : plugin.masters) {
       auto iter = m_ESPsByName.find(master);
       if (iter != m_ESPsByName.end()) {
         if (m_ESPs.at(iter->second).isBlueprintFlagged == plugin.isBlueprintFlagged) {
@@ -723,10 +724,10 @@ void PluginList::writeLockedOrder(const QString& fileName) const
   SafeWriteFile file(fileName);
 
   file->resize(0);
-  file->write(QString("# This file was automatically generated by Mod Organizer.\r\n")
+  file->write(QStringLiteral("# This file was automatically generated by Mod Organizer.\r\n")
                   .toUtf8());
   for (auto iter = m_LockedOrder.begin(); iter != m_LockedOrder.end(); ++iter) {
-    file->write(QString("%1|%2\r\n").arg(iter->first).arg(iter->second).toUtf8());
+    file->write(QStringLiteral("%1|%2\r\n").arg(iter->first).arg(iter->second).toUtf8());
   }
   file.commit();
 }
@@ -757,7 +758,7 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
       bool archive = false;
       int originid = fileEntry->getOrigin(archive);
 
-      fileName = QString("%1/%2")
+      fileName = QStringLiteral("%1/%2")
                      .arg(QDir::toNativeSeparators(
                          directoryStructure.getOriginByID(originid).getPath()))
                      .arg(esp.name);
@@ -1199,7 +1200,7 @@ void PluginList::generatePluginIndexes()
     }
     if (mediumPluginsSupported && m_ESPs[i].isMediumFlagged) {
       int ESHpos      = 253 + (numESHs / 256);
-      m_ESPs[i].index = QString("%1:%2")
+      m_ESPs[i].index = QStringLiteral("%1:%2")
                             .arg(ESHpos, 2, 16, QChar('0'))
                             .arg(numESHs % 256, 2, 16, QChar('0'))
                             .toUpper();
@@ -1208,13 +1209,13 @@ void PluginList::generatePluginIndexes()
     } else if (lightPluginsSupported &&
                (m_ESPs[i].hasLightExtension || m_ESPs[i].isLightFlagged)) {
       int ESLpos      = 254 + (numESLs / 4096);
-      m_ESPs[i].index = QString("%1:%2")
+      m_ESPs[i].index = QStringLiteral("%1:%2")
                             .arg(ESLpos, 2, 16, QChar('0'))
                             .arg(numESLs % 4096, 3, 16, QChar('0'))
                             .toUpper();
       ++numESLs;
     } else {
-      m_ESPs[i].index = QString("%1")
+      m_ESPs[i].index = QStringLiteral("%1")
                             .arg(l - numESHs - numESLs - numSkipped, 2, 16, QChar('0'))
                             .toUpper();
     }
@@ -1377,36 +1378,34 @@ QVariant PluginList::tooltipData(const QModelIndex& modelIndex) const
   const int index = modelIndex.row();
   const auto& esp = m_ESPs[index];
 
-  QString toolTip;
-
-  toolTip += "<b>" + tr("Origin") + "</b>: " + esp.originName;
+  QString toolTip =  u"<b>"_s % tr("Origin") % u"</b>: "_s % esp.originName;
 
   if (esp.forceLoaded) {
-    toolTip += "<br><b><i>" +
-               tr("This plugin can't be disabled or moved (enforced by the game).") +
-               "</i></b>";
+    toolTip += u"<br><b><i>"_s %
+               tr("This plugin can't be disabled or moved (enforced by the game).") %
+               u"</i></b>"_s;
   }
 
   if (esp.forceEnabled) {
-    toolTip += "<br><b><i>" +
-               tr("This plugin can't be disabled (enforced by the game).") + "</i></b>";
+    toolTip += u"<br><b><i>"_s %
+               tr("This plugin can't be disabled (enforced by the game).") % u"</i></b>"_s;
   }
 
   if (!esp.author.isEmpty()) {
-    toolTip += "<br><b>" + tr("Author") + "</b>: " + TruncateString(esp.author);
+    toolTip += u"<br><b>"_s % tr("Author") % u"</b>: "_s % TruncateString(esp.author);
   }
 
   if (esp.description.size() > 0) {
     toolTip +=
-        "<br><b>" + tr("Description") + "</b>: " + TruncateString(esp.description);
+        u"<br><b>"_s % tr("Description") % u"</b>: "_s % TruncateString(esp.description);
   }
 
   if (esp.masterUnset.size() > 0) {
     toolTip +=
-        "<br><b>" + tr("Missing Masters") + "</b>: " + "<b>" +
+        u"<br><b>"_s % tr("Missing Masters") % u"</b>: "_s % u"<b>"_s %
         TruncateString(
-            QStringList(esp.masterUnset.begin(), esp.masterUnset.end()).join(", ")) +
-        "</b>";
+            QStringList(esp.masterUnset.begin(), esp.masterUnset.end()).join(u", "_s)) %
+        u"</b>"_s;
   }
 
   std::set<QString> enabledMasters;
@@ -1415,18 +1414,18 @@ QVariant PluginList::tooltipData(const QModelIndex& modelIndex) const
                       std::inserter(enabledMasters, enabledMasters.end()));
 
   if (!enabledMasters.empty()) {
-    toolTip += "<br><b>" + tr("Enabled Masters") +
-               "</b>: " + TruncateString(SetJoin(enabledMasters, ", "));
+    toolTip += u"<br><b>"_s % tr("Enabled Masters") %
+               u"</b>: "_s % TruncateString(SetJoin(enabledMasters, u", "_s));
   }
 
   if (!esp.archives.empty()) {
     QString archiveString =
         esp.archives.size() < 6
             ? TruncateString(
-                  QStringList(esp.archives.begin(), esp.archives.end()).join(", ")) +
-                  "<br>"
+                  QStringList(esp.archives.begin(), esp.archives.end()).join(u", "_s)) +
+                  u"<br>"_s
             : "";
-    toolTip += "<br><b>" + tr("Loads Archives") + "</b>: " + archiveString +
+    toolTip += u"<br><b>"_s % tr("Loads Archives") % u"</b>: " % archiveString %
                tr("There are Archives connected to this plugin. Their assets will be "
                   "added to your game, overwriting in case of conflicts following the "
                   "plugin order. Loose files will always overwrite assets from "
@@ -1435,30 +1434,30 @@ QVariant PluginList::tooltipData(const QModelIndex& modelIndex) const
   }
 
   if (esp.hasIni) {
-    toolTip += "<br><b>" + tr("Loads INI settings") +
-               "</b>: "
-               "<br>" +
+    toolTip += u"<br><b>"_s % tr("Loads INI settings") %
+               u"</b>: "_s
+               u"<br>"_s %
                tr("There is an ini file connected to this plugin. Its settings will "
                   "be added to your game settings, overwriting in case of conflicts.");
   }
 
   if (esp.isLightFlagged && !esp.hasLightExtension) {
-    QString type = esp.hasMasterExtension ? "ESM" : "ESP";
+    QString type = esp.hasMasterExtension ? u"ESM"_s : u"ESP"_s;
     toolTip +=
-        "<br><br>" +
+        u"<br><br>"_s %
         tr("This %1 is flagged as a light plugin (ESL). It will adhere to the %1 load "
            "order but the records will be loaded in ESL space (FE/FF). You can have up "
            "to 4096 light plugins in addition to other plugin types.")
             .arg(type);
   } else if (esp.isMediumFlagged && esp.hasMasterExtension) {
-    toolTip += "<br><br>" +
+    toolTip += u"<br><br>"_s %
                tr("This ESM is flagged as a medium plugin (ESH). It adheres to the ESM "
                   "load order but loads records in ESH space (FD). You can have 256 "
                   "medium plugins in addition to other plugin types.");
   }
 
   if (esp.isBlueprintFlagged) {
-    toolTip += "<br><br>" +
+    toolTip += u"<br><br>"_s %
                tr("This plugin has the blueprint flag. This forces it to load after "
                   "every other non-blueprint plugin. Blueprint plugins will adhere to "
                   "standard load order rules with other blueprint plugins.");
@@ -1466,23 +1465,23 @@ QVariant PluginList::tooltipData(const QModelIndex& modelIndex) const
 
   if (esp.isLightFlagged && esp.isMediumFlagged) {
     toolTip +=
-        "<br><br>" +
+        u"<br><br>"_s %
         tr("WARNING: This plugin is both light and medium flagged. "
            "This could indicate that the file was saved improperly "
            "and may have mismatched record references. Use it at your own risk.");
   }
 
   if (esp.hasNoRecords) {
-    toolTip += "<br><br>" + tr("This is a dummy plugin. It contains no records and is "
+    toolTip += u"<br><br>"_s % tr("This is a dummy plugin. It contains no records and is "
                                "typically used to load a paired archive file.");
   }
 
   if (esp.forceDisabled) {
     auto feature = m_Organizer.gameFeatures().gameFeature<GamePlugins>();
     if (feature && esp.hasLightExtension && feature->lightPluginsAreSupported()) {
-      toolTip += "<br><br>" + tr("Light plugins (ESL) are not supported by this game.");
+      toolTip += u"<br><br>"_s % tr("Light plugins (ESL) are not supported by this game.");
     } else {
-      toolTip += "<br><br>" + tr("This game does not currently permit custom plugin "
+      toolTip += u"<br><br>"_s % tr("This game does not currently permit custom plugin "
                                  "loading. There may be manual workarounds.");
     }
   }
@@ -1492,13 +1491,13 @@ QVariant PluginList::tooltipData(const QModelIndex& modelIndex) const
 
   if (itor != m_AdditionalInfo.end()) {
     if (!itor->second.messages.isEmpty()) {
-      toolTip += "<hr><ul style=\"margin-left:15px; -qt-list-indent: 0;\">";
+      toolTip += u"<hr><ul style=\"margin-left:15px; -qt-list-indent: 0;\">"_s;
 
       for (auto&& message : itor->second.messages) {
-        toolTip += "<li>" + message + "</li>";
+        toolTip += u"<li>"_s % message % u"</li>"_s;
       }
 
-      toolTip += "</ul>";
+      toolTip += u"</ul>"_s;
     }
 
     // loot
@@ -1513,26 +1512,26 @@ QString PluginList::makeLootTooltip(const Loot::Plugin& loot) const
   QString s;
 
   for (auto&& f : loot.incompatibilities) {
-    s += "<li>" +
+    s += u"<li>"_s %
          tr("Incompatible with %1")
-             .arg(f.displayName.isEmpty() ? f.name : f.displayName) +
-         "</li>";
+             .arg(f.displayName.isEmpty() ? f.name : f.displayName) %
+         u"</li>"_s;
   }
 
   for (auto&& m : loot.missingMasters) {
-    s += "<li>" + tr("Depends on missing %1").arg(m) + "</li>";
+    s += u"<li>"_s % tr("Depends on missing %1").arg(m) % u"</li>"_s;
   }
 
   for (auto&& m : loot.messages) {
-    s += "<li>";
+    s += u"<li>"_s;
 
     switch (m.type) {
     case log::Warning:
-      s += tr("Warning") + ": ";
+      s += tr("Warning") % u": "_s;
       break;
 
     case log::Error:
-      s += tr("Error") + ": ";
+      s += tr("Error") % u": "_s;
       break;
 
     case log::Info:  // fall-through
@@ -1542,22 +1541,22 @@ QString PluginList::makeLootTooltip(const Loot::Plugin& loot) const
       break;
     }
 
-    s += m.text + "</li>";
+    s += m.text % u"</li>"_s;
   }
 
   for (auto&& d : loot.dirty) {
-    s += "<li>" + d.toString(false) + "</li>";
+    s += u"<li>"_s % d.toString(false) % u"</li>"_s;
   }
 
   for (auto&& c : loot.clean) {
-    s += "<li>" + c.toString(true) + "</li>";
+    s += u"<li>"_s % c.toString(true) % u"</li>"_s;
   }
 
   if (!s.isEmpty()) {
-    s = "<hr>"
+    s = u"<hr>"
         "<ul style=\"margin-top:0px; padding-top:0px; margin-left:15px; "
-        "-qt-list-indent: 0;\">" +
-        s + "</ul>";
+        "-qt-list-indent: 0;\">"_s %
+        s % u"</ul>"_s;
   }
 
   return s;
@@ -1579,46 +1578,46 @@ QVariant PluginList::iconData(const QModelIndex& modelIndex) const
   }
 
   if (isProblematic(esp, info)) {
-    result.append(":/MO/gui/warning");
+    result.append(u":/MO/gui/warning"_s);
   }
 
   if (m_LockedOrder.find(esp.name) != m_LockedOrder.end()) {
-    result.append(":/MO/gui/locked");
+    result.append(u":/MO/gui/locked"_s);
   }
 
   if (hasInfo(esp, info)) {
-    result.append(":/MO/gui/information");
+    result.append(u":/MO/gui/information"_s);
   }
 
   if (esp.hasIni) {
-    result.append(":/MO/gui/attachment");
+    result.append(u":/MO/gui/attachment"_s);
   }
 
   if (!esp.archives.empty()) {
-    result.append(":/MO/gui/archive_conflict_neutral");
+    result.append(u":/MO/gui/archive_conflict_neutral"_s);
   }
 
   if (esp.isLightFlagged && !esp.hasLightExtension) {
-    result.append(":/MO/gui/awaiting");
+    result.append(u":/MO/gui/awaiting"_s);
   }
 
   if (esp.isMediumFlagged) {
-    result.append(":/MO/gui/run");
+    result.append(u":/MO/gui/run"_s);
     if (esp.isLightFlagged) {
-      result.append(":/MO/gui/warning");
+      result.append(u":/MO/gui/warning"_s);
     }
   }
 
   if (esp.isBlueprintFlagged) {
-    result.append(":/MO/gui/resources/go-down.png");
+    result.append(u":/MO/gui/resources/go-down.png"_s);
   }
 
   if (esp.hasNoRecords) {
-    result.append(":/MO/gui/unchecked-checkbox");
+    result.append(u":/MO/gui/unchecked-checkbox"_s);
   }
 
   if (info && !info->loot.dirty.empty()) {
-    result.append(":/MO/gui/edit_clear");
+    result.append(u":/MO/gui/edit_clear"_s);
   }
 
   return result;
@@ -1751,7 +1750,7 @@ void PluginList::setPluginPriority(int row, int& newPriority, bool isForced)
     newPriorityTemp = static_cast<int>(m_ESPsByPriority.size()) - 1;
 
   int blueprintStartPos = 0;
-  for (auto esp : m_ESPs) {
+  for (const auto& esp : m_ESPs) {
     if (!esp.isBlueprintFlagged) {
       blueprintStartPos++;
     }
@@ -1800,7 +1799,7 @@ void PluginList::setPluginPriority(int row, int& newPriority, bool isForced)
   int oldPriority = m_ESPs.at(row).priority;
   if (newPriorityTemp < oldPriority) {  // moving up
     // don't allow plugins to be moved above their masters
-    for (auto master : m_ESPs[row].masters) {
+    for (const QString& master : m_ESPs[row].masters) {
       auto iter = m_ESPsByName.find(master);
       if (iter != m_ESPsByName.end()) {
         if (m_ESPs[iter->second].isBlueprintFlagged ==
@@ -1816,7 +1815,7 @@ void PluginList::setPluginPriority(int row, int& newPriority, bool isForced)
     // don't allow masters to be moved below their children
     for (int i = oldPriority + 1; i <= newPriorityTemp; i++) {
       PluginList::ESPInfo* otherInfo = &m_ESPs.at(m_ESPsByPriority[i]);
-      for (auto master : otherInfo->masters) {
+      for (const QString& master : otherInfo->masters) {
         auto iter = m_ESPsByName.find(master);
         if (iter != m_ESPsByName.end()) {
           if (m_ESPs[iter->second].isBlueprintFlagged ==
@@ -1897,7 +1896,7 @@ bool PluginList::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, 
     return true;
   }
 
-  QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
+  QByteArray encoded = mimeData->data(u"application/x-qabstractitemmodeldatalist"_s);
   QDataStream stream(&encoded, QIODevice::ReadOnly);
 
   std::vector<int> sourceRows;
@@ -1954,8 +1953,8 @@ PluginList::ESPInfo::ESPInfo(const QString& name, bool forceLoaded, bool forceEn
   try {
     ESP::File file(ToWString(fullPath));
     auto extension     = name.right(3).toLower();
-    hasMasterExtension = (extension == "esm");
-    hasLightExtension  = (extension == "esl");
+    hasMasterExtension = (extension == "esm"_L1);
+    hasLightExtension  = (extension == "esl"_L1);
     isMasterFlagged    = file.isMaster();
     isLightFlagged     = lightSupported && file.isLight(mediumSupported);
     isMediumFlagged    = mediumSupported && file.isMedium();

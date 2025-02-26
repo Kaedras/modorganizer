@@ -41,11 +41,12 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace std::chrono_literals;
+using namespace Qt::StringLiterals;
 
-const QString NexusBaseUrl("https://api.nexusmods.com/v1");
-const QString NexusSSO("wss://sso.nexusmods.com");
+const QString NexusBaseUrl(u"https://api.nexusmods.com/v1"_s);
+const QString NexusSSO(u"wss://sso.nexusmods.com"_s);
 const QString
-    NexusSSOPage("https://www.nexusmods.com/sso?id=%1&application=modorganizer2");
+    NexusSSOPage(u"https://www.nexusmods.com/sso?id=%1&application=modorganizer2"_s);
 
 ValidationProgressDialog::ValidationProgressDialog(Settings* s, NexusKeyValidator& v)
     : m_settings(s), m_validator(v), m_updateTimer(nullptr), m_first(true)
@@ -145,11 +146,11 @@ void ValidationProgressDialog::updateProgress()
   }
 
   if (const auto* a = m_validator.lastAttempt()) {
-    ui->label->setText(a->message() + ". " + tr("Trying again..."));
+    ui->label->setText(a->message() % u". "_s % tr("Trying again..."));
   } else if (current) {
     ui->label->setText(tr("Connecting to Nexus..."));
   } else {
-    ui->label->setText("?");
+    ui->label->setText(u"?"_s);
   }
 }
 
@@ -215,7 +216,7 @@ QString NexusSSOLogin::stateToString(States s, const QString& e)
   case Error:  // fall-through
   default: {
     if (e.isEmpty()) {
-      return QString("%1").arg(s);
+      return QStringLiteral("%1").arg(s);
     } else {
       return e;
     }
@@ -278,8 +279,8 @@ void NexusSSOLogin::onConnected()
   m_guid                       = boost::uuids::to_string(sessionId).c_str();
 
   QJsonObject data;
-  data.insert(QString("id"), QJsonValue(m_guid));
-  data.insert(QString("protocol"), 2);
+  data.insert(QStringLiteral("id"), QJsonValue(m_guid));
+  data.insert(QStringLiteral("protocol"), 2);
 
   const QString message = QJsonDocument(data).toJson();
   m_socket.sendTextMessage(message);
@@ -290,18 +291,18 @@ void NexusSSOLogin::onMessage(const QString& s)
   const QJsonDocument doc = QJsonDocument::fromJson(s.toUtf8());
   const QVariantMap root  = doc.object().toVariantMap();
 
-  if (!root["success"].toBool()) {
+  if (!root[u"success"_s].toBool()) {
     close();
 
-    setState(Error, QString("There was a problem with SSO initialization: %1")
-                        .arg(root["error"].toString()));
+    setState(Error, QStringLiteral("There was a problem with SSO initialization: %1")
+                        .arg(root[u"error"_s].toString()));
 
     return;
   }
 
-  const QVariantMap data = root["data"].toMap();
+  const QVariantMap data = root[u"data"_s].toMap();
 
-  if (data.contains("connection_token")) {
+  if (data.contains(u"connection_token"_s)) {
     // first answer
 
     // open browser
@@ -312,7 +313,7 @@ void NexusSSOLogin::onMessage(const QString& s)
     setState(WaitingForBrowser);
   } else {
     // second answer
-    const auto key = data["api_key"].toString();
+    const auto key = data[u"api_key"_s].toString();
     close();
 
     if (keyChanged) {
@@ -383,17 +384,17 @@ void ValidationAttempt::start(NXMAccessManager& m, const QString& key)
 
 bool ValidationAttempt::sendRequest(NXMAccessManager& m, const QString& key)
 {
-  const QString requestUrl(NexusBaseUrl + "/users/validate");
+  const QString requestUrl(NexusBaseUrl % u"/users/validate"_s);
   QNetworkRequest request(requestUrl);
 
-  request.setRawHeader("APIKEY", key.toUtf8());
+  request.setRawHeader(QByteArrayLiteral("APIKEY"), key.toUtf8());
   request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader,
                     m.userAgent().toUtf8());
   request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader,
-                    "application/json");
-  request.setRawHeader("Protocol-Version", "1.0.0");
-  request.setRawHeader("Application-Name", "MO2");
-  request.setRawHeader("Application-Version", m.MOVersion().toUtf8());
+                    u"application/json"_s);
+  request.setRawHeader(QByteArrayLiteral("Protocol-Version"), QByteArrayLiteral("1.0.0"));
+  request.setRawHeader(QByteArrayLiteral("Application-Name"), QByteArrayLiteral("MO2"));
+  request.setRawHeader(QByteArrayLiteral("Application-Version"), m.MOVersion().toUtf8());
 
   m_reply = m.get(request);
 
@@ -491,7 +492,7 @@ void ValidationAttempt::onFinished()
 
     QString s = m_reply->errorString();
 
-    const auto nexusMessage = data.value("message").toString();
+    const auto nexusMessage = data.value(u"message"_s).toString();
     if (!nexusMessage.isEmpty()) {
       if (!s.isEmpty()) {
         s += ", ";
@@ -503,7 +504,7 @@ void ValidationAttempt::onFinished()
     if (s.isEmpty()) {
       s = QObject::tr("HTTP code %1").arg(code);
     } else {
-      s += QString(" (%1)").arg(code);
+      s += QStringLiteral(" (%1)").arg(code);
     }
 
     setFailure(SoftError, s);
@@ -520,10 +521,10 @@ void ValidationAttempt::onFinished()
     return;
   }
 
-  const int id       = data.value("user_id").toInt();
-  const QString key  = data.value("key").toString();
-  const QString name = data.value("name").toString();
-  const bool premium = data.value("is_premium").toBool();
+  const int id       = data.value(u"user_id"_s).toInt();
+  const QString key  = data.value(u"key"_s).toString();
+  const QString name = data.value(u"name"_s).toString();
+  const bool premium = data.value(u"is_premium"_s).toBool();
 
   if (key.isEmpty()) {
     setFailure(HardError, QObject::tr("API key is empty"));
@@ -533,7 +534,7 @@ void ValidationAttempt::onFinished()
   const auto user =
       APIUserAccount()
           .apiKey(key)
-          .id(QString("%1").arg(id))
+          .id(QStringLiteral("%1").arg(id))
           .name(name)
           .type(premium ? APIUserAccountTypes::Premium : APIUserAccountTypes::Regular)
           .limits(NexusInterface::parseLimits(headers));
@@ -779,7 +780,7 @@ NXMAccessManager::NXMAccessManager(QObject* parent, Settings* s,
 
   if (m_Settings) {
     setCookieJar(new PersistentCookieJar(QDir::fromNativeSeparators(
-        m_Settings->paths().cache() + "/nexus_cookies.dat")));
+        m_Settings->paths().cache() % u"/nexus_cookies.dat"_s)));
   }
 }
 
@@ -799,7 +800,7 @@ QNetworkReply*
 NXMAccessManager::createRequest(QNetworkAccessManager::Operation operation,
                                 const QNetworkRequest& request, QIODevice* device)
 {
-  if (request.url().scheme() != "nxm") {
+  if (request.url().scheme() != "nxm"_L1) {
     return QNetworkAccessManager::createRequest(operation, request, device);
   }
   if (operation == GetOperation) {
@@ -948,20 +949,20 @@ QString NXMAccessManager::userAgent(const QString& subModule) const
 {
   QStringList comments;
   QString os;
-  if (QSysInfo::productType() == "windows")
-    comments << ((QSysInfo::kernelType() == "winnt") ? "Windows_NT " : "Windows ") +
+  if (QSysInfo::productType() == "windows"_L1)
+    comments << ((QSysInfo::kernelType() == "winnt"_L1) ? u"Windows_NT "_s : u"Windows "_s) %
                     QSysInfo::kernelVersion();
   else
-    comments << QSysInfo::kernelType().left(1).toUpper() + QSysInfo::kernelType().mid(1)
-             << QSysInfo::productType().left(1).toUpper() +
-                    QSysInfo::kernelType().mid(1) + " " + QSysInfo::productVersion();
+    comments << QSysInfo::kernelType().left(1).toUpper() % QSysInfo::kernelType().mid(1)
+             << QSysInfo::productType().left(1).toUpper() %
+                    QSysInfo::kernelType().mid(1) % u" "_s % QSysInfo::productVersion();
   if (!subModule.isEmpty()) {
-    comments << "module: " + subModule;
+    comments << u"module: "_s % subModule;
   }
-  comments << ((QSysInfo::buildCpuArchitecture() == "x86_64") ? "x64" : "x86");
+  comments << ((QSysInfo::buildCpuArchitecture() == "x86_64"_L1) ? u"x64"_s : u"x86"_s);
 
-  return QString("Mod Organizer/%1 (%2) Qt/%3")
-      .arg(m_MOVersion, comments.join("; "), qVersion());
+  return QStringLiteral("Mod Organizer/%1 (%2) Qt/%3")
+      .arg(m_MOVersion, comments.join(u"; "_s), qVersion());
 }
 
 void NXMAccessManager::clearApiKey()

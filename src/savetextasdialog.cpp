@@ -6,6 +6,8 @@
 
 using MOBase::reportError;
 
+using namespace Qt::StringLiterals;
+
 SaveTextAsDialog::SaveTextAsDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::SaveTextAsDialog)
 {
@@ -36,7 +38,7 @@ void SaveTextAsDialog::on_clipboardBtn_clicked()
 void SaveTextAsDialog::on_saveAsBtn_clicked()
 {
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save CSV"), QString(),
-                                                  tr("Text Files") + " (*.txt *.csv)");
+                                                  tr("Text Files") % u" (*.txt *.csv)"_s);
   if (!fileName.isEmpty()) {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {

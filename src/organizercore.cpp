@@ -82,6 +82,7 @@
 
 using namespace MOShared;
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 static env::CoreDumpTypes g_coreDumpType = env::CoreDumpTypes::Mini;
 
@@ -445,7 +446,7 @@ bool OrganizerCore::bootstrap()
 
   // log if there are any dmp files
   const auto hasCrashDumps =
-      !QDir(getGlobalCoreDumpPath()).entryList({"*.dmp"}, QDir::Files).empty();
+      !QDir(getGlobalCoreDumpPath()).entryList({u"*.dmp"_s}, QDir::Files).empty();
 
   if (hasCrashDumps) {
     log::debug("there are crash dumps in '{}'", getGlobalCoreDumpPath());
@@ -503,7 +504,7 @@ bool OrganizerCore::cycleDiagnostics()
   const auto path     = getGlobalCoreDumpPath();
 
   if (maxDumps > 0) {
-    removeOldFiles(path, "*.dmp", maxDumps, QDir::Time | QDir::Reversed);
+    removeOldFiles(path, u"*.dmp"_s, maxDumps, QDir::Time | QDir::Reversed);
   }
 
   return true;
@@ -524,7 +525,7 @@ QString OrganizerCore::getGlobalCoreDumpPath()
   if (qApp) {
     const auto dp = qApp->property("dataPath");
     if (!dp.isNull()) {
-      return dp.toString() + "/" + AppConfig::dumpsDir();
+      return dp.toString() % u"/"_s % AppConfig::dumpsDir();
     }
   }
 
@@ -674,19 +675,19 @@ MOBase::IModInterface* OrganizerCore::createMod(GuessedValue<QString>& name)
   m_InstallationManager.setModsDirectory(m_Settings.paths().mods());
 
   QString targetDirectory =
-      QDir::fromNativeSeparators(m_Settings.paths().mods()).append("/").append(name);
+      QDir::fromNativeSeparators(m_Settings.paths().mods()) % u"/"_s + name;
 
-  QSettings settingsFile(targetDirectory + "/meta.ini", QSettings::IniFormat);
+  QSettings settingsFile(targetDirectory % u"/meta.ini"_s, QSettings::IniFormat);
 
   if (!result.merged()) {
-    settingsFile.setValue("modid", 0);
-    settingsFile.setValue("version", "");
-    settingsFile.setValue("newestVersion", "");
-    settingsFile.setValue("category", 0);
-    settingsFile.setValue("installationFile", "");
+    settingsFile.setValue(u"modid"_s, 0);
+    settingsFile.setValue(u"version"_s, "");
+    settingsFile.setValue(u"newestVersion"_s, "");
+    settingsFile.setValue(u"category"_s, 0);
+    settingsFile.setValue(u"installationFile"_s, "");
 
-    settingsFile.remove("installedFiles");
-    settingsFile.beginWriteArray("installedFiles", 0);
+    settingsFile.remove(u"installedFiles"_s);
+    settingsFile.beginWriteArray(u"installedFiles"_s, 0);
     settingsFile.endArray();
   }
 
@@ -726,7 +727,7 @@ void OrganizerCore::setPersistent(const QString& pluginName, const QString& key,
 
 QString OrganizerCore::pluginDataPath()
 {
-  return qApp->applicationDirPath() + "/" + AppConfig::pluginPath() + "/data";
+  return qApp->applicationDirPath() % u"/"_s % AppConfig::pluginPath() % u"/data"_s;
 }
 
 MOBase::IModInterface* OrganizerCore::installMod(const QString& archivePath,
@@ -941,7 +942,7 @@ OrganizerCore::findFiles(const QString& path,
 {
   QStringList result;
   DirectoryEntry* dir = m_DirectoryStructure;
-  if (!path.isEmpty() && path != ".")
+  if (!path.isEmpty() && path != "."_L1)
     dir = dir->findSubDirectoryRecursive(path);
   if (dir != nullptr) {
     std::vector<FileEntryPtr> files = dir->getFiles();
@@ -975,11 +976,11 @@ QList<MOBase::IOrganizer::FileInfo> OrganizerCore::findFileInfos(
 {
   QList<IOrganizer::FileInfo> result;
   DirectoryEntry* dir = m_DirectoryStructure;
-  if (!path.isEmpty() && path != ".")
+  if (!path.isEmpty() && path != "."_L1)
     dir = dir->findSubDirectoryRecursive(path);
   if (dir != nullptr) {
     std::vector<FileEntryPtr> files = dir->getFiles();
-    for (FileEntryPtr file : files) {
+    for (const FileEntryPtr& file : files) {
       IOrganizer::FileInfo info;
       info.filePath    = file->getFullPath();
       bool fromArchive = false;
@@ -1032,13 +1033,13 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
 
   // if the file is on a different drive the dirRelativePath will actually be an
   // absolute path so we make sure that is not the case
-  if (!dirRelativePath.isAbsolute() && !relativePath.startsWith("..")) {
+  if (!dirRelativePath.isAbsolute() && !relativePath.startsWith(".."_L1)) {
     fileName = relativePath;
   } else {
     // crude: we search for the next slash after the base mod directory to skip
     // everything up to the data-relative directory
     int offset = settings().paths().mods().size() + 1;
-    offset     = fileName.indexOf("/", offset);
+    offset     = fileName.indexOf('/', offset);
     fileName   = fileName.mid(offset + 1);
   }
 
@@ -1054,7 +1055,7 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
 
   auto addFunc = [&](int originId, QString archiveName = "") {
     FilesOrigin& origin = directoryStructure()->getOriginByID(originId);
-    QString filePath    = QDir::fromNativeSeparators(origin.getPath()) + "/" + fileName;
+    QString filePath    = QDir::fromNativeSeparators(origin.getPath()) % u"/"_s % fileName;
     if (QFile::exists(filePath)) {
       // it's very possible the file doesn't exist, because it's inside an archive. we
       // don't support that
@@ -1064,7 +1065,7 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
       } else {
         preview.addVariant(origin.getName(), wid);
       }
-    } else if (archiveName != "") {
+    } else if (archiveName != ""_L1) {
       auto archiveFile = directoryStructure()->searchFile(archiveName);
       if (archiveFile.get() != nullptr) {
         try {
@@ -1251,7 +1252,7 @@ void OrganizerCore::refreshESPList(bool force)
 {
   onNextRefresh(
       [this, force] {
-        TimeThis tt("OrganizerCore::refreshESPList()");
+        TimeThis tt(u"OrganizerCore::refreshESPList()"_s);
 
         m_CurrentProfile->writeModlist();
 
@@ -1268,7 +1269,7 @@ void OrganizerCore::refreshESPList(bool force)
 
 void OrganizerCore::refreshBSAList()
 {
-  TimeThis tt("OrganizerCore::refreshBSAList()");
+  TimeThis tt(u"OrganizerCore::refreshBSAList()"_s);
 
   auto archives = gameFeatures().gameFeature<DataArchives>();
 
@@ -1324,7 +1325,7 @@ void OrganizerCore::updateModsActiveState(const QList<unsigned int>& modIndices,
   for (auto index : modIndices) {
     ModInfo::Ptr modInfo = ModInfo::getByIndex(index);
     QDir dir(modInfo->absolutePath());
-    for (const QString& esm : dir.entryList(QStringList() << "*.esm", QDir::Files)) {
+    for (const QString& esm : dir.entryList(QStringList() << u"*.esm"_s, QDir::Files)) {
       const FileEntryPtr file = m_DirectoryStructure->findFile(esm);
       if (file.get() == nullptr) {
         log::warn("failed to activate {}", esm);
@@ -1338,7 +1339,7 @@ void OrganizerCore::updateModsActiveState(const QList<unsigned int>& modIndices,
       }
     }
 
-    for (const QString& esl : dir.entryList(QStringList() << "*.esl", QDir::Files)) {
+    for (const QString& esl : dir.entryList(QStringList() << u"*.esl"_s, QDir::Files)) {
       const FileEntryPtr file = m_DirectoryStructure->findFile(esl);
       if (file.get() == nullptr) {
         log::warn("failed to activate {}", esl);
@@ -1352,7 +1353,7 @@ void OrganizerCore::updateModsActiveState(const QList<unsigned int>& modIndices,
         ++enabled;
       }
     }
-    QStringList esps = dir.entryList(QStringList() << "*.esp", QDir::Files);
+    QStringList esps = dir.entryList(QStringList() << u"*.esp"_s, QDir::Files);
     for (const QString& esp : esps) {
       const FileEntryPtr file = m_DirectoryStructure->findFile(esp);
       if (file.get() == nullptr) {
@@ -1463,21 +1464,21 @@ void OrganizerCore::requestDownload(const QUrl& url, QNetworkReply* reply)
   }
 
   // no mod found that could handle the download. Is it a nexus mod?
-  if (url.host() == "www.nexusmods.com") {
-    QString gameName = "";
+  if (url.host() == "www.nexusmods.com"_L1) {
+    QString gameName;
     int modID        = 0;
     int fileID       = 0;
-    QRegularExpression nameExp("www\\.nexusmods\\.com/(\\a+)/");
+    static const QRegularExpression nameExp(u"www\\.nexusmods\\.com/(\\a+)/"_s);
     auto match = nameExp.match(url.toString());
     if (match.hasMatch()) {
       gameName = match.captured(1);
     }
-    QRegularExpression modExp("mods/(\\d+)");
+    static const QRegularExpression modExp(u"mods/(\\d+)"_s);
     match = modExp.match(url.toString());
     if (match.hasMatch()) {
       modID = match.captured(1).toInt();
     }
-    QRegularExpression fileExp("fid=(\\d+)");
+    static const QRegularExpression fileExp(u"fid=(\\d+)"_s);
     match = fileExp.match(url.toString());
     if (match.hasMatch()) {
       fileID = match.captured(1).toInt();
@@ -1557,7 +1558,7 @@ void OrganizerCore::refreshDirectoryStructure()
 void OrganizerCore::onDirectoryRefreshed()
 {
   log::debug("directory refreshed, finishing up");
-  TimeThis tt("OrganizerCore::onDirectoryRefreshed()");
+  TimeThis tt(u"OrganizerCore::onDirectoryRefreshed()"_s);
 
   DirectoryEntry* newStructure = m_DirectoryRefresher->stealDirectoryStructure();
   Q_ASSERT(newStructure != m_DirectoryStructure);
@@ -1762,11 +1763,11 @@ void OrganizerCore::loginSuccessful(bool necessary)
   if (necessary) {
     MessageDialog::showMessage(tr("login successful"), qApp->activeWindow());
   }
-  for (QString url : m_PendingDownloads) {
+  for (const QString& url : m_PendingDownloads) {
     downloadRequestedNXM(url);
   }
   m_PendingDownloads.clear();
-  for (auto task : m_PostLoginTasks) {
+  for (const auto& task : m_PostLoginTasks) {
     task();
   }
 
@@ -1798,7 +1799,7 @@ void OrganizerCore::loginFailed(const QString& message)
         tr("login failed: %1. Download will not be associated with an account")
             .arg(message),
         qApp->activeWindow());
-    for (QString url : m_PendingDownloads) {
+    for (const QString& url : m_PendingDownloads) {
       downloadRequestedNXM(url);
     }
     m_PendingDownloads.clear();
@@ -1834,7 +1835,7 @@ QString OrganizerCore::oldMO1HookDll() const
   if (auto extender = gameFeatures().gameFeature<ScriptExtender>()) {
     QString hookdll =
         QDir::toNativeSeparators(managedGame()->dataDirectory().absoluteFilePath(
-            extender->PluginPath() + "/hook.dll"));
+            extender->PluginPath() % u"/hook.dll"_s));
     if (QFile(hookdll).exists())
       return hookdll;
   }
@@ -2024,7 +2025,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
   }
 
   IPluginGame* game = qApp->property("managed_game").value<IPluginGame*>();
-  Profile profile(QDir(m_Settings.paths().profiles() + "/" + profileName), game,
+  Profile profile(QDir(m_Settings.paths().profiles() % u"/"_s % profileName), game,
                   gameFeatures());
 
   MappingType result;
@@ -2039,7 +2040,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
   bool overwriteActive = false;
 
   for (const auto& mod : profile.getActiveMods()) {
-    if (std::get<0>(mod).compare("overwrite", Qt::CaseInsensitive) == 0) {
+    if (std::get<0>(mod).compare("overwrite"_L1, Qt::CaseInsensitive) == 0) {
       continue;
     }
 
@@ -2067,7 +2068,7 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
     auto localSaves = gameFeatures().gameFeature<LocalSavegames>();
     if (localSaves != nullptr) {
       MappingType saveMap =
-          localSaves->mappings(currentProfile()->absolutePath() + "/saves");
+          localSaves->mappings(currentProfile()->absolutePath() + u"/saves"_s);
       result.reserve(result.size() + saveMap.size());
       result.insert(result.end(), saveMap.begin(), saveMap.end());
     } else {
@@ -2111,8 +2112,8 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
 
     QString originPath = base->getOriginByID(origin).getPath();
     QString fileName   = current->getName();
-    QString source     = originPath + relPath + fileName;
-    QString target     = dataPath + relPath + fileName;
+    QString source     = originPath % relPath % fileName;
+    QString target     = dataPath % relPath % fileName;
     if (source != target) {
       result.push_back({source, target, false, false});
     }
@@ -2124,14 +2125,14 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& dataPath,
 
     QString originPath     = base->getOriginByID(origin).getPath();
     const QString& dirName = d->getName();
-    QString source         = originPath + relPath + dirName;
-    QString target         = dataPath + relPath + dirName;
+    QString source         = originPath % relPath % dirName;
+    QString target         = dataPath % relPath % dirName;
 
     bool writeDestination = (base == directoryEntry) && (origin == createDestination);
 
     result.push_back({source, target, true, writeDestination});
     std::vector<Mapping> subRes =
-        fileMapping(dataPath, relPath + dirName + "/", base, d, createDestination);
+        fileMapping(dataPath, relPath % dirName % u"/"_s, base, d, createDestination);
     result.insert(result.end(), subRes.begin(), subRes.end());
   }
   return result;

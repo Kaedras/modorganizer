@@ -243,8 +243,8 @@ std::shared_ptr<ArchiveFileTree> ArchiveFileTree::makeTree(Archive const& archiv
 
     files.push_back(std::make_tuple(
         QString::fromStdWString(data[i]->getArchiveFilePath().generic_wstring())
-            .replace("\\", "/")
-            .split("/", Qt::SkipEmptyParts),
+            .replace('\\', '/')
+            .split('/', Qt::SkipEmptyParts),
         data[i]->isDirectory(), (int)i));
   }
 
@@ -262,7 +262,7 @@ template <class It>
 void mapToArchive(std::vector<FileData*> const& data, It begin, It end)
 {
   for (auto it = begin; it != end; ++it) {
-    auto entry   = *it;
+    const auto& entry   = *it;
     auto* aentry = dynamic_cast<const ArchiveFileEntry*>(entry.get());
 
     if (aentry->m_Index != -1) {

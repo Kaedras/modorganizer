@@ -30,6 +30,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 // delegate to remove indentation for mods when using collapsible
 // separator
@@ -164,10 +165,10 @@ ModListView::ModListView(QWidget* parent)
     if (mIndex.isValid() && hasCollapsibleSeparators()) {
       ModInfo::Ptr info = ModInfo::getByIndex(mIndex.toInt());
       if (info->isSeparator()) {
-        name = "[" + name + "]";
+        name = u"["_s % name % u"]"_s;
       }
     } else if (model()->hasChildren(index)) {
-      name = "[" + name + "]";
+      name = u"["_s % name % u"]"_s;
     }
     return name;
   }));
@@ -186,7 +187,7 @@ void ModListView::onProfileChanged(Profile* oldProfile, Profile* newProfile)
   // save expanded/collapsed state of separators
   if (oldProfile && perProfileSeparators) {
     auto& collapsed = m_collapsed[m_byPriorityProxy];
-    oldProfile->storeSetting("UserInterface", "collapsed_separators",
+    oldProfile->storeSetting(u"UserInterface"_s, u"collapsed_separators"_s,
                              QStringList(collapsed.begin(), collapsed.end()));
   }
 
@@ -195,7 +196,7 @@ void ModListView::onProfileChanged(Profile* oldProfile, Profile* newProfile)
 
   if (newProfile && perProfileSeparators) {
     auto collapsed =
-        newProfile->setting("UserInterface", "collapsed_separators", QStringList())
+        newProfile->setting(u"UserInterface"_s, u"collapsed_separators"_s, QStringList())
             .toStringList();
     m_collapsed[m_byPriorityProxy] = {collapsed.begin(), collapsed.end()};
   }
@@ -483,10 +484,10 @@ void ModListView::onModFilterActive(bool filterActive)
 {
   ui.clearFilters->setVisible(filterActive);
   if (filterActive) {
-    setStyleSheet("QTreeView { border: 2px ridge #f00; }");
-    ui.counter->setStyleSheet("QLCDNumber { border: 2px ridge #f00; }");
+    setStyleSheet(u"QTreeView { border: 2px ridge #f00; }"_s);
+    ui.counter->setStyleSheet(u"QLCDNumber { border: 2px ridge #f00; }"_s);
   } else if (ui.groupBy->currentIndex() != GroupBy::NONE) {
-    setStyleSheet("QTreeView { border: 2px ridge #337733; }");
+    setStyleSheet(u"QTreeView { border: 2px ridge #337733; }"_s);
     ui.counter->setStyleSheet("");
   } else {
     setStyleSheet("");
@@ -1303,9 +1304,9 @@ QString ModListView::contentsTooltip(const QModelIndex& index) const
   if (contents.empty()) {
     return {};
   }
-  QString result("<table cellspacing=7>");
+  QString result(u"<table cellspacing=7>"_s);
   m_core->modDataContents().forEachContentIn(contents, [&result](auto const& content) {
-    result.append(QString("<tr><td><img src=\"%1\" width=32/></td>"
+    result.append(QStringLiteral("<tr><td><img src=\"%1\" width=32/></td>"
                           "<td valign=\"middle\">%2</td></tr>")
                       .arg(content.icon())
                       .arg(content.name()));
@@ -1319,10 +1320,10 @@ void ModListView::onFiltersCriteria(
 {
   setFilterCriteria(criteria);
 
-  QString label = "?";
+  QString label = u"?"_s;
 
   if (criteria.empty()) {
-    label = "";
+    label.clear();
   } else if (criteria.size() == 1) {
     const auto& c = criteria[0];
 

@@ -8,6 +8,7 @@
 #include "organizercore.h"
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ModListGlobalContextMenu::ModListGlobalContextMenu(OrganizerCore& core,
                                                    ModListView* view, QWidget* parent)
@@ -145,13 +146,13 @@ bool ModListChangeCategoryMenu::populate(QMenu* menu, CategoryFactory* factory,
     if (factory->getParentID(i) == targetId) {
       QMenu* targetMenu = menu;
       if (factory->hasChildren(i)) {
-        targetMenu = menu->addMenu(factory->getCategoryName(i).replace('&', "&&"));
+        targetMenu = menu->addMenu(factory->getCategoryName(i).replace('&', u"&&"_s));
       }
 
       int id = factory->getCategoryID(i);
       QScopedPointer<QCheckBox> checkBox(new QCheckBox(targetMenu));
       bool enabled = categories.find(id) != categories.end();
-      checkBox->setText(factory->getCategoryName(i).replace('&', "&&"));
+      checkBox->setText(factory->getCategoryName(i).replace('&', u"&&"_s));
       if (enabled) {
         childEnabled = true;
       }
@@ -164,7 +165,7 @@ bool ModListChangeCategoryMenu::populate(QMenu* menu, CategoryFactory* factory,
 
       if (factory->hasChildren(i)) {
         if (populate(targetMenu, factory, mod, factory->getCategoryID(i)) || enabled) {
-          targetMenu->setIcon(QIcon(":/MO/gui/resources/check.png"));
+          targetMenu->setIcon(QIcon(u":/MO/gui/resources/check.png"_s));
         }
       }
     }
@@ -191,7 +192,7 @@ void ModListPrimaryCategoryMenu::populate(const CategoryFactory* factory,
     QWidgetAction* action = new QWidgetAction(this);
     try {
       QRadioButton* categoryBox =
-          new QRadioButton(factory->getCategoryName(catIdx).replace('&', "&&"), this);
+          new QRadioButton(factory->getCategoryName(catIdx).replace('&', u"&&"_s), this);
       categoryBox->setChecked(categoryID == mod->primaryCategory());
       action->setDefaultWidget(categoryBox);
       action->setData(categoryID);

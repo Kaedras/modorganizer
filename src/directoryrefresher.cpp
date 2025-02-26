@@ -42,6 +42,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 #ifdef __unix__
 static constexpr std::string statsFile("/tmp/data.csv");
@@ -90,27 +91,27 @@ DirectoryStats& DirectoryStats::operator+=(const DirectoryStats& o)
 
 std::string DirectoryStats::csvHeader()
 {
-  QStringList sl = {"dirTimes",
-                    "fileTimes",
-                    "sortTimes",
-                    "subdirLookupTimes",
-                    "addDirectoryTimes",
-                    "filesLookupTimes",
-                    "addFileTimes",
-                    "addOriginToFileTimes",
-                    "addFileToOriginTimes",
-                    "addFileToRegisterTimes",
-                    "originExists",
-                    "originCreate",
-                    "originsNeededEnabled",
-                    "subdirExists",
-                    "subdirCreate",
-                    "fileExists",
-                    "fileCreate",
-                    "filesInsertedInRegister",
-                    "filesAssignedInRegister"};
+  QStringList sl = {u"dirTimes"_s,
+                    u"fileTimes"_s,
+                    u"sortTimes"_s,
+                    u"subdirLookupTimes"_s,
+                    u"addDirectoryTimes"_s,
+                    u"filesLookupTimes"_s,
+                    u"addFileTimes"_s,
+                    u"addOriginToFileTimes"_s,
+                    u"addFileToOriginTimes"_s,
+                    u"addFileToRegisterTimes"_s,
+                    u"originExists"_s,
+                    u"originCreate"_s,
+                    u"originsNeededEnabled"_s,
+                    u"subdirExists"_s,
+                    u"subdirCreate"_s,
+                    u"fileExists"_s,
+                    u"fileCreate"_s,
+                    u"filesInsertedInRegister"_s,
+                    u"filesAssignedInRegister"_s};
 
-  return sl.join(",").toStdString();
+  return sl.join(',').toStdString();
 }
 
 std::string DirectoryStats::toCsv() const
@@ -199,12 +200,12 @@ void DirectoryRefresher::setMods(
 
 void DirectoryRefresher::cleanStructure(DirectoryEntry* structure)
 {
-  QStringList files = {"meta.ini", "readme.txt"};
+  QStringList files = {u"meta.ini"_s, u"readme.txt"_s};
   for (const auto& file : files) {
     structure->removeFile(file);
   }
 
-  QStringList dirs = {"fomod"};
+  QStringList dirs = {u"fomod"_s};
   for (const auto& dir : dirs) {
     structure->removeDir(dir);
   }
@@ -288,7 +289,7 @@ void DirectoryRefresher::addModFilesToStructure(DirectoryEntry* directoryStructu
                                                 const QString& directory,
                                                 const QStringList& stealFiles)
 {
-  TimeThis tt("DirectoryRefresher::addModFilesToStructure()");
+  TimeThis tt(u"DirectoryRefresher::addModFilesToStructure()"_s);
 
   DirectoryStats dummy;
 
@@ -307,7 +308,7 @@ void DirectoryRefresher::addModToStructure(DirectoryEntry* directoryStructure,
                                            const QStringList& stealFiles,
                                            const QStringList& archives)
 {
-  TimeThis tt("DirectoryRefresher::addModToStructure()");
+  TimeThis tt(u"DirectoryRefresher::addModToStructure()"_s);
 
   DirectoryStats dummy;
 
@@ -358,7 +359,7 @@ struct ModThread
       return ready;
     });
 
-    SetThisThreadName(modName + " refresher");
+    SetThisThreadName(modName % u" refresher"_s);
     ds->addFromOrigin(walker, modName, path, prio, *stats);
 
     if (Settings::instance().archiveParsing()) {
@@ -380,7 +381,7 @@ struct ModThread
       progress->addDone();
     }
 
-    SetThisThreadName(QString::fromStdWString(L"idle refresher"));
+    SetThisThreadName(u"idle refresher"_s);
     ready = false;
   }
 };
@@ -460,14 +461,14 @@ void DirectoryRefresher::addMultipleModsFilesToStructure(
 
 void DirectoryRefresher::refresh()
 {
-  SetThisThreadName("DirectoryRefresher");
-  TimeThis tt("DirectoryRefresher::refresh()");
+  SetThisThreadName(u"DirectoryRefresher"_s);
+  TimeThis tt(u"DirectoryRefresher::refresh()"_s);
   auto* p = new DirectoryRefreshProgress(this);
 
   {
     QMutexLocker locker(&m_RefreshLock);
 
-    m_Root.reset(new DirectoryEntry("data", nullptr, 0));
+    m_Root.reset(new DirectoryEntry(u"data"_s, nullptr, 0));
 
     IPluginGame* game = qApp->property("managed_game").value<IPluginGame*>();
 
@@ -476,10 +477,10 @@ void DirectoryRefresher::refresh()
 
     {
       DirectoryStats dummy;
-      m_Root->addFromOrigin("data", dataDirectory, 0, dummy);
+      m_Root->addFromOrigin(u"data"_s, dataDirectory, 0, dummy);
     }
 
-    for (auto directory : game->secondaryDataDirectories().toStdMap()) {
+    for (const auto& directory : game->secondaryDataDirectories().toStdMap()) {
       DirectoryStats dummy;
       m_Root->addFromOrigin(directory.first,
                             QDir::toNativeSeparators(directory.second.absolutePath()),

@@ -41,10 +41,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 TransferSavesDialog::TransferSavesDialog(const Profile& profile,
                                          IPluginGame const* gamePlugin, QWidget* parent)
-    : TutorableDialog("TransferSaves", parent), ui(new Ui::TransferSavesDialog),
+    : TutorableDialog(u"TransferSaves"_s, parent), ui(new Ui::TransferSavesDialog),
       m_Profile(profile), m_GamePlugin(gamePlugin)
 {
   ui->setupUi(this);

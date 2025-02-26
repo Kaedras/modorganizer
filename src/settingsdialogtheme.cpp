@@ -8,6 +8,7 @@
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ThemeSettingsTab::ThemeSettingsTab(Settings& s, SettingsDialog& d) : SettingsTab(s, d)
 {
@@ -45,16 +46,16 @@ void ThemeSettingsTab::update()
 
 void ThemeSettingsTab::addStyles()
 {
-  ui->styleBox->addItem("None", "");
+  ui->styleBox->addItem(u"None"_s, "");
   for (auto&& key : QStyleFactory::keys()) {
     ui->styleBox->addItem(key, key);
   }
 
   ui->styleBox->insertSeparator(ui->styleBox->count());
 
-  QDirIterator iter(QCoreApplication::applicationDirPath() + "/" +
+  QDirIterator iter(QCoreApplication::applicationDirPath() % u"/"_s %
                         AppConfig::stylesheetsPath(),
-                    QStringList("*.qss"), QDir::Files);
+                    QStringList(u"*.qss"_s), QDir::Files);
 
   while (iter.hasNext()) {
     iter.next();
@@ -76,6 +77,6 @@ void ThemeSettingsTab::selectStyle()
 void ThemeSettingsTab::onExploreStyles()
 {
   QString ssPath =
-      QCoreApplication::applicationDirPath() + "/" + AppConfig::stylesheetsPath();
+      QCoreApplication::applicationDirPath() % u"/"_s % AppConfig::stylesheetsPath();
   shell::Explore(ssPath);
 }

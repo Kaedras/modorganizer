@@ -6,6 +6,7 @@
 #include <isavegameinfowidget.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 SavesTab::SavesTab(QWidget* window, OrganizerCore& core, Ui::MainWindow* mwui)
     : m_window(window), m_core(core), m_CurrentSaveView(nullptr),
@@ -141,7 +142,7 @@ QDir SavesTab::currentSavesDir() const
     QString iniPath = m_core.currentProfile()->absoluteIniFilePath(iniFiles[0]);
 
     QSettings ini(iniPath, QSettings::IniFormat);
-    QString path = ini.value("General/SLocalSavePath").toString();
+    QString path = ini.value(u"General/SLocalSavePath"_s).toString();
 
     if (!path.isEmpty()) {
       savesDir.setPath(
@@ -172,7 +173,7 @@ void SavesTab::stopMonitorSaves()
 
 void SavesTab::refreshSaveList()
 {
-  TimeThis tt("MainWindow::refreshSaveList()");
+  TimeThis tt(u"MainWindow::refreshSaveList()"_s);
 
   startMonitorSaves();  // re-starts monitoring
 
@@ -212,7 +213,7 @@ void SavesTab::deleteSavegame()
 
     if (count < 10) {
       savesMsgLabel +=
-          "<li>" + QFileInfo(saveGame->getFilepath()).completeBaseName() + "</li>";
+          u"<li>"_s % QFileInfo(saveGame->getFilepath()).completeBaseName() % u"</li>"_s;
     }
     ++count;
 
@@ -220,7 +221,7 @@ void SavesTab::deleteSavegame()
   }
 
   if (count > 10) {
-    savesMsgLabel += "<li><i>... " + tr("%1 more").arg(count - 10) + "</i></li>";
+    savesMsgLabel += u"<li><i>... "_s % tr("%1 more").arg(count - 10) % u"</i></li>"_s;
   }
 
   if (QMessageBox::question(
@@ -283,7 +284,7 @@ void SavesTab::fixMods(SaveGameInfo::MissingAssets const& missingAssets)
     std::set<QString> modsToActivate = dialog.getModsToActivate();
     for (std::set<QString>::iterator iter = modsToActivate.begin();
          iter != modsToActivate.end(); ++iter) {
-      if ((*iter != "<data>") && (*iter != "<overwrite>")) {
+      if ((*iter != "<data>"_L1) && (*iter != "<overwrite>"_L1)) {
         unsigned int modIndex = ModInfo::getIndex(*iter);
         m_core.currentProfile()->setModEnabled(modIndex, true);
       }

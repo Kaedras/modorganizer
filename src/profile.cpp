@@ -59,10 +59,14 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef __unix__
 #include "linux/compatibility.h"
+static const QString newline = QStringLiteral("\n");
+#else
+static const QString newline = QStringLiteral("\r\n");
 #endif
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 void Profile::touchFile(QString fileName)
 {
@@ -90,15 +94,15 @@ Profile::Profile(const QString& name, IPluginGame const* gamePlugin,
   if (!profileBase.exists() || !profileBase.mkdir(fixedName)) {
     throw MyException(tr("failed to create %1").arg(fixedName).toUtf8().constData());
   }
-  QString fullPath = profilesDir + "/" + fixedName;
+  QString fullPath = profilesDir % u"/"_s % fixedName;
   m_Directory      = QDir(fullPath);
   m_Settings =
-      new QSettings(m_Directory.absoluteFilePath("settings.ini"), QSettings::IniFormat);
+      new QSettings(m_Directory.absoluteFilePath(u"settings.ini"_s), QSettings::IniFormat);
 
   try {
     // create files. Needs to happen after m_Directory was set!
-    touchFile("modlist.txt");
-    touchFile("archives.txt");
+    touchFile(u"modlist.txt"_s);
+    touchFile(u"archives.txt"_s);
 
     IPluginGame::ProfileSettings settings =
         IPluginGame::CONFIGURATION | IPluginGame::MODS | IPluginGame::SAVEGAMES;
@@ -125,12 +129,12 @@ Profile::Profile(const QDir& directory, IPluginGame const* gamePlugin,
   assert(gamePlugin != nullptr);
 
   m_Settings =
-      new QSettings(directory.absoluteFilePath("settings.ini"), QSettings::IniFormat);
+      new QSettings(directory.absoluteFilePath(u"settings.ini"_s), QSettings::IniFormat);
   findProfileSettings();
 
-  if (!QFile::exists(m_Directory.filePath("modlist.txt"))) {
+  if (!QFile::exists(m_Directory.filePath(u"modlist.txt"_s))) {
     log::warn("missing modlist.txt in {}", directory.path());
-    touchFile(m_Directory.filePath("modlist.txt"));
+    touchFile(m_Directory.filePath(u"modlist.txt"_s));
   }
 
   IPluginGame::ProfileSettings settings = IPluginGame::MODS | IPluginGame::SAVEGAMES;
@@ -146,7 +150,7 @@ Profile::Profile(const Profile& reference)
 
 {
   m_Settings =
-      new QSettings(m_Directory.absoluteFilePath("settings.ini"), QSettings::IniFormat);
+      new QSettings(m_Directory.absoluteFilePath(u"settings.ini"_s), QSettings::IniFormat);
   findProfileSettings();
   refreshModStatus();
 }
@@ -159,42 +163,42 @@ Profile::~Profile()
 
 void Profile::findProfileSettings()
 {
-  if (setting("", "LocalSaves") == QVariant()) {
-    if (m_Directory.exists("saves")) {
+  if (setting("", u"LocalSaves"_s) == QVariant()) {
+    if (m_Directory.exists(u"saves"_s)) {
       if (!Settings::instance().profileLocalSaves()) {
-        m_Directory.rename("saves", "_saves");
-        storeSetting("", "LocalSaves", false);
+        m_Directory.rename(u"saves"_s, u"_saves"_s);
+        storeSetting("", u"LocalSaves"_s, false);
       } else {
-        storeSetting("", "LocalSaves", true);
+        storeSetting("", u"LocalSaves"_s, true);
       }
     } else {
-      if (m_Directory.exists("_saves")) {
+      if (m_Directory.exists(u"_saves"_s)) {
         if (Settings::instance().profileLocalSaves()) {
-          m_Directory.rename("_saves", "saves");
-          storeSetting("", "LocalSaves", true);
+          m_Directory.rename(u"_saves_s"_s, u"saves"_s);
+          storeSetting("", u"LocalSaves"_s, true);
         } else {
-          storeSetting("", "LocalSaves", false);
+          storeSetting("", u"LocalSaves"_s, false);
         }
       } else {
-        storeSetting("", "LocalSaves", Settings::instance().profileLocalSaves());
+        storeSetting("", u"LocalSaves"_s, Settings::instance().profileLocalSaves());
       }
     }
   }
 
-  if (setting("", "LocalSettings") == QVariant()) {
-    QString backupFile = getIniFileName() + "_";
+  if (setting("", u"LocalSettings"_s) == QVariant()) {
+    QString backupFile = getIniFileName() % u"_"_s;
     if (m_Directory.exists(backupFile)) {
-      storeSetting("", "LocalSettings", true);
+      storeSetting("", u"LocalSettings"_s, true);
       m_Directory.rename(backupFile, getIniFileName());
     } else if (Settings::instance().profileLocalInis()) {
-      storeSetting("", "LocalSettings", true);
+      storeSetting("", u"LocalSettings"_s, true);
       enableLocalSettings(true);
     } else {
-      storeSetting("", "LocalSettings", false);
+      storeSetting("", u"LocalSettings"_s, false);
     }
   }
 
-  if (setting("", "AutomaticArchiveInvalidation") == QVariant()) {
+  if (setting("", u"AutomaticArchiveInvalidation"_s) == QVariant()) {
     auto invalidation = m_GameFeatures.gameFeature<BSAInvalidation>();
     auto dataArchives = m_GameFeatures.gameFeature<DataArchives>();
     bool found        = false;
@@ -210,13 +214,13 @@ void Profile::findProfileSettings()
       if (!Settings::instance().profileArchiveInvalidation()) {
         deactivateInvalidation();
       } else {
-        storeSetting("", "AutomaticArchiveInvalidation", true);
+        storeSetting("", u"AutomaticArchiveInvalidation"_s, true);
       }
     } else {
       if (Settings::instance().profileArchiveInvalidation()) {
         activateInvalidation();
       } else {
-        storeSetting("", "AutomaticArchiveInvalidation", false);
+        storeSetting("", u"AutomaticArchiveInvalidation"_s, false);
       }
     }
   }
@@ -251,7 +255,7 @@ void Profile::doWriteModlist()
     QString fileName = getModlistFileName();
     SafeWriteFile file(fileName);
 
-    file->write(QString("# This file was automatically generated by Mod Organizer.\r\n")
+    file->write((QStringLiteral("# This file was automatically generated by Mod Organizer.") % newline)
                     .toUtf8());
     if (m_ModStatus.empty()) {
       return;
@@ -271,7 +275,7 @@ void Profile::doWriteModlist()
           file->write("-");
         }
         file->write(modInfo->name().toUtf8());
-        file->write("\r\n");
+        file->write(qUtf8Printable(newline));
       }
     }
 
@@ -284,7 +288,7 @@ void Profile::doWriteModlist()
 
 void Profile::createTweakedIniFile()
 {
-  QString tweakedIni = m_Directory.absoluteFilePath("initweaks.ini");
+  QString tweakedIni = m_Directory.absoluteFilePath(u"initweaks.ini"_s);
 
   if (QFile::exists(tweakedIni) && !shellDelete({tweakedIni})) {
     const auto e = ::GetLastError();
@@ -304,7 +308,7 @@ void Profile::createTweakedIniFile()
 
   bool error = false;
   if (!MOBase::WriteRegistryValue(QStringLiteral("Archive/bInvalidateOlderFiles"),
-                                  QString::number(1), tweakedIni)) {
+                                  QStringLiteral("1"), tweakedIni)) {
     error = true;
   }
 
@@ -323,7 +327,7 @@ void Profile::renameModInAllProfiles(const QString& oldName, const QString& newN
   QDirIterator profileIter(profilesDir);
   while (profileIter.hasNext()) {
     profileIter.next();
-    QFile modList(profileIter.filePath() + "/modlist.txt");
+    QFile modList(profileIter.filePath() % u"/modlist.txt"_s);
     if (modList.exists())
       renameModInList(modList, oldName, newName);
     else
@@ -374,7 +378,7 @@ void Profile::renameModInList(QFile& modList, const QString& oldName,
       ++renamed;
     }
     outBuffer.write(qUtf8Printable(modName));
-    outBuffer.write("\r\n");
+    outBuffer.write(qUtf8Printable(newline));
   }
   modList.close();
 
@@ -466,7 +470,7 @@ void Profile::refreshModStatus()
       continue;
     }
 
-    if (modName.compare("overwrite", Qt::CaseInsensitive) == 0) {
+    if (modName.compare("overwrite"_L1, Qt::CaseInsensitive) == 0) {
       warnAboutOverwrite = true;
     }
 
@@ -733,7 +737,7 @@ bool Profile::setModPriority(unsigned int index, int& newPriority)
 Profile* Profile::createPtrFrom(const QString& name, const Profile& reference,
                                 MOBase::IPluginGame const* gamePlugin)
 {
-  QString profileDirectory = Settings::instance().paths().profiles() + "/" + name;
+  QString profileDirectory = Settings::instance().paths().profiles() % u"/"_s % name;
   reference.copyFilesTo(profileDirectory);
   return new Profile(QDir(profileDirectory), gamePlugin, reference.m_GameFeatures);
 }
@@ -771,7 +775,7 @@ bool Profile::invalidationActive(bool* supported) const
     *supported = ((invalidation != nullptr) && (dataArchives != nullptr));
   }
 
-  return setting("", "AutomaticArchiveInvalidation",
+  return setting("", u"AutomaticArchiveInvalidation"_s,
                  Settings::instance().profileArchiveInvalidation())
       .toBool();
 }
@@ -784,7 +788,7 @@ void Profile::deactivateInvalidation()
     invalidation->deactivate(this);
   }
 
-  storeSetting("", "AutomaticArchiveInvalidation", false);
+  storeSetting("", u"AutomaticArchiveInvalidation"_s, false);
 }
 
 void Profile::activateInvalidation()
@@ -795,24 +799,24 @@ void Profile::activateInvalidation()
     invalidation->activate(this);
   }
 
-  storeSetting("", "AutomaticArchiveInvalidation", true);
+  storeSetting("", u"AutomaticArchiveInvalidation"_s, true);
 }
 
 bool Profile::localSavesEnabled() const
 {
-  return setting("", "LocalSaves", Settings::instance().profileLocalSaves()).toBool();
+  return setting("", u"LocalSaves"_s, Settings::instance().profileLocalSaves()).toBool();
 }
 
 bool Profile::enableLocalSaves(bool enable)
 {
   if (enable) {
-    if (!m_Directory.exists("saves")) {
-      m_Directory.mkdir("saves");
+    if (!m_Directory.exists(u"saves"_s)) {
+      m_Directory.mkdir(u"saves"_s);
     }
   } else {
     QDialogButtonBox::StandardButton res;
     res = QuestionBoxMemory::query(
-        QApplication::activeModalWidget(), "deleteSavesQuery",
+        QApplication::activeModalWidget(), u"deleteSavesQuery"_s,
         tr("Delete profile-specific save games?"),
         tr("Do you want to delete the profile-specific save games? (If you select "
            "\"No\", the "
@@ -821,21 +825,21 @@ bool Profile::enableLocalSaves(bool enable)
         QDialogButtonBox::No | QDialogButtonBox::Yes | QDialogButtonBox::Cancel,
         QDialogButtonBox::No);
     if (res == QMessageBox::Yes) {
-      shellDelete(QStringList(m_Directory.absoluteFilePath("saves")));
+      shellDelete(QStringList(m_Directory.absoluteFilePath(u"saves"_s)));
     } else if (res == QMessageBox::No) {
       // No action
     } else {
       return false;
     }
   }
-  storeSetting("", "LocalSaves", enable);
+  storeSetting("", u"LocalSaves"_s, enable);
   return true;
 }
 
 bool Profile::localSettingsEnabled() const
 {
   bool enabled =
-      setting("", "LocalSettings", Settings::instance().profileLocalInis()).toBool();
+      setting("", u"LocalSettings"_s, Settings::instance().profileLocalInis()).toBool();
   if (enabled) {
     QStringList missingFiles;
     for (QString file : m_GamePlugin->iniFiles()) {
@@ -889,33 +893,33 @@ bool Profile::enableLocalSettings(bool enable)
       return false;
     }
   }
-  storeSetting("", "LocalSettings", enable);
+  storeSetting("", u"LocalSettings"_s, enable);
   return true;
 }
 
 QString Profile::getModlistFileName() const
 {
-  return QDir::cleanPath(m_Directory.absoluteFilePath("modlist.txt"));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(u"modlist.txt"_s));
 }
 
 QString Profile::getPluginsFileName() const
 {
-  return QDir::cleanPath(m_Directory.absoluteFilePath("plugins.txt"));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(u"plugins.txt"_s));
 }
 
 QString Profile::getLoadOrderFileName() const
 {
-  return QDir::cleanPath(m_Directory.absoluteFilePath("loadorder.txt"));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(u"loadorder.txt"_s));
 }
 
 QString Profile::getLockedOrderFileName() const
 {
-  return QDir::cleanPath(m_Directory.absoluteFilePath("lockedorder.txt"));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(u"lockedorder.txt"_s));
 }
 
 QString Profile::getArchivesFileName() const
 {
-  return QDir::cleanPath(m_Directory.absoluteFilePath("archives.txt"));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(u"archives.txt"_s));
 }
 
 QString Profile::getIniFileName() const
@@ -934,7 +938,7 @@ QString Profile::absoluteIniFilePath(QString iniFile) const
   QFileInfo targetIniFile(m_GamePlugin->documentsDirectory(), iniFile);
 
   bool isGameIni = false;
-  for (auto gameIni : m_GamePlugin->iniFiles()) {
+  for (const QString& gameIni : m_GamePlugin->iniFiles()) {
     // We compare the target file, not the actual ones:
     if (QFileInfo(m_GamePlugin->documentsDirectory(), gameIni) == targetIniFile) {
       isGameIni = true;
@@ -964,7 +968,7 @@ QString Profile::absolutePath() const
 
 QString Profile::savePath() const
 {
-  return QDir::cleanPath(m_Directory.absoluteFilePath("saves"));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(u"saves"_s));
 }
 
 void Profile::rename(const QString& newName)
@@ -980,7 +984,7 @@ QString keyName(const QString& section, const QString& name)
 
   if (!name.isEmpty()) {
     if (!key.isEmpty()) {
-      key += "/";
+      key += u"/"_s;
     }
 
     key += name;
@@ -1057,12 +1061,12 @@ void Profile::storeSettingsByArray(const QString& prefix,
 
 bool Profile::forcedLibrariesEnabled(const QString& executable) const
 {
-  return setting("forced_libraries", executable + "/enabled", true).toBool();
+  return setting(u"forced_libraries"_s, executable % u"/enabled"_s, true).toBool();
 }
 
 void Profile::setForcedLibrariesEnabled(const QString& executable, bool enabled)
 {
-  storeSetting("forced_libraries", executable + "/enabled", enabled);
+  storeSetting(u"forced_libraries"_s, executable % u"/enabled"_s, enabled);
 }
 
 QList<ExecutableForcedLoadSetting>
@@ -1070,19 +1074,19 @@ Profile::determineForcedLibraries(const QString& executable) const
 {
   QList<ExecutableForcedLoadSetting> results;
 
-  auto rawSettings = settingsByArray("forced_libraries/" + executable);
+  auto rawSettings = settingsByArray(u"forced_libraries/"_s % executable);
   auto forcedLoads = m_GamePlugin->executableForcedLoads();
 
   // look for enabled status on forced loads and add those
   for (auto forcedLoad : forcedLoads) {
     bool found = false;
-    for (auto rawSetting : rawSettings) {
-      if ((rawSetting.value("process").toString().compare(forcedLoad.process(),
+    for (const auto& rawSetting : rawSettings) {
+      if ((rawSetting.value(u"process"_s).toString().compare(forcedLoad.process(),
                                                           Qt::CaseInsensitive) == 0) &&
-          (rawSetting.value("library").toString().compare(forcedLoad.library(),
+          (rawSetting.value(u"library"_s).toString().compare(forcedLoad.library(),
                                                           Qt::CaseInsensitive) == 0)) {
         results.append(
-            forcedLoad.withEnabled(rawSetting.value("enabled", false).toBool()));
+            forcedLoad.withEnabled(rawSetting.value(u"enabled"_s, false).toBool()));
         found = true;
       }
     }
@@ -1092,20 +1096,20 @@ Profile::determineForcedLibraries(const QString& executable) const
   }
 
   // add everything else
-  for (auto rawSetting : rawSettings) {
+  for (const auto& rawSetting : rawSettings) {
     bool add = true;
-    for (auto forcedLoad : forcedLoads) {
-      if ((rawSetting.value("process").toString().compare(forcedLoad.process(),
+    for (const auto& forcedLoad : forcedLoads) {
+      if ((rawSetting.value(u"process"_s).toString().compare(forcedLoad.process(),
                                                           Qt::CaseInsensitive) == 0) &&
-          (rawSetting.value("library").toString().compare(forcedLoad.library(),
+          (rawSetting.value(u"library"_s).toString().compare(forcedLoad.library(),
                                                           Qt::CaseInsensitive) == 0)) {
         add = false;
       }
     }
     if (add) {
-      results.append(ExecutableForcedLoadSetting(rawSetting.value("process").toString(),
-                                                 rawSetting.value("library").toString())
-                         .withEnabled(rawSetting.value("enabled", false).toBool()));
+      results.append(ExecutableForcedLoadSetting(rawSetting.value(u"process"_s).toString(),
+                                                 rawSetting.value(u"library"_s).toString())
+                         .withEnabled(rawSetting.value(u"enabled"_s, false).toBool()));
     }
   }
 
@@ -1118,17 +1122,17 @@ void Profile::storeForcedLibraries(const QString& executable,
   QList<QVariantMap> rawSettings;
   for (auto setting : values) {
     QVariantMap rawSetting;
-    rawSetting["enabled"] = setting.enabled();
-    rawSetting["process"] = setting.process();
-    rawSetting["library"] = setting.library();
+    rawSetting[u"enabled"_s] = setting.enabled();
+    rawSetting[u"process"_s] = setting.process();
+    rawSetting[u"library"_s] = setting.library();
     rawSettings.append(rawSetting);
   }
-  storeSettingsByArray("forced_libraries/" + executable, rawSettings);
+  storeSettingsByArray(u"forced_libraries/"_s % executable, rawSettings);
 }
 
 void Profile::removeForcedLibraries(const QString& executable)
 {
-  m_Settings->remove("forced_libraries/" + executable);
+  m_Settings->remove(u"forced_libraries/"_s % executable);
 }
 
 void Profile::debugDump() const

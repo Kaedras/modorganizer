@@ -10,6 +10,7 @@ namespace env
 {
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 Shortcut::Shortcut() : m_iconIndex(0) {}
 
@@ -20,11 +21,11 @@ Shortcut::Shortcut(const Executable& exe) : Shortcut()
   m_name   = MOBase::sanitizeFileName(exe.title());
   m_target = QFileInfo(qApp->applicationFilePath()).absoluteFilePath();
 
-  m_arguments = QString("\"moshortcut://%1:%2\"")
+  m_arguments = QStringLiteral("\"moshortcut://%1:%2\"")
                     .arg(i.isPortable() ? "" : i.displayName())
                     .arg(exe.title());
 
-  m_description = QString("Run %1 with ModOrganizer").arg(exe.title());
+  m_description = QStringLiteral("Run %1 with ModOrganizer").arg(exe.title());
 
   if (exe.usesOwnIcon()) {
     m_icon = exe.binaryInfo().absoluteFilePath();
@@ -136,23 +137,23 @@ QString Shortcut::shortcutFilename() const
     return {};
   }
 
-  return m_name + ".lnk";
+  return m_name % u".lnk"_s;
 }
 
 QString toString(Shortcut::Locations loc)
 {
   switch (loc) {
   case Shortcut::None:
-    return "none";
+    return u"none"_s;
 
   case Shortcut::Desktop:
-    return "desktop";
+    return u"desktop"_s;
 
   case Shortcut::StartMenu:
-    return "start menu";
+    return u"start menu"_s;
 
   default:
-    return QString("? (%1)").arg(static_cast<int>(loc));
+    return QStringLiteral("? (%1)").arg(static_cast<int>(loc));
   }
 }
 

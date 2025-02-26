@@ -19,6 +19,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "categoriestable.h"
 
+using namespace Qt::StringLiterals;
+
 CategoriesTable::CategoriesTable(QWidget* parent) : QTableWidget(parent) {}
 
 bool CategoriesTable::dropMimeData(int row, int column, const QMimeData* data,
@@ -30,10 +32,10 @@ bool CategoriesTable::dropMimeData(int row, int column, const QMimeData* data,
   if (action == Qt::IgnoreAction)
     return true;
 
-  if (!data->hasFormat("application/x-qabstractitemmodeldatalist"))
+  if (!data->hasFormat(u"application/x-qabstractitemmodeldatalist"_s))
     return false;
 
-  QByteArray encoded = data->data("application/x-qabstractitemmodeldatalist");
+  QByteArray encoded = data->data(u"application/x-qabstractitemmodeldatalist"_s);
   QDataStream stream(&encoded, QIODevice::ReadOnly);
 
   while (!stream.atEnd()) {
@@ -55,7 +57,7 @@ bool CategoriesTable::dropMimeData(int row, int column, const QMimeData* data,
       for (auto nexData : newData) {
         names.append(nexData.toList()[0].toString());
       }
-      item->setData(Qt::DisplayRole, names.join(", "));
+      item->setData(Qt::DisplayRole, names.join(u", "_s));
       item->setData(Qt::UserRole, newData);
     }
 
@@ -70,7 +72,7 @@ bool CategoriesTable::dropMimeData(int row, int column, const QMimeData* data,
       names.append(cat.toList()[0].toString());
     }
     nexusItem->setData(Qt::UserRole, itemData);
-    nexusItem->setData(Qt::DisplayRole, names.join(", "));
+    nexusItem->setData(Qt::DisplayRole, names.join(u", "_s));
   }
 
   return true;

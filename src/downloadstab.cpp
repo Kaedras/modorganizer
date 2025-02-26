@@ -4,6 +4,8 @@
 #include "organizercore.h"
 #include "ui_mainwindow.h"
 
+using namespace Qt::StringLiterals;
+
 DownloadsTab::DownloadsTab(OrganizerCore& core, Ui::MainWindow* mwui)
     : m_core(core), ui{mwui->btnRefreshDownloads, mwui->downloadView,
                        mwui->showHiddenBox, mwui->downloadFilterEdit}
@@ -61,11 +63,11 @@ void DownloadsTab::update()
 
   // set the view attribute and default row sizes
   if (m_core.settings().interface().compactDownloads()) {
-    ui.list->setProperty("downloadView", "compact");
-    ui.list->setStyleSheet("DownloadListView::item { padding: 4px 2px; }");
+    ui.list->setProperty("downloadView", u"compact"_s);
+    ui.list->setStyleSheet(u"DownloadListView::item { padding: 4px 2px; }"_s);
   } else {
-    ui.list->setProperty("downloadView", "standard");
-    ui.list->setStyleSheet("DownloadListView::item { padding: 16px 4px; }");
+    ui.list->setProperty("downloadView", u"standard"_s);
+    ui.list->setStyleSheet(u"DownloadListView::item { padding: 16px 4px; }"_s);
   }
 
   ui.list->style()->unpolish(ui.list);

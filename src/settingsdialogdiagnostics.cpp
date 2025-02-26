@@ -5,6 +5,7 @@
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 DiagnosticsSettingsTab::DiagnosticsSettingsTab(Settings& s, SettingsDialog& d)
     : SettingsTab(s, d)
@@ -15,18 +16,18 @@ DiagnosticsSettingsTab::DiagnosticsSettingsTab(Settings& s, SettingsDialog& d)
 
   ui->dumpsMaxEdit->setValue(settings().diagnostics().maxCoreDumps());
 
-  QString logsPath = QUrl::fromLocalFile(qApp->property("dataPath").toString() + "/" +
+  QString logsPath = QUrl::fromLocalFile(qApp->property("dataPath").toString() % u"/"_s %
                                          AppConfig::logPath())
                          .toString();
 
   ui->diagnosticsExplainedLabel->setText(
       ui->diagnosticsExplainedLabel->text()
-          .replace("LOGS_FULL_PATH", logsPath)
-          .replace("LOGS_DIR", AppConfig::logPath())
+          .replace("LOGS_FULL_PATH"_L1, logsPath)
+          .replace("LOGS_DIR"_L1, AppConfig::logPath())
           .replace(
-              "DUMPS_FULL_PATH",
+              "DUMPS_FULL_PATH"_L1,
               QUrl::fromLocalFile(OrganizerCore::getGlobalCoreDumpPath()).toString())
-          .replace("DUMPS_DIR", AppConfig::dumpsDir()));
+          .replace("DUMPS_DIR"_L1, AppConfig::dumpsDir()));
 }
 
 void DiagnosticsSettingsTab::setLogLevel()

@@ -45,6 +45,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 Q_DECLARE_METATYPE(Profile::Ptr)
 
@@ -245,7 +246,7 @@ void ProfilesDialog::on_removeProfileButton_clicked()
   if (confirmBox.exec() == QMessageBox::Yes) {
     QString profilePath;
     if (profileToDelete.get() == nullptr) {
-      profilePath = Settings::instance().paths().profiles() + "/" +
+      profilePath = Settings::instance().paths().profiles() % u"/"_s %
                     ui->profilesList->currentItem()->text();
       if (QMessageBox::question(
               this, tr("Profile broken"),

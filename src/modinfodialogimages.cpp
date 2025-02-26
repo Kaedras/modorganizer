@@ -6,6 +6,7 @@
 
 using namespace MOBase;
 using namespace ImagesTabHelpers;
+using namespace Qt::StringLiterals;
 
 QSize resizeWithAspectRatio(const QSize& original, const QSize& available)
 {
@@ -208,7 +209,7 @@ void ImagesTab::switchToFiltered()
 
     if (!m_ddsEnabled) {
       // skip .dds files
-      if (f.filename().endsWith(".dds", Qt::CaseInsensitive)) {
+      if (f.filename().endsWith(u".dds"_s, Qt::CaseInsensitive)) {
         continue;
       }
     }
@@ -277,7 +278,7 @@ void ImagesTab::select(std::size_t i, Visibility v)
       paint.fillRect(0, 0, 300, 100, QBrush(QColor(0, 0, 0, 255)));
       paint.setPen(m_theme.textColor);
       paint.setFont(m_theme.font);
-      paint.drawImage(QPoint(150 - 16, 50 - 20 - 16), QImage(":/MO/gui/warning"));
+      paint.drawImage(QPoint(150 - 16, 50 - 20 - 16), QImage(u":/MO/gui/warning"_s));
       const auto flags = Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextWordWrap;
       paint.drawText(0, 46, 300, 54, flags,
                      "This image format is not supported by Qt, but the preview plugin "
@@ -567,9 +568,8 @@ void ImagesTab::showTooltip(QHelpEvent* e)
     return;
   }
 
-  const auto s = QString("%1 (%2)")
-                     .arg(QDir::toNativeSeparators(f->path()))
-                     .arg(dimensionString(f->original().size()));
+  const auto s = QStringLiteral("%1 (%2)")
+                     .arg(QDir::toNativeSeparators(f->path()), dimensionString(f->original().size()));
 
   QToolTip::showText(e->globalPos(), s, ui->imagesThumbnails);
 }
@@ -686,7 +686,7 @@ void ThumbnailsWidget::keyPressEvent(QKeyEvent* e)
 bool ThumbnailsWidget::event(QEvent* e)
 {
   if (e->type() == QEvent::ToolTip) {
-    m_tab->showTooltip(static_cast<QHelpEvent*>(e));
+    m_tab->showTooltip(dynamic_cast<QHelpEvent*>(e));
     return true;
   }
 
@@ -957,7 +957,7 @@ void File::load(const Geometry& geo)
   ensureOriginalLoaded();
 
   if (m_failed) {
-    QImage warning(":/MO/gui/warning");
+    QImage warning(u":/MO/gui/warning"_s);
     const auto scaledSize = geo.scaledImageSize(warning.size());
 
     m_thumbnail =

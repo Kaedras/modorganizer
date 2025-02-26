@@ -4,6 +4,8 @@
 #include "modlistview.h"
 #include "settings.h"
 
+using namespace Qt::StringLiterals;
+
 ModListVersionDelegate::ModListVersionDelegate(ModListView* view, Settings& settings)
     : QItemDelegate(view), m_view(view), m_settings(settings)
 {}
@@ -41,7 +43,7 @@ void ModListVersionDelegate::paint(QPainter* painter,
     opt.decorationAlignment = Qt::AlignCenter;
 
     if (upgrade) {
-      QIcon icon(":/MO/gui/update_available");
+      QIcon icon(u":/MO/gui/update_available"_s);
       QPixmap pixmap = decoration(opt, icon);
 
       QSize pm = icon.actualSize(opt.decorationSize);
@@ -54,7 +56,7 @@ void ModListVersionDelegate::paint(QPainter* painter,
     }
 
     if (downgrade) {
-      QIcon icon(":/MO/gui/warning");
+      QIcon icon(u":/MO/gui/warning"_s);
       QPixmap pixmap = decoration(opt, icon);
 
       QSize pm = icon.actualSize(opt.decorationSize);

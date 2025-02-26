@@ -59,6 +59,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdexcept>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ModList::ModList(PluginContainer* pluginContainer, OrganizerCore* organizer)
     : QAbstractItemModel(organizer), m_Organizer(organizer), m_Profile(nullptr),
@@ -108,7 +109,7 @@ QString ModList::getDisplayName(ModInfo::Ptr info) const
 {
   QString name = info->name();
   if (info->isSeparator()) {
-    name = name.replace("_separator", "");
+    name = name.remove(u"_separator"_s);
   }
   return name;
 }
@@ -135,9 +136,9 @@ QString ModList::getFlagText(ModInfo::EFlag flag, ModInfo::Ptr modInfo) const
   case ModInfo::FLAG_NOTES: {
     QStringList output;
     if (!modInfo->comments().isEmpty())
-      output << QString("<i>%1</i>").arg(modInfo->comments());
+      output << QStringLiteral("<i>%1</i>").arg(modInfo->comments());
     if (!modInfo->notes().isEmpty())
-      output << QString("<i>%1</i>").arg(modInfo->notes());
+      output << QStringLiteral("<i>%1</i>").arg(modInfo->notes());
     return output.join("");
   }
   case ModInfo::FLAG_ALTERNATE_GAME:
@@ -341,11 +342,11 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
   } else if (role == Qt::DecorationRole) {
     if (column == COL_VERSION) {
       if (modInfo->updateAvailable()) {
-        return QIcon(":/MO/gui/update_available");
+        return QIcon(u":/MO/gui/update_available"_s);
       } else if (modInfo->downgradeAvailable()) {
-        return QIcon(":/MO/gui/warning");
+        return QIcon(u":/MO/gui/warning"_s);
       } else if (modInfo->version().scheme() == VersionInfo::SCHEME_DATE) {
-        return QIcon(":/MO/gui/version_date");
+        return QIcon(u":/MO/gui/version_date"_s);
       }
     }
     return QVariant();
@@ -406,12 +407,11 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
         return QString();
       }
     } else if (column == COL_VERSION) {
-      QString text = tr("installed version: \"%1\", newest version: \"%2\"")
-                         .arg(modInfo->version().displayString(3))
-                         .arg(modInfo->newestVersion().displayString(3));
+      QString text = tr(R"(installed version: "%1", newest version: "%2")")
+                         .arg(modInfo->version().displayString(3), modInfo->newestVersion().displayString(3));
       if (modInfo->downgradeAvailable()) {
         text +=
-            "<br>" + tr("The newest version on Nexus seems to be older than the one "
+            u"<br>"_s % tr("The newest version on Nexus seems to be older than the one "
                         "you have installed. This could either mean the version you "
                         "have has been withdrawn "
                         "(i.e. due to a bug) or the author uses a non-standard "
@@ -419,7 +419,7 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
                         "Either way you may want to \"upgrade\".");
       }
       if (modInfo->getNexusFileStatus() == NexusInterface::FileStatus::OLD_VERSION) {
-        text += "<br>" + tr("This file has been marked as \"Old\". There is most "
+        text += u"<br>"_s % tr("This file has been marked as \"Old\". There is most "
                             "likely an updated version of this file available.");
       } else if (modInfo->getNexusFileStatus() == NexusInterface::FileStatus::REMOVED ||
                  modInfo->getNexusFileStatus() ==
@@ -427,7 +427,7 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
                  modInfo->getNexusFileStatus() ==
                      NexusInterface::FileStatus::ARCHIVED_HIDDEN) {
         text +=
-            "<br>" + tr("This file has been marked as \"Deleted\"! You may want to "
+            u"<br>"_s % tr("This file has been marked as \"Deleted\"! You may want to "
                         "check for an update or remove the nexus ID from this mod!");
       }
       if (modInfo->nexusId() > 0) {
@@ -439,7 +439,7 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
           QString remainsStr(
               tr("%1 minute(s) and %2 second(s)").arg(minutes).arg(seconds));
           text +=
-              "<br>" + tr("This mod will be available to check in %2.").arg(remainsStr);
+              u"<br>"_s % tr("This mod will be available to check in %2.").arg(remainsStr);
         }
       }
       return text;
@@ -645,14 +645,14 @@ Qt::ItemFlags ModList::flags(const QModelIndex& modelIndex) const
 QStringList ModList::mimeTypes() const
 {
   QStringList result = QAbstractItemModel::mimeTypes();
-  result.append("text/uri-list");
+  result.append(u"text/uri-list"_s);
   return result;
 }
 
 QMimeData* ModList::mimeData(const QModelIndexList& indexes) const
 {
   QMimeData* result = QAbstractItemModel::mimeData(indexes);
-  result->setData("text/plain", ModListDropInfo::ModText);
+  result->setData(u"text/plain"_s, ModListDropInfo::ModText);
   return result;
 }
 
@@ -1028,7 +1028,7 @@ bool ModList::dropLocalFiles(const ModListDropInfo& dropInfo, int row,
   QStringList targetList;
   QList<QPair<QString, QString>> relativePathList;
 
-  for (auto localUrl : dropInfo.localUrls()) {
+  for (const auto& localUrl : dropInfo.localUrls()) {
 
     QFileInfo sourceInfo(localUrl.url.toLocalFile());
     QString sourceFile = sourceInfo.canonicalFilePath();
@@ -1047,7 +1047,7 @@ bool ModList::dropLocalFiles(const ModListDropInfo& dropInfo, int row,
     }
   }
 
-  for (auto iter : relativePathList) {
+  for (const auto& iter : relativePathList) {
     emit fileMoved(iter.first, iter.second, modInfo->name());
   }
 
@@ -1325,11 +1325,11 @@ QString ModList::getColumnToolTip(int column) const
     QString result =
         tr("Depicts the content of the mod:") + "<br>" + "<table cellspacing=7>";
     m_Organizer->modDataContents().forEachContent([&result](auto const& content) {
-      result += QString("<tr><td><img src=\"%1\" width=32/></td><td>%2</td></tr>")
+      result += QStringLiteral("<tr><td><img src=\"%1\" width=32/></td><td>%2</td></tr>")
                     .arg(content.icon())
                     .arg(content.name());
     });
-    return result + "</table>";
+    return result % u"</table>"_s;
   };
   case COL_INSTALLTIME:
     return tr("Time this mod was installed");

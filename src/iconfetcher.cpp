@@ -2,6 +2,8 @@
 #include "shared/util.h"
 #include "thread_utils.h"
 
+using namespace Qt::StringLiterals;
+
 void IconFetcher::Waiter::wait()
 {
   std::unique_lock lock(m_wakeUpMutex);
@@ -45,9 +47,9 @@ QPixmap IconFetcher::genericDirectoryIcon() const
 
 bool IconFetcher::hasOwnIcon(const QString& path) const
 {
-  static const QString exe = ".exe";
-  static const QString lnk = ".lnk";
-  static const QString ico = ".ico";
+  static const QString exe = u".exe"_s;
+  static const QString lnk = u".lnk"_s;
+  static const QString ico = u".ico"_s;
 
   return path.endsWith(exe, Qt::CaseInsensitive) ||
          path.endsWith(lnk, Qt::CaseInsensitive) ||
@@ -56,7 +58,7 @@ bool IconFetcher::hasOwnIcon(const QString& path) const
 
 void IconFetcher::threadFun()
 {
-  MOShared::SetThisThreadName("IconFetcher");
+  MOShared::SetThisThreadName(u"IconFetcher"_s);
 
   while (!m_stop) {
     m_waiter.wait();

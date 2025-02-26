@@ -8,6 +8,7 @@
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 using CriteriaType = ModListSortProxy::CriteriaType;
 using Criteria     = ModListSortProxy::Criteria;
 
@@ -37,7 +38,7 @@ public:
     setData(0, Qt::ToolTipRole, name);
     setData(0, TypeRole, type);
     setData(0, IDRole, id);
-    setData(0, Qt::DecorationRole, QIcon(":/MO/gui/unchecked-checkbox"));
+    setData(0, Qt::DecorationRole, QIcon(u":/MO/gui/unchecked-checkbox"_s));
   }
 
   CriteriaType type() const
@@ -102,17 +103,17 @@ private:
 
     switch (m_state) {
     case Inactive: {
-      i = QIcon(":/MO/gui/unchecked-checkbox");
+      i = QIcon(u":/MO/gui/unchecked-checkbox"_s);
       break;
     }
 
     case Active: {
-      i = QIcon(":/MO/gui/checked-checkbox");
+      i = QIcon(u":/MO/gui/checked-checkbox"_s);
       break;
     }
 
     case Inverted: {
-      i = QIcon(":/MO/gui/indeterminate-checkbox");
+      i = QIcon(u":/MO/gui/indeterminate-checkbox"_s);
       break;
     }
     }
@@ -266,7 +267,7 @@ void FilterList::addContentCriteria()
   m_core.modDataContents().forEachContent(
       [this](auto const& content) {
         addCriteriaItem(nullptr,
-                        QString("<%1>").arg(tr("Contains %1").arg(content.name())),
+                        QStringLiteral("<%1>").arg(tr("Contains %1").arg(content.name())),
                         content.id(), ModListSortProxy::TypeContent);
       },
       true);
@@ -330,7 +331,7 @@ void FilterList::refresh()
       while (currentID != 0) {
         categoriesUsed.insert(currentID);
         if (!cycleTest.insert(currentID).second) {
-          log::warn("cycle in categories: {}", SetJoin(cycleTest, ", "));
+          log::warn("cycle in categories: {}", SetJoin(cycleTest, u", "_s));
           break;
         }
         currentID = m_factory.getParentID(m_factory.getCategoryIndex(currentID));

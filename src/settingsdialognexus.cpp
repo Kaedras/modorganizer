@@ -7,6 +7,7 @@
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 template <typename T>
 class ServerItem : public QListWidgetItem
@@ -56,7 +57,7 @@ public:
 
   void openBrowser()
   {
-    shell::Open(QUrl("https://www.nexusmods.com/users/myaccount?tab=api"));
+    shell::Open(QUrl(u"https://www.nexusmods.com/users/myaccount?tab=api"_s));
   }
 
   void paste()
@@ -193,7 +194,7 @@ void NexusConnectionUI::onSSOStateChanged(NexusSSOLogin::States s, const QString
     // finished state is handled in onSSOKeyChanged()
     const auto log = NexusSSOLogin::stateToString(s, e);
 
-    for (auto&& line : log.split("\n")) {
+    for (auto&& line : log.split('\n')) {
       addLog(line);
     }
   }
@@ -301,13 +302,13 @@ NexusSettingsTab::NexusSettingsTab(Settings& s, SettingsDialog& d) : SettingsTab
   for (const auto& server : s.network().servers()) {
     QString descriptor = server.name();
 
-    if (!descriptor.compare("CDN", Qt::CaseInsensitive)) {
+    if (!descriptor.compare("CDN"_L1, Qt::CaseInsensitive)) {
       descriptor += QStringLiteral(" (automatic)");
     }
 
     const auto averageSpeed = server.averageSpeed();
     if (averageSpeed > 0) {
-      descriptor += QString(" (%1)").arg(MOBase::localizedByteSpeed(averageSpeed));
+      descriptor += QStringLiteral(" (%1)").arg(MOBase::localizedByteSpeed(averageSpeed));
     }
 
     QListWidgetItem* newItem = new ServerItem<int>(descriptor, Qt::UserRole + 1);
@@ -431,11 +432,11 @@ void NexusSettingsTab::updateNexusData()
     ui->nexusName->setText(user.name());
     ui->nexusAccount->setText(localizedUserAccountType(user.type()));
 
-    ui->nexusDailyRequests->setText(QString("%1/%2")
+    ui->nexusDailyRequests->setText(QStringLiteral("%1/%2")
                                         .arg(user.limits().remainingDailyRequests)
                                         .arg(user.limits().maxDailyRequests));
 
-    ui->nexusHourlyRequests->setText(QString("%1/%2")
+    ui->nexusHourlyRequests->setText(QStringLiteral("%1/%2")
                                          .arg(user.limits().remainingHourlyRequests)
                                          .arg(user.limits().maxHourlyRequests));
   } else {
@@ -455,7 +456,7 @@ void NexusSettingsTab::updateCustomBrowser()
 void NexusSettingsTab::browseCustomBrowser()
 {
   const QString Filters =
-      QObject::tr("Executables (*.exe)") + ";;" + QObject::tr("All Files (*.*)");
+      QObject::tr("Executables (*.exe)") % u";;"_s % QObject::tr("All Files (*.*)");
 
   QString file = QFileDialog::getOpenFileName(
       parentWidget(), QObject::tr("Select the browser executable"),
@@ -465,5 +466,5 @@ void NexusSettingsTab::browseCustomBrowser()
     return;
   }
 
-  ui->browserCommand->setText(file + " \"%1\"");
+  ui->browserCommand->setText(file % u" \"%1\""_s);
 }

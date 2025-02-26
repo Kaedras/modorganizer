@@ -31,63 +31,64 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QVariant>
 #include <Qt>
 
+using namespace Qt::StringLiterals;
+
 AboutDialog::AboutDialog(const QString& version, QWidget* parent)
     : QDialog(parent), ui(new Ui::AboutDialog)
 {
   ui->setupUi(this);
 
-  m_LicenseFiles[LICENSE_LGPL3]   = "LGPL-v3.0.txt";
-  m_LicenseFiles[LICENSE_LGPL21]  = "GNU-LGPL-v2.1.txt";
-  m_LicenseFiles[LICENSE_GPL3]    = "GPL-v3.0.txt";
-  m_LicenseFiles[LICENSE_GPL2]    = "GPL-v2.0.txt";
-  m_LicenseFiles[LICENSE_BOOST]   = "boost.txt";
-  m_LicenseFiles[LICENSE_7ZIP]    = "7zip.txt";
-  m_LicenseFiles[LICENSE_CCBY3]   = "BY-SA-v3.0.txt";
-  m_LicenseFiles[LICENSE_ZLIB]    = "zlib.txt";
-  m_LicenseFiles[LICENSE_PYTHON]  = "python.txt";
-  m_LicenseFiles[LICENSE_SSL]     = "openssl.txt";
-  m_LicenseFiles[LICENSE_CPPTOML] = "cpptoml.txt";
-  m_LicenseFiles[LICENSE_UDIS]    = "udis86.txt";
-  m_LicenseFiles[LICENSE_SPDLOG]  = "spdlog.txt";
-  m_LicenseFiles[LICENSE_FMT]     = "fmt.txt";
-  m_LicenseFiles[LICENSE_SIP]     = "sip.txt";
-  m_LicenseFiles[LICENSE_CASTLE]  = "Castle.txt";
-  m_LicenseFiles[LICENSE_ANTLR]   = "AntlrBuildTask.txt";
-  m_LicenseFiles[LICENSE_DXTEX]   = "DXTex.txt";
-  m_LicenseFiles[LICENSE_VDF]     = "ValveFileVDF.txt";
+  m_LicenseFiles[LICENSE_LGPL3]   = u"LGPL-v3.0.txt"_s;
+  m_LicenseFiles[LICENSE_LGPL21]  = u"GNU-LGPL-v2.1.txt"_s;
+  m_LicenseFiles[LICENSE_GPL3]    = u"GPL-v3.0.txt"_s;
+  m_LicenseFiles[LICENSE_GPL2]    = u"GPL-v2.0.txt"_s;
+  m_LicenseFiles[LICENSE_BOOST]   = u"boost.txt"_s;
+  m_LicenseFiles[LICENSE_7ZIP]    = u"7zip.txt"_s;
+  m_LicenseFiles[LICENSE_CCBY3]   = u"BY-SA-v3.0.txt"_s;
+  m_LicenseFiles[LICENSE_ZLIB]    = u"zlib.txt"_s;
+  m_LicenseFiles[LICENSE_PYTHON]  = u"python.txt"_s;
+  m_LicenseFiles[LICENSE_SSL]     = u"openssl.txt"_s;
+  m_LicenseFiles[LICENSE_CPPTOML] = u"cpptoml.txt"_s;
+  m_LicenseFiles[LICENSE_UDIS]    = u"udis86.txt"_s;
+  m_LicenseFiles[LICENSE_SPDLOG]  = u"spdlog.txt"_s;
+  m_LicenseFiles[LICENSE_FMT]     = u"fmt.txt"_s;
+  m_LicenseFiles[LICENSE_SIP]     = u"sip.txt"_s;
+  m_LicenseFiles[LICENSE_CASTLE]  = u"Castle.txt"_s;
+  m_LicenseFiles[LICENSE_ANTLR]   = u"AntlrBuildTask.txt"_s;
+  m_LicenseFiles[LICENSE_DXTEX]   = u"DXTex.txt"_s;
+  m_LicenseFiles[LICENSE_VDF]     = u"ValveFileVDF.txt"_s;
 
-  addLicense("Qt", LICENSE_LGPL3);
-  addLicense("Qt Json", LICENSE_GPL3);
-  addLicense("Boost Library", LICENSE_BOOST);
-  addLicense("7-zip", LICENSE_7ZIP);
-  addLicense("ZLib", LICENSE_NONE);
-  addLicense("Tango Icon Theme", LICENSE_NONE);
-  addLicense("RRZE Icon Set", LICENSE_CCBY3);
-  addLicense("Icons by Lorc, Delapouite and sbed available on http://game-icons.net",
+  addLicense(u"Qt"_s, LICENSE_LGPL3);
+  addLicense(u"Qt Json"_s, LICENSE_GPL3);
+  addLicense(u"Boost Library"_s, LICENSE_BOOST);
+  addLicense(u"7-zip"_s, LICENSE_7ZIP);
+  addLicense(u"ZLib"_s, LICENSE_NONE);
+  addLicense(u"Tango Icon Theme"_s, LICENSE_NONE);
+  addLicense(u"RRZE Icon Set"_s, LICENSE_CCBY3);
+  addLicense(u"Icons by Lorc, Delapouite and sbed available on http://game-icons.net"_s,
              LICENSE_CCBY3);
-  addLicense("Castle Core", LICENSE_CASTLE);
-  addLicense("ANTLR", LICENSE_ANTLR);
-  addLicense("LOOT", LICENSE_GPL3);
-  addLicense("Python", LICENSE_PYTHON);
-  addLicense("OpenSSL", LICENSE_SSL);
-  addLicense("cpptoml", LICENSE_CPPTOML);
-  addLicense("Udis86", LICENSE_UDIS);
-  addLicense("spdlog", LICENSE_SPDLOG);
-  addLicense("{fmt}", LICENSE_FMT);
-  addLicense("SIP", LICENSE_SIP);
-  addLicense("DXTex Headers", LICENSE_DXTEX);
-  addLicense("Valve File VDF Reader", LICENSE_VDF);
+  addLicense(u"Castle Core"_s, LICENSE_CASTLE);
+  addLicense(u"ANTLR"_s, LICENSE_ANTLR);
+  addLicense(u"LOOT"_s, LICENSE_GPL3);
+  addLicense(u"Python"_s, LICENSE_PYTHON);
+  addLicense(u"OpenSSL"_s, LICENSE_SSL);
+  addLicense(u"cpptoml"_s, LICENSE_CPPTOML);
+  addLicense(u"Udis86"_s, LICENSE_UDIS);
+  addLicense(u"spdlog"_s, LICENSE_SPDLOG);
+  addLicense(u"{fmt}"_s, LICENSE_FMT);
+  addLicense(u"SIP"_s, LICENSE_SIP);
+  addLicense(u"DXTex Headers"_s, LICENSE_DXTEX);
+  addLicense(u"Valve File VDF Reader"_s, LICENSE_VDF);
 
   ui->nameLabel->setText(
-      QString("<span style=\"font-size:12pt; font-weight:600;\">%1 %2</span>")
-          .arg(ui->nameLabel->text())
-          .arg(version));
+      QStringLiteral("<span style=\"font-size:12pt; font-weight:600;\">%1 %2</span>")
+          .arg(ui->nameLabel->text(), version));
 #if defined(HGID)
-  ui->revisionLabel->setText(ui->revisionLabel->text() + " " + HGID);
+  ui->revisionLabel->setText(ui->revisionLabel->text() % ' ' % HGID);
 #elif defined(GITID)
-  ui->revisionLabel->setText(ui->revisionLabel->text() + " " + GITID);
+  ui->revisionLabel->setText(ui->revisionLabel->text() % ' ' % GITID);
 #else
-  ui->revisionLabel->setText(ui->revisionLabel->text() + " unknown");
+  ui->revisionLabel->setText(ui->revisionLabel->text() % u" unknown"_s);
 #endif
 
   ui->usvfsLabel->setText(ui->usvfsLabel->text() + " " +
@@ -112,7 +113,7 @@ void AboutDialog::on_creditsList_currentItemChanged(QListWidgetItem* current,
 {
   auto iter = m_LicenseFiles.find(current->data(Qt::UserRole).toInt());
   if (iter != m_LicenseFiles.end()) {
-    QString filePath = qApp->applicationDirPath() + "/licenses/" + iter->second;
+    QString filePath = qApp->applicationDirPath() % u"/licenses/"_s % iter->second;
     QString text     = MOBase::readFileText(filePath);
     ui->licenseText->setText(text);
   } else {

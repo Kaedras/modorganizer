@@ -14,6 +14,7 @@ namespace cid
 {
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 using MOBase::TaskDialog;
 
 // returns %base_dir%/dir
@@ -43,7 +44,7 @@ PlaceholderLabel::PlaceholderLabel(QLabel* label)
 
 void PlaceholderLabel::setText(const QString& arg)
 {
-  if (m_original.contains("%1")) {
+  if (m_original.contains(u"%1"_s)) {
     m_label->setText(m_original.arg(arg));
   }
 }
@@ -388,7 +389,7 @@ void GamePage::warnUnrecognized(const QString& path)
   // put the list of supported games in the details textbox
   QString supportedGames;
   for (auto* game : sortedGamePlugins()) {
-    supportedGames += game->displayGameName() + "\n";
+    supportedGames += game->displayGameName() % u"\n"_s;
   }
 
   QMessageBox dlg(&m_dlg);
@@ -469,7 +470,7 @@ void GamePage::updateButton(Game* g)
     return;
   }
 
-  g->button->setText(g->game->displayGameName().replace("&", "&&"));
+  g->button->setText(g->game->displayGameName().replace(u"&"_s, u"&&"_s));
   g->button->setIcon(g->game->gameIcon());
 
   if (g->installed) {
@@ -652,7 +653,7 @@ GamePage::Game* GamePage::checkInstallation(const QString& path, Game* g)
 
 bool GamePage::detectMicrosoftStore(const QString& path)
 {
-  return path.contains("/ModifiableWindowsApps/") || path.contains("/WindowsApps/");
+  return path.contains(u"/ModifiableWindowsApps/"_s) || path.contains(u"/WindowsApps/"_s);
 }
 
 bool GamePage::confirmMicrosoftStore(const QString& path, IPluginGame* game)
@@ -1274,12 +1275,12 @@ QString ConfirmationPage::makeReview() const
   lines.push_back(QObject::tr("Game: %1").arg(name));
   lines.push_back(QObject::tr("Game location: %1").arg(ci.gameLocation));
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 QString ConfirmationPage::dirLine(const QString& caption, const QString& path) const
 {
-  return QString("  - %1: %2").arg(caption).arg(path);
+  return QStringLiteral("  - %1: %2").arg(caption, path);
 }
 
 }  // namespace cid

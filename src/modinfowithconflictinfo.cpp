@@ -12,6 +12,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 namespace fs = std::filesystem;
 
 ModInfoWithConflictInfo::ModInfoWithConflictInfo(OrganizerCore& core)
@@ -100,8 +101,8 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
   bool hasHiddenFiles   = false;
 
   std::vector<int> dataIDs;
-  if (m_Core.directoryStructure()->originExists("data")) {
-    dataIDs.push_back(m_Core.directoryStructure()->getOriginByName("data").getID());
+  if (m_Core.directoryStructure()->originExists(u"data"_s)) {
+    dataIDs.push_back(m_Core.directoryStructure()->getOriginByName(u"data"_s).getID());
   }
   for (const auto& origin : m_Core.managedGame()->secondaryDataDirectories().keys()) {
     if (m_Core.directoryStructure()->originExists(origin)) {
@@ -117,7 +118,7 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
     std::set<const DirectoryEntry*> checkedDirs;
 
     // for all files in this origin
-    for (FileEntryPtr file : files) {
+    for (const FileEntryPtr& file : files) {
 
       // skip hiidden file check if already found one
       if (!hasHiddenFiles) {

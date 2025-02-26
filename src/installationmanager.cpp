@@ -55,6 +55,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 using namespace MOBase;
 using namespace MOShared;
 using namespace std::chrono_literals;
+using namespace Qt::StringLiterals;
 
 InstallationResult::InstallationResult(IPluginInstaller::EInstallResult result)
     : m_result(result), m_name(), m_iniTweaks(false), m_backup(false), m_merged(false),
@@ -295,7 +296,7 @@ InstallationManager::createFile(std::shared_ptr<const MOBase::FileTreeEntry> ent
 {
   // Use QTemporaryFile to create the temporary file with the given template:
   QTemporaryFile tempFile(
-      QDir::cleanPath(QDir::tempPath() + QDir::separator() + "mo2-install"));
+      QDir::cleanPath(QDir::tempPath() % QDir::separator() % u"mo2-install"_s));
 
   // Turn-off autoRemove otherwise the file is deleted when destructor is called:
   tempFile.setAutoRemove(false);
@@ -358,13 +359,13 @@ InstallationManager::installArchive(GuessedValue<QString>& modName,
 
 QString InstallationManager::generateBackupName(const QString& directoryName) const
 {
-  QString backupName = directoryName + "_backup";
+  QString backupName = directoryName % u"_backup"_s;
   if (QDir(backupName).exists()) {
     int idx      = 2;
-    QString temp = backupName + QString::number(idx);
+    QString temp = backupName % QString::number(idx);
     while (QDir(temp).exists()) {
       ++idx;
-      temp = backupName + QString::number(idx);
+      temp = backupName % QString::number(idx);
     }
     backupName = temp;
   }
@@ -374,7 +375,7 @@ QString InstallationManager::generateBackupName(const QString& directoryName) co
 InstallationResult InstallationManager::testOverwrite(GuessedValue<QString>& modName)
 {
   QString targetDirectory =
-      QDir::fromNativeSeparators(m_ModsDirectory + QDir::separator() + modName);
+      QDir::fromNativeSeparators(m_ModsDirectory % QDir::separator() + modName);
 
   // this is only returned on success
   InstallationResult result{IPluginInstaller::RESULT_SUCCESS};
@@ -411,7 +412,7 @@ InstallationResult InstallationManager::testOverwrite(GuessedValue<QString>& mod
           if (!ensureValidModName(modName)) {
             return {IPluginInstaller::RESULT_FAILED};
           }
-          targetDirectory = QDir::fromNativeSeparators(m_ModsDirectory) + "/" + modName;
+          targetDirectory = QDir::fromNativeSeparators(m_ModsDirectory) % u"/"_s + modName;
         }
       } else if (overwriteDialog.action() == QueryOverwriteDialog::ACT_REPLACE) {
         unsigned int idx = ModInfo::getIndex(modName);
@@ -421,7 +422,7 @@ InstallationResult InstallationManager::testOverwrite(GuessedValue<QString>& mod
           emit modReplaced(modInfo->installationFile());
         }
         // save original settings like categories. Because it makes sense
-        QString metaFilename = targetDirectory + "/meta.ini";
+        QString metaFilename = targetDirectory % u"/meta.ini"_s;
         QFile settingsFile(metaFilename);
         QByteArray originalSettings;
         if (settingsFile.open(QIODevice::ReadOnly)) {
@@ -498,7 +499,7 @@ InstallationResult InstallationManager::doInstall(GuessedValue<QString>& modName
 
   result.m_name = modName;
 
-  QString targetDirectory       = QDir(m_ModsDirectory + "/" + modName).canonicalPath();
+  QString targetDirectory       = QDir(m_ModsDirectory % u"/"_s + modName).canonicalPath();
   QString targetDirectoryNative = QDir::toNativeSeparators(targetDirectory);
 
   log::debug("installing to \"{}\"", targetDirectoryNative);
@@ -519,44 +520,44 @@ InstallationResult InstallationManager::doInstall(GuessedValue<QString>& modName
 
     QDir dir = QFileInfo(destPath).absoluteDir();
     if (!dir.exists()) {
-      dir.mkpath(".");
+      dir.mkpath(u"."_s);
     }
 
     QFile::copy(p.second, destPath);
   }
 
-  QSettings settingsFile(targetDirectory + "/meta.ini", QSettings::IniFormat);
+  QSettings settingsFile(targetDirectory % u"/meta.ini"_s, QSettings::IniFormat);
 
   // overwrite settings only if they are actually are available or haven't been set
   // before
-  if ((gameName != "") || !settingsFile.contains("gameName")) {
-    settingsFile.setValue("gameName", gameName);
+  if ((gameName != "") || !settingsFile.contains(u"gameName"_s)) {
+    settingsFile.setValue(u"gameName"_s, gameName);
   }
-  if ((modID != 0) || !settingsFile.contains("modid")) {
-    settingsFile.setValue("modid", modID);
+  if ((modID != 0) || !settingsFile.contains(u"modid"_s)) {
+    settingsFile.setValue(u"modid"_s, modID);
   }
-  if (!settingsFile.contains("version") ||
+  if (!settingsFile.contains(u"version"_s) ||
       (!version.isEmpty() &&
        (!merge || (VersionInfo(version) >=
-                   VersionInfo(settingsFile.value("version").toString()))))) {
-    settingsFile.setValue("version", version);
+                   VersionInfo(settingsFile.value(u"version"_s).toString()))))) {
+    settingsFile.setValue(u"version"_s, version);
   }
-  if (!newestVersion.isEmpty() || !settingsFile.contains("newestVersion")) {
-    settingsFile.setValue("newestVersion", newestVersion);
+  if (!newestVersion.isEmpty() || !settingsFile.contains(u"newestVersion"_s)) {
+    settingsFile.setValue(u"newestVersion"_s, newestVersion);
   }
   // issue #51 used to overwrite the manually set categories
-  if (!settingsFile.contains("category")) {
-    settingsFile.setValue("category", QString::number(categoryID));
+  if (!settingsFile.contains(u"category"_s)) {
+    settingsFile.setValue(u"category"_s, QString::number(categoryID));
   }
-  settingsFile.setValue("nexusFileStatus", fileCategoryID);
-  settingsFile.setValue("installationFile", m_CurrentFile);
-  settingsFile.setValue("repository", repository);
+  settingsFile.setValue(u"nexusFileStatus"_s, fileCategoryID);
+  settingsFile.setValue(u"installationFile"_s, m_CurrentFile);
+  settingsFile.setValue(u"repository"_s, repository);
 
   if (!merge) {
     // this does not clear the list we have in memory but the mod is going to have to be
     // re-read anyway btw.: installedFiles were written with beginWriteArray but we can
     // still clear it with beginGroup. nice
-    settingsFile.beginGroup("installedFiles");
+    settingsFile.beginGroup(u"installedFiles"_s);
     settingsFile.remove("");
     settingsFile.endGroup();
   }
@@ -598,7 +599,7 @@ void InstallationManager::postInstallCleanup()
   // TODO: this doesn't yet remove directories. Also, the files may be left there if
   // this point isn't reached
   for (const QString& tempFile : m_TempFilesToDelete) {
-    QFileInfo fileInfo(QDir::tempPath() + "/" + tempFile);
+    QFileInfo fileInfo(QDir::tempPath() % u"/"_s % tempFile);
     if (fileInfo.exists()) {
       if (!fileInfo.isReadable() || !fileInfo.isWritable()) {
         QFile::setPermissions(fileInfo.absoluteFilePath(),
@@ -646,21 +647,21 @@ InstallationResult InstallationManager::install(const QString& fileName,
   int category          = 0;
   int categoryID        = 0;
   int fileCategoryID    = 1;
-  QString repository    = "Nexus";
+  QString repository    = u"Nexus"_s;
 
-  QString metaName = fileName + ".meta";
+  QString metaName = fileName % u".meta"_s;
   if (QFile(metaName).exists()) {
     QSettings metaFile(metaName, QSettings::IniFormat);
-    gameName = metaFile.value("gameName", "").toString();
-    modID    = metaFile.value("modID", 0).toInt();
+    gameName = metaFile.value(u"gameName"_s, "").toString();
+    modID    = metaFile.value(u"modID"_s, 0).toInt();
     QTextDocument doc;
-    doc.setHtml(metaFile.value("name", "").toString());
+    doc.setHtml(metaFile.value(u"name"_s, "").toString());
     modName.update(doc.toPlainText(), GUESS_FALLBACK);
-    modName.update(metaFile.value("modName", "").toString(), GUESS_META);
+    modName.update(metaFile.value(u"modName"_s, "").toString(), GUESS_META);
 
-    version                    = metaFile.value("version", "").toString();
-    newestVersion              = metaFile.value("newestVersion", "").toString();
-    category                   = metaFile.value("category", 0).toInt();
+    version                    = metaFile.value(u"version"_s, "").toString();
+    newestVersion              = metaFile.value(u"newestVersion"_s, "").toString();
+    category                   = metaFile.value(u"category"_s, 0).toInt();
     unsigned int categoryIndex = CategoryFactory::instance().resolveNexusID(category);
     if (category != 0 && categoryIndex == 0U &&
         Settings::instance().nexus().categoryMappings()) {
@@ -685,8 +686,8 @@ InstallationResult InstallationManager::install(const QString& fileName,
     } else {
       categoryID = CategoryFactory::instance().getCategoryID(categoryIndex);
     }
-    repository     = metaFile.value("repository", "").toString();
-    fileCategoryID = metaFile.value("fileCategory", 1).toInt();
+    repository     = metaFile.value(u"repository"_s, "").toString();
+    fileCategoryID = metaFile.value(u"fileCategory"_s, 1).toInt();
   }
 
   if (version.isEmpty()) {
@@ -845,7 +846,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
     case IPluginInstaller::RESULT_SUCCESS:
     case IPluginInstaller::RESULT_SUCCESSCANCEL: {
       if (filesTree != nullptr) {
-        auto iniTweakEntry = filesTree->find("INI Tweaks", FileTreeEntry::DIRECTORY);
+        auto iniTweakEntry = filesTree->find(u"INI Tweaks"_s, FileTreeEntry::DIRECTORY);
         installResult.m_iniTweaks =
             iniTweakEntry != nullptr && !iniTweakEntry->astree()->empty();
       }
@@ -907,7 +908,7 @@ QString InstallationManager::getErrorString(Archive::Error errorCode)
 QStringList InstallationManager::getSupportedExtensions() const
 {
   std::set<QString, CaseInsensitive> supportedExtensions(
-      {"zip", "rar", "7z", "fomod", "001"});
+      {u"zip"_s, u"rar"_s, u"7z"_s, u"fomod"_s, u"001"_s});
   for (auto* installer : m_PluginContainer->plugins<IPluginInstaller>()) {
     if (m_PluginContainer->isEnabled(installer)) {
       if (auto* installerCustom = dynamic_cast<IPluginInstallerCustom*>(installer)) {

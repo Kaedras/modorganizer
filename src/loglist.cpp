@@ -29,6 +29,7 @@ static constexpr const char* userEnvVariable = "USERNAME";
 #endif
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 static LogModel* g_instance = nullptr;
 const std::size_t MaxLines  = 1000;
@@ -145,7 +146,7 @@ QVariant LogModel::data(const QModelIndex& index, int role) const
       const int frac       = static_cast<int>(ms.count() % 1000);
 
       const auto time = QDateTime::fromSecsSinceEpoch(tt).time().addMSecs(frac);
-      return time.toString("hh:mm:ss.zzz");
+      return time.toString(u"hh:mm:ss.zzz"_s);
     } else if (index.column() == 2) {
       return QString::fromStdString(e.message);
     }
@@ -155,15 +156,15 @@ QVariant LogModel::data(const QModelIndex& index, int role) const
     if (index.column() == 1) {
       switch (e.level) {
       case log::Warning:
-        return QIcon(":/MO/gui/warning");
+        return QIcon(u":/MO/gui/warning"_s);
 
       case log::Error:
-        return QIcon(":/MO/gui/problem");
+        return QIcon(u":/MO/gui/problem"_s);
 
       case log::Debug:
-        return QIcon(":/MO/gui/debug");
+        return QIcon(u":/MO/gui/debug"_s);
       case log::Info:
-        return QIcon(":/MO/gui/information");
+        return QIcon(u":/MO/gui/information"_s);
       default:
         return {};
       }
@@ -244,7 +245,7 @@ void LogList::clear()
 
 void LogList::openLogsFolder()
 {
-  QString logsPath = qApp->property("dataPath").toString() + "/" + AppConfig::logPath();
+  QString logsPath = qApp->property("dataPath").toString() % u"/"_s % AppConfig::logPath();
   shell::Explore(logsPath);
 }
 
@@ -384,7 +385,7 @@ void initLogging()
 bool createAndMakeWritable(const QString& subPath)
 {
   QString const dataPath = qApp->property("dataPath").toString();
-  QString fullPath       = dataPath + "/" + subPath;
+  QString fullPath       = dataPath % u"/"_s % subPath;
 
   if (!QDir(fullPath).exists() && !QDir().mkdir(fullPath)) {
     QMessageBox::critical(nullptr, QObject::tr("Error"),
@@ -399,8 +400,8 @@ bool createAndMakeWritable(const QString& subPath)
 
 bool setLogDirectory(const QString& dir)
 {
-  const auto logFile =
-      dir + "/" + AppConfig::logPath() + "/" + AppConfig::logFileName();
+  const QString logFile =
+      dir % u"/"_s % AppConfig::logPath() % u"/"_s % AppConfig::logFileName();
 
   if (!createAndMakeWritable(AppConfig::logPath())) {
     return false;

@@ -4,6 +4,8 @@
 #include "ui_modinfodialog.h"
 #include <QMessageBox>
 
+using namespace Qt::StringLiterals;
+
 class FileListModel : public QAbstractItemModel
 {
 public:
@@ -200,7 +202,7 @@ TextFilesTab::TextFilesTab(ModInfoDialogTabContext cx)
 
 bool TextFilesTab::wantsFile(const QString& rootPath, const QString& fullPath) const
 {
-  static const QString extensions[] = {".txt", ".json", ".cfg", ".log", ".toml"};
+  static const QString extensions[] = {u".txt"_s, u".json"_s, u".cfg"_s, u".log"_s, u".toml"_s};
 
   for (const auto& e : extensions) {
     if (fullPath.endsWith(e, Qt::CaseInsensitive)) {
@@ -218,8 +220,8 @@ IniFilesTab::IniFilesTab(ModInfoDialogTabContext cx)
 
 bool IniFilesTab::wantsFile(const QString& rootPath, const QString& fullPath) const
 {
-  static const QString extensions[] = {".ini"};
-  static const QString meta("meta.ini");
+  static const QString extensions[] = {u".ini"_s};
+  static const QString meta(u"meta.ini"_s);
 
   for (const auto& e : extensions) {
     if (fullPath.endsWith(e, Qt::CaseInsensitive)) {

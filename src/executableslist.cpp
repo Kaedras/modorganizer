@@ -32,6 +32,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ExecutablesList::iterator ExecutablesList::begin()
 {
@@ -76,26 +77,26 @@ void ExecutablesList::load(const MOBase::IPluginGame* game, const Settings& s)
   for (auto& map : s.executables()) {
     Executable::Flags flags;
 
-    if (map["toolbar"].toBool())
+    if (map[u"toolbar"_s].toBool())
       flags |= Executable::ShowInToolbar;
 
-    if (map["ownicon"].toBool())
+    if (map[u"ownicon"_s].toBool())
       flags |= Executable::UseApplicationIcon;
 
-    if (map["hide"].toBool())
+    if (map[u"hide"_s].toBool())
       flags |= Executable::Hide;
 
-    if (map.contains("custom")) {
+    if (map.contains(u"custom"_s)) {
       // the "custom" setting only exists in older versions
       needsUpgrade = true;
     }
 
     setExecutable(Executable()
-                      .title(map["title"].toString())
-                      .binaryInfo(QFileInfo(map["binary"].toString()))
-                      .arguments(map["arguments"].toString())
-                      .steamAppID(map["steamAppID"].toString())
-                      .workingDirectory(map["workingDirectory"].toString())
+                      .title(map[u"title"_s].toString())
+                      .binaryInfo(QFileInfo(map[u"binary"_s].toString()))
+                      .arguments(map[u"arguments"_s].toString())
+                      .steamAppID(map[u"steamAppID"_s].toString())
+                      .workingDirectory(map[u"workingDirectory"_s].toString())
                       .flags(flags));
   }
 
@@ -114,14 +115,14 @@ void ExecutablesList::store(Settings& s)
   for (const auto& item : *this) {
     std::map<QString, QVariant> map;
 
-    map["title"]            = item.title();
-    map["toolbar"]          = item.isShownOnToolbar();
-    map["ownicon"]          = item.usesOwnIcon();
-    map["hide"]             = item.hide();
-    map["binary"]           = item.binaryInfo().filePath();
-    map["arguments"]        = item.arguments();
-    map["workingDirectory"] = item.workingDirectory();
-    map["steamAppID"]       = item.steamAppID();
+    map[u"title"_s]            = item.title();
+    map[u"toolbar"_s]          = item.isShownOnToolbar();
+    map[u"ownicon"_s]          = item.usesOwnIcon();
+    map[u"hide"_s]             = item.hide();
+    map[u"binary"_s]           = item.binaryInfo().filePath();
+    map[u"arguments"_s]        = item.arguments();
+    map[u"workingDirectory"_s] = item.workingDirectory();
+    map[u"steamAppID"_s]       = item.steamAppID();
 
     v.push_back(std::move(map));
   }
@@ -144,15 +145,15 @@ ExecutablesList::getPluginExecutables(MOBase::IPluginGame const* game) const
     v.push_back({info, Executable::UseApplicationIcon});
   }
 
-  const QFileInfo eppBin(QCoreApplication::applicationDirPath() +
-                         "/explorer++/Explorer++.exe");
+  const QFileInfo eppBin(QCoreApplication::applicationDirPath() %
+                         u"/explorer++/Explorer++.exe"_s);
 
   if (eppBin.exists()) {
-    const auto args = QString("\"%1\"").arg(
+    const auto args = QStringLiteral("\"%1\"").arg(
         QDir::toNativeSeparators(game->dataDirectory().absolutePath()));
 
     const auto exe = Executable()
-                         .title("Explore Virtual Folder")
+                         .title(u"Explore Virtual Folder"_s)
                          .binaryInfo(eppBin)
                          .arguments(args)
                          .workingDirectory(eppBin.absolutePath())
@@ -193,7 +194,7 @@ const Executable& ExecutablesList::get(const QString& title) const
   }
 
   throw std::runtime_error(
-      QString("executable not found: %1").arg(title).toLocal8Bit().constData());
+      QStringLiteral("executable not found: %1").arg(title).toLocal8Bit().constData());
 }
 
 Executable& ExecutablesList::get(const QString& title)
@@ -296,7 +297,7 @@ std::optional<QString> ExecutablesList::makeNonConflictingTitle(const QString& p
       return title;
     }
 
-    title = prefix + QString(" (%1)").arg(i);
+    title = prefix % QStringLiteral(" (%1)").arg(i);
   }
 
   log::error("ran out of executable titles for prefix '{}'", prefix);
@@ -349,15 +350,15 @@ void ExecutablesList::dump() const
     QStringList flags;
 
     if (e.flags() & Executable::ShowInToolbar) {
-      flags.push_back("toolbar");
+      flags.push_back(u"toolbar"_s);
     }
 
     if (e.flags() & Executable::UseApplicationIcon) {
-      flags.push_back("icon");
+      flags.push_back(u"icon"_s);
     }
 
     if (e.flags() & Executable::Hide) {
-      flags.push_back("hide");
+      flags.push_back(u"hide"_s);
     }
 
     log::debug(" . executable '{}'\n"
@@ -367,7 +368,7 @@ void ExecutablesList::dump() const
                "    directory: {}\n"
                "    flags: {} ({})",
                e.title(), e.binaryInfo().filePath(), e.arguments(), e.steamAppID(),
-               e.workingDirectory(), flags.join("|"), e.flags());
+               e.workingDirectory(), flags.join('|'), e.flags());
   }
 }
 

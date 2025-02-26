@@ -39,6 +39,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QWebEngineSettings>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 BrowserDialog::BrowserDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::BrowserDialog),
@@ -47,7 +48,7 @@ BrowserDialog::BrowserDialog(QWidget* parent)
   ui->setupUi(this);
 
   m_AccessManager->setCookieJar(new PersistentCookieJar(QDir::fromNativeSeparators(
-      Settings::instance().paths().cache() + "/cookies.dat")));
+      Settings::instance().paths().cache() % u"/cookies.dat"_s)));
 
   Qt::WindowFlags flags =
       windowFlags() | Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint;
@@ -55,7 +56,7 @@ BrowserDialog::BrowserDialog(QWidget* parent)
   flags                    = flags & (~helpFlag);
   setWindowFlags(flags);
 
-  m_Tabs = this->findChild<QTabWidget*>("browserTabWidget");
+  m_Tabs = this->findChild<QTabWidget*>(u"browserTabWidget"_s);
 
   installEventFilter(this);
 
@@ -168,14 +169,14 @@ void BrowserDialog::titleChanged(const QString& title)
 
 QString BrowserDialog::guessFileName(const QString& url)
 {
-  QRegularExpression uploadsExp(QString("https://.+/uploads/([^/]+)$"));
+  static const QRegularExpression uploadsExp(QStringLiteral("https://.+/uploads/([^/]+)$"));
   auto match = uploadsExp.match(url);
   if (match.hasMatch()) {
     // these seem to be premium downloads
     return match.captured(1);
   }
 
-  QRegularExpression filesExp(QString("https://.+\\?file=([^&]+)"));
+  static const QRegularExpression filesExp(QStringLiteral("https://.+\\?file=([^&]+)"));
   match = filesExp.match(url);
   if (match.hasMatch()) {
     // a regular manual download?

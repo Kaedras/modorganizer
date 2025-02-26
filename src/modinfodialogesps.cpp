@@ -6,6 +6,7 @@
 #include <report.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 class ESPItem
 {
@@ -54,7 +55,7 @@ public:
 
       if (QFileInfo(m_inactivePath).fileName() != newName) {
         // file was renamed
-        m_inactivePath = QFileInfo(m_inactivePath).path() + QDir::separator() + newName;
+        m_inactivePath = QFileInfo(m_inactivePath).path() % QDir::separator() % newName;
       }
 
       pathChanged();
@@ -89,7 +90,7 @@ private:
 
   void pathChanged()
   {
-    m_fileInfo.setFile(m_rootPath + QDir::separator() + relativePath());
+    m_fileInfo.setFile(m_rootPath % QDir::separator() % relativePath());
     m_filename = m_fileInfo.fileName();
   }
 };
@@ -217,7 +218,7 @@ void ESPsTab::clear()
 
 bool ESPsTab::feedFile(const QString& rootPath, const QString& fullPath)
 {
-  static const QString extensions[] = {".esp", ".esm", ".esl"};
+  static const QString extensions[] = {u".esp"_s, u".esm"_s, u".esl"_s};
 
   for (const auto& e : extensions) {
     if (fullPath.endsWith(e, Qt::CaseInsensitive)) {
@@ -330,14 +331,14 @@ void ESPsTab::onDeactivate()
   QString newName = esp->inactivePath();
 
   if (newName.isEmpty()) {
-    if (!root.exists("optional")) {
-      if (!root.mkdir("optional")) {
+    if (!root.exists(u"optional"_s)) {
+      if (!root.mkdir(u"optional"_s)) {
         reportError(QObject::tr("Failed to create directory \"optional\""));
         return;
       }
     }
 
-    newName = QString("optional") + QDir::separator() + esp->fileInfo().fileName();
+    newName = u"optional"_s % QDir::separator() % esp->fileInfo().fileName();
   }
 
   if (esp->deactivate(newName)) {

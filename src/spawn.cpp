@@ -19,15 +19,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "spawn.h"
 
-#ifdef __unix__
-#include "linux/compatibility.h"
-static constexpr const char* steamName        = "steam";
-static constexpr const char* steamServiceName = "steamwebhelper";
-#else
-static constexpr const char* steamName        = "Steam.exe";
-static constexpr const char* steamServiceName = "SteamService.exe";
-#endif
-
 #include "env.h"
 #include "envmodule.h"
 #include "envos.h"
@@ -46,6 +37,16 @@ static constexpr const char* steamServiceName = "SteamService.exe";
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
+
+#ifdef __unix__
+#include "linux/compatibility.h"
+static const auto steamName        = "steam"_L1;
+static const auto steamServiceName = "steamwebhelper"_L1;
+#else
+static const auto steamName        = "Steam.exe"_L1;
+static const auto steamServiceName = "SteamService.exe"_L1;
+#endif
 
 namespace spawn::dialogs
 {
@@ -80,7 +81,7 @@ void helperFailed(QWidget* parent, DWORD code, const QString& why,
   sp.currentDirectory.setPath(cwd);
   sp.arguments = args;
 
-  const auto details = makeDetails(sp, code, "in " + why);
+  const auto details = makeDetails(sp, code, u"in "_s % why);
   log::error("{}", details);
 
   const auto title = QObject::tr("Cannot launch helper");
@@ -113,7 +114,7 @@ confirmStartSteam(QWidget* parent, const SpawnParameters& sp, const QString& det
       .button({QObject::tr("Continue without starting Steam"),
                QObject::tr("The program might fail to run."), QMessageBox::No})
       .button({QObject::tr("Cancel"), QMessageBox::Cancel})
-      .remember("steamQuery", sp.binary.fileName())
+      .remember(u"steamQuery"_s, sp.binary.fileName())
       .exec();
 }
 
@@ -140,7 +141,7 @@ QMessageBox::StandardButton confirmRestartAsAdminForSteam(QWidget* parent,
       .button({QObject::tr("Continue"), QObject::tr("The program might fail to run."),
                QMessageBox::No})
       .button({QObject::tr("Cancel"), QMessageBox::Cancel})
-      .remember("steamAdminQuery", sp.binary.fileName())
+      .remember(u"steamAdminQuery"_s, sp.binary.fileName())
       .exec();
 }
 
@@ -155,9 +156,9 @@ confirmBlacklisted(QWidget* parent, const SpawnParameters& sp, Settings& setting
       "filesystem. This will likely prevent it from seeing any mods, INI files "
       "or any other virtualized files.");
 
-  const auto details = "Executable: " + sp.binary.fileName() +
-                       "\n"
-                       "Current blacklist: " +
+  const QString details = u"Executable: "_s % sp.binary.fileName() %
+                       u"\n"
+                       "Current blacklist: "_s %
                        settings.executablesBlacklist();
 
   auto r = MOBase::TaskDialog(parent, title)
@@ -238,14 +239,14 @@ QString makeSteamArguments(const QString& username, const QString& password)
 bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDirectory,
                 const QString& steamAppID, const Settings& settings)
 {
-  static const std::vector<QString> steamFiles = {"steam_api.dll", "steam_api64.dll"};
+  static const std::vector<QString> steamFiles = {u"steam_api.dll"_s, u"steam_api64.dll"_s};
 
   log::debug("checking steam");
 
   if (!steamAppID.isEmpty()) {
-    env::set("SteamAPPId", steamAppID);
+    env::set(u"SteamAPPId"_s, steamAppID);
   } else {
-    env::set("SteamAPPId", settings.steam().appID());
+    env::set(u"SteamAPPId"_s, settings.steam().appID());
   }
 
   bool steamRequired = false;
@@ -254,9 +255,8 @@ bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDire
   for (const auto& file : steamFiles) {
     const QFileInfo fi(gameDirectory.absoluteFilePath(file));
     if (fi.exists()) {
-      details = QString("managed game is located at '%1' and file '%2' exists")
-                    .arg(gameDirectory.absolutePath())
-                    .arg(fi.absoluteFilePath());
+      details = QStringLiteral("managed game is located at '%1' and file '%2' exists")
+                    .arg(gameDirectory.absolutePath(), fi.absoluteFilePath());
 
       log::debug("{}", details);
       steamRequired = true;
@@ -336,7 +336,7 @@ bool checkBlacklist(QWidget* parent, const SpawnParameters& sp, Settings& settin
 
 bool isJavaFile(const QFileInfo& target)
 {
-  return target.suffix().compare("jar", Qt::CaseInsensitive) == 0;
+  return target.suffix().compare("jar"_L1, Qt::CaseInsensitive) == 0;
 }
 
 extern bool isExeFile(const QFileInfo& target);
@@ -361,7 +361,7 @@ extern bool helperExec(QWidget* parent, const QString& moDirectory,
 
 bool backdateBSAs(QWidget* parent, const QString& moPath, const QString& dataPath)
 {
-  const QString commandLine = QString(R"(backdateBSA "%1")").arg(dataPath);
+  const QString commandLine = QStringLiteral(R"(backdateBSA "%1")").arg(dataPath);
 
   return helperExec(parent, moPath, commandLine, false);
 }

@@ -11,6 +11,7 @@
 
 using namespace MOShared;
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 // if there are more than 50 selected items in the conflict tree, don't bother
 // checking whether menu items apply to them, just show all of them
@@ -119,13 +120,13 @@ void ConflictsTab::changeItemsVisibility(QTreeView* tree, bool visible)
 
   // logging
   {
-    const QString action = (visible ? "unhiding" : "hiding");
+    const QString action = (visible ? u"unhiding"_s : u"hiding"_s);
 
     QString files;
     if (n > max_small_selection)
       files = "a lot of";
     else
-      files = QString("%1").arg(n);
+      files = QStringLiteral("%1").arg(n);
 
     log::debug("{} {} conflict files", action, files);
   }
@@ -637,7 +638,7 @@ bool GeneralConflictsTab::update()
     for (const auto& file : m_tab->origin()->getFiles()) {
       // careful: these two strings are moved into createXItem() below
       QString relativeName = QDir::fromNativeSeparators(file->getRelativePath());
-      QString fileName     = rootPath + relativeName;
+      QString fileName     = rootPath % relativeName;
 
       bool archive         = false;
       const int fileOrigin = file->getOrigin(archive);
@@ -722,7 +723,7 @@ ConflictItem GeneralConflictsTab::createOverwriteItem(
 
   for (const auto& alt : alternatives) {
     if (!altString.isEmpty()) {
-      altString += ", ";
+      altString += u", "_s;
     }
 
     altString += ds.getOriginByID(alt.originID()).getName();
@@ -997,7 +998,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
         for (const auto& alt : alternatives) {
           const auto& altOrigin = ds.getOriginByID(alt.originID());
           if (!before.isEmpty()) {
-            before += ", ";
+            before += u", "_s;
           }
 
           before += altOrigin.getName();
@@ -1040,7 +1041,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
             // mod comes before current
 
             if (!before.isEmpty()) {
-              before += ", ";
+              before += u", "_s;
             }
 
             before += altOrigin.getName();
@@ -1048,7 +1049,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
             // mod comes after current
 
             if (!after.isEmpty()) {
-              after += ", ";
+              after += u", "_s;
             }
 
             after += altOrigin.getName();
@@ -1057,7 +1058,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
 
         // also add the active winner origin (the one outside alternatives) to 'after'
         if (!after.isEmpty()) {
-          after += ", ";
+          after += u", "_s;
         }
         after += ds.getOriginByID(fileOrigin).getName();
 

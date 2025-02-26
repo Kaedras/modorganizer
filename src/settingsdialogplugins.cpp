@@ -8,18 +8,19 @@
 #include "plugincontainer.h"
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 PluginsSettingsTab::PluginsSettingsTab(Settings& s, PluginContainer* pluginContainer,
                                        SettingsDialog& d)
     : SettingsTab(s, d), m_pluginContainer(pluginContainer)
 {
-  ui->pluginSettingsList->setStyleSheet("QTreeWidget::item {padding-right: 10px;}");
+  ui->pluginSettingsList->setStyleSheet(u"QTreeWidget::item {padding-right: 10px;}"_s);
 
   // Create top-level tree widget:
   QStringList pluginInterfaces = m_pluginContainer->pluginInterfaces();
   pluginInterfaces.sort(Qt::CaseInsensitive);
   std::map<QString, QTreeWidgetItem*> topItems;
-  for (QString interfaceName : pluginInterfaces) {
+  for (const QString& interfaceName : pluginInterfaces) {
     auto* item = new QTreeWidgetItem(ui->pluginsList, {interfaceName});
     item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
     auto font = item->font(0);
@@ -195,7 +196,7 @@ void PluginsSettingsTab::update()
 
   // set plugin blacklist
   QStringList names;
-  for (QListWidgetItem* item : ui->pluginBlacklist->findItems("*", Qt::MatchWildcard)) {
+  for (QListWidgetItem* item : ui->pluginBlacklist->findItems(u"*"_s, Qt::MatchWildcard)) {
     names.push_back(item->text());
   }
 
@@ -261,7 +262,7 @@ void PluginsSettingsTab::on_checkboxEnabled_clicked(bool checked)
           QObject::tr("<p>Disabling the '%1' plugin will also disable the following "
                       "plugins:</p><ul>%1</ul><p>Do you want to continue?</p>")
               .arg(plugin->localizedName())
-              .arg("<li>" + pluginNames.join("</li><li>") + "</li>");
+              .arg(u"<li>"_s % pluginNames.join(u"</li><li>"_s) % u"</li>"_s);
       if (QMessageBox::warning(parentWidget(), QObject::tr("Really disable plugin?"),
                                message,
                                QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
@@ -328,8 +329,8 @@ void PluginsSettingsTab::on_pluginsList_currentItemChanged(QTreeWidgetItem* curr
       for (auto& problem : problems) {
         descriptions.append(problem.shortDescription());
       }
-      ui->enabledCheckbox->setToolTip("<ul><li>" + descriptions.join("</li><li>") +
-                                      "</li></ul>");
+      ui->enabledCheckbox->setToolTip(u"<ul><li>"_s % descriptions.join(u"</li><li>"_s) %
+                                      u"</li></ul>"_s);
     }
   }
 

@@ -3,6 +3,8 @@
 #include "modflagicondelegate.h"
 #include "settings.h"
 
+using namespace Qt::StringLiterals;
+
 class ColorItem;
 ColorItem* colorItemForRow(QTableWidget* table, int row);
 
@@ -290,7 +292,7 @@ void ColorTable::addColor(const QString& text, const QColor& defaultColor,
   setRowCount(r + 1);
 
   setItem(r, 0, new ColorItem(text, defaultColor, get, commit));
-  setItem(r, 1, new QTableWidgetItem("Text"));
+  setItem(r, 1, new QTableWidgetItem(u"Text"_s));
   setItem(r, 2, new QTableWidgetItem);
 
   resizeColumnsToContents();

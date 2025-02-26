@@ -18,6 +18,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 namespace bf = boost::fusion;
 
@@ -86,47 +87,47 @@ struct PluginTypeName;
 template <>
 struct PluginTypeName<MOBase::IPlugin>
 {
-  static QString value() { return QT_TR_NOOP("Plugin"); }
+  static QString value() { return QT_TR_NOOP(u"Plugin"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginDiagnose>
 {
-  static QString value() { return QT_TR_NOOP("Diagnose"); }
+  static QString value() { return QT_TR_NOOP(u"Diagnose"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginGame>
 {
-  static QString value() { return QT_TR_NOOP("Game"); }
+  static QString value() { return QT_TR_NOOP(u"Game"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginInstaller>
 {
-  static QString value() { return QT_TR_NOOP("Installer"); }
+  static QString value() { return QT_TR_NOOP(u"Installer"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginModPage>
 {
-  static QString value() { return QT_TR_NOOP("Mod Page"); }
+  static QString value() { return QT_TR_NOOP(u"Mod Page"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginPreview>
 {
-  static QString value() { return QT_TR_NOOP("Preview"); }
+  static QString value() { return QT_TR_NOOP(u"Preview"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginTool>
 {
-  static QString value() { return QT_TR_NOOP("Tool"); }
+  static QString value() { return QT_TR_NOOP(u"Tool"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginProxy>
 {
-  static QString value() { return QT_TR_NOOP("Proxy"); }
+  static QString value() { return QT_TR_NOOP(u"Proxy"_s); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginFileMapper>
 {
-  static QString value() { return QT_TR_NOOP("File Mapper"); }
+  static QString value() { return QT_TR_NOOP(u"File Mapper"_s); }
 };
 
 QStringList PluginContainer::pluginInterfaces()
@@ -146,7 +147,7 @@ QStringList PluginContainer::pluginInterfaces()
 
 // PluginRequirementProxy
 
-const std::set<QString> PluginRequirements::s_CorePlugins{"INI Bakery"};
+const std::set<QString> PluginRequirements::s_CorePlugins{u"INI Bakery"_s};
 
 PluginRequirements::PluginRequirements(PluginContainer* pluginContainer,
                                        MOBase::IPlugin* plugin, OrganizerProxy* proxy,
@@ -401,8 +402,8 @@ QStringList PluginContainer::pluginFileNames() const
   }
   std::vector<IPluginProxy*> proxyList = bf::at_key<IPluginProxy>(m_Plugins);
   for (IPluginProxy* proxy : proxyList) {
-    QStringList proxiedPlugins = proxy->pluginList(
-        QCoreApplication::applicationDirPath() + "/" + AppConfig::pluginPath());
+    QStringList proxiedPlugins = proxy->pluginList(QDir(
+        QCoreApplication::applicationDirPath() % u"/"_s % AppConfig::pluginPath()));
     result.append(proxiedPlugins);
   }
   return result;
@@ -603,8 +604,8 @@ IPlugin* PluginContainer::registerPlugin(QObject* plugin, const QString& filepat
       bf::at_key<IPluginProxy>(m_Plugins).push_back(proxy);
       emit pluginRegistered(proxy);
 
-      QStringList filepaths = proxy->pluginList(QCoreApplication::applicationDirPath() +
-                                                "/" + AppConfig::pluginPath());
+      QStringList filepaths = proxy->pluginList(QDir(QCoreApplication::applicationDirPath() %
+                                                u"/"_s % AppConfig::pluginPath()));
       for (const QString& filepath : filepaths) {
         loadProxied(filepath, proxy);
       }
@@ -648,7 +649,7 @@ bool PluginContainer::isEnabled(IPlugin* plugin) const
   }
 
   // Check if the plugin is enabled:
-  if (!m_Organizer->persistent(plugin->name(), "enabled", plugin->enabledByDefault())
+  if (!m_Organizer->persistent(plugin->name(), u"enabled"_s, plugin->enabledByDefault())
            .toBool()) {
     return false;
   }
@@ -674,7 +675,7 @@ void PluginContainer::setEnabled(MOBase::IPlugin* plugin, bool enable,
     setEnabled(p, enable, false);
   }
 
-  m_Organizer->setPersistent(plugin->name(), "enabled", enable, true);
+  m_Organizer->setPersistent(plugin->name(), u"enabled"_s, enable, true);
 
   if (enable) {
     emit pluginEnabled(plugin);
@@ -863,7 +864,7 @@ QObject* PluginContainer::loadQtPlugin(const QString& filepath)
     if (IPlugin* plugin = registerPlugin(object, filepath, nullptr); plugin) {
       log::debug("loaded plugin '{}' from '{}' - [{}]", plugin->name(),
                  QFileInfo(filepath).fileName(),
-                 implementedInterfaces(plugin).join(", "));
+                 implementedInterfaces(plugin).join(u", "_s));
       m_PluginLoaders.push_back(pluginLoader.release());
       return object;
     } else {
@@ -918,8 +919,8 @@ void PluginContainer::loadPlugin(QString const& filepath)
   } else {
     // We need to check if this can be handled by a proxy.
     for (auto* proxy : this->plugins<IPluginProxy>()) {
-      auto filepaths = proxy->pluginList(QCoreApplication::applicationDirPath() + "/" +
-                                         AppConfig::pluginPath());
+      auto filepaths = proxy->pluginList(QDir(
+          QCoreApplication::applicationDirPath() % u"/"_s % AppConfig::pluginPath()));
       if (filepaths.contains(filepath)) {
         plugins = loadProxied(filepath, proxy);
         break;
@@ -1078,8 +1079,8 @@ void PluginContainer::loadPlugins()
   QString skipPlugin;
 
   if (m_Organizer) {
-    loadCheck.setFileName(qApp->property("dataPath").toString() +
-                          "/plugin_loadcheck.tmp");
+    loadCheck.setFileName(qApp->property("dataPath").toString() %
+                          u"/plugin_loadcheck.tmp"_s);
 
     if (loadCheck.exists() && loadCheck.open(QIODevice::ReadOnly)) {
       // oh, there was a failed plugin load last time. Find out which plugin was loaded
@@ -1134,7 +1135,7 @@ void PluginContainer::loadPlugins()
     loadCheck.open(QIODevice::WriteOnly);
   }
 
-  QString pluginPath = qApp->applicationDirPath() + "/" + AppConfig::pluginPath();
+  QString pluginPath = qApp->applicationDirPath() % u"/"_s % AppConfig::pluginPath();
   log::debug("looking for plugins in {}", QDir::toNativeSeparators(pluginPath));
   QDirIterator iter(pluginPath, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 
@@ -1223,9 +1224,9 @@ QString PluginContainer::fullDescription(unsigned int key) const
            "dependencies (i.e. python) or an outdated version:") +
         "<ul>";
     for (const QString& plugin : m_FailedPlugins) {
-      result += "<li>" + plugin + "</li>";
+      result += u"<li>"_s % plugin % u"</li>"_s;
     }
-    result += "<ul>";
+    result += u"<ul>"_s;
     return result;
   } break;
   default: {

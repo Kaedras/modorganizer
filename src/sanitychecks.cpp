@@ -6,19 +6,21 @@
 #include <log.h>
 #include <utility.h>
 
+using namespace Qt::StringLiterals;
+
 #ifdef __unix__
 // executables file types
-static const QStringList FileTypes = {"*.so"};
+static const QStringList FileTypes = {u"*.so"_s};
 // files that are likely to be eaten
-static const QStringList files({"helper", "nxmhandler", "loot/libloot.so",
-                                "loot/lootcli"});
+static const QStringList files({u"helper"_s, u"nxmhandler"_s, u"loot/libloot.so"_s,
+                                u"loot/lootcli"_s});
 #else
 // executables file types
-static const QStringList FileTypes = {"*.dll", "*.exe"};
+static const QStringList FileTypes = {u"*.dll"_s, u"*.exe"_s};
 // files that are likely to be eaten
-static const QStringList files({"helper.exe", "nxmhandler.exe", "usvfs_proxy_x64.exe",
-                                "usvfs_proxy_x86.exe", "usvfs_x64.dll", "usvfs_x86.dll",
-                                "loot/loot.dll", "loot/lootcli.exe"});
+static const QStringList files({u"helper.exe"_s, u"nxmhandler.exe"_s, u"usvfs_proxy_x64.exe"_s,
+                                u"usvfs_proxy_x86.exe"_s, u"usvfs_x64.dll"_s, u"usvfs_x86.dll"_s,
+                                u"loot/loot.dll"_s, u"loot/lootcli.exe"_s});
 #endif
 
 namespace sanity
@@ -40,25 +42,25 @@ QString toCodeName(SecurityZone z)
 {
   switch (z) {
   case SecurityZone::NoZone:
-    return "NoZone";
+    return u"NoZone"_s;
   case SecurityZone::MyComputer:
-    return "MyComputer";
+    return u"MyComputer"_s;
   case SecurityZone::Intranet:
-    return "Intranet";
+    return u"Intranet"_s;
   case SecurityZone::Trusted:
-    return "Trusted";
+    return u"Trusted"_s;
   case SecurityZone::Internet:
-    return "Internet";
+    return u"Internet"_s;
   case SecurityZone::Untrusted:
-    return "Untrusted";
+    return u"Untrusted"_s;
   default:
-    return "Unknown zone";
+    return u"Unknown zone"_s;
   }
 }
 
 QString toString(SecurityZone z)
 {
-  return QString("%1 (%2)").arg(toCodeName(z)).arg(static_cast<int>(z));
+  return QStringLiteral("%1 (%2)").arg(toCodeName(z)).arg(static_cast<int>(z));
 }
 
 // whether the given zone is considered blocked
@@ -84,14 +86,14 @@ bool isZoneBlocked(SecurityZone z)
 bool isFileBlocked(const QFileInfo& fi)
 {
   // name of the alternate data stream containing the zone identifier ini
-  const QString ads = "Zone.Identifier";
+  const QString ads = u"Zone.Identifier"_s;
 
   // key in the ini
-  const auto key = "ZoneTransfer/ZoneId";
+  const QString key = u"ZoneTransfer/ZoneId"_s;
 
   // the path to the ADS is always `filename:Zone.Identifier`
-  const auto path    = fi.absoluteFilePath();
-  const auto adsPath = path + ":" + ads;
+  const QString path    = fi.absoluteFilePath();
+  const QString adsPath = path % u":"_s % ads;
 
   QFile f(adsPath);
   if (!f.exists()) {
@@ -172,7 +174,7 @@ int checkBlocked()
 {
   // directories that contain executables; these need to be explicit because
   // portable instances might add billions of files in MO's directory
-  const QString dirs[] = {".", "/dlls", "/loot", "/NCC", "/platforms", "/plugins"};
+  const QStringList dirs = {u"."_s, u"/dlls"_s, u"/loot"_s, u"/NCC"_s, u"/platforms"_s, u"/plugins"_s};
 
   log::debug("  . blocked files");
   const QString appDir = QCoreApplication::applicationDirPath();
@@ -180,7 +182,7 @@ int checkBlocked()
   int n = 0;
 
   for (const auto& d : dirs) {
-    const auto path = QDir(appDir + "/" + d).canonicalPath();
+    const auto path = QDir(appDir % u"/"_s % d).canonicalPath();
     n += checkBlockedFiles(path);
   }
 
@@ -195,7 +197,7 @@ int checkMissingFiles()
   int n = 0;
 
   for (const auto& name : files) {
-    const QFileInfo file(dir + "/" + name);
+    const QFileInfo file(dir % u"/"_s % name);
 
     if (!file.exists()) {
       log::warn("{}", QObject::tr(
@@ -219,7 +221,7 @@ int checkBadOSDs(const env::Module& m)
   // where they got loaded later, so this is also called every time a new module
   // is loaded into this process
 
-  const std::string nahimic = "Nahimic (also known as SonicSuite, SonicRadar, "
+  static const std::string nahimic = "Nahimic (also known as SonicSuite, SonicRadar, "
                               "SteelSeries, A-Volute, etc.)";
 
   auto p = [](std::string re, std::string s) {
@@ -268,7 +270,7 @@ int checkUsvfsIncompatibilites(const env::Module& m)
   // these dlls seems to interfere with usvfs
 
   static const std::map<QString, QString> names = {
-      {"mactype64.dll", "Mactype"}, {"epclient64.dll", "Citrix ICA Client"}};
+      {u"mactype64.dll"_s, u"Mactype"_s}, {u"epclient64.dll"_s, u"Citrix ICA Client"_s}};
 
   const QFileInfo file(m.path());
   int n = 0;
@@ -347,18 +349,18 @@ int checkPaths(IPluginGame& game, const Settings& s)
 
   int n = 0;
 
-  n += checkProtected(game.gameDirectory(), "the game");
+  n += checkProtected(game.gameDirectory(), u"the game"_s);
   n += checkMicrosoftStore(game.gameDirectory());
-  n += checkProtected(QApplication::applicationDirPath(), "Mod Organizer");
+  n += checkProtected(QApplication::applicationDirPath(), u"Mod Organizer"_s);
 
-  if (checkProtected(s.paths().base(), "the instance base directory")) {
+  if (checkProtected(s.paths().base(), u"the instance base directory"_s)) {
     ++n;
   } else {
-    n += checkProtected(s.paths().downloads(), "the downloads directory");
-    n += checkProtected(s.paths().mods(), "the mods directory");
-    n += checkProtected(s.paths().cache(), "the cache directory");
-    n += checkProtected(s.paths().profiles(), "the profiles directory");
-    n += checkProtected(s.paths().overwrite(), "the overwrite directory");
+    n += checkProtected(s.paths().downloads(), u"the downloads directory"_s);
+    n += checkProtected(s.paths().mods(), u"the mods directory"_s);
+    n += checkProtected(s.paths().cache(), u"the cache directory"_s);
+    n += checkProtected(s.paths().profiles(), u"the profiles directory"_s);
+    n += checkProtected(s.paths().overwrite(), u"the overwrite directory"_s);
   }
 
   return n;

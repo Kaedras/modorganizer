@@ -220,7 +220,7 @@ void OverwriteInfoDialog::createDirectoryTriggered()
   index = index.sibling(index.row(), 0);
 
   QString name = tr("New Folder");
-  QString path = m_FileSystemModel->filePath(index).append("/");
+  QString path = m_FileSystemModel->filePath(index) % '/';
 
   QModelIndex existingIndex = m_FileSystemModel->index(path + name);
   int suffix                = 1;

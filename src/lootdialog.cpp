@@ -6,6 +6,7 @@
 #include <utility.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 QString progressToString(lootcli::Progress p)
 {
@@ -23,7 +24,7 @@ QString progressToString(lootcli::Progress p)
 
   auto itor = map.find(p);
   if (itor == map.end()) {
-    return QString("unknown progress %1").arg(static_cast<int>(p));
+    return QStringLiteral("unknown progress %1").arg(static_cast<int>(p));
   } else {
     return itor->second;
   }
@@ -44,7 +45,7 @@ MarkdownPage::MarkdownPage(QObject* parent) : QWebEnginePage(parent) {}
 
 bool MarkdownPage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
 {
-  static const QStringList allowed = {"qrc", "data"};
+  static const QStringList allowed = {u"qrc"_s, u"data"_s};
 
   if (!allowed.contains(url.scheme())) {
     shell::Open(url);
@@ -116,7 +117,7 @@ void LootDialog::addOutput(const QString& s)
     return;
   }
 
-  const auto lines = s.split(QRegularExpression("[\\r\\n]"), Qt::SkipEmptyParts);
+  const auto lines = s.split(QRegularExpression(u"[\\r\\n]"_s), Qt::SkipEmptyParts);
 
   for (auto&& line : lines) {
     if (line.isEmpty()) {
@@ -139,7 +140,7 @@ void LootDialog::cancel()
     m_loot.cancel();
 
     setText(tr("Stopping LOOT..."));
-    addLineOutput("stopping loot");
+    addLineOutput(u"stopping loot"_s);
 
     ui->buttons->setEnabled(false);
     m_cancelling = true;
@@ -191,10 +192,10 @@ void LootDialog::createUI()
   ui->report->setPage(page);
 
   auto* channel = new QWebChannel(this);
-  channel->registerObject("content", &m_report);
+  channel->registerObject(u"content"_s, &m_report);
   page->setWebChannel(channel);
 
-  const QString path = QApplication::applicationDirPath() + "/resources/markdown.html";
+  const QString path = QApplication::applicationDirPath() % u"/resources/markdown.html"_s;
   QFile f(path);
 
   if (f.open(QFile::ReadOnly)) {
@@ -269,7 +270,7 @@ void LootDialog::log(log::Levels lv, const QString& s)
   }
 
   if (m_core.settings().diagnostics().lootLogLevel() > lootcli::LogLevels::Debug) {
-    addLineOutput(QString("[%1] %2").arg(log::levelToString(lv)).arg(s));
+    addLineOutput(QStringLiteral("[%1] %2").arg(log::levelToString(lv), s));
   }
 }
 

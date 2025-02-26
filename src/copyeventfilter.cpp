@@ -33,7 +33,7 @@ void CopyEventFilter::copySelection() const
     rows.append(m_format(idx));
   }
 
-  QGuiApplication::clipboard()->setText(rows.join("\n"));
+  QGuiApplication::clipboard()->setText(rows.join('\n'));
 }
 
 bool CopyEventFilter::eventFilter(QObject* sender, QEvent* event)

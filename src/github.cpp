@@ -6,8 +6,10 @@
 #include <QCoreApplication>
 #include <QThread>
 
-static const QString GITHUB_URL("https://api.github.com");
-static const QString USER_AGENT("GitHubPP");
+using namespace Qt::StringLiterals;
+
+static const QString GITHUB_URL(u"https://api.github.com"_s);
+static const QString USER_AGENT(u"GitHubPP"_s);
 
 GitHub::GitHub(const char* clientId) : m_AccessManager(new QNetworkAccessManager(this))
 {}
@@ -25,7 +27,7 @@ GitHub::~GitHub()
 QJsonArray GitHub::releases(const Repository& repo)
 {
   QJsonDocument result = request(
-      Method::GET, QString("repos/%1/%2/releases").arg(repo.owner, repo.project),
+      Method::GET, QStringLiteral("repos/%1/%2/releases").arg(repo.owner, repo.project),
       QByteArray(), true);
   return result.array();
 }
@@ -34,7 +36,7 @@ void GitHub::releases(const Repository& repo,
                       const std::function<void(const QJsonArray&)>& callback)
 {
   request(
-      Method::GET, QString("repos/%1/%2/releases").arg(repo.owner, repo.project),
+      Method::GET, QStringLiteral("repos/%1/%2/releases").arg(repo.owner, repo.project),
       QByteArray(),
       [callback](const QJsonDocument& result) {
         callback(result.array());
@@ -47,10 +49,10 @@ QJsonDocument GitHub::handleReply(QNetworkReply* reply)
   int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
   if (statusCode != 200) {
     return QJsonDocument(QJsonObject(
-        {{"http_status", statusCode},
-         {"redirection",
+        {{u"http_status"_s, statusCode},
+         {u"redirection"_s,
           reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString()},
-         {"reason",
+         {u"reason"_s,
           reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString()}}));
   }
 
@@ -63,7 +65,7 @@ QJsonDocument GitHub::handleReply(QNetworkReply* reply)
   QJsonDocument result = QJsonDocument::fromJson(data, &parseError);
 
   if (parseError.error != QJsonParseError::NoError) {
-    return QJsonDocument(QJsonObject({{"parse_error", parseError.errorString()}}));
+    return QJsonDocument(QJsonObject({{u"parse_error"_s, parseError.errorString()}}));
   }
 
   return result;
@@ -72,10 +74,10 @@ QJsonDocument GitHub::handleReply(QNetworkReply* reply)
 QNetworkReply* GitHub::genReply(Method method, const QString& path,
                                 const QByteArray& data, bool relative)
 {
-  QNetworkRequest request(relative ? GITHUB_URL + "/" + path : path);
+  QNetworkRequest request(relative ? GITHUB_URL % u"/"_s % path : path);
 
   request.setHeader(QNetworkRequest::UserAgentHeader, USER_AGENT);
-  request.setRawHeader("Accept", "application/vnd.github.v3+json");
+  request.setRawHeader(QByteArrayLiteral("Accept"), QByteArrayLiteral("application/vnd.github.v3+json"));
 
   switch (method) {
   case Method::GET:
@@ -100,8 +102,8 @@ QJsonDocument GitHub::request(Method method, const QString& path,
   reply->deleteLater();
 
   QJsonObject object = result.object();
-  if (object.value("http_status").toDouble() == 301.0) {
-    return request(method, object.value("redirection").toString(), data, false);
+  if (object.value(u"http_status"_s).toDouble() == 301.0) {
+    return request(method, object.value(u"redirection"_s).toString(), data, false);
   } else {
     return result;
   }
@@ -151,8 +153,8 @@ void GitHub::onFinished(const Request& req)
 
   req.timer->stop();
 
-  if (object.value("http_status").toInt() == 301) {
-    request(req.method, object.value("redirection").toString(), req.data, req.callback,
+  if (object.value(u"http_status"_s).toInt() == 301) {
+    request(req.method, object.value(u"redirection"_s).toString(), req.data, req.callback,
             false);
   } else {
     req.callback(result);
@@ -174,7 +176,7 @@ void GitHub::onError(const Request& req, QNetworkReply::NetworkError error)
   req.timer->stop();
   req.reply->disconnect();
 
-  QJsonObject root({{"network_error", req.reply->errorString()}});
+  QJsonObject root({{u"network_error"_s, req.reply->errorString()}});
   QJsonDocument doc(root);
 
   req.callback(doc);

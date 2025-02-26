@@ -17,6 +17,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 namespace
 {
@@ -84,23 +85,23 @@ bool ModInfoRegular::isEmpty() const
 
 void ModInfoRegular::readMeta()
 {
-  QSettings metaFile(m_Path + "/meta.ini", QSettings::IniFormat);
-  m_Comments           = metaFile.value("comments", "").toString();
-  m_Notes              = metaFile.value("notes", "").toString();
-  QString tempGameName = metaFile.value("gameName", m_GameName).toString();
+  QSettings metaFile(m_Path % u"/meta.ini"_s, QSettings::IniFormat);
+  m_Comments           = metaFile.value(u"comments"_s, "").toString();
+  m_Notes              = metaFile.value(u"notes"_s, "").toString();
+  QString tempGameName = metaFile.value(u"gameName"_s, m_GameName).toString();
   if (tempGameName.size())
     m_GameName = tempGameName;
-  m_NexusID = metaFile.value("modid", -1).toInt();
-  m_Version.parse(metaFile.value("version", "").toString());
-  m_NewestVersion    = metaFile.value("newestVersion", "").toString();
-  m_IgnoredVersion   = metaFile.value("ignoredVersion", "").toString();
-  m_InstallationFile = metaFile.value("installationFile", "").toString();
-  m_NexusDescription = metaFile.value("nexusDescription", "").toString();
-  m_NexusFileStatus  = metaFile.value("nexusFileStatus", "1").toInt();
-  m_NexusCategory    = metaFile.value("nexusCategory", 0).toInt();
-  m_Repository       = metaFile.value("repository", "Nexus").toString();
-  m_Converted        = metaFile.value("converted", false).toBool();
-  m_Validated        = metaFile.value("validated", false).toBool();
+  m_NexusID = metaFile.value(u"modid"_s, -1).toInt();
+  m_Version.parse(metaFile.value(u"version"_s, "").toString());
+  m_NewestVersion    = metaFile.value(u"newestVersion"_s, "").toString();
+  m_IgnoredVersion   = metaFile.value(u"ignoredVersion"_s, "").toString();
+  m_InstallationFile = metaFile.value(u"installationFile"_s, "").toString();
+  m_NexusDescription = metaFile.value(u"nexusDescription"_s, "").toString();
+  m_NexusFileStatus  = metaFile.value(u"nexusFileStatus"_s, "1").toInt();
+  m_NexusCategory    = metaFile.value(u"nexusCategory"_s, 0).toInt();
+  m_Repository       = metaFile.value(u"repository"_s, u"Nexus"_s).toString();
+  m_Converted        = metaFile.value(u"converted"_s, false).toBool();
+  m_Validated        = metaFile.value(u"validated"_s, false).toBool();
 
   // this handles changes to how the URL works after 2.2.0
   //
@@ -149,10 +150,10 @@ void ModInfoRegular::readMeta()
   //        from a user manually entering a url, and so is handled as such)
 
   // always read the url
-  m_CustomURL = metaFile.value("url").toString();
+  m_CustomURL = metaFile.value(u"url"_s).toString();
 
-  if (metaFile.contains("hasCustomURL")) {
-    m_HasCustomURL = metaFile.value("hasCustomURL").toBool();
+  if (metaFile.contains(u"hasCustomURL"_s)) {
+    m_HasCustomURL = metaFile.value(u"hasCustomURL"_s).toBool();
   } else {
     if (m_NexusID > 0) {
       // the mod id is valid, disable the custom url
@@ -166,21 +167,21 @@ void ModInfoRegular::readMeta()
   }
 
   m_LastNexusQuery = QDateTime::fromString(
-      metaFile.value("lastNexusQuery", "").toString(), Qt::ISODate);
+      metaFile.value(u"lastNexusQuery"_s, "").toString(), Qt::ISODate);
   m_LastNexusUpdate = QDateTime::fromString(
-      metaFile.value("lastNexusUpdate", "").toString(), Qt::ISODate);
+      metaFile.value(u"lastNexusUpdate"_s, "").toString(), Qt::ISODate);
   m_NexusLastModified = QDateTime::fromString(
-      metaFile.value("nexusLastModified", QDateTime::currentDateTimeUtc()).toString(),
+      metaFile.value(u"nexusLastModified"_s, QDateTime::currentDateTimeUtc()).toString(),
       Qt::ISODate);
-  m_NexusCategory = metaFile.value("nexusCategory", 0).toInt();
-  m_Color         = metaFile.value("color", QColor()).value<QColor>();
-  m_TrackedState  = metaFile.value("tracked", false).toBool()
+  m_NexusCategory = metaFile.value(u"nexusCategory"_s, 0).toInt();
+  m_Color         = metaFile.value(u"color"_s, QColor()).value<QColor>();
+  m_TrackedState  = metaFile.value(u"tracked"_s, false).toBool()
                         ? TrackedState::TRACKED_TRUE
                         : TrackedState::TRACKED_FALSE;
-  if (metaFile.contains("endorsed")) {
-    if (metaFile.value("endorsed").canConvert<int>()) {
+  if (metaFile.contains(u"endorsed"_s)) {
+    if (metaFile.value(u"endorsed"_s).canConvert<int>()) {
       using ut = std::underlying_type_t<EndorsedState>;
-      switch (metaFile.value("endorsed").toInt()) {
+      switch (metaFile.value(u"endorsed"_s).toInt()) {
       case static_cast<ut>(EndorsedState::ENDORSED_FALSE):
         m_EndorsedState = EndorsedState::ENDORSED_FALSE;
         break;
@@ -195,13 +196,13 @@ void ModInfoRegular::readMeta()
         break;
       }
     } else {
-      m_EndorsedState = metaFile.value("endorsed", false).toBool()
+      m_EndorsedState = metaFile.value(u"endorsed"_s, false).toBool()
                             ? EndorsedState::ENDORSED_TRUE
                             : EndorsedState::ENDORSED_FALSE;
     }
   }
 
-  QString categoriesString = metaFile.value("category", "").toString();
+  QString categoriesString = metaFile.value(u"category"_s, "").toString();
 
   QStringList categories = categoriesString.split(',', Qt::SkipEmptyParts);
   for (QStringList::iterator iter = categories.begin(); iter != categories.end();
@@ -221,16 +222,16 @@ void ModInfoRegular::readMeta()
     }
   }
 
-  int numFiles = metaFile.beginReadArray("installedFiles");
+  int numFiles = metaFile.beginReadArray(u"installedFiles"_s);
   for (int i = 0; i < numFiles; ++i) {
     metaFile.setArrayIndex(i);
-    m_InstalledFileIDs.insert(std::make_pair(metaFile.value("modid").toInt(),
-                                             metaFile.value("fileid").toInt()));
+    m_InstalledFileIDs.insert(std::make_pair(metaFile.value(u"modid"_s).toInt(),
+                                             metaFile.value(u"fileid"_s).toInt()));
   }
   metaFile.endArray();
 
   // Plugin settings:
-  metaFile.beginGroup("Plugins");
+  metaFile.beginGroup(u"Plugins");
   for (auto pluginName : metaFile.childGroups()) {
     metaFile.beginGroup(pluginName);
     for (auto settingKey : metaFile.childKeys()) {
@@ -247,56 +248,55 @@ void ModInfoRegular::saveMeta()
 {
   // only write meta data if the mod directory exists
   if (m_MetaInfoChanged && QFile::exists(absolutePath())) {
-    QSettings metaFile(absolutePath().append("/meta.ini"), QSettings::IniFormat);
+    QSettings metaFile(absolutePath().append(u"/meta.ini"_s), QSettings::IniFormat);
     if (metaFile.status() == QSettings::NoError) {
       std::set<int> temp = m_Categories;
       temp.erase(m_PrimaryCategory);
-      metaFile.setValue("category", QString("%1").arg(m_PrimaryCategory) + "," +
-                                        SetJoin(temp, ","));
-      metaFile.setValue("newestVersion", m_NewestVersion.canonicalString());
-      metaFile.setValue("ignoredVersion", m_IgnoredVersion.canonicalString());
-      metaFile.setValue("version", m_Version.canonicalString());
-      metaFile.setValue("installationFile", m_InstallationFile);
-      metaFile.setValue("repository", m_Repository);
-      metaFile.setValue("gameName", m_GameName);
-      metaFile.setValue("modid", m_NexusID);
-      metaFile.setValue("comments", m_Comments);
-      metaFile.setValue("notes", m_Notes);
-      metaFile.setValue("nexusDescription", m_NexusDescription);
-      metaFile.setValue("url", m_CustomURL);
-      metaFile.setValue("hasCustomURL", m_HasCustomURL);
-      metaFile.setValue("nexusFileStatus", m_NexusFileStatus);
-      metaFile.setValue("lastNexusQuery", m_LastNexusQuery.toString(Qt::ISODate));
-      metaFile.setValue("lastNexusUpdate", m_LastNexusUpdate.toString(Qt::ISODate));
-      metaFile.setValue("nexusLastModified", m_NexusLastModified.toString(Qt::ISODate));
-      metaFile.setValue("nexusCategory", m_NexusCategory);
-      metaFile.setValue("converted", m_Converted);
-      metaFile.setValue("validated", m_Validated);
-      metaFile.setValue("color", m_Color);
+      metaFile.setValue(u"category"_s, QStringLiteral(u"%1,%2").arg(m_PrimaryCategory).arg(SetJoin(temp, u","_s)));
+      metaFile.setValue(u"newestVersion"_s, m_NewestVersion.canonicalString());
+      metaFile.setValue(u"ignoredVersion"_s, m_IgnoredVersion.canonicalString());
+      metaFile.setValue(u"version"_s, m_Version.canonicalString());
+      metaFile.setValue(u"installationFile"_s, m_InstallationFile);
+      metaFile.setValue(u"repository"_s, m_Repository);
+      metaFile.setValue(u"gameName"_s, m_GameName);
+      metaFile.setValue(u"modid"_s, m_NexusID);
+      metaFile.setValue(u"comments"_s, m_Comments);
+      metaFile.setValue(u"notes"_s, m_Notes);
+      metaFile.setValue(u"nexusDescription"_s, m_NexusDescription);
+      metaFile.setValue(u"url"_s, m_CustomURL);
+      metaFile.setValue(u"hasCustomURL"_s, m_HasCustomURL);
+      metaFile.setValue(u"nexusFileStatus"_s, m_NexusFileStatus);
+      metaFile.setValue(u"lastNexusQuery"_s, m_LastNexusQuery.toString(Qt::ISODate));
+      metaFile.setValue(u"lastNexusUpdate"_s, m_LastNexusUpdate.toString(Qt::ISODate));
+      metaFile.setValue(u"nexusLastModified"_s, m_NexusLastModified.toString(Qt::ISODate));
+      metaFile.setValue(u"nexusCategory"_s, m_NexusCategory);
+      metaFile.setValue(u"converted"_s, m_Converted);
+      metaFile.setValue(u"validated"_s, m_Validated);
+      metaFile.setValue(u"color"_s, m_Color);
       if (m_EndorsedState != EndorsedState::ENDORSED_UNKNOWN) {
         metaFile.setValue(
-            "endorsed",
+            u"endorsed"_s,
             static_cast<std::underlying_type_t<EndorsedState>>(m_EndorsedState));
       }
       if (m_TrackedState != TrackedState::TRACKED_UNKNOWN) {
-        metaFile.setValue("tracked", static_cast<std::underlying_type_t<TrackedState>>(
+        metaFile.setValue(u"tracked"_s, static_cast<std::underlying_type_t<TrackedState>>(
                                          m_TrackedState));
       }
 
-      metaFile.remove("installedFiles");
-      metaFile.beginWriteArray("installedFiles");
+      metaFile.remove(u"installedFiles");
+      metaFile.beginWriteArray(u"installedFiles");
       int idx = 0;
       for (auto iter = m_InstalledFileIDs.begin(); iter != m_InstalledFileIDs.end();
            ++iter) {
         metaFile.setArrayIndex(idx++);
-        metaFile.setValue("modid", iter->first);
-        metaFile.setValue("fileid", iter->second);
+        metaFile.setValue(u"modid"_s, iter->first);
+        metaFile.setValue(u"fileid"_s, iter->second);
       }
       metaFile.endArray();
 
       // Plugin settings:
-      metaFile.remove("Plugins");
-      metaFile.beginGroup("Plugins");
+      metaFile.remove(u"Plugins"_s);
+      metaFile.beginGroup(u"Plugins"_s);
       for (const auto& [pluginName, pluginSettings] : m_PluginSettings) {
         metaFile.beginGroup(pluginName);
         for (const auto& [settingName, settingValue] : pluginSettings) {
@@ -347,19 +347,19 @@ void ModInfoRegular::nxmDescriptionAvailable(QString, int, QVariant,
   setNexusDescription(result["description"].toString());
 
   if ((m_EndorsedState != EndorsedState::ENDORSED_NEVER) &&
-      (result.contains("endorsement"))) {
-    QVariantMap endorsement   = result["endorsement"].toMap();
-    QString endorsementStatus = endorsement["endorse_status"].toString();
-    if (endorsementStatus.compare("Endorsed", Qt::CaseInsensitive) == 00)
+      (result.contains(u"endorsement"_s))) {
+    QVariantMap endorsement   = result[u"endorsement"_s].toMap();
+    QString endorsementStatus = endorsement[u"endorse_status"_s].toString();
+    if (endorsementStatus.compare(u"Endorsed"_s, Qt::CaseInsensitive) == 00)
       setEndorsedState(EndorsedState::ENDORSED_TRUE);
-    else if (endorsementStatus.compare("Abstained", Qt::CaseInsensitive) == 00)
+    else if (endorsementStatus.compare(u"Abstained"_s, Qt::CaseInsensitive) == 00)
       setEndorsedState(EndorsedState::ENDORSED_NEVER);
     else
       setEndorsedState(EndorsedState::ENDORSED_FALSE);
   }
   m_LastNexusQuery = QDateTime::currentDateTimeUtc();
   m_NexusLastModified =
-      QDateTime::fromSecsSinceEpoch(result["updated_timestamp"].toInt(), Qt::UTC);
+      QDateTime::fromSecsSinceEpoch(result[u"updated_timestamp"_s].toInt(), Qt::UTC);
   m_MetaInfoChanged = true;
   saveMeta();
   disconnect(sender(), SIGNAL(descriptionAvailable(QString, int, QVariant, QVariant)));
@@ -373,9 +373,9 @@ void ModInfoRegular::nxmEndorsementToggled(QString, int, QVariant, QVariant resu
   for (auto& mod : s_Collection) {
     if (mod->gameName().compare(m_GameName, Qt::CaseInsensitive) == 0 &&
         mod->nexusId() == m_NexusID) {
-      if (results["status"].toString().compare("Endorsed") == 0) {
+      if (results[u"status"_s].toString().compare(u"Endorsed"_s) == 0) {
         mod->setIsEndorsed(true);
-      } else if (results["status"].toString().compare("Abstained") == 0) {
+      } else if (results[u"status"_s].toString().compare(u"Abstained"_s) == 0) {
         mod->setNeverEndorse();
       } else {
         mod->setIsEndorsed(false);
@@ -473,9 +473,9 @@ bool ModInfoRegular::setName(const QString& name)
 
   if (m_Name.compare(name, Qt::CaseInsensitive) == 0) {
     QString tempName = name;
-    tempName.append("_temp");
+    tempName.append(u"_temp"_s);
     while (modDir.exists(tempName)) {
-      tempName.append("_");
+      tempName.append(u"_"_s);
     }
     if (!modDir.rename(m_Name, tempName)) {
       return false;
@@ -884,9 +884,9 @@ QStringList ModInfoRegular::archives(bool checkOnDisk)
   if (checkOnDisk) {
     QStringList result;
     QDir dir(this->absolutePath());
-    QStringList bsaList = dir.entryList(QStringList({"*.bsa", "*.ba2"}));
+    QStringList bsaList = dir.entryList(QStringList({u"*.bsa"_s, u"*.ba2"_s}));
     for (const QString& archive : bsaList) {
-      result.append(this->absolutePath() + "/" + archive);
+      result.append(this->absolutePath() % u"/"_s % archive);
     }
     m_Archives = result;
   }
@@ -901,12 +901,12 @@ void ModInfoRegular::addInstalledFile(int modId, int fileId)
 
 std::vector<QString> ModInfoRegular::getIniTweaks() const
 {
-  QString metaFileName = absolutePath().append("/meta.ini");
+  QString metaFileName = absolutePath().append(u"/meta.ini"_s);
   QSettings metaFile(metaFileName, QSettings::IniFormat);
 
   std::vector<QString> result;
 
-  int numTweaks = metaFile.beginReadArray("INI Tweaks");
+  int numTweaks = metaFile.beginReadArray(u"INI Tweaks"_s);
 
   if (numTweaks != 0) {
     log::debug("{} active ini tweaks in {}", numTweaks,
@@ -916,7 +916,7 @@ std::vector<QString> ModInfoRegular::getIniTweaks() const
   for (int i = 0; i < numTweaks; ++i) {
     metaFile.setArrayIndex(i);
     QString filename =
-        absolutePath().append("/INI Tweaks/").append(metaFile.value("name").toString());
+        absolutePath() % u"/INI Tweaks/"_s % metaFile.value(u"name"_s).toString();
     result.push_back(filename);
   }
   metaFile.endArray();

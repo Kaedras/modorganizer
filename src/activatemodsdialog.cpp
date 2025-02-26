@@ -29,6 +29,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtGlobal>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 ActivateModsDialog::ActivateModsDialog(SaveGameInfo::MissingAssets const& missingAssets,
                                        QWidget* parent)
@@ -36,7 +37,7 @@ ActivateModsDialog::ActivateModsDialog(SaveGameInfo::MissingAssets const& missin
 {
   ui->setupUi(this);
 
-  QTableWidget* modsTable = findChild<QTableWidget*>("modsTable");
+  QTableWidget* modsTable = findChild<QTableWidget*>(u"modsTable"_s);
   QHeaderView* headerView = modsTable->horizontalHeader();
   headerView->setSectionResizeMode(0, QHeaderView::Stretch);
   headerView->setSectionResizeMode(1, QHeaderView::Interactive);
@@ -68,7 +69,7 @@ ActivateModsDialog::~ActivateModsDialog()
 std::set<QString> ActivateModsDialog::getModsToActivate()
 {
   std::set<QString> result;
-  QTableWidget* modsTable = findChild<QTableWidget*>("modsTable");
+  QTableWidget* modsTable = findChild<QTableWidget*>(u"modsTable"_s);
 
   for (int row = 0; row < modsTable->rowCount(); ++row) {
     QComboBox* comboBox = dynamic_cast<QComboBox*>(modsTable->cellWidget(row, 1));
@@ -82,7 +83,7 @@ std::set<QString> ActivateModsDialog::getModsToActivate()
 std::set<QString> ActivateModsDialog::getESPsToActivate()
 {
   std::set<QString> result;
-  QTableWidget* modsTable = findChild<QTableWidget*>("modsTable");
+  QTableWidget* modsTable = findChild<QTableWidget*>(u"modsTable"_s);
 
   for (int row = 0; row < modsTable->rowCount(); ++row) {
     QComboBox* comboBox = dynamic_cast<QComboBox*>(modsTable->cellWidget(row, 1));

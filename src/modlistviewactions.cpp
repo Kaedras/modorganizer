@@ -33,6 +33,7 @@
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 ModListViewActions::ModListViewActions(OrganizerCore& core, FilterList& filters,
                                        CategoryFactory& categoryFactory,
@@ -96,8 +97,8 @@ void ModListViewActions::installMod(const QString& archivePath,
       }
 
       path = FileDialogMemory::getOpenFileName(
-          "installMod", m_parent, tr("Choose Mod"), QString(),
-          tr("Mod Archive").append(QString(" (%1)").arg(extensions.join(" "))));
+          u"installMod"_s, m_parent, tr("Choose Mod"), QString(),
+          tr("Mod Archive").append(QStringLiteral(" (%1)").arg(extensions.join(' '))));
     }
 
     if (path.isEmpty()) {
@@ -243,7 +244,7 @@ void ModListViewActions::checkModsForUpdates() const
   }
 
   bool updatesAvailable = false;
-  for (auto mod : m_core.modList()->allMods()) {
+  for (const auto& mod : m_core.modList()->allMods()) {
     ModInfo::Ptr modInfo = ModInfo::getByName(mod);
     if (modInfo->updateAvailable()) {
       updatesAvailable = true;
@@ -277,22 +278,22 @@ void ModListViewActions::assignCategories() const
     if (result == QMessageBox::Cancel)
       return;
   }
-  for (auto mod : m_core.modList()->allMods()) {
+  for (const auto& mod : m_core.modList()->allMods()) {
     ModInfo::Ptr modInfo = ModInfo::getByName(mod);
     if (modInfo->isSeparator())
       continue;
     int nexusCategory = modInfo->getNexusCategory();
     if (!nexusCategory) {
-      QSettings downloadMeta(m_core.downloadsPath() + "/" +
-                                 modInfo->installationFile() + ".meta",
+      QSettings downloadMeta(m_core.downloadsPath() % u"/"_s %
+                                 modInfo->installationFile() % u".meta"_s,
                              QSettings::IniFormat);
-      if (downloadMeta.contains("category")) {
-        nexusCategory = downloadMeta.value("category", 0).toInt();
+      if (downloadMeta.contains(u"category"_s)) {
+        nexusCategory = downloadMeta.value(u"category"_s, 0).toInt();
       }
     }
     int newCategory = CategoryFactory::instance().resolveNexusID(nexusCategory);
     if (newCategory != 0) {
-      for (auto category : modInfo->categories()) {
+      for (const auto& category : modInfo->categories()) {
         modInfo->removeCategory(category);
       }
     }
@@ -424,32 +425,32 @@ void ModListViewActions::exportModListCSV() const
       std::vector<std::pair<QString, CSVBuilder::EFieldType>> fields;
       if (mod_Priority->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Mod_Priority"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Mod_Priority"), CSVBuilder::TYPE_STRING));
       if (mod_Status->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Mod_Status"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Mod_Status"), CSVBuilder::TYPE_STRING));
       if (mod_Name->isChecked())
-        fields.push_back(std::make_pair(QString("#Mod_Name"), CSVBuilder::TYPE_STRING));
+        fields.push_back(std::make_pair(QStringLiteral("#Mod_Name"), CSVBuilder::TYPE_STRING));
       if (mod_Note->isChecked())
-        fields.push_back(std::make_pair(QString("#Note"), CSVBuilder::TYPE_STRING));
+        fields.push_back(std::make_pair(QStringLiteral("#Note"), CSVBuilder::TYPE_STRING));
       if (primary_Category->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Primary_Category"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Primary_Category"), CSVBuilder::TYPE_STRING));
       if (nexus_ID->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Nexus_ID"), CSVBuilder::TYPE_INTEGER));
+            std::make_pair(QStringLiteral("#Nexus_ID"), CSVBuilder::TYPE_INTEGER));
       if (mod_Nexus_URL->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Mod_Nexus_URL"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Mod_Nexus_URL"), CSVBuilder::TYPE_STRING));
       if (mod_Version->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Mod_Version"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Mod_Version"), CSVBuilder::TYPE_STRING));
       if (install_Date->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Install_Date"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Install_Date"), CSVBuilder::TYPE_STRING));
       if (download_File_Name->isChecked())
         fields.push_back(
-            std::make_pair(QString("#Download_File_Name"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Download_File_Name"), CSVBuilder::TYPE_STRING));
 
       builder.setFields(fields);
 
@@ -470,15 +471,15 @@ void ModListViewActions::exportModListCSV() const
             (std::find(flags.begin(), flags.end(), ModInfo::FLAG_BACKUP) ==
              flags.end())) {
           if (mod_Priority->isChecked())
-            builder.setRowField("#Mod_Priority",
-                                QString("%1").arg(iter.first, 4, 10, QChar('0')));
+            builder.setRowField(u"#Mod_Priority"_s,
+                                QStringLiteral("%1").arg(iter.first, 4, 10, QChar('0')));
           if (mod_Status->isChecked())
-            builder.setRowField("#Mod_Status", (enabled) ? "+" : "-");
+            builder.setRowField(u"#Mod_Status"_s, (enabled) ? u"+"_s : u"-"_s);
           if (mod_Name->isChecked())
-            builder.setRowField("#Mod_Name", info->name());
+            builder.setRowField(u"#Mod_Name"_s, info->name());
           if (mod_Note->isChecked())
-            builder.setRowField("#Note",
-                                QString("%1").arg(info->comments().remove(',')));
+            builder.setRowField(u"#Note"_s,
+                                QStringLiteral("%1").arg(info->comments().remove(',')));
           if (primary_Category->isChecked())
             builder.setRowField(
                 "#Primary_Category",
@@ -486,20 +487,20 @@ void ModListViewActions::exportModListCSV() const
                     ? m_categories.getCategoryNameByID(info->primaryCategory())
                     : "");
           if (nexus_ID->isChecked())
-            builder.setRowField("#Nexus_ID", info->nexusId());
+            builder.setRowField(u"#Nexus_ID"_s, info->nexusId());
           if (mod_Nexus_URL->isChecked())
-            builder.setRowField("#Mod_Nexus_URL",
+            builder.setRowField(u"#Mod_Nexus_URL"_s,
                                 (info->nexusId() > 0)
                                     ? NexusInterface::instance().getModURL(
                                           info->nexusId(), info->gameName())
                                     : "");
           if (mod_Version->isChecked())
-            builder.setRowField("#Mod_Version", info->version().canonicalString());
+            builder.setRowField(u"#Mod_Version"_s, info->version().canonicalString());
           if (install_Date->isChecked())
-            builder.setRowField("#Install_Date",
-                                info->creationTime().toString("yyyy/MM/dd HH:mm:ss"));
+            builder.setRowField(u"#Install_Date"_s,
+                                info->creationTime().toString(u"yyyy/MM/dd HH:mm:ss"));
           if (download_File_Name->isChecked())
-            builder.setRowField("#Download_File_Name", info->installationFile());
+            builder.setRowField(u"#Download_File_Name"_s, info->installationFile());
 
           builder.writeRow();
         }
@@ -545,11 +546,11 @@ void ModListViewActions::displayModInformation(ModInfo::Ptr modInfo,
   }
   std::vector<ModInfo::EFlag> flags = modInfo->getFlags();
   if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_OVERWRITE) != flags.end()) {
-    QDialog* dialog = m_parent->findChild<QDialog*>("__overwriteDialog");
+    QDialog* dialog = m_parent->findChild<QDialog*>(u"__overwriteDialog"_s);
     try {
       if (dialog == nullptr) {
         dialog = new OverwriteInfoDialog(modInfo, m_parent);
-        dialog->setObjectName("__overwriteDialog");
+        dialog->setObjectName(u"__overwriteDialog"_s);
       } else {
         qobject_cast<OverwriteInfoDialog*>(dialog)->setModInfo(modInfo);
       }
@@ -665,7 +666,7 @@ void ModListViewActions::sendModsToSeparator(const QModelIndexList& indexes) con
   }
 
   const auto sepPriority =
-      m_core.currentProfile()->getModPriority(ModInfo::getIndex(result + "_separator"));
+      m_core.currentProfile()->getModPriority(ModInfo::getIndex(result % u"_separator"_s));
 
   auto isSeparator = [](const auto& p) {
     return ModInfo::getByIndex(p.second)->isSeparator();
@@ -779,9 +780,9 @@ void ModListViewActions::removeMods(const QModelIndexList& indices) const
         // are still added to `modNames` below so they can be removed correctly
 
         if (i < max_items) {
-          mods += "<li>" + name + "</li>";
+          mods += u"<li>"_s % name % u"</li>"_s;
         } else if (i == max_items) {
-          mods += "<li>...</li>";
+          mods += u"<li>...</li>"_s;
         }
 
         modNames.append(
@@ -795,7 +796,7 @@ void ModListViewActions::removeMods(const QModelIndexList& indices) const
         // use mod names instead of indexes because those become invalid during the
         // removal
         DownloadManager::startDisableDirWatcher();
-        for (QString name : modNames) {
+        for (const QString& name : modNames) {
           m_core.modList()->removeRowForce(ModInfo::getIndex(name), QModelIndex());
         }
         DownloadManager::endDisableDirWatcher();
@@ -864,8 +865,7 @@ void ModListViewActions::changeVersioningScheme(const QModelIndex& index) const
       QMessageBox::information(
           m_parent, tr("Sorry"),
           tr("I don't know a versioning scheme where %1 is newer than %2.")
-              .arg(info->newestVersion().canonicalString())
-              .arg(info->version().canonicalString()),
+              .arg(info->newestVersion().canonicalString(), info->version().canonicalString()),
           QMessageBox::Ok);
     }
   }
@@ -972,11 +972,11 @@ void ModListViewActions::reinstallMod(const QModelIndex& index) const
         fullInstallationFile = installationFile;
       } else {
         fullInstallationFile =
-            m_core.downloadManager()->getOutputDirectory() + "/" + fileInfo.fileName();
+            m_core.downloadManager()->getOutputDirectory() % u"/"_s % fileInfo.fileName();
       }
     } else {
       fullInstallationFile =
-          m_core.downloadManager()->getOutputDirectory() + "/" + installationFile;
+          m_core.downloadManager()->getOutputDirectory() % u"/"_s % installationFile;
     }
     if (QFile::exists(fullInstallationFile)) {
       m_core.installMod(fullInstallationFile, -1, true, modInfo, modInfo->name());
@@ -1032,9 +1032,9 @@ void ModListViewActions::restoreHiddenFiles(const QModelIndexList& indices) cons
       modNames.append(idx.data(Qt::DisplayRole).toString());
     }
 
-    QString mods = "<li>" + modNames.mid(0, max_items).join("</li><li>") + "</li>";
+    QString mods = u"<li>"_s % modNames.mid(0, max_items).join(u"</li><li>"_s) % u"</li>"_s;
     if (modNames.size() > max_items) {
-      mods += "<li>...</li>";
+      mods += u"<li>...</li>"_s;
     }
 
     if (QMessageBox::question(
@@ -1131,11 +1131,11 @@ void ModListViewActions::remapCategory(const QModelIndexList& indices) const
 
     int categoryID = modInfo->getNexusCategory();
     if (!categoryID) {
-      QSettings downloadMeta(m_core.downloadsPath() + "/" +
-                                 modInfo->installationFile() + ".meta",
+      QSettings downloadMeta(m_core.downloadsPath() % u"/"_s %
+                                 modInfo->installationFile() % u".meta"_s,
                              QSettings::IniFormat);
-      if (downloadMeta.contains("category")) {
-        categoryID = downloadMeta.value("category", 0).toInt();
+      if (downloadMeta.contains(u"category"_s)) {
+        categoryID = downloadMeta.value(u"category"_s, 0).toInt();
       }
     }
     unsigned int categoryIndex = CategoryFactory::instance().resolveNexusID(categoryID);
@@ -1265,7 +1265,7 @@ void ModListViewActions::openExplorer(const QModelIndexList& index) const
 
 void ModListViewActions::restoreBackup(const QModelIndex& index) const
 {
-  QRegularExpression backupRegEx("(.*)_backup[0-9]*$");
+  QRegularExpression backupRegEx(u"(.*)_backup[0-9]*$"_s);
   ModInfo::Ptr modInfo = ModInfo::getByIndex(index.data(ModList::IndexRole).toInt());
   auto match           = backupRegEx.match(modInfo->name());
   if (match.hasMatch()) {
@@ -1285,8 +1285,7 @@ void ModListViewActions::restoreBackup(const QModelIndex& index) const
             regName;
         if (!modDir.rename(modInfo->absolutePath(), destinationPath)) {
           reportError(tr("failed to rename \"%1\" to \"%2\"")
-                          .arg(modInfo->absolutePath())
-                          .arg(destinationPath));
+                          .arg(modInfo->absolutePath(), destinationPath));
         }
         m_core.refresh();
         m_view->updateModCount();
@@ -1299,7 +1298,7 @@ void ModListViewActions::moveOverwriteContentsTo(const QString& absolutePath) co
 {
   ModInfo::Ptr overwriteInfo = ModInfo::getOverwrite();
   bool successful =
-      shellMove((QDir::toNativeSeparators(overwriteInfo->absolutePath()) + "\\*"),
+      shellMove((QDir::toNativeSeparators(overwriteInfo->absolutePath()) % u"\\*"_s),
                 (QDir::toNativeSeparators(absolutePath)), false, m_parent);
 
   if (successful) {
@@ -1358,7 +1357,7 @@ void ModListViewActions::moveOverwriteContentToExistingMod() const
   }
 
   ListDialog dialog(m_parent);
-  dialog.setWindowTitle("Select a mod...");
+  dialog.setWindowTitle(u"Select a mod..."_s);
   dialog.setChoices(mods);
 
   if (dialog.exec() == QDialog::Accepted) {

@@ -2,6 +2,8 @@
 
 #include "organizercore.h"
 
+using namespace Qt::StringLiterals;
+
 ModListDropInfo::ModListDropInfo(const QMimeData* mimeData, OrganizerCore& core)
     : m_rows{}, m_download{-1}, m_localUrls{}, m_url{}
 {
@@ -36,7 +38,7 @@ ModListDropInfo::ModListDropInfo(const QMimeData* mimeData, OrganizerCore& core)
       }
 
     } else if (mimeData->hasText()) {
-      QByteArray encoded = mimeData->data("application/x-qabstractitemmodeldatalist");
+      QByteArray encoded = mimeData->data(u"application/x-qabstractitemmodeldatalist"_s);
       QDataStream stream(&encoded, QIODevice::ReadOnly);
 
       while (!stream.atEnd()) {
@@ -81,10 +83,10 @@ ModListDropInfo::relativeUrl(const QUrl& url) const
 
   if (sourceFile.startsWith(allModsDir.canonicalPath())) {
     QDir relativeDir(allModsDir.relativeFilePath(sourceFile));
-    QStringList splitPath = relativeDir.path().split("/");
+    QStringList splitPath = relativeDir.path().split('/');
     originName            = splitPath[0];
     splitPath.pop_front();
-    return {{url, splitPath.join("/"), originName}};
+    return {{url, splitPath.join('/'), originName}};
   } else if (sourceFile.startsWith(overwriteDir.canonicalPath())) {
     return {{url, overwriteDir.relativeFilePath(sourceFile),
              ModInfo::getOverwrite()->name()}};

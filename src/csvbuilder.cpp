@@ -1,5 +1,7 @@
 #include "csvbuilder.h"
 
+using namespace Qt::StringLiterals;
+
 CSVBuilder::CSVBuilder(QIODevice* target)
     : m_Out(target), m_Separator(','), m_LineBreak(BREAK_CRLF)
 {
@@ -186,14 +188,14 @@ void CSVBuilder::quoteInsert(QTextStream& stream, const QString& value)
     stream << value;
   } break;
   case QUOTE_ONDEMAND: {
-    if (value.contains("[,\r\n]")) {
-      stream << "\"" << value.mid(0).replace("\"", "\"\"") << "\"";
+    if (value.contains(u"[,\r\n]"_s)) {
+      stream << u"\""_s << value.mid(0).replace(u"\""_s, u"\"\""_s) << u"\""_s;
     } else {
       stream << value;
     }
   } break;
   case QUOTE_ALWAYS: {
-    stream << "\"" << value.mid(0).replace("\"", "\"\"") << "\"";
+    stream << u"\""_s << value.mid(0).replace(u"\""_s, u"\"\""_s) << u"\""_s;
   } break;
   }
 }

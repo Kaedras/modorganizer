@@ -29,10 +29,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "ui_settingsdialog.h"
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 SettingsDialog::SettingsDialog(PluginContainer* pluginContainer, Settings& settings,
                                QWidget* parent)
-    : TutorableDialog("SettingsDialog", parent), ui(new Ui::SettingsDialog),
+    : TutorableDialog(u"SettingsDialog"_s, parent), ui(new Ui::SettingsDialog),
       m_settings(settings), m_exit(Exit::None), m_pluginContainer(pluginContainer)
 {
   ui->setupUi(this);
@@ -108,7 +109,7 @@ SettingsDialog::~SettingsDialog()
 
 QString SettingsDialog::getColoredButtonStyleSheet() const
 {
-  return QString("QPushButton {"
+  return QStringLiteral("QPushButton {"
                  "background-color: %1;"
                  "color: %2;"
                  "border: 1px solid;"

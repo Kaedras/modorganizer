@@ -19,6 +19,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "settings.h"
 #include "ui_listdialog.h"
 
+using namespace Qt::StringLiterals;
+
 ListDialog::ListDialog(QWidget* parent)
     : QDialog(parent), ui(new Ui::ListDialog), m_Choices()
 {
@@ -57,7 +59,7 @@ QString ListDialog::getChoice() const
 void ListDialog::on_filterEdit_textChanged(QString filter)
 {
   QStringList newChoices;
-  for (auto choice : m_Choices) {
+  for (const auto& choice : m_Choices) {
     if (choice.contains(filter, Qt::CaseInsensitive)) {
       newChoices << choice;
     }
@@ -72,7 +74,7 @@ void ListDialog::on_filterEdit_textChanged(QString filter)
   }
 
   if (!filter.isEmpty()) {
-    ui->choiceList->setStyleSheet("QListWidget { border: 2px ridge #f00; }");
+    ui->choiceList->setStyleSheet(u"QListWidget { border: 2px ridge #f00; }"_s);
   } else {
     ui->choiceList->setStyleSheet("");
   }

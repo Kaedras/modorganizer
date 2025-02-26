@@ -22,6 +22,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <log.h>
 #include <map>
 
+using namespace Qt::StringLiterals;
+
 namespace BBCode
 {
 
@@ -54,14 +56,14 @@ public:
 
       int closeTagPos        = 0;
       int nextTagPos         = 0;
-      int nextTagSearchIndex = input.indexOf("]");
+      int nextTagSearchIndex = input.indexOf(']');
       int closeTagLength     = 0;
-      if (tagName == "*") {
+      if (tagName == '*') {
         // ends at the next bullet point
+        static const QRegularExpression regex(uR"((\[\*\]|</ul>))"_s,
+                                             QRegularExpression::CaseInsensitiveOption);
         closeTagPos =
-            input.indexOf(QRegularExpression("(\\[\\*\\]|</ul>)",
-                                             QRegularExpression::CaseInsensitiveOption),
-                          3);
+            input.indexOf(regex,3);
         // leave closeTagLength at 0 because we don't want to "eat" the next bullet
         // point
       } else if (tagName == "line") {
@@ -69,9 +71,9 @@ public:
         closeTagPos = 6;
         // leave closeTagLength at 0 because there is no close tag to skip over
       } else {
-        QRegularExpression nextTag(QString("\\[%1[=\\]]?").arg(tagName),
+        QRegularExpression nextTag(QStringLiteral("\\[%1[=\\]]?").arg(tagName),
                                    QRegularExpression::CaseInsensitiveOption);
-        QString closeTag = QString("[/%1]").arg(tagName);
+        QString closeTag = QStringLiteral("[/%1]").arg(tagName);
         closeTagPos      = input.indexOf(closeTag, 0, Qt::CaseInsensitive);
         nextTagPos       = nextTag.match(input, nextTagSearchIndex).capturedStart(0);
         while (nextTagPos != -1 && closeTagPos != -1 && nextTagPos < closeTagPos) {
@@ -101,7 +103,7 @@ public:
               QString content = match.captured(2);
               if (color.at(0) == '#') {
                 return temp.replace(tagIter->second.first,
-                                    QString("<font style=\"color: %1;\">%2</font>")
+                                    QStringLiteral("<font style=\"color: %1;\">%2</font>")
                                         .arg(color, content));
               } else {
                 auto colIter = m_ColorMap.find(color.toLower());
@@ -109,14 +111,14 @@ public:
                   color = colIter->second;
                 }
                 return temp.replace(tagIter->second.first,
-                                    QString("<font style=\"color: #%1;\">%2</font>")
+                                    QStringLiteral("<font style=\"color: #%1;\">%2</font>")
                                         .arg(color, content));
               }
             } else {
               log::warn("don't know how to deal with tag {}", tagName);
             }
           } else {
-            if (tagName == "*") {
+            if (tagName == '*') {
               temp.remove(QRegularExpression("(\\[/\\*\\])?(<br/>)?$"));
             }
             return temp.replace(tagIter->second.first, tagIter->second.second);
@@ -137,7 +139,7 @@ public:
   }
 
 private:
-  BBCodeMap() : m_TagNameExp("[a-zA-Z*]*=?")
+  BBCodeMap() : m_TagNameExp(u"[a-zA-Z*]*=?"_s)
   {
     m_TagMap["b"] =
         std::make_pair(QRegularExpression("\\[b\\](.*)\\[/b\\]"), "<b>\\1</b>");

@@ -4,7 +4,7 @@
 #include <log.h>
 #include <report.h>
 
-static const char s_Key[]  = "mo-43d1a3ad-eeb0-4818-97c9-eda5216c29b5";
+static const QString s_Key = QStringLiteral("mo-43d1a3ad-eeb0-4818-97c9-eda5216c29b5");
 static const int s_Timeout = 5000;
 
 using MOBase::reportError;

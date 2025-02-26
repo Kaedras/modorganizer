@@ -34,11 +34,12 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 SyncOverwriteDialog::SyncOverwriteDialog(const QString& path,
                                          DirectoryEntry* directoryStructure,
                                          QWidget* parent)
-    : TutorableDialog("SyncOverwrite", parent), ui(new Ui::SyncOverwriteDialog),
+    : TutorableDialog(u"SyncOverwrite"_s, parent), ui(new Ui::SyncOverwriteDialog),
       m_SourcePath(path), m_DirectoryStructure(directoryStructure)
 {
   ui->setupUi(this);
@@ -61,7 +62,7 @@ SyncOverwriteDialog::~SyncOverwriteDialog()
 
 static void addToComboBox(QComboBox* box, const QString& name, const QVariant& userData)
 {
-  if (QString::compare(name, "overwrite", Qt::CaseInsensitive) != 0) {
+  if (QString::compare(name, "overwrite"_L1, Qt::CaseInsensitive) != 0) {
     box->addItem(name, userData);
   }
 }
@@ -78,7 +79,7 @@ void SyncOverwriteDialog::readTree(const QString& path,
     QFileInfo fileInfo = dirIter.fileInfo();
 
     QString file = fileInfo.fileName();
-    if (file == "meta.ini") {
+    if (file == "meta.ini"_L1) {
       continue;
     }
 
@@ -135,7 +136,7 @@ void SyncOverwriteDialog::applyTo(QTreeWidgetItem* item, const QString& path,
     QTreeWidgetItem* child = item->child(i);
     QString filePath;
     if (path.length() != 0) {
-      filePath = path + "/" + child->text(0);
+      filePath = path % u"/"_s % child->text(0);
     } else {
       filePath = child->text(0);
     }
@@ -149,8 +150,8 @@ void SyncOverwriteDialog::applyTo(QTreeWidgetItem* item, const QString& path,
             comboBox->itemData(comboBox->currentIndex(), Qt::UserRole).toInt();
         if (originID != -1) {
           FilesOrigin& origin = m_DirectoryStructure->getOriginByID(originID);
-          QString source      = m_SourcePath + "/" + filePath;
-          QString destination = modDirectory + "/" + origin.getName() + "/" + filePath;
+          QString source      = m_SourcePath % u"/"_s % filePath;
+          QString destination = modDirectory % u"/"_s % origin.getName() % u"/"_s % filePath;
           if (!QFile::remove(destination)) {
             reportError(tr("failed to remove %1").arg(destination));
           } else if (!QFile::rename(source, destination)) {
@@ -161,9 +162,9 @@ void SyncOverwriteDialog::applyTo(QTreeWidgetItem* item, const QString& path,
     }
   }
 
-  QDir dir(m_SourcePath + "/" + path);
+  QDir dir(m_SourcePath % u"/"_s % path);
   if ((path.length() > 0) && (dir.count() == 2)) {
-    dir.rmpath(".");
+    dir.rmpath(u"."_s);
   }
 }
 

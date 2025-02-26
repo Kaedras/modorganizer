@@ -22,6 +22,7 @@
 #include "ui_mainwindow.h"
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 PluginListView::PluginListView(QWidget* parent)
     : QTreeView(parent), m_sortProxy(nullptr),
@@ -159,7 +160,7 @@ void PluginListView::updatePluginCount()
                    .arg(blueprintCount);
   }
 
-  toolTip += "</table>";
+  toolTip += u"</table>"_s;
 
   ui.counter->display(activeVisibleCount);
   ui.counter->setToolTip(toolTip);
@@ -168,8 +169,8 @@ void PluginListView::updatePluginCount()
 void PluginListView::onFilterChanged(const QString& filter)
 {
   if (!filter.isEmpty()) {
-    setStyleSheet("QTreeView { border: 2px ridge #f00; }");
-    ui.counter->setStyleSheet("QLCDNumber { border: 2px ridge #f00; }");
+    setStyleSheet(u"QTreeView { border: 2px ridge #f00; }"_s);
+    ui.counter->setStyleSheet(u"QLCDNumber { border: 2px ridge #f00; }"_s);
   } else {
     setStyleSheet("");
     ui.counter->setStyleSheet("");
@@ -185,8 +186,8 @@ void PluginListView::onSortButtonClicked()
 
   if (offline) {
     r = QMessageBox::question(topLevelWidget(), tr("Sorting plugins"),
-                              tr("Are you sure you want to sort your plugins list?") +
-                                  "\r\n\r\n" +
+                              tr("Are you sure you want to sort your plugins list?") %
+                                  u"\r\n\r\n"_s %
                                   tr("Note: You are currently in offline mode and LOOT "
                                      "will not update the master list."),
                               QMessageBox::Yes | QMessageBox::No);
