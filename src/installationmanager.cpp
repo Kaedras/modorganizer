@@ -203,7 +203,6 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
             {
               std::scoped_lock guard(mutex);
               currentFileName = QFileInfo(file).fileName();
-              ;
             }
             emit progressUpdate();
           }

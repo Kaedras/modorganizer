@@ -3,7 +3,6 @@
 #include "shared/directoryentry.h"
 #include "shared/fileentry.h"
 #include "shared/filesorigin.h"
-// #include "shared/util.h"
 
 using namespace MOBase;
 using namespace MOShared;

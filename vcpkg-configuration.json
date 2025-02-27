@@ -13,15 +13,9 @@
     },
     {
       "kind": "git",
-      "repository": "https://git.kaedras.org/Kaedras/vcpkg",
-      "baseline": "95d4e2774198734e948a6285eb3421ec0adcbd99",
-      "packages": ["overlayfs"]
-    },
-    {
-      "kind": "git",
       "repository": "https://github.com/Kaedras/vcpkg-registry",
-      "baseline": "f540811367f992758da9d185729f5616c1fa05cf",
-      "packages": ["mo2-*", "7zip", "usvfs", "libbsarchpp", "spdlog"]
+      "baseline": "9fd1c503f9fb704fa921c9c8940aaec227581fff",
+      "packages": ["mo2-*", "7zip", "usvfs", "overlayfs", "libbsarchpp", "spdlog"]
     }
   ]
 }
