@@ -604,8 +604,8 @@ IPlugin* PluginContainer::registerPlugin(QObject* plugin, const QString& filepat
       bf::at_key<IPluginProxy>(m_Plugins).push_back(proxy);
       emit pluginRegistered(proxy);
 
-      QStringList filepaths = proxy->pluginList(QDir(QCoreApplication::applicationDirPath() %
-                                                u"/"_s % AppConfig::pluginPath()));
+      QStringList filepaths = proxy->pluginList(QDir(
+          QCoreApplication::applicationDirPath() % u"/"_s % AppConfig::pluginPath()));
       for (const QString& filepath : filepaths) {
         loadProxied(filepath, proxy);
       }
@@ -919,8 +919,8 @@ void PluginContainer::loadPlugin(QString const& filepath)
   } else {
     // We need to check if this can be handled by a proxy.
     for (auto* proxy : this->plugins<IPluginProxy>()) {
-      auto filepaths = proxy->pluginList(QDir(
-          QCoreApplication::applicationDirPath() % u"/"_s % AppConfig::pluginPath()));
+      auto filepaths = proxy->pluginList(QDir(QCoreApplication::applicationDirPath() %
+                                              u"/"_s % AppConfig::pluginPath()));
       if (filepaths.contains(filepath)) {
         plugins = loadProxied(filepath, proxy);
         break;

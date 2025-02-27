@@ -38,7 +38,8 @@ ModListDropInfo::ModListDropInfo(const QMimeData* mimeData, OrganizerCore& core)
       }
 
     } else if (mimeData->hasText()) {
-      QByteArray encoded = mimeData->data(u"application/x-qabstractitemmodeldatalist"_s);
+      QByteArray encoded =
+          mimeData->data(u"application/x-qabstractitemmodeldatalist"_s);
       QDataStream stream(&encoded, QIODevice::ReadOnly);
 
       while (!stream.atEnd()) {

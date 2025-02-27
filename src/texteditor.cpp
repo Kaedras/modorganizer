@@ -173,11 +173,12 @@ void TextEditor::setBackgroundColor(const QColor& c)
 
   m_highlighter->setBackgroundColor(c);
 
-  setStyleSheet(QStringLiteral("QPlainTextEdit{ background-color: rgba(%1, %2, %3, %4); }")
-                    .arg(c.redF() * 255)
-                    .arg(c.greenF() * 255)
-                    .arg(c.blueF() * 255)
-                    .arg(c.alphaF()));
+  setStyleSheet(
+      QStringLiteral("QPlainTextEdit{ background-color: rgba(%1, %2, %3, %4); }")
+          .arg(c.redF() * 255)
+          .arg(c.greenF() * 255)
+          .arg(c.blueF() * 255)
+          .arg(c.alphaF()));
 }
 
 QColor TextEditor::textColor() const

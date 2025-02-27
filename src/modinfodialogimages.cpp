@@ -568,8 +568,8 @@ void ImagesTab::showTooltip(QHelpEvent* e)
     return;
   }
 
-  const auto s = QStringLiteral("%1 (%2)")
-                     .arg(QDir::toNativeSeparators(f->path()), dimensionString(f->original().size()));
+  const auto s = QStringLiteral("%1 (%2)").arg(QDir::toNativeSeparators(f->path()),
+                                               dimensionString(f->original().size()));
 
   QToolTip::showText(e->globalPos(), s, ui->imagesThumbnails);
 }

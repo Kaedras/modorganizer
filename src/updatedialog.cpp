@@ -34,7 +34,8 @@ UpdateDialog::UpdateDialog(QWidget* parent)
   channel->registerObject("content", &m_changeLogs);
   page->setWebChannel(channel);
 
-  const QString path = QApplication::applicationDirPath() % u"/resources/markdown.html"_s;
+  const QString path =
+      QApplication::applicationDirPath() % u"/resources/markdown.html"_s;
   QFile f(path);
 
   if (f.open(QFile::ReadOnly)) {

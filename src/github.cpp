@@ -77,7 +77,8 @@ QNetworkReply* GitHub::genReply(Method method, const QString& path,
   QNetworkRequest request(relative ? GITHUB_URL % u"/"_s % path : path);
 
   request.setHeader(QNetworkRequest::UserAgentHeader, USER_AGENT);
-  request.setRawHeader(QByteArrayLiteral("Accept"), QByteArrayLiteral("application/vnd.github.v3+json"));
+  request.setRawHeader(QByteArrayLiteral("Accept"),
+                       QByteArrayLiteral("application/vnd.github.v3+json"));
 
   switch (method) {
   case Method::GET:
@@ -154,8 +155,8 @@ void GitHub::onFinished(const Request& req)
   req.timer->stop();
 
   if (object.value(u"http_status"_s).toInt() == 301) {
-    request(req.method, object.value(u"redirection"_s).toString(), req.data, req.callback,
-            false);
+    request(req.method, object.value(u"redirection"_s).toString(), req.data,
+            req.callback, false);
   } else {
     req.callback(result);
   }

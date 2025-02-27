@@ -362,12 +362,12 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
   resizeLists(pluginListAdjusted);
 
   QMenu* linkMenu = new QMenu(this);
-  m_LinkToolbar   = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Toolbar and Menu"),
-                                        this, SLOT(linkToolbar()));
-  m_LinkDesktop   = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Desktop"), this,
-                                        SLOT(linkDesktop()));
-  m_LinkStartMenu = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Start Menu"), this,
-                                        SLOT(linkMenu()));
+  m_LinkToolbar = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Toolbar and Menu"),
+                                      this, SLOT(linkToolbar()));
+  m_LinkDesktop = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Desktop"), this,
+                                      SLOT(linkDesktop()));
+  m_LinkStartMenu = linkMenu->addAction(QIcon(u":/MO/gui/link"_s), tr("Start Menu"),
+                                        this, SLOT(linkMenu()));
   ui->linkButton->setMenu(linkMenu);
 
   ui->listOptionsBtn->setMenu(

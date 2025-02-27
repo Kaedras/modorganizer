@@ -16,8 +16,8 @@ DiagnosticsSettingsTab::DiagnosticsSettingsTab(Settings& s, SettingsDialog& d)
 
   ui->dumpsMaxEdit->setValue(settings().diagnostics().maxCoreDumps());
 
-  QString logsPath = QUrl::fromLocalFile(qApp->property("dataPath").toString() % u"/"_s %
-                                         AppConfig::logPath())
+  QString logsPath = QUrl::fromLocalFile(qApp->property("dataPath").toString() %
+                                         u"/"_s % AppConfig::logPath())
                          .toString();
 
   ui->diagnosticsExplainedLabel->setText(

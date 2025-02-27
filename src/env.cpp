@@ -12,14 +12,14 @@
 
 #ifdef __unix__
 static inline const QString defaultName = QStringLiteral("ModOrganizer");
-static inline const char pathSeparator = ':';
+static inline const char pathSeparator  = ':';
 inline QString GETENV(const char* varName)
 {
   return qgetenv(varName);
 }
 #else
 static inline const QString defaultName = QStringLiteral("ModOrganizer.exe");
-static inline const char pathSeparator = ';';
+static inline const char pathSeparator  = ';';
 inline QString GETENV(const char* varName)
 {
   return qEnvironmentVariable(varName);
@@ -134,8 +134,8 @@ QString Environment::timezone() const
   const auto now = QDateTime::currentDateTime();
 
   const auto stdName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
-  const auto std =
-      QStringLiteral("%1, %2").arg(stdName).arg(offsetString(timeZone.offsetFromUtc(now)));
+  const auto std     = QStringLiteral("%1, %2").arg(stdName).arg(
+      offsetString(timeZone.offsetFromUtc(now)));
 
   const auto dstName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
   const auto dst     = QString("%1, %2").arg(dstName).arg(timeZone.offsetFromUtc(now));

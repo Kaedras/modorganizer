@@ -110,11 +110,11 @@ SettingsDialog::~SettingsDialog()
 QString SettingsDialog::getColoredButtonStyleSheet() const
 {
   return QStringLiteral("QPushButton {"
-                 "background-color: %1;"
-                 "color: %2;"
-                 "border: 1px solid;"
-                 "padding: 3px;"
-                 "}");
+                        "background-color: %1;"
+                        "color: %2;"
+                        "border: 1px solid;"
+                        "padding: 3px;"
+                        "}");
 }
 
 void SettingsDialog::accept()

@@ -18,8 +18,9 @@ static const QStringList files({u"helper"_s, u"nxmhandler"_s, u"loot/libloot.so"
 // executables file types
 static const QStringList FileTypes = {u"*.dll"_s, u"*.exe"_s};
 // files that are likely to be eaten
-static const QStringList files({u"helper.exe"_s, u"nxmhandler.exe"_s, u"usvfs_proxy_x64.exe"_s,
-                                u"usvfs_proxy_x86.exe"_s, u"usvfs_x64.dll"_s, u"usvfs_x86.dll"_s,
+static const QStringList files({u"helper.exe"_s, u"nxmhandler.exe"_s,
+                                u"usvfs_proxy_x64.exe"_s, u"usvfs_proxy_x86.exe"_s,
+                                u"usvfs_x64.dll"_s, u"usvfs_x86.dll"_s,
                                 u"loot/loot.dll"_s, u"loot/lootcli.exe"_s});
 #endif
 
@@ -174,7 +175,8 @@ int checkBlocked()
 {
   // directories that contain executables; these need to be explicit because
   // portable instances might add billions of files in MO's directory
-  const QStringList dirs = {u"."_s, u"/dlls"_s, u"/loot"_s, u"/NCC"_s, u"/platforms"_s, u"/plugins"_s};
+  const QStringList dirs = {u"."_s,    u"/dlls"_s,      u"/loot"_s,
+                            u"/NCC"_s, u"/platforms"_s, u"/plugins"_s};
 
   log::debug("  . blocked files");
   const QString appDir = QCoreApplication::applicationDirPath();
@@ -222,7 +224,7 @@ int checkBadOSDs(const env::Module& m)
   // is loaded into this process
 
   static const std::string nahimic = "Nahimic (also known as SonicSuite, SonicRadar, "
-                              "SteelSeries, A-Volute, etc.)";
+                                     "SteelSeries, A-Volute, etc.)";
 
   auto p = [](std::string re, std::string s) {
     return std::make_pair(std::regex(re, std::regex::icase), s);
@@ -270,7 +272,8 @@ int checkUsvfsIncompatibilites(const env::Module& m)
   // these dlls seems to interfere with usvfs
 
   static const std::map<QString, QString> names = {
-      {u"mactype64.dll"_s, u"Mactype"_s}, {u"epclient64.dll"_s, u"Citrix ICA Client"_s}};
+      {u"mactype64.dll"_s, u"Mactype"_s},
+      {u"epclient64.dll"_s, u"Citrix ICA Client"_s}};
 
   const QFileInfo file(m.path());
   int n = 0;

@@ -408,19 +408,20 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
       }
     } else if (column == COL_VERSION) {
       QString text = tr(R"(installed version: "%1", newest version: "%2")")
-                         .arg(modInfo->version().displayString(3), modInfo->newestVersion().displayString(3));
+                         .arg(modInfo->version().displayString(3),
+                              modInfo->newestVersion().displayString(3));
       if (modInfo->downgradeAvailable()) {
-        text +=
-            u"<br>"_s % tr("The newest version on Nexus seems to be older than the one "
-                        "you have installed. This could either mean the version you "
-                        "have has been withdrawn "
-                        "(i.e. due to a bug) or the author uses a non-standard "
-                        "versioning scheme and that newest version is actually newer. "
-                        "Either way you may want to \"upgrade\".");
+        text += u"<br>"_s %
+                tr("The newest version on Nexus seems to be older than the one "
+                   "you have installed. This could either mean the version you "
+                   "have has been withdrawn "
+                   "(i.e. due to a bug) or the author uses a non-standard "
+                   "versioning scheme and that newest version is actually newer. "
+                   "Either way you may want to \"upgrade\".");
       }
       if (modInfo->getNexusFileStatus() == NexusInterface::FileStatus::OLD_VERSION) {
         text += u"<br>"_s % tr("This file has been marked as \"Old\". There is most "
-                            "likely an updated version of this file available.");
+                               "likely an updated version of this file available.");
       } else if (modInfo->getNexusFileStatus() == NexusInterface::FileStatus::REMOVED ||
                  modInfo->getNexusFileStatus() ==
                      NexusInterface::FileStatus::ARCHIVED ||
@@ -428,7 +429,7 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
                      NexusInterface::FileStatus::ARCHIVED_HIDDEN) {
         text +=
             u"<br>"_s % tr("This file has been marked as \"Deleted\"! You may want to "
-                        "check for an update or remove the nexus ID from this mod!");
+                           "check for an update or remove the nexus ID from this mod!");
       }
       if (modInfo->nexusId() > 0) {
         if (!modInfo->canBeUpdated()) {
@@ -438,8 +439,8 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
           qint64 seconds = remains % 60;
           QString remainsStr(
               tr("%1 minute(s) and %2 second(s)").arg(minutes).arg(seconds));
-          text +=
-              u"<br>"_s % tr("This mod will be available to check in %2.").arg(remainsStr);
+          text += u"<br>"_s %
+                  tr("This mod will be available to check in %2.").arg(remainsStr);
         }
       }
       return text;
@@ -1325,9 +1326,10 @@ QString ModList::getColumnToolTip(int column) const
     QString result =
         tr("Depicts the content of the mod:") + "<br>" + "<table cellspacing=7>";
     m_Organizer->modDataContents().forEachContent([&result](auto const& content) {
-      result += QStringLiteral("<tr><td><img src=\"%1\" width=32/></td><td>%2</td></tr>")
-                    .arg(content.icon())
-                    .arg(content.name());
+      result +=
+          QStringLiteral("<tr><td><img src=\"%1\" width=32/></td><td>%2</td></tr>")
+              .arg(content.icon())
+              .arg(content.name());
     });
     return result % u"</table>"_s;
   };

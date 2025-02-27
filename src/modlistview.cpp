@@ -196,7 +196,8 @@ void ModListView::onProfileChanged(Profile* oldProfile, Profile* newProfile)
 
   if (newProfile && perProfileSeparators) {
     auto collapsed =
-        newProfile->setting(u"UserInterface"_s, u"collapsed_separators"_s, QStringList())
+        newProfile
+            ->setting(u"UserInterface"_s, u"collapsed_separators"_s, QStringList())
             .toStringList();
     m_collapsed[m_byPriorityProxy] = {collapsed.begin(), collapsed.end()};
   }
@@ -1307,7 +1308,7 @@ QString ModListView::contentsTooltip(const QModelIndex& index) const
   QString result(u"<table cellspacing=7>"_s);
   m_core->modDataContents().forEachContentIn(contents, [&result](auto const& content) {
     result.append(QStringLiteral("<tr><td><img src=\"%1\" width=32/></td>"
-                          "<td valign=\"middle\">%2</td></tr>")
+                                 "<td valign=\"middle\">%2</td></tr>")
                       .arg(content.icon())
                       .arg(content.name()));
   });

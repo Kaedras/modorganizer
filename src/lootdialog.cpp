@@ -195,7 +195,8 @@ void LootDialog::createUI()
   channel->registerObject(u"content"_s, &m_report);
   page->setWebChannel(channel);
 
-  const QString path = QApplication::applicationDirPath() % u"/resources/markdown.html"_s;
+  const QString path =
+      QApplication::applicationDirPath() % u"/resources/markdown.html"_s;
   QFile f(path);
 
   if (f.open(QFile::ReadOnly)) {

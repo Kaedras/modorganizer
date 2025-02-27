@@ -212,8 +212,9 @@ void SavesTab::deleteSavegame()
     auto& saveGame = m_SaveGames[idx.row()];
 
     if (count < 10) {
-      savesMsgLabel +=
-          u"<li>"_s % QFileInfo(saveGame->getFilepath()).completeBaseName() % u"</li>"_s;
+      savesMsgLabel += u"<li>"_s %
+                       QFileInfo(saveGame->getFilepath()).completeBaseName() %
+                       u"</li>"_s;
     }
     ++count;
 

@@ -207,9 +207,9 @@ void CategoriesDialog::fillTable()
   table->setItemDelegateForColumn(
       2, new ValidatingDelegate(this, new ExistingIDValidator(m_IDs)));
   table->setItemDelegateForColumn(
-      3, new ValidatingDelegate(this,
-                                new QRegularExpressionValidator(
-                                    QRegularExpression(u"([0-9]+)?(,[0-9]+)*"_s), this)));
+      3, new ValidatingDelegate(
+             this, new QRegularExpressionValidator(
+                       QRegularExpression(u"([0-9]+)?(,[0-9]+)*"_s), this)));
 
   int row = 0;
   for (const auto& category : categories.m_Categories) {

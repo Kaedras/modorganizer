@@ -245,7 +245,8 @@ void LogList::clear()
 
 void LogList::openLogsFolder()
 {
-  QString logsPath = qApp->property("dataPath").toString() % u"/"_s % AppConfig::logPath();
+  QString logsPath =
+      qApp->property("dataPath").toString() % u"/"_s % AppConfig::logPath();
   shell::Explore(logsPath);
 }
 

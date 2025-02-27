@@ -411,7 +411,8 @@ InstallationResult InstallationManager::testOverwrite(GuessedValue<QString>& mod
           if (!ensureValidModName(modName)) {
             return {IPluginInstaller::RESULT_FAILED};
           }
-          targetDirectory = QDir::fromNativeSeparators(m_ModsDirectory) % u"/"_s + modName;
+          targetDirectory =
+              QDir::fromNativeSeparators(m_ModsDirectory) % u"/"_s + modName;
         }
       } else if (overwriteDialog.action() == QueryOverwriteDialog::ACT_REPLACE) {
         unsigned int idx = ModInfo::getIndex(modName);
@@ -498,7 +499,7 @@ InstallationResult InstallationManager::doInstall(GuessedValue<QString>& modName
 
   result.m_name = modName;
 
-  QString targetDirectory       = QDir(m_ModsDirectory % u"/"_s + modName).canonicalPath();
+  QString targetDirectory = QDir(m_ModsDirectory % u"/"_s + modName).canonicalPath();
   QString targetDirectoryNative = QDir::toNativeSeparators(targetDirectory);
 
   log::debug("installing to \"{}\"", targetDirectoryNative);

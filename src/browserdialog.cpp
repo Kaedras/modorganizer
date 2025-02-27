@@ -169,7 +169,8 @@ void BrowserDialog::titleChanged(const QString& title)
 
 QString BrowserDialog::guessFileName(const QString& url)
 {
-  static const QRegularExpression uploadsExp(QStringLiteral("https://.+/uploads/([^/]+)$"));
+  static const QRegularExpression uploadsExp(
+      QStringLiteral("https://.+/uploads/([^/]+)$"));
   auto match = uploadsExp.match(url);
   if (match.hasMatch()) {
     // these seem to be premium downloads

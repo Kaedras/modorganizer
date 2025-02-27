@@ -653,7 +653,8 @@ GamePage::Game* GamePage::checkInstallation(const QString& path, Game* g)
 
 bool GamePage::detectMicrosoftStore(const QString& path)
 {
-  return path.contains(u"/ModifiableWindowsApps/"_s) || path.contains(u"/WindowsApps/"_s);
+  return path.contains(u"/ModifiableWindowsApps/"_s) ||
+         path.contains(u"/WindowsApps/"_s);
 }
 
 bool GamePage::confirmMicrosoftStore(const QString& path, IPluginGame* game)

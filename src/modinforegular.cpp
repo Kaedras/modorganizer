@@ -171,7 +171,8 @@ void ModInfoRegular::readMeta()
   m_LastNexusUpdate = QDateTime::fromString(
       metaFile.value(u"lastNexusUpdate"_s, "").toString(), Qt::ISODate);
   m_NexusLastModified = QDateTime::fromString(
-      metaFile.value(u"nexusLastModified"_s, QDateTime::currentDateTimeUtc()).toString(),
+      metaFile.value(u"nexusLastModified"_s, QDateTime::currentDateTimeUtc())
+          .toString(),
       Qt::ISODate);
   m_NexusCategory = metaFile.value(u"nexusCategory"_s, 0).toInt();
   m_Color         = metaFile.value(u"color"_s, QColor()).value<QColor>();
@@ -252,7 +253,9 @@ void ModInfoRegular::saveMeta()
     if (metaFile.status() == QSettings::NoError) {
       std::set<int> temp = m_Categories;
       temp.erase(m_PrimaryCategory);
-      metaFile.setValue(u"category"_s, QStringLiteral(u"%1,%2").arg(m_PrimaryCategory).arg(SetJoin(temp, u","_s)));
+      metaFile.setValue(
+          u"category"_s,
+          QStringLiteral(u"%1,%2").arg(m_PrimaryCategory).arg(SetJoin(temp, u","_s)));
       metaFile.setValue(u"newestVersion"_s, m_NewestVersion.canonicalString());
       metaFile.setValue(u"ignoredVersion"_s, m_IgnoredVersion.canonicalString());
       metaFile.setValue(u"version"_s, m_Version.canonicalString());
@@ -268,7 +271,8 @@ void ModInfoRegular::saveMeta()
       metaFile.setValue(u"nexusFileStatus"_s, m_NexusFileStatus);
       metaFile.setValue(u"lastNexusQuery"_s, m_LastNexusQuery.toString(Qt::ISODate));
       metaFile.setValue(u"lastNexusUpdate"_s, m_LastNexusUpdate.toString(Qt::ISODate));
-      metaFile.setValue(u"nexusLastModified"_s, m_NexusLastModified.toString(Qt::ISODate));
+      metaFile.setValue(u"nexusLastModified"_s,
+                        m_NexusLastModified.toString(Qt::ISODate));
       metaFile.setValue(u"nexusCategory"_s, m_NexusCategory);
       metaFile.setValue(u"converted"_s, m_Converted);
       metaFile.setValue(u"validated"_s, m_Validated);
@@ -279,8 +283,9 @@ void ModInfoRegular::saveMeta()
             static_cast<std::underlying_type_t<EndorsedState>>(m_EndorsedState));
       }
       if (m_TrackedState != TrackedState::TRACKED_UNKNOWN) {
-        metaFile.setValue(u"tracked"_s, static_cast<std::underlying_type_t<TrackedState>>(
-                                         m_TrackedState));
+        metaFile.setValue(
+            u"tracked"_s,
+            static_cast<std::underlying_type_t<TrackedState>>(m_TrackedState));
       }
 
       metaFile.remove(u"installedFiles");

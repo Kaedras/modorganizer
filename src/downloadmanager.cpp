@@ -148,9 +148,9 @@ DownloadManager::DownloadInfo::createFromMeta(const QString& filePath, bool show
       metaFile.value(u"newestVersion"_s, u"0"_s).toString());
   info->m_FileInfo->categoryID   = metaFile.value(u"category"_s, 0).toInt();
   info->m_FileInfo->fileCategory = metaFile.value(u"fileCategory"_s, 0).toInt();
-  info->m_FileInfo->repository   = metaFile.value(u"repository"_s, u"Nexus"_s).toString();
-  info->m_FileInfo->userData     = metaFile.value(u"userData"_s).toMap();
-  info->m_Reply                  = nullptr;
+  info->m_FileInfo->repository = metaFile.value(u"repository"_s, u"Nexus"_s).toString();
+  info->m_FileInfo->userData   = metaFile.value(u"userData"_s).toMap();
+  info->m_Reply                = nullptr;
 
   return info;
 }
@@ -1113,7 +1113,8 @@ void DownloadManager::queryInfoMd5(int index)
 
   QFile downloadFile(info->m_FileName);
   if (!downloadFile.exists()) {
-    downloadFile.setFileName(m_OrganizerCore->downloadsPath() % u"/"_s % info->m_FileName);
+    downloadFile.setFileName(m_OrganizerCore->downloadsPath() % u"/"_s %
+                             info->m_FileName);
   }
   if (!downloadFile.exists()) {
     log::error("Can't find download file '{}'", info->m_FileName);
@@ -1494,7 +1495,8 @@ void DownloadManager::markUninstalled(QString fileName)
   if (index >= 0) {
     markUninstalled(index);
   } else {
-    QString filePath   = QDir::fromNativeSeparators(m_OutputDirectory) % u"/"_s % fileName;
+    QString filePath =
+        QDir::fromNativeSeparators(m_OutputDirectory) % u"/"_s % fileName;
     DownloadInfo* info = getDownloadInfo(filePath);
     if (info != nullptr) {
 
@@ -1529,8 +1531,8 @@ QString DownloadManager::getFileNameFromNetworkReply(QNetworkReply* reply)
     std::regex exp("filename=\"(.+)\"");
 
     std::cmatch result;
-    if (std::regex_search(reply->rawHeader(u"Content-Disposition"_s).constData(), result,
-                          exp)) {
+    if (std::regex_search(reply->rawHeader(u"Content-Disposition"_s).constData(),
+                          result, exp)) {
       return MOBase::sanitizeFileName(QString::fromUtf8(result.str(1).c_str()));
     }
   }
@@ -1679,16 +1681,18 @@ void DownloadManager::createMetaFile(DownloadInfo* info)
   metaFile.setValue(u"description"_s, info->m_FileInfo->description);
   metaFile.setValue(u"modName"_s, info->m_FileInfo->modName);
   metaFile.setValue(u"version"_s, info->m_FileInfo->version.canonicalString());
-  metaFile.setValue(u"newestVersion"_s, info->m_FileInfo->newestVersion.canonicalString());
+  metaFile.setValue(u"newestVersion"_s,
+                    info->m_FileInfo->newestVersion.canonicalString());
   metaFile.setValue(u"fileTime"_s, info->m_FileInfo->fileTime);
   metaFile.setValue(u"fileCategory"_s, info->m_FileInfo->fileCategory);
   metaFile.setValue(u"category"_s, info->m_FileInfo->categoryID);
   metaFile.setValue(u"repository"_s, info->m_FileInfo->repository);
   metaFile.setValue(u"userData"_s, info->m_FileInfo->userData);
   metaFile.setValue(u"installed"_s, info->m_State == DownloadManager::STATE_INSTALLED);
-  metaFile.setValue(u"uninstalled"_s, info->m_State == DownloadManager::STATE_UNINSTALLED);
+  metaFile.setValue(u"uninstalled"_s,
+                    info->m_State == DownloadManager::STATE_UNINSTALLED);
   metaFile.setValue(u"paused"_s, (info->m_State == DownloadManager::STATE_PAUSED) ||
-                                  (info->m_State == DownloadManager::STATE_ERROR));
+                                     (info->m_State == DownloadManager::STATE_ERROR));
   metaFile.setValue(u"removed"_s, info->m_Hidden);
 
   // slightly hackish...
@@ -1768,8 +1772,8 @@ void DownloadManager::nxmFilesAvailable(QString, int, QVariant userData,
         info->m_FileInfo->version = info->m_FileInfo->newestVersion;
       }
       info->m_FileInfo->fileCategory = fileInfo[u"category_id"_s].toInt();
-      info->m_FileInfo->fileTime =
-          QDateTime::fromMSecsSinceEpoch(fileInfo[u"uploaded_timestamp"_s].toLongLong());
+      info->m_FileInfo->fileTime     = QDateTime::fromMSecsSinceEpoch(
+          fileInfo[u"uploaded_timestamp"_s].toLongLong());
       info->m_FileInfo->fileID   = fileInfo[u"file_id"_s].toInt();
       info->m_FileInfo->fileName = fileInfo[u"file_name"_s].toString();
       info->m_FileInfo->description =
@@ -2025,7 +2029,7 @@ void DownloadManager::nxmFileInfoFromMd5Available(QString gameName, QVariant use
       auto fileDetails = results[u"file_details"_s].toMap();
 
       if (fileDetails[u"file_name"_s].toString().compare(info->m_FileName,
-                                                      Qt::CaseInsensitive) == 0) {
+                                                         Qt::CaseInsensitive) == 0) {
         if (chosenIdx < 0) {
           chosenIdx = i;  // intentional to not break in order to check other results
         } else {
@@ -2043,8 +2047,10 @@ void DownloadManager::nxmFileInfoFromMd5Available(QString gameName, QVariant use
       auto results     = resultlist[i].toMap();
       auto fileDetails = results[u"file_details"_s].toMap();
 
-      if (fileDetails[u"category_id"_s].toInt() != NexusInterface::FileStatus::REMOVED &&
-          fileDetails[u"category_id"_s].toInt() != NexusInterface::FileStatus::ARCHIVED) {
+      if (fileDetails[u"category_id"_s].toInt() !=
+              NexusInterface::FileStatus::REMOVED &&
+          fileDetails[u"category_id"_s].toInt() !=
+              NexusInterface::FileStatus::ARCHIVED) {
         if (chosenIdx < 0) {
           chosenIdx = i;  // intentional to not break in order to check other results
         } else {

@@ -261,7 +261,8 @@ std::size_t Settings::refreshThreadCount() const
 
 void Settings::setRefreshThreadCount(std::size_t n) const
 {
-  return set(m_Settings, u"Settings"_s, u"refresh_thread_count"_s, QVariant::fromValue(n));
+  return set(m_Settings, u"Settings"_s, u"refresh_thread_count"_s,
+             QVariant::fromValue(n));
 }
 
 std::optional<QVersionNumber> Settings::version() const
@@ -285,17 +286,12 @@ void Settings::setFirstStart(bool b)
 
 QString Settings::executablesBlacklist() const
 {
-  static const QString def = (QStringList() << u"Chrome.exe"_s
-                                            << u"Firefox.exe"_s
-                                            << u"TSVNCache.exe"_s
-                                            << u"TGitCache.exe"_s
-                                            << u"Steam.exe"_s
-                                            << u"GameOverlayUI.exe"_s
-                                            << u"Discord.exe"_s
-                                            << u"GalaxyClient.exe"_s
-                                            << u"Spotify.exe"_s
-                                            << u"Brave.exe"_s)
-                                 .join(';');
+  static const QString def =
+      (QStringList() << u"Chrome.exe"_s << u"Firefox.exe"_s << u"TSVNCache.exe"_s
+                     << u"TGitCache.exe"_s << u"Steam.exe"_s << u"GameOverlayUI.exe"_s
+                     << u"Discord.exe"_s << u"GalaxyClient.exe"_s << u"Spotify.exe"_s
+                     << u"Brave.exe"_s)
+          .join(';');
 
   return get<QString>(m_Settings, u"Settings"_s, u"executable_blacklist"_s, def);
 }
@@ -320,7 +316,8 @@ QStringList Settings::skipFileSuffixes() const
 {
   static const QStringList def = QStringList() << u".mohidden"_s;
 
-  auto setting = get<QStringList>(m_Settings, u"Settings"_s, u"skip_file_suffixes"_s, def);
+  auto setting =
+      get<QStringList>(m_Settings, u"Settings"_s, u"skip_file_suffixes"_s, def);
 
   return setting;
 }
@@ -334,7 +331,8 @@ QStringList Settings::skipDirectories() const
 {
   static const QStringList def = QStringList() << u".git"_s;
 
-  auto setting = get<QStringList>(m_Settings, u"Settings"_s, u"skip_directories"_s, def);
+  auto setting =
+      get<QStringList>(m_Settings, u"Settings"_s, u"skip_directories"_s, def);
 
   return setting;
 }
@@ -654,7 +652,8 @@ void GameSettings::setEdition(const QString& name)
 
 std::optional<QString> GameSettings::selectedProfileName() const
 {
-  if (auto v = getOptional<QByteArray>(m_Settings, u"General"_s, u"selected_profile"_s)) {
+  if (auto v =
+          getOptional<QByteArray>(m_Settings, u"General"_s, u"selected_profile"_s)) {
     return QString::fromUtf8(*v);
   }
 
@@ -768,7 +767,8 @@ void GeometrySettings::saveState(const QMainWindow* w)
 
 bool GeometrySettings::restoreState(QMainWindow* w) const
 {
-  if (auto v = getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(w))) {
+  if (auto v =
+          getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(w))) {
     w->restoreState(*v);
     return true;
   }
@@ -783,7 +783,8 @@ void GeometrySettings::saveState(const QHeaderView* w)
 
 bool GeometrySettings::restoreState(QHeaderView* w) const
 {
-  if (auto v = getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(w))) {
+  if (auto v =
+          getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(w))) {
     w->restoreState(*v);
     return true;
   }
@@ -798,7 +799,8 @@ void GeometrySettings::saveState(const QSplitter* w)
 
 bool GeometrySettings::restoreState(QSplitter* w) const
 {
-  if (auto v = getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(w))) {
+  if (auto v =
+          getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(w))) {
     w->restoreState(*v);
     return true;
   }
@@ -813,8 +815,8 @@ void GeometrySettings::saveState(const ExpanderWidget* expander)
 
 bool GeometrySettings::restoreState(ExpanderWidget* expander) const
 {
-  if (auto v =
-          getOptional<QByteArray>(m_Settings, u"Geometry"_s, stateSettingName(expander))) {
+  if (auto v = getOptional<QByteArray>(m_Settings, u"Geometry"_s,
+                                       stateSettingName(expander))) {
     expander->restoreState(*v);
     return true;
   }
@@ -841,8 +843,9 @@ bool GeometrySettings::restoreVisibility(QWidget* w, std::optional<bool> def) co
 void GeometrySettings::restoreToolbars(QMainWindow* w) const
 {
   // all toolbars have the same size and button style settings
-  const auto size  = getOptional<QSize>(m_Settings, u"Geometry"_s, u"toolbar_size"_s);
-  const auto style = getOptional<int>(m_Settings, u"Geometry"_s, u"toolbar_button_style"_s);
+  const auto size = getOptional<QSize>(m_Settings, u"Geometry"_s, u"toolbar_size"_s);
+  const auto style =
+      getOptional<int>(m_Settings, u"Geometry"_s, u"toolbar_button_style"_s);
 
   for (auto* tb : w->findChildren<QToolBar*>()) {
     if (size) {
@@ -1031,7 +1034,8 @@ void GeometrySettings::restoreDocks(QMainWindow* mw) const
 
   // for each dock
   for (auto* dock : mw->findChildren<QDockWidget*>()) {
-    if (auto size = getOptional<int>(m_Settings, u"Geometry"_s, dockSettingName(dock))) {
+    if (auto size =
+            getOptional<int>(m_Settings, u"Geometry"_s, dockSettingName(dock))) {
       // remember this dock, its size and orientation
       dockInfos.push_back({dock, *size, dockOrientation(mw, dock)});
     }
@@ -1164,7 +1168,8 @@ void WidgetSettings::restoreChecked(QAbstractButton* w, std::optional<bool> def)
 {
   warnIfNotCheckable(w);
 
-  if (auto v = getOptional<bool>(m_Settings, u"Widgets"_s, checkedSettingName(w), def)) {
+  if (auto v =
+          getOptional<bool>(m_Settings, u"Widgets"_s, checkedSettingName(w), def)) {
     w->setChecked(*v);
   }
 }
@@ -1278,7 +1283,8 @@ void ColorSettings::setModlistContainsFile(const QColor& c)
 
 QColor ColorSettings::pluginListContained() const
 {
-  return get<QColor>(m_Settings, u"Settings"_s, u"containedColor"_s, QColor(0, 0, 255, 64));
+  return get<QColor>(m_Settings, u"Settings"_s, u"containedColor"_s,
+                     QColor(0, 0, 255, 64));
 }
 
 void ColorSettings::setPluginListContained(const QColor& c)
@@ -1288,7 +1294,8 @@ void ColorSettings::setPluginListContained(const QColor& c)
 
 QColor ColorSettings::pluginListMaster() const
 {
-  return get<QColor>(m_Settings, u"Settings"_s, u"masterColor"_s, QColor(255, 255, 0, 64));
+  return get<QColor>(m_Settings, u"Settings"_s, u"masterColor"_s,
+                     QColor(255, 255, 0, 64));
 }
 
 void ColorSettings::setPluginListMaster(const QColor& c)
@@ -1298,7 +1305,8 @@ void ColorSettings::setPluginListMaster(const QColor& c)
 
 std::optional<QColor> ColorSettings::previousSeparatorColor() const
 {
-  const auto c = getOptional<QColor>(m_Settings, u"General"_s, u"previousSeparatorColor"_s);
+  const auto c =
+      getOptional<QColor>(m_Settings, u"General"_s, u"previousSeparatorColor"_s);
   if (c && c->isValid()) {
     return c;
   }
@@ -1496,7 +1504,8 @@ QVariant PluginSettings::persistent(const QString& pluginName, const QString& ke
     return def;
   }
 
-  return get<QVariant>(m_Settings, u"PluginPersistance"_s, pluginName % u"/"_s % key, def);
+  return get<QVariant>(m_Settings, u"PluginPersistance"_s, pluginName % u"/"_s % key,
+                       def);
 }
 
 void PluginSettings::setPersistent(const QString& pluginName, const QString& key,
@@ -1667,7 +1676,8 @@ QString PathSettings::base() const
 
 QString PathSettings::downloads(bool resolve) const
 {
-  return getConfigurablePath(u"download_directory"_s, AppConfig::downloadPath(), resolve);
+  return getConfigurablePath(u"download_directory"_s, AppConfig::downloadPath(),
+                             resolve);
 }
 
 QString PathSettings::cache(bool resolve) const
@@ -1682,7 +1692,8 @@ QString PathSettings::mods(bool resolve) const
 
 QString PathSettings::profiles(bool resolve) const
 {
-  return getConfigurablePath(u"profiles_directory"_s, AppConfig::profilesPath(), resolve);
+  return getConfigurablePath(u"profiles_directory"_s, AppConfig::profilesPath(),
+                             resolve);
 }
 
 QString PathSettings::overwrite(bool resolve) const
@@ -1899,8 +1910,8 @@ ServerList NetworkSettings::serversFromOldMap() const
   sg.for_each([&](auto&& serverKey) {
     QVariantMap data = sg.get<QVariantMap>(serverKey);
 
-    ServerInfo server(serverKey, data[u"premium"_s].toBool(), data[u"lastSeen"_s].toDate(),
-                      data[u"preferred"_s].toInt(), {});
+    ServerInfo server(serverKey, data[u"premium"_s].toBool(),
+                      data[u"lastSeen"_s].toDate(), data[u"preferred"_s].toInt(), {});
 
     // ignoring download count and speed, it's now a list of values instead of
     // a total
@@ -2101,7 +2112,8 @@ void InterfaceSettings::setCollapsibleSeparators(bool ascending, bool descending
 
 bool InterfaceSettings::collapsibleSeparatorsHighlightTo() const
 {
-  return get<bool>(m_Settings, u"Settings"_s, u"collapsible_separators_conflicts_to"_s, true);
+  return get<bool>(m_Settings, u"Settings"_s, u"collapsible_separators_conflicts_to"_s,
+                   true);
 }
 
 void InterfaceSettings::setCollapsibleSeparatorsHighlightTo(bool b)
@@ -2111,8 +2123,8 @@ void InterfaceSettings::setCollapsibleSeparatorsHighlightTo(bool b)
 
 bool InterfaceSettings::collapsibleSeparatorsHighlightFrom() const
 {
-  return get<bool>(m_Settings, u"Settings"_s, u"collapsible_separators_conflicts_from"_s,
-                   true);
+  return get<bool>(m_Settings, u"Settings"_s,
+                   u"collapsible_separators_conflicts_from"_s, true);
 }
 
 void InterfaceSettings::setCollapsibleSeparatorsHighlightFrom(bool b)
@@ -2128,13 +2140,14 @@ bool InterfaceSettings::collapsibleSeparatorsIcons(int column) const
 
 void InterfaceSettings::setCollapsibleSeparatorsIcons(int column, bool show)
 {
-  set(m_Settings, u"Settings"_s, QStringLiteral("collapsible_separators_icons_%1").arg(column),
-      show);
+  set(m_Settings, u"Settings"_s,
+      QStringLiteral("collapsible_separators_icons_%1").arg(column), show);
 }
 
 bool InterfaceSettings::collapsibleSeparatorsPerProfile() const
 {
-  return get<bool>(m_Settings, u"Settings"_s, u"collapsible_separators_per_profile"_s, false);
+  return get<bool>(m_Settings, u"Settings"_s, u"collapsible_separators_per_profile"_s,
+                   false);
 }
 
 void InterfaceSettings::setCollapsibleSeparatorsPerProfile(bool b)
@@ -2370,7 +2383,8 @@ void GlobalSettings::updateRegistryKey()
 
   const QString OldRootKey = u"Software\\"_s % OldOrganization;
 
-  if (env::registryValueExists(OldRootKey % u"\\"_s % OldApplication, OldInstanceValue)) {
+  if (env::registryValueExists(OldRootKey % u"\\"_s % OldApplication,
+                               OldInstanceValue)) {
     QSettings old(OldOrganization, OldApplication);
     setCurrentInstance(old.value(OldInstanceValue).toString());
     old.remove(OldInstanceValue);

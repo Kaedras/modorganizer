@@ -60,10 +60,9 @@ public:
       int closeTagLength     = 0;
       if (tagName == '*') {
         // ends at the next bullet point
-        static const QRegularExpression regex(uR"((\[\*\]|</ul>))"_s,
-                                             QRegularExpression::CaseInsensitiveOption);
-        closeTagPos =
-            input.indexOf(regex,3);
+        static const QRegularExpression regex(
+            uR"((\[\*\]|</ul>))"_s, QRegularExpression::CaseInsensitiveOption);
+        closeTagPos = input.indexOf(regex, 3);
         // leave closeTagLength at 0 because we don't want to "eat" the next bullet
         // point
       } else if (tagName == "line") {
@@ -102,17 +101,19 @@ public:
               QString color   = match.captured(1);
               QString content = match.captured(2);
               if (color.at(0) == '#') {
-                return temp.replace(tagIter->second.first,
-                                    QStringLiteral("<font style=\"color: %1;\">%2</font>")
-                                        .arg(color, content));
+                return temp.replace(
+                    tagIter->second.first,
+                    QStringLiteral("<font style=\"color: %1;\">%2</font>")
+                        .arg(color, content));
               } else {
                 auto colIter = m_ColorMap.find(color.toLower());
                 if (colIter != m_ColorMap.end()) {
                   color = colIter->second;
                 }
-                return temp.replace(tagIter->second.first,
-                                    QStringLiteral("<font style=\"color: #%1;\">%2</font>")
-                                        .arg(color, content));
+                return temp.replace(
+                    tagIter->second.first,
+                    QStringLiteral("<font style=\"color: #%1;\">%2</font>")
+                        .arg(color, content));
               }
             } else {
               log::warn("don't know how to deal with tag {}", tagName);

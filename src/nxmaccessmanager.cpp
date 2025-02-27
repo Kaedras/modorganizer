@@ -392,9 +392,11 @@ bool ValidationAttempt::sendRequest(NXMAccessManager& m, const QString& key)
                     m.userAgent().toUtf8());
   request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader,
                     u"application/json"_s);
-  request.setRawHeader(QByteArrayLiteral("Protocol-Version"), QByteArrayLiteral("1.0.0"));
+  request.setRawHeader(QByteArrayLiteral("Protocol-Version"),
+                       QByteArrayLiteral("1.0.0"));
   request.setRawHeader(QByteArrayLiteral("Application-Name"), QByteArrayLiteral("MO2"));
-  request.setRawHeader(QByteArrayLiteral("Application-Version"), m.MOVersion().toUtf8());
+  request.setRawHeader(QByteArrayLiteral("Application-Version"),
+                       m.MOVersion().toUtf8());
 
   m_reply = m.get(request);
 
@@ -950,7 +952,8 @@ QString NXMAccessManager::userAgent(const QString& subModule) const
   QStringList comments;
   QString os;
   if (QSysInfo::productType() == "windows"_L1)
-    comments << ((QSysInfo::kernelType() == "winnt"_L1) ? u"Windows_NT "_s : u"Windows "_s) %
+    comments << ((QSysInfo::kernelType() == "winnt"_L1) ? u"Windows_NT "_s
+                                                        : u"Windows "_s) %
                     QSysInfo::kernelVersion();
   else
     comments << QSysInfo::kernelType().left(1).toUpper() % QSysInfo::kernelType().mid(1)

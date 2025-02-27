@@ -128,11 +128,11 @@ void NexusBridge::nxmFilesAvailable(QString gameName, int modID, QVariant userDa
       QVariantMap fileInfo = file.toMap();
       temp.uri             = fileInfo[u"file_name"_s].toString();
       temp.name            = fileInfo[u"name"_s].toString();
-      temp.description     = BBCode::convertToHTML(fileInfo[u"description"_s].toString());
-      temp.version         = VersionInfo(fileInfo[u"version"_s].toString());
-      temp.categoryID      = fileInfo[u"category_id"_s].toInt();
-      temp.fileID          = fileInfo[u"file_id"_s].toInt();
-      temp.fileSize        = fileInfo[u"size"_s].toInt();
+      temp.description = BBCode::convertToHTML(fileInfo[u"description"_s].toString());
+      temp.version     = VersionInfo(fileInfo[u"version"_s].toString());
+      temp.categoryID  = fileInfo[u"category_id"_s].toInt();
+      temp.fileID      = fileInfo[u"file_id"_s].toInt();
+      temp.fileSize    = fileInfo[u"size"_s].toInt();
       fileInfoList.append(&temp);
     }
 
@@ -357,7 +357,7 @@ void NexusInterface::interpretNexusFileName(const QString& fileName, QString& mo
 
   if (query) {
     SelectionDialog selection(tr("Please pick the mod ID for \"%1\"").arg(fileName));
-    int index   = 0;
+    int index = 0;
     static const QRegularExpression regex(u"[^0-9]"_s);
     auto splits = fileName.split(regex, Qt::KeepEmptyParts);
     for (const auto& substr : splits) {
@@ -924,7 +924,8 @@ void NexusInterface::nextRequest()
                   .arg(info.m_FileID);
       } else if (!fileInfo->nexusKey.isEmpty() && fileInfo->nexusExpires &&
                  fileInfo->nexusDownloadUser == m_User.id().toInt()) {
-        url = QStringLiteral("%1/games/%2/mods/%3/files/%4/download_link?key=%5&expires=%6")
+        url = QStringLiteral(
+                  "%1/games/%2/mods/%3/files/%4/download_link?key=%5&expires=%6")
                   .arg(info.m_URL, info.m_GameName)
                   .arg(info.m_ModID)
                   .arg(info.m_FileID)
@@ -980,7 +981,8 @@ void NexusInterface::nextRequest()
                     m_AccessManager->userAgent(info.m_SubModule));
   request.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader,
                     "application/json");
-  request.setRawHeader(QByteArrayLiteral("Protocol-Version"), QByteArrayLiteral("1.0.0"));
+  request.setRawHeader(QByteArrayLiteral("Protocol-Version"),
+                       QByteArrayLiteral("1.0.0"));
   request.setRawHeader(QByteArrayLiteral("Application-Name"), QByteArrayLiteral("MO2"));
   request.setRawHeader(QByteArrayLiteral("Application-Version"),
                        QApplication::applicationVersion().toUtf8());
@@ -996,8 +998,8 @@ void NexusInterface::nextRequest()
   } else {
     // Qt doesn't support DELETE with a payload as that's technically against the HTTP
     // standard...
-    info.m_Reply =
-        m_AccessManager->sendCustomRequest(request, QByteArrayLiteral("DELETE"), postData.toJson());
+    info.m_Reply = m_AccessManager->sendCustomRequest(
+        request, QByteArrayLiteral("DELETE"), postData.toJson());
   }
 
   connect(info.m_Reply, SIGNAL(finished()), this, SLOT(requestFinished()));
@@ -1117,14 +1119,16 @@ void NexusInterface::requestFinished(std::list<NXMRequestInfo>::iterator iter)
           auto results = result.toMap();
           auto message = results[u"message"_s].toString();
 
-          static const QRegularExpression alreadyTracking(u"User [0-9]+ is already Tracking Mod: [0-9]+"_s);
-          static const QRegularExpression nowTracking(u"User [0-9]+ is now Tracking Mod: [0-9]+"_s);
-          static const QRegularExpression noLongerTracking(u"User [0-9]+ is no longer tracking [0-9]+"_s);
-          static const QRegularExpression notTracking(u"User is not tracking mod. Unable to untrack."_s);
+          static const QRegularExpression alreadyTracking(
+              u"User [0-9]+ is already Tracking Mod: [0-9]+"_s);
+          static const QRegularExpression nowTracking(
+              u"User [0-9]+ is now Tracking Mod: [0-9]+"_s);
+          static const QRegularExpression noLongerTracking(
+              u"User [0-9]+ is no longer tracking [0-9]+"_s);
+          static const QRegularExpression notTracking(
+              u"User is not tracking mod. Unable to untrack."_s);
 
-
-          if (message.contains(alreadyTracking) ||
-              message.contains(nowTracking)) {
+          if (message.contains(alreadyTracking) || message.contains(nowTracking)) {
             emit nxmTrackingToggled(iter->m_GameName, iter->m_ModID, iter->m_UserData,
                                     true, iter->m_ID);
           } else if (message.contains(noLongerTracking) ||

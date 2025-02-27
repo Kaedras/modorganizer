@@ -211,8 +211,7 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
 
   log::info("starting Mod Organizer version {} revision {} in {}, {}: {}",
             createVersionInfo().string(), GITID, QCoreApplication::applicationDirPath(),
-            usvfs,
-            MOShared::getUsvfsVersionString());
+            usvfs, MOShared::getUsvfsVersionString());
 
   if (multiProcess.secondary()) {
     log::debug("another instance of MO is running but --multiple was given");
@@ -333,8 +332,8 @@ int MOApplication::run(MOMultiProcess& multiProcess)
 
   // tutorials
   log::debug("initializing tutorials");
-  TutorialManager::init(qApp->applicationDirPath() % u"/"_s + AppConfig::tutorialsPath() %
-                            u"/"_s,
+  TutorialManager::init(qApp->applicationDirPath() % u"/"_s +
+                            AppConfig::tutorialsPath() % u"/"_s,
                         m_core.get());
 
   // styling
@@ -539,8 +538,8 @@ bool MOApplication::setStyleFile(const QString& styleName)
   }
   // set new stylesheet or clear it
   if (styleName.length() != 0) {
-    QString styleSheetName =
-        applicationDirPath() % u"/"_s % AppConfig::stylesheetsPath() % u"/"_s % styleName;
+    QString styleSheetName = applicationDirPath() % u"/"_s %
+                             AppConfig::stylesheetsPath() % u"/"_s % styleName;
     if (QFile::exists(styleSheetName)) {
       m_styleWatcher.addPath(styleSheetName);
       updateStyle(styleSheetName);

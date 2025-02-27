@@ -292,14 +292,14 @@ void CategoryFactory::loadDefaultCategories()
   // the order here is relevant as it defines the order in which the
   // mods appear in the combo box
   addCategory(1, u"Animations"_s, 0);
-  addCategory(52,u"Poses"_s, 1);
+  addCategory(52, u"Poses"_s, 1);
   addCategory(2, u"Armour"_s, 0);
   addCategory(53, u"Power Armor"_s, 2);
   addCategory(3, u"Audio"_s, 0);
   addCategory(38, u"Music"_s, 0);
   addCategory(39, u"Voice"_s, 0);
   addCategory(5, u"Clothing"_s, 0);
-  addCategory(41,u"Jewelry"_s, 5);
+  addCategory(41, u"Jewelry"_s, 5);
   addCategory(42, u"Backpacks"_s, 5);
   addCategory(6, u"Collectables"_s, 0);
   addCategory(28, u"Companions"_s, 0);

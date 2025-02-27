@@ -151,7 +151,8 @@ void SyncOverwriteDialog::applyTo(QTreeWidgetItem* item, const QString& path,
         if (originID != -1) {
           FilesOrigin& origin = m_DirectoryStructure->getOriginByID(originID);
           QString source      = m_SourcePath % u"/"_s % filePath;
-          QString destination = modDirectory % u"/"_s % origin.getName() % u"/"_s % filePath;
+          QString destination =
+              modDirectory % u"/"_s % origin.getName() % u"/"_s % filePath;
           if (!QFile::remove(destination)) {
             reportError(tr("failed to remove %1").arg(destination));
           } else if (!QFile::rename(source, destination)) {

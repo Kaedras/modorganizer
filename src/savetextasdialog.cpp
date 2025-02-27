@@ -37,8 +37,8 @@ void SaveTextAsDialog::on_clipboardBtn_clicked()
 
 void SaveTextAsDialog::on_saveAsBtn_clicked()
 {
-  QString fileName = QFileDialog::getSaveFileName(this, tr("Save CSV"), QString(),
-                                                  tr("Text Files") % u" (*.txt *.csv)"_s);
+  QString fileName = QFileDialog::getSaveFileName(
+      this, tr("Save CSV"), QString(), tr("Text Files") % u" (*.txt *.csv)"_s);
   if (!fileName.isEmpty()) {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {

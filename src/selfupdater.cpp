@@ -111,8 +111,9 @@ void SelfUpdater::testForUpdate(const Settings& settings)
           CandidatesMap mreleases;
           for (const QJsonValue& releaseVal : releases) {
             QJsonObject release = releaseVal.toObject();
-            if (!release[u"draft"_s].toBool() && (Settings::instance().usePrereleases() ||
-                                               !release[u"prerelease"_s].toBool())) {
+            if (!release[u"draft"_s].toBool() &&
+                (Settings::instance().usePrereleases() ||
+                 !release[u"prerelease"_s].toBool())) {
               auto version       = Version::parse(release[u"tag_name"_s].toString(),
                                                   Version::ParseMode::MO2);
               mreleases[version] = release;

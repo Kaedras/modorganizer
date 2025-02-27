@@ -157,9 +157,9 @@ confirmBlacklisted(QWidget* parent, const SpawnParameters& sp, Settings& setting
       "or any other virtualized files.");
 
   const QString details = u"Executable: "_s % sp.binary.fileName() %
-                       u"\n"
-                       "Current blacklist: "_s %
-                       settings.executablesBlacklist();
+                          u"\n"
+                          "Current blacklist: "_s %
+                          settings.executablesBlacklist();
 
   auto r = MOBase::TaskDialog(parent, title)
                .main(mainText)
@@ -239,7 +239,8 @@ QString makeSteamArguments(const QString& username, const QString& password)
 bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDirectory,
                 const QString& steamAppID, const Settings& settings)
 {
-  static const std::vector<QString> steamFiles = {u"steam_api.dll"_s, u"steam_api64.dll"_s};
+  static const std::vector<QString> steamFiles = {u"steam_api.dll"_s,
+                                                  u"steam_api64.dll"_s};
 
   log::debug("checking steam");
 

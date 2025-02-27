@@ -88,7 +88,7 @@ void StatusBar::setAPI(const APIStats& stats, const APIUserAccount& user)
   QString backgroundColor;
 
   if (user.type() == APIUserAccountTypes::None) {
-    text            = u"API: not logged in"_s;
+    text = u"API: not logged in"_s;
   } else {
     text = QStringLiteral("API: Queued: %1 | Daily: %2 | Hourly: %3")
                .arg(stats.requestsQueued)
@@ -226,7 +226,7 @@ QString StatusBarAction::cleanupActionText(const QString& original) const
   static const QRegularExpression regex(u"\\&([^&])"_s);
 
   s.replace(regex, u"\\1"_s);  // &Item -> Item
-  s.replace(u"&&"_s, u"&"_s);                               // &&Item -> &Item
+  s.replace(u"&&"_s, u"&"_s);  // &&Item -> &Item
 
   if (s.endsWith("..."_L1)) {
     s = s.left(s.size() - 3);

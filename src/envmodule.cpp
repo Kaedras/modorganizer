@@ -110,8 +110,9 @@ QString Module::toString() const
 
 QString Module::getMD5() const
 {
-  static const std::set<QString> ignore = {
-      u"\\windows\\"_s, u"\\program files\\"_s, u"\\program files (x86)\\"_s, u"\\programdata\\"_s};
+  static const std::set<QString> ignore = {u"\\windows\\"_s, u"\\program files\\"_s,
+                                           u"\\program files (x86)\\"_s,
+                                           u"\\programdata\\"_s};
 
   // don't calculate md5 for system files, it's not really relevant and
   // it takes a while

@@ -1055,7 +1055,7 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
 
   auto addFunc = [&](int originId, QString archiveName = "") {
     FilesOrigin& origin = directoryStructure()->getOriginByID(originId);
-    QString filePath    = QDir::fromNativeSeparators(origin.getPath()) % u"/"_s % fileName;
+    QString filePath = QDir::fromNativeSeparators(origin.getPath()) % u"/"_s % fileName;
     if (QFile::exists(filePath)) {
       // it's very possible the file doesn't exist, because it's inside an archive. we
       // don't support that
@@ -1466,8 +1466,8 @@ void OrganizerCore::requestDownload(const QUrl& url, QNetworkReply* reply)
   // no mod found that could handle the download. Is it a nexus mod?
   if (url.host() == "www.nexusmods.com"_L1) {
     QString gameName;
-    int modID        = 0;
-    int fileID       = 0;
+    int modID  = 0;
+    int fileID = 0;
     static const QRegularExpression nameExp(u"www\\.nexusmods\\.com/(\\a+)/"_s);
     auto match = nameExp.match(url.toString());
     if (match.hasMatch()) {

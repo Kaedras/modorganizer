@@ -202,7 +202,8 @@ TextFilesTab::TextFilesTab(ModInfoDialogTabContext cx)
 
 bool TextFilesTab::wantsFile(const QString& rootPath, const QString& fullPath) const
 {
-  static const QString extensions[] = {u".txt"_s, u".json"_s, u".cfg"_s, u".log"_s, u".toml"_s};
+  static const QString extensions[] = {u".txt"_s, u".json"_s, u".cfg"_s, u".log"_s,
+                                       u".toml"_s};
 
   for (const auto& e : extensions) {
     if (fullPath.endsWith(e, Qt::CaseInsensitive)) {

@@ -262,8 +262,8 @@ template <class It>
 void mapToArchive(std::vector<FileData*> const& data, It begin, It end)
 {
   for (auto it = begin; it != end; ++it) {
-    const auto& entry   = *it;
-    auto* aentry = dynamic_cast<const ArchiveFileEntry*>(entry.get());
+    const auto& entry = *it;
+    auto* aentry      = dynamic_cast<const ArchiveFileEntry*>(entry.get());
 
     if (aentry->m_Index != -1) {
       data[aentry->m_Index]->addOutputFilePath(aentry->path().toStdWString());

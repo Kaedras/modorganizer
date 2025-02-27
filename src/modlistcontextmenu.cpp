@@ -191,8 +191,8 @@ void ModListPrimaryCategoryMenu::populate(const CategoryFactory* factory,
     int catIdx            = factory->getCategoryIndex(categoryID);
     QWidgetAction* action = new QWidgetAction(this);
     try {
-      QRadioButton* categoryBox =
-          new QRadioButton(factory->getCategoryName(catIdx).replace('&', u"&&"_s), this);
+      QRadioButton* categoryBox = new QRadioButton(
+          factory->getCategoryName(catIdx).replace('&', u"&&"_s), this);
       categoryBox->setChecked(categoryID == mod->primaryCategory());
       action->setDefaultWidget(categoryBox);
       action->setData(categoryID);

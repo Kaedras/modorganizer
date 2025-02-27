@@ -196,7 +196,8 @@ void PluginsSettingsTab::update()
 
   // set plugin blacklist
   QStringList names;
-  for (QListWidgetItem* item : ui->pluginBlacklist->findItems(u"*"_s, Qt::MatchWildcard)) {
+  for (QListWidgetItem* item :
+       ui->pluginBlacklist->findItems(u"*"_s, Qt::MatchWildcard)) {
     names.push_back(item->text());
   }
 
@@ -329,8 +330,8 @@ void PluginsSettingsTab::on_pluginsList_currentItemChanged(QTreeWidgetItem* curr
       for (auto& problem : problems) {
         descriptions.append(problem.shortDescription());
       }
-      ui->enabledCheckbox->setToolTip(u"<ul><li>"_s % descriptions.join(u"</li><li>"_s) %
-                                      u"</li></ul>"_s);
+      ui->enabledCheckbox->setToolTip(
+          u"<ul><li>"_s % descriptions.join(u"</li><li>"_s) % u"</li></ul>"_s);
     }
   }
 

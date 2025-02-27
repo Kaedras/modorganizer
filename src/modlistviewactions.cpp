@@ -428,12 +428,14 @@ void ModListViewActions::exportModListCSV() const
         fields.push_back(
             std::make_pair(QStringLiteral("#Mod_Status"), CSVBuilder::TYPE_STRING));
       if (mod_Name->isChecked())
-        fields.push_back(std::make_pair(QStringLiteral("#Mod_Name"), CSVBuilder::TYPE_STRING));
-      if (mod_Note->isChecked())
-        fields.push_back(std::make_pair(QStringLiteral("#Note"), CSVBuilder::TYPE_STRING));
-      if (primary_Category->isChecked())
         fields.push_back(
-            std::make_pair(QStringLiteral("#Primary_Category"), CSVBuilder::TYPE_STRING));
+            std::make_pair(QStringLiteral("#Mod_Name"), CSVBuilder::TYPE_STRING));
+      if (mod_Note->isChecked())
+        fields.push_back(
+            std::make_pair(QStringLiteral("#Note"), CSVBuilder::TYPE_STRING));
+      if (primary_Category->isChecked())
+        fields.push_back(std::make_pair(QStringLiteral("#Primary_Category"),
+                                        CSVBuilder::TYPE_STRING));
       if (nexus_ID->isChecked())
         fields.push_back(
             std::make_pair(QStringLiteral("#Nexus_ID"), CSVBuilder::TYPE_INTEGER));
@@ -447,8 +449,8 @@ void ModListViewActions::exportModListCSV() const
         fields.push_back(
             std::make_pair(QStringLiteral("#Install_Date"), CSVBuilder::TYPE_STRING));
       if (download_File_Name->isChecked())
-        fields.push_back(
-            std::make_pair(QStringLiteral("#Download_File_Name"), CSVBuilder::TYPE_STRING));
+        fields.push_back(std::make_pair(QStringLiteral("#Download_File_Name"),
+                                        CSVBuilder::TYPE_STRING));
 
       builder.setFields(fields);
 
@@ -469,8 +471,8 @@ void ModListViewActions::exportModListCSV() const
             (std::find(flags.begin(), flags.end(), ModInfo::FLAG_BACKUP) ==
              flags.end())) {
           if (mod_Priority->isChecked())
-            builder.setRowField(u"#Mod_Priority"_s,
-                                QStringLiteral("%1").arg(iter.first, 4, 10, QChar('0')));
+            builder.setRowField(u"#Mod_Priority"_s, QStringLiteral("%1").arg(
+                                                        iter.first, 4, 10, QChar('0')));
           if (mod_Status->isChecked())
             builder.setRowField(u"#Mod_Status"_s, (enabled) ? u"+"_s : u"-"_s);
           if (mod_Name->isChecked())
@@ -663,8 +665,8 @@ void ModListViewActions::sendModsToSeparator(const QModelIndexList& indexes) con
     return;
   }
 
-  const auto sepPriority =
-      m_core.currentProfile()->getModPriority(ModInfo::getIndex(result % u"_separator"_s));
+  const auto sepPriority = m_core.currentProfile()->getModPriority(
+      ModInfo::getIndex(result % u"_separator"_s));
 
   auto isSeparator = [](const auto& p) {
     return ModInfo::getByIndex(p.second)->isSeparator();
@@ -863,7 +865,8 @@ void ModListViewActions::changeVersioningScheme(const QModelIndex& index) const
       QMessageBox::information(
           m_parent, tr("Sorry"),
           tr("I don't know a versioning scheme where %1 is newer than %2.")
-              .arg(info->newestVersion().canonicalString(), info->version().canonicalString()),
+              .arg(info->newestVersion().canonicalString(),
+                   info->version().canonicalString()),
           QMessageBox::Ok);
     }
   }
@@ -969,8 +972,8 @@ void ModListViewActions::reinstallMod(const QModelIndex& index) const
       if (fileInfo.exists()) {
         fullInstallationFile = installationFile;
       } else {
-        fullInstallationFile =
-            m_core.downloadManager()->getOutputDirectory() % u"/"_s % fileInfo.fileName();
+        fullInstallationFile = m_core.downloadManager()->getOutputDirectory() % u"/"_s %
+                               fileInfo.fileName();
       }
     } else {
       fullInstallationFile =
@@ -1030,7 +1033,8 @@ void ModListViewActions::restoreHiddenFiles(const QModelIndexList& indices) cons
       modNames.append(idx.data(Qt::DisplayRole).toString());
     }
 
-    QString mods = u"<li>"_s % modNames.mid(0, max_items).join(u"</li><li>"_s) % u"</li>"_s;
+    QString mods =
+        u"<li>"_s % modNames.mid(0, max_items).join(u"</li><li>"_s) % u"</li>"_s;
     if (modNames.size() > max_items) {
       mods += u"<li>...</li>"_s;
     }

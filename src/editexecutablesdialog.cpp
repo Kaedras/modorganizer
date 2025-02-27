@@ -882,8 +882,8 @@ void EditExecutablesDialog::setJarBinary(const QFileInfo& binary)
 
     ui->binary->setText(java);
     ui->workingDirectory->setText(QDir::toNativeSeparators(binary.absolutePath()));
-    ui->arguments->setText(u"-jar \""_s %
-                           QDir::toNativeSeparators(binary.absoluteFilePath()) % u"\""_s);
+    ui->arguments->setText(
+        u"-jar \""_s % QDir::toNativeSeparators(binary.absoluteFilePath()) % u"\""_s);
   }
 
   save();
