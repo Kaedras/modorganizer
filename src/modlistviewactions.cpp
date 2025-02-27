@@ -400,8 +400,6 @@ void ModListViewActions::exportModListCSV() const
 
   grid->addWidget(groupBoxColumns);
 
-  QPushButton* ok     = new QPushButton("Ok");
-  QPushButton* cancel = new QPushButton("Cancel");
   QDialogButtonBox* buttons =
       new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
