@@ -1159,7 +1159,7 @@ void NexusInterface::requestFinished(std::list<NXMRequestInfo>::iterator iter)
 
 void NexusInterface::requestFinished()
 {
-  QNetworkReply* reply = static_cast<QNetworkReply*>(sender());
+  QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
   for (std::list<NXMRequestInfo>::iterator iter = m_ActiveRequest.begin();
        iter != m_ActiveRequest.end(); ++iter) {
     if (iter->m_Reply == reply) {

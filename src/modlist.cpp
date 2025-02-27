@@ -830,7 +830,7 @@ QStringList ModList::allMods() const
 QStringList ModList::allModsByProfilePriority(MOBase::IProfile* profile) const
 {
   Profile* mo2Profile = profile == nullptr ? m_Organizer->currentProfile()
-                                           : static_cast<Profile*>(profile);
+                                           : dynamic_cast<Profile*>(profile);
 
   QStringList res;
   for (auto& [priority, index] : mo2Profile->getAllIndexesByPriority()) {

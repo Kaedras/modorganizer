@@ -1492,7 +1492,7 @@ bool ModListView::event(QEvent* event)
 {
   if (event->type() == QEvent::KeyPress && m_core->currentProfile() &&
       selectionModel()->hasSelection()) {
-    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+    QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(event);
 
     auto index = selectionModel()->currentIndex();
 
