@@ -19,13 +19,6 @@ int run(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
-  // TODO: remove this workaround
-  setenv("QT_PLUGIN_PATH", "/usr/lib64/qt6/plugins/", 0);
-  // setenv("QTWEBENGINEPROCESS_PATH", "/usr/lib64/qt6/libexec/", 0);
-  // setenv("QTWEBENGINE_RESOURCES_PATH", "/usr/share/qt6/resources/", 0);
-  // setenv("QTWEBENGINE_LOCALES_PATH",
-  // "/usr/share/qt6/translations/qtwebengine_locales/", 0);
-
   const int r = run(argc, argv);
   std::cout << "mod organizer done\n";
   return r;
