@@ -74,9 +74,10 @@ example_get_schema (void)
 bool deleteSecret(const QString& key)
 {
   GError* e = nullptr;
+  QByteArray keyBA = key.toLocal8Bit();
 
   GHashTablePtr attributes(g_hash_table_new(nullptr, nullptr));
-  g_hash_table_insert(attributes.get(), gpointer("key"), key.toUtf8().data());
+  g_hash_table_insert(attributes.get(), gpointer("key"), keyBA.data());
 
   GListPtr items(secret_service_search_sync(nullptr, nullptr, attributes.get(),
                                             SECRET_SEARCH_UNLOCK, nullptr, &e));
@@ -143,15 +144,17 @@ bool addSecret(const QString& key, const QString& data)
     throw std::runtime_error(message);
   }
 
+  QByteArray keyBA = key.toLocal8Bit();
+  QByteArray dataBA = data.toLocal8Bit();
   SecretValuePtr secretValue(
-      secret_value_new(data.toUtf8().data(), data.size(), "text/plain"));
+      secret_value_new(dataBA.data(), data.size(), "text/plain"));
 
   GHashTablePtr attributes(g_hash_table_new(nullptr, nullptr));
-  g_hash_table_insert(attributes.get(), gpointer("key"), key.toUtf8().data());
+  g_hash_table_insert(attributes.get(), gpointer("key"), keyBA.data());
 
   bool result =
       secret_service_store_sync(service.get(), nullptr, attributes.get(), nullptr,
-                                key.toUtf8(), secretValue.get(), nullptr, &e);
+                                keyBA.data(), secretValue.get(), nullptr, &e);
 
   if (e) {
     std::string message = e->message;
@@ -169,8 +172,9 @@ bool addSecret(const QString& key, const QString& data)
 QString getSecret(const QString& key) noexcept(false)
 {
   GError* e = nullptr;
+  QByteArray keyBA = key.toLocal8Bit();
   GHashTablePtr attributes(g_hash_table_new(nullptr, nullptr));
-  g_hash_table_insert(attributes.get(), gpointer("key"), key.toUtf8().data());
+  g_hash_table_insert(attributes.get(), gpointer("key"), keyBA.data());
 
   SecretValuePtr value(secret_service_lookup_sync(nullptr, nullptr, attributes.get(), nullptr, &e));
 
