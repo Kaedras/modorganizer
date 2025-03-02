@@ -7,6 +7,7 @@ if (WIN32)
 else ()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+    pkg_check_modules(LIBFLATPAK REQUIRED flatpak)
     # TODO: add this package
     #	find_package(overlayfs CONFIG REQUIRED)
 endif ()
@@ -70,10 +71,14 @@ set(PRIVATE_UNIX_LIBS
         # TODO: add this library
         #		overlayfs
         ${LIBSECRET_LIBRARIES}
+        ${LIBFLATPAK_LIBRARIES}
 )
 
 if (UNIX)
-    target_include_directories(organizer PRIVATE ${LIBSECRET_INCLUDE_DIRS})
+    target_include_directories(organizer PRIVATE
+            ${LIBSECRET_INCLUDE_DIRS}
+            ${LIBFLATPAK_INCLUDE_DIRS}
+    )
     target_link_libraries(organizer PRIVATE
             ${PRIVATE_LIBS}
             ${PRIVATE_UNIX_LIBS}

@@ -1,31 +1,37 @@
-#include "spawn.h"
-
+#include "env.h"
+#include "envos.h"
+#include "envsecurity.h"
+#include "overlayfs/OverlayfsManager.h"
+#include "settings.h"
 #include "shared/util.h"
-#include <QApplication>
+#include "spawn.h"
+#include "stub.h"
 #include <QMessageBox>
 #include <QString>
-#include <QtDebug>
-#include <uibase/errorcodes.h>
 #include <uibase/log.h>
 #include <uibase/report.h>
 #include <uibase/utility.h>
 
-#include "stub.h"
+// undefine signals from qtmetamacros.h because it conflicts with glib
+#ifdef signals
+#undef signals
+#endif
+#include <flatpak/flatpak.h>
 
 using namespace MOBase;
 using namespace MOShared;
 using namespace std;
+using namespace Qt::StringLiterals;
+
+static const QString steamFlatpak = u"com.valvesoftware.Steam"_s;
 
 namespace spawn::dialogs
 {
 
-void spawnFailed(QWidget* parent, const SpawnParameters& sp, DWORD code);
-
-void helperFailed(QWidget* parent, const QString& error, const QString& why,
-                  const QString& binary, const QString& cwd, const QString& args)
-{
-  STUB();
-}
+extern void spawnFailed(QWidget* parent, const SpawnParameters& sp, DWORD code);
+extern void helperFailed(QWidget* parent, DWORD code, const QString& why,
+                         const QString& binary, const QString& cwd,
+                         const QString& args);
 
 std::string makeRightsDetails(const QFileInfo& info)
 {
@@ -89,19 +95,63 @@ std::string makeRightsDetails(const QFileInfo& info)
 
 QString makeDetails(const SpawnParameters& sp, DWORD code, const QString& more = {})
 {
-  STUB();
-  return "";
+  std::string owner, rights;
+
+  if (sp.binary.isFile()) {
+    const auto fs = env::getFileSecurity(sp.binary.absoluteFilePath());
+
+    if (fs.error.isEmpty()) {
+      owner  = fs.owner.toStdString();
+      rights = makeRightsDetails(sp.binary);
+    } else {
+      owner  = fs.error.toStdString();
+      rights = fs.error.toStdString();
+    }
+  } else {
+    owner  = "(file not found)";
+    rights = "(file not found)";
+  }
+
+  const bool cwdExists =
+      (sp.currentDirectory.isEmpty() ? true : sp.currentDirectory.exists());
+
+  std::string elevated;
+  if (auto b = env::Environment().getOsInfo().isElevated()) {
+    elevated = (*b ? "yes" : "no");
+  } else {
+    elevated = "(not available)";
+  }
+
+  auto s = std::format(
+      "Error {} {}{}: {}\n"
+      " . binary: '{}'\n"
+      " . owner: {}\n"
+      " . rights: {}\n"
+      " . arguments: '{}'\n"
+      " . cwd: '{}'{}\n"
+      " . hooked: {}\n"
+      " . MO elevated: {}",
+      code, strerror(static_cast<int>(code)), (more.isEmpty() ? more : ", " + more),
+      formatSystemMessage(static_cast<int>(code)),
+      QDir::toNativeSeparators(sp.binary.absoluteFilePath()).toStdString(), owner,
+      rights, sp.arguments,
+      QDir::toNativeSeparators(sp.currentDirectory.absolutePath()).toStdString(),
+      (cwdExists ? "" : " (not found)"), (sp.hooked ? "yes" : "no"), elevated);
+
+  return QString::fromStdString(s);
 }
 
 QString makeContent(const SpawnParameters& sp, DWORD code, const QString& message = {})
 {
   STUB();
-  return QString(strerror(code));
+  return {strerror(static_cast<int>(code))};
 }
 
 QMessageBox::StandardButton badSteamPath(QWidget* parent)
 {
-  const auto details = QString("can't start steam, steam.desktop not exist");
+  const auto details =
+      QStringLiteral("can't start steam because it was not found. tried "
+                     "/usr/bin/steam, steam.desktop, and flatpak");
 
   log::error("{}", details);
 
@@ -128,11 +178,30 @@ bool confirmRestartAsAdmin(QWidget* parent, const SpawnParameters& sp)
 
 namespace spawn
 {
+extern QString makeSteamArguments(const QString& username, const QString& password);
 
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
-  STUB();
-  return ENOTSUP;
+  if (sp.hooked) {
+    if (!OverlayfsManager::getInstance().mount()) {
+      return -1;
+    }
+  }
+
+  QProcess p;
+  p.setProgram(QDir::toNativeSeparators(sp.binary.absoluteFilePath()));
+  p.setArguments(QProcess::splitCommand(sp.arguments));
+  p.setWorkingDirectory(QDir::toNativeSeparators(sp.currentDirectory.absolutePath()));
+
+  qint64 pid;
+  if (p.startDetached(&pid)) {
+    processHandle = pidfd_open(pid, 0);
+    if (processHandle == -1) {
+      return errno;
+    }
+  }
+
+  return EXIT_SUCCESS;
 }
 
 bool restartAsAdmin(QWidget* parent)
@@ -152,10 +221,83 @@ void startBinaryAdmin(QWidget* parent, const SpawnParameters& sp)
   restartAsAdmin(parent);
 }
 
+std::pair<QString, int> getSteamExecutable(QWidget* parent)
+{
+  // try path
+  QString steam = QStandardPaths::findExecutable(u"steam"_s);
+  if (!steam.isEmpty()) {
+    return {steam, 0};
+  }
+
+  // try flatpak
+  GError* e;
+  FlatpakInstallation* installation = flatpak_installation_new_user(nullptr, &e);
+  if (e != nullptr) {
+    g_error_free(e);
+    return {{}, dialogs::badSteamPath(parent)};
+  }
+
+  FlatpakInstalledRef* flatpakInstalledRef = flatpak_installation_get_installed_ref(
+      installation, FLATPAK_REF_KIND_APP, "com.valvesoftware.Steam", nullptr, "stable",
+      nullptr, &e);
+  if (e != nullptr || flatpakInstalledRef == nullptr) {
+    if (e != nullptr) {
+      g_error_free(e);
+    }
+    return {{}, dialogs::badSteamPath(parent)};
+  }
+
+  return {steamFlatpak, 0};
+}
+
 bool startSteam(QWidget* parent)
 {
-  STUB();
-  return false;
+  QString binary = getSteamExecutable(parent).first;
+  if (binary.isEmpty()) {
+    return dialogs::badSteamPath(parent) == QMessageBox::Yes;
+  }
+  QString arguments;
+
+  // See if username and password supplied. If so, pass them into steam.
+  QString username, password;
+  if (Settings::instance().steam().login(username, password)) {
+    if (username.length() > 0)
+      MOBase::log::getDefault().addToBlacklist(username.toStdString(),
+                                               "STEAM_USERNAME");
+    if (password.length() > 0)
+      MOBase::log::getDefault().addToBlacklist(password.toStdString(),
+                                               "STEAM_PASSWORD");
+    arguments = makeSteamArguments(username, password);
+  }
+
+  log::debug("starting steam process:\n"
+             " . program: '{}'\n"
+             " . username={}, password={}",
+             binary.toStdString(), (username.isEmpty() ? "no" : "yes"),
+             (password.isEmpty() ? "no" : "yes"));
+
+  if (binary == steamFlatpak) {
+    GError* e;
+    FlatpakInstallation* installation = flatpak_installation_new_user(nullptr, &e);
+    if (e != nullptr) {
+      g_error_free(e);
+      return false;
+    }
+
+    if (flatpak_installation_launch(installation, steamFlatpak.toStdString().c_str(),
+                                    nullptr, "stable", nullptr, nullptr, &e)) {
+      return true;
+    }
+    if (e) {
+      g_error_free(e);
+    }
+    return false;
+  }
+
+  QProcess p;
+  p.setProgram(binary);
+  p.setArguments(QProcess::splitCommand(arguments));
+  return p.startDetached();
 }
 
 HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
@@ -180,18 +322,6 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
   }
 }
 
-std::pair<QString, int> getSteamExecutable(QWidget* parent)
-{
-  QString steam =
-      QStandardPaths::locate(QStandardPaths::ApplicationsLocation, "steam.desktop");
-
-  if (steam.isEmpty()) {
-    return {{}, dialogs::badSteamPath(parent)};
-  }
-
-  return {"steam", 0};
-}
-
 QString findJavaInstallation(const QString& jarFile)
 {
   (void)jarFile;
@@ -202,7 +332,7 @@ QString findJavaInstallation(const QString& jarFile)
     if (!tmp.endsWith('/')) {
       tmp += '/';
     }
-    return tmp + "bin/java";
+    return tmp % u"bin/java"_s;
   }
 
   // not found
@@ -211,7 +341,7 @@ QString findJavaInstallation(const QString& jarFile)
 
 bool isBatchFile(const QFileInfo& target)
 {
-  return target.suffix() == "sh";
+  return target.suffix() == "sh"_L1;
 }
 
 bool isExeFile(const QFileInfo& target)
@@ -221,7 +351,7 @@ bool isExeFile(const QFileInfo& target)
 
 QFileInfo getCmdPath()
 {
-  return QFileInfo("/bin/sh");
+  return QFileInfo(u"/bin/sh"_s);
 }
 
 extern bool isJavaFile(const QFileInfo& target);
@@ -233,10 +363,10 @@ FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& t
   }
 
   if (isBatchFile(target)) {
-    return {
-        getCmdPath(),
-        QString("-c \"%1\"").arg(QDir::toNativeSeparators(target.absoluteFilePath())),
-        FileExecutionTypes::Executable};
+    return {getCmdPath(),
+            QStringLiteral(R"(-c "%1")")
+                .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
+            FileExecutionTypes::Executable};
   }
 
   if (isJavaFile(target)) {
@@ -249,7 +379,7 @@ FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& t
 
     if (!java.isEmpty()) {
       return {QFileInfo(java),
-              QString("-jar \"%1\"")
+              QStringLiteral(R"(-jar "%1")")
                   .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
               FileExecutionTypes::Executable};
     }
@@ -265,15 +395,15 @@ namespace helper
 bool helperExec(QWidget* parent, const QString& moDirectory, const QString& commandLine,
                 bool async)
 {
-  const QString fileName = QDir(moDirectory).path() + "/helper";
+  const QString fileName = QDir(moDirectory).path() % u"/helper"_s;
 
   QProcess process;
 
   process.setWorkingDirectory(moDirectory);
-  process.startCommand(fileName + " " + commandLine);
+  process.startCommand(fileName % u" "_s % commandLine);
 
   if (!process.waitForStarted(1000)) {
-    spawn::dialogs::helperFailed(parent, process.errorString(), "waitForStarted()",
+    spawn::dialogs::helperFailed(parent, process.error(), process.errorString(),
                                  fileName, moDirectory, commandLine);
 
     return false;
@@ -284,7 +414,7 @@ bool helperExec(QWidget* parent, const QString& moDirectory, const QString& comm
   }
 
   if (!process.waitForFinished()) {
-    spawn::dialogs::helperFailed(parent, process.errorString(), "waitForFinished()",
+    spawn::dialogs::helperFailed(parent, process.error(), process.errorString(),
                                  fileName, moDirectory, commandLine);
 
     return false;
@@ -292,8 +422,8 @@ bool helperExec(QWidget* parent, const QString& moDirectory, const QString& comm
 
   int exitCode = process.exitCode();
   if (exitCode != 0) {
-    spawn::dialogs::helperFailed(parent, process.errorString(), "exitCode()", fileName,
-                                 moDirectory, commandLine);
+    spawn::dialogs::helperFailed(parent, process.error(), process.errorString(),
+                                 fileName, moDirectory, commandLine);
 
     return false;
   }
