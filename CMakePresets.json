@@ -62,7 +62,7 @@
     {
       "binaryDir": "${sourceDir}/linux-build",
       "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "-Wall -Wextra",
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wl,--no-undefined",
         "VCPKG_TARGET_TRIPLET": {
           "type": "STRING",
           "value": "x64-linux"
