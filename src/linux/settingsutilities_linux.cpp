@@ -73,7 +73,7 @@ example_get_schema (void)
 
 bool deleteSecret(const QString& key)
 {
-  GError* e = nullptr;
+  GError* e        = nullptr;
   QByteArray keyBA = key.toLocal8Bit();
 
   GHashTablePtr attributes(g_hash_table_new(nullptr, nullptr));
@@ -125,7 +125,8 @@ bool addSecret(const QString& key, const QString& data)
   GError* e = nullptr;
 
   // connect to service
-  SecretServicePtr service(secret_service_get_sync(SECRET_SERVICE_OPEN_SESSION, nullptr, &e));
+  SecretServicePtr service(
+      secret_service_get_sync(SECRET_SERVICE_OPEN_SESSION, nullptr, &e));
   if (e) {
     std::string message = e->message;
     g_error_free(e);
@@ -144,7 +145,7 @@ bool addSecret(const QString& key, const QString& data)
     throw std::runtime_error(message);
   }
 
-  QByteArray keyBA = key.toLocal8Bit();
+  QByteArray keyBA  = key.toLocal8Bit();
   QByteArray dataBA = data.toLocal8Bit();
   SecretValuePtr secretValue(
       secret_value_new(dataBA.data(), data.size(), "text/plain"));
@@ -171,12 +172,13 @@ bool addSecret(const QString& key, const QString& data)
 
 QString getSecret(const QString& key) noexcept(false)
 {
-  GError* e = nullptr;
+  GError* e        = nullptr;
   QByteArray keyBA = key.toLocal8Bit();
   GHashTablePtr attributes(g_hash_table_new(nullptr, nullptr));
   g_hash_table_insert(attributes.get(), gpointer("key"), keyBA.data());
 
-  SecretValuePtr value(secret_service_lookup_sync(nullptr, nullptr, attributes.get(), nullptr, &e));
+  SecretValuePtr value(
+      secret_service_lookup_sync(nullptr, nullptr, attributes.get(), nullptr, &e));
 
   if (e) {
     log::error("failed to retrieve secret {}: {}", key, e->message);

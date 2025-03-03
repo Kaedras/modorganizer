@@ -19,8 +19,8 @@ using LPCWSTR    = const wchar_t*;
 
 // pidfd_open returns -1 on error
 static inline constexpr int INVALID_HANDLE_VALUE = -1;
-static inline constexpr auto ERROR_ACCESS_DENIED = EACCES;
-static inline constexpr auto ERROR_CANCELLED     = ECANCELED;
+#define ERROR_ACCESS_DENIED EACCES
+#define ERROR_CANCELLED ECANCELED
 
 inline int GetLastError()
 {

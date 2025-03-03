@@ -69,7 +69,7 @@ using namespace Qt::StringLiterals;
 class ProxyStyle : public QProxyStyle
 {
 public:
-  ProxyStyle(QStyle* baseStyle = 0) : QProxyStyle(baseStyle) {}
+  ProxyStyle(QStyle* baseStyle = nullptr) : QProxyStyle(baseStyle) {}
 
   void drawPrimitive(PrimitiveElement element, const QStyleOption* option,
                      QPainter* painter, const QWidget* widget) const override

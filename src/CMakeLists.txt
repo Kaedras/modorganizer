@@ -118,9 +118,13 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
 
 # install dependencies DLLs
-install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/dlls)
-install(FILES $<TARGET_FILE:mo2::archive> DESTINATION ${_bin}/dlls)
-install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
+if (WIN32)
+    install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/dlls)
+    install(FILES $<TARGET_FILE:mo2::archive> DESTINATION ${_bin}/dlls)
+    install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
+else()
+    install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/lib)
+endif()
 
 if (WIN32)
     # this may copy over the ones from uibase/usvfs

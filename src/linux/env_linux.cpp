@@ -1,13 +1,12 @@
-#include "env.h"
-#include "envmodule.h"
-#include "stub.h"
-
 #include "compatibility.h"
+#include "env.h"
 #include "envdump.h"
 #include "envmetrics.h"
+#include "envmodule.h"
 #include "envshortcut.h"
 #include "settings.h"
 #include "shared/util.h"
+#include "stub.h"
 #include <log.h>
 #include <sys/resource.h>
 #include <utility.h>
@@ -93,24 +92,39 @@ Association getAssociation(const QFileInfo& targetInfo)
   return {};
 }
 
-bool registryValueExists(const QString& key, const QString& value)
+bool registryValueExists([[maybe_unused]] const QString& key,
+                         [[maybe_unused]] const QString& value)
 {
-  STUB();
   return false;
 }
 
-void deleteRegistryKeyIfEmpty(const QString& name)
-{
-  STUB();
-}
+void deleteRegistryKeyIfEmpty([[maybe_unused]] const QString& name) {}
 
 bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
 {
-  struct rlimit core_limits;
-  core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
+  // check if gcore is available
+  if (QStandardPaths::findExecutable(u"gcore"_s).isEmpty()) {
+    return false;
+  }
+
+  // set core limit to enable core dumps
+  rlimit core_limits{RLIM_INFINITY, RLIM_INFINITY};
   setrlimit(RLIMIT_CORE, &core_limits);
 
-  return true;
+  std::unique_ptr<QProcess> p = std::make_unique<QProcess>();
+  p->setProgram(u"gcore"_s);
+  p->setArguments({u"-d"_s, dir});
+  p->start();
+
+  bool result = p->waitForFinished();
+
+  // todo: compress core dump
+
+  // reset limits
+  core_limits = {0, 0};
+  setrlimit(RLIMIT_CORE, &core_limits);
+
+  return result;
 }
 
 bool coredumpOther(CoreDumpTypes type)
