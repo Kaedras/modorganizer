@@ -183,6 +183,7 @@ inline QString formatSystemMessageToQString(int e)
 {
   return QString::fromLocal8Bit(strerror(e));
 }
+static constexpr const char* newLine = "\n";
 #else
 #include <shlobj.h>
 #include <usvfs/usvfs.h>
@@ -190,6 +191,7 @@ inline QString formatSystemMessageToQString(int e)
 {
   return QString::fromStdWString(formatSystemMessage(e));
 }
+static constexpr const char* newLine = "\r\n";
 #endif
 
 #pragma warning(disable : 4428)
@@ -2566,7 +2568,7 @@ void MainWindow::saveArchiveList()
       for (int j = 0; j < tlItem->childCount(); ++j) {
         QTreeWidgetItem* item = tlItem->child(j);
         if (item->checkState(0) == Qt::Checked) {
-          archiveFile->write(item->text(0).toUtf8().append("\r\n"));
+          archiveFile->write(item->text(0).toUtf8().append(newLine));
         }
       }
     }
