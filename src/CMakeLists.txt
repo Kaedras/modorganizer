@@ -90,14 +90,16 @@ else ()
     )
 endif ()
 
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
-        DESTINATION ${_bin}/dlls
-        CONFIGURATIONS Release RelWithDebInfo
-        RENAME dlls.manifest)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.debug.qt6"
-        DESTINATION ${_bin}/dlls
-        CONFIGURATIONS Debug
-        RENAME dlls.manifest)
+if (WIN32)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
+            DESTINATION ${_bin}/dlls
+            CONFIGURATIONS Release RelWithDebInfo
+            RENAME dlls.manifest)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.debug.qt6"
+            DESTINATION ${_bin}/dlls
+            CONFIGURATIONS Debug
+            RENAME dlls.manifest)
+endif()
 
 if (NOT MO2_SKIP_STYLESHEETS_INSTALL)
     install(

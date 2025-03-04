@@ -349,6 +349,8 @@ const std::vector<QString>& Loot::warnings() const
 
 void Loot::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+  OverlayfsManager::getInstance().umount();
+
   if (exitStatus == QProcess::CrashExit) {
     if (m_cancel) {
       m_lootProcess.reset();
@@ -371,6 +373,11 @@ void Loot::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
   emit output(lootOut);
   QStringList lines = lootOut.split('\n');
   for (const auto& line : lines) {
+    // skip empty lines
+    if (line.isEmpty()) {
+      continue;
+    }
+
     const auto m = lootcli::parseMessage(line.toStdString());
 
     if (m.type == lootcli::MessageType::None) {

@@ -8,7 +8,7 @@ namespace MOShared
 MOBase::Version createVersionInfo()
 {
   STUB();
-  return {0, 0, 1};
+  return {3, 0, 0};
 }
 QString getUsvfsVersionString()
 {

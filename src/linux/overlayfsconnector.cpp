@@ -86,11 +86,11 @@ OverlayfsConnector::OverlayfsConnector()
     if (suffix.isEmpty()) {
       continue;
     }
-    m_overlayfsManager.addSkipFileSuffix(suffix.toStdString());
+    m_overlayfsManager.addToFileSuffixBlacklist(suffix.toStdString());
   }
 
   for (auto& dir : s.skipDirectories()) {
-    m_overlayfsManager.addSkipDirectory(dir.toStdString());
+    m_overlayfsManager.addToDirectoryBlacklist(dir.toStdString());
   }
 }
 
@@ -106,7 +106,7 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
   const auto start = std::chrono::high_resolution_clock::now();
 
   QProgressDialog progress(qApp->activeWindow());
-  progress.setLabelText(tr("Preparing overlayfs"));
+  progress.setLabelText(tr("Preparing Overlayfs"));
   progress.setMaximum(static_cast<int>(mapping.size()));
   progress.show();
 
@@ -134,7 +134,7 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
       ++dirs;
     } else {
       m_overlayfsManager.addFile(map.source.toStdString(),
-                                 map.destination.toStdString(), 0);
+                                 map.destination.toStdString());
       ++files;
     }
   }
@@ -159,22 +159,17 @@ void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
   m_overlayfsManager.setDebugMode(false);
   m_overlayfsManager.setLogLevel(toOverlayfsLogLevel(logLevel));
 
-  m_overlayfsManager.clearExecutableBlacklist();
-  for (auto exec : executableBlacklist.split(";")) {
-    m_overlayfsManager.blacklistExecutable(exec.toStdString());
-  }
-
-  m_overlayfsManager.clearSkipFileSuffixes();
+  m_overlayfsManager.clearFileSuffixBlacklist();
   for (auto& suffix : skipFileSuffixes) {
     if (suffix.isEmpty()) {
       continue;
     }
-    m_overlayfsManager.addSkipFileSuffix(suffix.toStdString());
+    m_overlayfsManager.addToFileSuffixBlacklist(suffix.toStdString());
   }
 
-  m_overlayfsManager.clearSkipDirectories();
+  m_overlayfsManager.clearDirectoryBlacklist();
   for (auto& dir : skipDirectories) {
-    m_overlayfsManager.addSkipDirectory(dir.toStdString());
+    m_overlayfsManager.addToDirectoryBlacklist(dir.toStdString());
   }
 }
 

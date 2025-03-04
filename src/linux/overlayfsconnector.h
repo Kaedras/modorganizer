@@ -38,8 +38,6 @@ class OverlayfsConnectorException;
 using UsvfsConnector          = OverlayfsConnector;
 using UsvfsConnectorException = OverlayfsConnectorException;
 
-// TODO: this class currently contains mostly placeholders
-
 class OverlayfsConnectorException : public std::exception
 {
 
@@ -61,7 +59,7 @@ class OverlayfsConnector : public QObject
 
 public:
   OverlayfsConnector();
-  ~OverlayfsConnector();
+  ~OverlayfsConnector() override;
 
   void updateMapping(const MappingType& mapping);
 

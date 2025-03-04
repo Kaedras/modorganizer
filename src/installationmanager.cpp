@@ -299,6 +299,9 @@ InstallationManager::createFile(std::shared_ptr<const MOBase::FileTreeEntry> ent
 
   // Turn-off autoRemove otherwise the file is deleted when destructor is called:
   tempFile.setAutoRemove(false);
+  // On some systems, if fileName() is not called before closing the file, the temporary
+  // file may be removed regardless of the state of auto-remove
+  (void)tempFile.fileName();
 
   // Open/Close the file so that installer can use it properly:
   if (!tempFile.open()) {
