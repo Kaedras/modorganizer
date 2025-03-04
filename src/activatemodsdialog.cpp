@@ -63,6 +63,11 @@ ActivateModsDialog::ActivateModsDialog(SaveGameInfo::MissingAssets const& missin
 
 ActivateModsDialog::~ActivateModsDialog()
 {
+  auto* modsTable = findChild<QTableWidget*>(u"modsTable"_s);
+  for (int row = 0; row < modsTable->rowCount(); ++row) {
+    delete modsTable->cellWidget(row, 1);
+  }
+
   delete ui;
 }
 
