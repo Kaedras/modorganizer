@@ -40,10 +40,7 @@ class MenuItem
 {
 public:
   MenuItem(QString s = {}) : m_action(new QAction(s)) {}
-  ~MenuItem()
-  {
-    delete m_action;
-  }
+  ~MenuItem() { delete m_action; }
 
   MenuItem& caption(const QString& s)
   {

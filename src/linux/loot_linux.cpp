@@ -15,7 +15,8 @@ static inline const QString lootExecutable = QStringLiteral("lootcli");
 static inline const QString lootExecutable = QStringLiteral("lootcli.exe");
 #endif
 
-static const QString LootReportPath = QDir::temp().absoluteFilePath(u"lootreport.json"_s);
+static const QString LootReportPath =
+    QDir::temp().absoluteFilePath(u"lootreport.json"_s);
 
 log::Levels levelFromLoot(lootcli::LogLevels level)
 {
@@ -282,9 +283,9 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   parameters << u"--game"_s << m_core.managedGame()->lootGameName() << u"--gamePath"_s
              << m_core.managedGame()->gameDirectory().absolutePath()
              << u"--pluginListPath"_s
-             << QString(u"%1/loadorder.txt"_s).arg(m_core.profilePath()) << u"--logLevel"_s
-             << QString::fromStdString(logLevelToString(logLevel)) << u"--out"_s
-             << LootReportPath << u"--language"_s
+             << QString(u"%1/loadorder.txt"_s).arg(m_core.profilePath())
+             << u"--logLevel"_s << QString::fromStdString(logLevelToString(logLevel))
+             << u"--out"_s << LootReportPath << u"--language"_s
              << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
   QString program = qApp->applicationDirPath() % u"/loot/"_s % lootExecutable;
@@ -460,8 +461,9 @@ void Loot::processOutputFile(Report& r) const
   QJsonParseError e;
   const QJsonDocument doc = QJsonDocument::fromJson(outFile.readAll(), &e);
   if (doc.isNull()) {
-    emit log(MOBase::log::Error,
-             QStringLiteral("invalid json, %1 (error %2)").arg(e.errorString(), e.error));
+    emit log(
+        MOBase::log::Error,
+        QStringLiteral("invalid json, %1 (error %2)").arg(e.errorString(), e.error));
 
     return;
   }

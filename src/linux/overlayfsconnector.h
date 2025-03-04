@@ -42,9 +42,7 @@ class OverlayfsConnectorException : public std::exception
 {
 
 public:
-  OverlayfsConnectorException(const QString& text)
-      : m_Message(text.toLocal8Bit())
-  {}
+  OverlayfsConnectorException(const QString& text) : m_Message(text.toLocal8Bit()) {}
 
   virtual const char* what() const throw() { return m_Message.constData(); }
 

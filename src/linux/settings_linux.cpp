@@ -14,8 +14,8 @@ static const QString steamPasswordKey  = u"steam_password"_s;
 
 void NexusSettings::dump() const
 {
-  const QString iniPath = InstanceManager::singleton().globalInstancesRootPath() % u"/"_s %
-                          AppConfig::nxmHandlerIni();
+  const QString iniPath = InstanceManager::singleton().globalInstancesRootPath() %
+                          u"/"_s % AppConfig::nxmHandlerIni();
 
   if (!QFileInfo::exists(iniPath)) {
     log::debug("nxm ini not found at {}", iniPath);
