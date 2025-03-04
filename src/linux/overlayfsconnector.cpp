@@ -18,7 +18,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "overlayfsconnector.h"
-#include "envmodule.h"
 #include "organizercore.h"
 #include "overlayfs/overlayfs.h"
 #include "settings.h"
@@ -26,14 +25,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QProgressDialog>
-#include <QTemporaryFile>
 #include <iomanip>
 #include <memory>
-#include <qstandardpaths.h>
 #include <sstream>
 
 static constexpr char SHMID[] = "mod_organizer_instance";
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 std::string to_hex(void* bufferIn, size_t bufferSize)
 {
@@ -69,12 +67,10 @@ LogLevel toOverlayfsLogLevel(log::Levels level)
 OverlayfsConnector::OverlayfsConnector()
     : m_overlayfsManager(OverlayfsManager::getInstance(
           (qApp->property("dataPath").toString() +
-           QString("/logs/overlayfs-%1.log")
-               .arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_hh-mm-ss")))
+           QStringLiteral("/logs/overlayfs-%1.log")
+               .arg(QDateTime::currentDateTimeUtc().toString(u"yyyy-MM-dd_hh-mm-ss"_s)))
               .toStdString()))
 {
-  using namespace std::chrono;
-
   const auto& s = Settings::instance();
 
   const LogLevel logLevel = toOverlayfsLogLevel(s.diagnostics().logLevel());
@@ -100,10 +96,9 @@ OverlayfsConnector::OverlayfsConnector()
 
 OverlayfsConnector::~OverlayfsConnector()
 {
-  m_overlayfsManager.umount();
-  // m_LogWorker.exit();
-  // m_WorkerThread.quit();
-  // m_WorkerThread.wait();
+  if (m_overlayfsManager.isMounted()) {
+    m_overlayfsManager.umount();
+  }
 }
 
 void OverlayfsConnector::updateMapping(const MappingType& mapping)
@@ -152,10 +147,10 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
 }
 
 void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
-                                      env::CoreDumpTypes coreDumpType,
-                                      const QString& crashDumpsPath,
-                                      std::chrono::seconds spawnDelay,
-                                      QString executableBlacklist,
+                                     [[maybe_unused]] env::CoreDumpTypes coreDumpType,
+                                     [[maybe_unused]] const QString& crashDumpsPath,
+                                     [[maybe_unused]] std::chrono::seconds spawnDelay,
+                                     [[maybe_unused]] QString executableBlacklist,
                                       const QStringList& skipFileSuffixes,
                                       const QStringList& skipDirectories)
 {
@@ -187,7 +182,7 @@ void OverlayfsConnector::updateForcedLibraries(
     const QList<MOBase::ExecutableForcedLoadSetting>& forcedLibraries)
 {
   m_overlayfsManager.clearLibraryForceLoads();
-  for (auto setting : forcedLibraries) {
+  for (const auto& setting : forcedLibraries) {
     if (setting.enabled()) {
       m_overlayfsManager.forceLoadLibrary(setting.process().toStdString(),
                                           setting.library().toStdString());

@@ -15,7 +15,7 @@ static inline const QString lootExecutable = QStringLiteral("lootcli");
 static inline const QString lootExecutable = QStringLiteral("lootcli.exe");
 #endif
 
-static QString LootReportPath = QDir::temp().absoluteFilePath(u"lootreport.json"_s);
+static const QString LootReportPath = QDir::temp().absoluteFilePath(u"lootreport.json"_s);
 
 log::Levels levelFromLoot(lootcli::LogLevels level)
 {
@@ -45,7 +45,7 @@ QString Loot::Report::toMarkdown() const
   QString s;
 
   if (!okay) {
-    s += "## " + tr("Loot failed to run") + "\n";
+    s += u"## "_s % tr("Loot failed to run") % u"\n"_s;
 
     if (errors.empty() && warnings.empty()) {
       s += tr("No errors were reported. The log below might have more information.\n");
@@ -55,7 +55,7 @@ QString Loot::Report::toMarkdown() const
   s += errorsMarkdown();
 
   if (okay) {
-    s += "\n" + successMarkdown();
+    s += u"\n"_s % successMarkdown();
   }
 
   return s;
@@ -66,30 +66,30 @@ QString Loot::Report::successMarkdown() const
   QString s;
 
   if (!messages.empty()) {
-    s += "### " + QObject::tr("General messages") + "\n";
+    s += u"### "_s % QObject::tr("General messages") % u"\n"_s;
 
     for (auto&& m : messages) {
-      s += " - " + m.toMarkdown() + "\n";
+      s += u" - "_s % m.toMarkdown() % u"\n"_s;
     }
   }
 
   if (!plugins.empty()) {
     if (!s.isEmpty()) {
-      s += "\n";
+      s += u"\n"_s;
     }
 
-    s += "### " + QObject::tr("Plugins") + "\n";
+    s += u"### "_s % QObject::tr("Plugins") % u"\n"_s;
 
     for (auto&& p : plugins) {
       const auto ps = p.toMarkdown();
       if (!ps.isEmpty()) {
-        s += ps + "\n";
+        s += ps % u"\n"_s;
       }
     }
   }
 
   if (s.isEmpty()) {
-    s += "**" + QObject::tr("No messages.") + "**\n";
+    s += u"**"_s % QObject::tr("No messages.") % u"**\n"_s;
   }
 
   s += stats.toMarkdown();
@@ -102,22 +102,22 @@ QString Loot::Report::errorsMarkdown() const
   QString s;
 
   if (!errors.empty()) {
-    s += "### " + tr("Errors") + ":\n";
+    s += u"### "_s % tr("Errors") % u":\n"_s;
 
     for (auto&& e : errors) {
-      s += " - " + e + "\n";
+      s += u" - "_s % e % u"\n"_s;
     }
   }
 
   if (!warnings.empty()) {
     if (!s.isEmpty()) {
-      s += "\n";
+      s += u"\n"_s;
     }
 
-    s += "### " + tr("Warnings") + ":\n";
+    s += u"### "_s % tr("Warnings") % u":\n"_s;
 
     for (auto&& w : warnings) {
-      s += " - " + w + "\n";
+      s += u" - "_s % w + u"\n"_s;
     }
   }
 
@@ -126,10 +126,8 @@ QString Loot::Report::errorsMarkdown() const
 
 QString Loot::Stats::toMarkdown() const
 {
-  return QString("`stats: %1s, lootcli %2, loot %3`")
-      .arg(QString::number(time / 1000.0, 'f', 2))
-      .arg(lootcliVersion)
-      .arg(lootVersion);
+  return QStringLiteral("`stats: %1s, lootcli %2, loot %3`")
+      .arg(QString::number(time / 1000.0, 'f', 2), lootcliVersion, lootVersion);
 }
 
 QString Loot::Plugin::toMarkdown() const
@@ -137,45 +135,45 @@ QString Loot::Plugin::toMarkdown() const
   QString s;
 
   if (!incompatibilities.empty()) {
-    s += " - **" + QObject::tr("Incompatibilities") + ": ";
+    s += u" - **"_s % QObject::tr("Incompatibilities") % u": "_s;
 
     QString fs;
     for (auto&& f : incompatibilities) {
       if (!fs.isEmpty()) {
-        fs += ", ";
+        fs += u", "_s;
       }
 
       fs += f.displayName.isEmpty() ? f.name : f.displayName;
     }
 
-    s += fs + "**\n";
+    s += fs % u"**\n"_s;
   }
 
   if (!missingMasters.empty()) {
-    s += " - **" + QObject::tr("Missing masters") + ": ";
+    s += u" - **"_s % QObject::tr("Missing masters") % u": "_s;
 
     QString ms;
     for (auto&& m : missingMasters) {
       if (!ms.isEmpty()) {
-        ms += ", ";
+        ms += u", "_s;
       }
 
       ms += m;
     }
 
-    s += ms + "**\n";
+    s += ms % u"**\n"_s;
   }
 
   for (auto&& m : messages) {
-    s += " - " + m.toMarkdown() + "\n";
+    s += u" - "_s % m.toMarkdown() % u"\n"_s;
   }
 
   for (auto&& d : dirty) {
-    s += " - " + d.toMarkdown(false) + "\n";
+    s += u" - "_s % d.toMarkdown(false) % u"\n"_s;
   }
 
   if (!s.isEmpty()) {
-    s = "#### " + name + "\n" + s;
+    s = u"#### "_s % name % u"\n"_s % s;
   }
 
   return s;
@@ -191,7 +189,7 @@ QString Loot::Dirty::toString(bool isClean) const
   QString s = cleaningString();
 
   if (!info.isEmpty()) {
-    s += " " + info;
+    s += u" "_s % info;
   }
 
   return s;
@@ -218,12 +216,12 @@ QString Loot::Message::toMarkdown() const
 
   switch (type) {
   case log::Error: {
-    s += "**" + QObject::tr("Error") + "**: ";
+    s += u"**"_s % QObject::tr("Error") % u"**: "_s;
     break;
   }
 
   case log::Warning: {
-    s += "**" + QObject::tr("Warning") + "**: ";
+    s += u"**"_s % QObject::tr("Warning") % u"**: "_s;
     break;
   }
 
@@ -279,18 +277,18 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   QStringList parameters;
 
   if (didUpdateMasterList) {
-    parameters << "--skipUpdateMasterlist";
+    parameters << u"--skipUpdateMasterlist"_s;
   }
-  parameters << "--game" << m_core.managedGame()->lootGameName() << "--gamePath"
+  parameters << u"--game"_s << m_core.managedGame()->lootGameName() << u"--gamePath"_s
              << m_core.managedGame()->gameDirectory().absolutePath()
-             << "--pluginListPath"
-             << QString(u"%1/loadorder.txt"_s).arg(m_core.profilePath()) << "--logLevel"
-             << QString::fromStdString(lootcli::logLevelToString(logLevel)) << "--out"
-             << LootReportPath << "--language"
+             << u"--pluginListPath"_s
+             << QString(u"%1/loadorder.txt"_s).arg(m_core.profilePath()) << u"--logLevel"_s
+             << QString::fromStdString(logLevelToString(logLevel)) << u"--out"_s
+             << LootReportPath << u"--language"_s
              << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
   QString program = qApp->applicationDirPath() % u"/loot/"_s % lootExecutable;
-  lootHandle->setWorkingDirectory(qApp->applicationDirPath() + "/loot");
+  lootHandle->setWorkingDirectory(qApp->applicationDirPath() % u"/loot"_s);
   lootHandle->setArguments(parameters);
   lootHandle->setProgram(program);
   lootHandle->start();
@@ -446,9 +444,8 @@ void Loot::processOutputFile(Report& r) const
 
   QFile outFile(LootReportPath);
   if (!outFile.open(QIODevice::ReadOnly)) {
-    emit log(MOBase::log::Error, QString("failed to open file, %1 (error %2)")
-                                     .arg(outFile.errorString())
-                                     .arg(outFile.error()));
+    emit log(MOBase::log::Error, QStringLiteral("failed to open file, %1 (error %2)")
+                                     .arg(outFile.errorString(), outFile.error()));
 
     return;
   }
@@ -457,7 +454,7 @@ void Loot::processOutputFile(Report& r) const
   const QJsonDocument doc = QJsonDocument::fromJson(outFile.readAll(), &e);
   if (doc.isNull()) {
     emit log(MOBase::log::Error,
-             QString("invalid json, %1 (error %2)").arg(e.errorString()).arg(e.error));
+             QStringLiteral("invalid json, %1 (error %2)").arg(e.errorString(), e.error));
 
     return;
   }
@@ -505,23 +502,23 @@ Loot::Plugin Loot::reportPlugin(const QJsonObject& plugin) const
     return {};
   }
 
-  if (plugin.contains("incompatibilities")) {
+  if (plugin.contains(u"incompatibilities"_s)) {
     p.incompatibilities = reportFiles(getOpt<QJsonArray>(plugin, "incompatibilities"));
   }
 
-  if (plugin.contains("messages")) {
+  if (plugin.contains(u"messages"_s)) {
     p.messages = reportMessages(getOpt<QJsonArray>(plugin, "messages"));
   }
 
-  if (plugin.contains("dirty")) {
+  if (plugin.contains(u"dirty"_s)) {
     p.dirty = reportDirty(getOpt<QJsonArray>(plugin, "dirty"));
   }
 
-  if (plugin.contains("clean")) {
+  if (plugin.contains(u"clean"_s)) {
     p.clean = reportDirty(getOpt<QJsonArray>(plugin, "clean"));
   }
 
-  if (plugin.contains("missingMasters")) {
+  if (plugin.contains(u"missingMasters"_s)) {
     p.missingMasters = reportStringArray(getOpt<QJsonArray>(plugin, "missingMasters"));
   }
 
@@ -557,11 +554,11 @@ std::vector<Loot::Message> Loot::reportMessages(const QJsonArray& array) const
 
     const auto type = getWarn<QString>(o, "type");
 
-    if (type == "info") {
+    if (type == "info"_L1) {
       m.type = log::Info;
-    } else if (type == "warn") {
+    } else if (type == "warn"_L1) {
       m.type = log::Warning;
-    } else if (type == "error") {
+    } else if (type == "error"_L1) {
       m.type = log::Error;
     } else {
       log::error("unknown message type '{}'", type);

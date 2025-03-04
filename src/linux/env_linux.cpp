@@ -12,6 +12,7 @@
 #include <utility.h>
 
 using namespace std;
+using namespace Qt::StringLiterals;
 
 namespace env
 {
