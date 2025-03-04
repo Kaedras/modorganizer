@@ -167,6 +167,7 @@ void CategoriesDialog::commitChanges()
   categories.setParents();
 
   std::vector<CategoryFactory::NexusCategory> nexusCats;
+  nexusCats.reserve(ui->nexusCategoryList->count());
   for (int i = 0; i < ui->nexusCategoryList->count(); ++i) {
     nexusCats.push_back(CategoryFactory::NexusCategory(
         ui->nexusCategoryList->item(i)->data(Qt::DisplayRole).toString(),
