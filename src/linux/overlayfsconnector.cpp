@@ -50,43 +50,6 @@ std::string to_hex(void* bufferIn, size_t bufferSize)
   }
   return temp.str();
 }
-//
-// LogWorker::LogWorker()
-//     : m_Buffer(1024, '\0'), m_QuitRequested(false),
-//       m_LogFile(
-//           qApp->property("dataPath").toString() +
-//           QString("/logs/overlayfs-%1.log")
-//               .arg(QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_hh-mm-ss")))
-// {
-//   m_LogFile.open(QIODevice::WriteOnly);
-//   log::debug("overlayfs log messages are written to {}", m_LogFile.fileName());
-// }
-//
-// LogWorker::~LogWorker() {}
-//
-// void LogWorker::process()
-// {
-//   MOShared::SetThisThreadName("LogWorker");
-//
-//   int noLogCycles = 0;
-//   while (!m_QuitRequested) {
-//     if (overlayfsGetLogMessages(&m_Buffer[0], m_Buffer.size(), false)) {
-//       m_LogFile.write(m_Buffer.c_str());
-//       m_LogFile.write("\n");
-//       m_LogFile.flush();
-//       noLogCycles = 0;
-//     } else {
-//       QThread::msleep(std::min(40, noLogCycles) * 5);
-//       ++noLogCycles;
-//     }
-//   }
-//   emit finished();
-// }
-//
-// void LogWorker::exit()
-// {
-//   m_QuitRequested = true;
-// }
 
 LogLevel toOverlayfsLogLevel(log::Levels level)
 {
@@ -102,24 +65,6 @@ LogLevel toOverlayfsLogLevel(log::Levels level)
     return LogLevel::Debug;
   }
 }
-//
-// CrashDumpsType toUsvfsCrashDumpsType(env::CoreDumpTypes type)
-// {
-//   switch (type) {
-//   case env::CoreDumpTypes::None:
-//     return CrashDumpsType::None;
-//
-//   case env::CoreDumpTypes::Data:
-//     return CrashDumpsType::Data;
-//
-//   case env::CoreDumpTypes::Full:
-//     return CrashDumpsType::Full;
-//
-//   case env::CoreDumpTypes::Mini:
-//   default:
-//     return CrashDumpsType::Mini;
-//   }
-// }
 
 OverlayfsConnector::OverlayfsConnector()
     : m_overlayfsManager(OverlayfsManager::getInstance(
@@ -133,24 +78,13 @@ OverlayfsConnector::OverlayfsConnector()
   const auto& s = Settings::instance();
 
   const LogLevel logLevel = toOverlayfsLogLevel(s.diagnostics().logLevel());
-  // const auto dumpType     = toUsvfsCrashDumpsType(s.diagnostics().coreDumpType());
-  // const auto delay        =
-  // duration_cast<milliseconds>(s.diagnostics().spawnDelay()); std::string dumpPath =
-  // OrganizerCore::getGlobalCoreDumpPath().toStdString();
 
   m_overlayfsManager.setLogLevel(logLevel);
-  m_overlayfsManager.setDebugMode(false);
-
-  // usvfsInitLogging(false);
 
   log::debug("initializing overlayfs:\n"
              " . instance: {}\n"
              " . log: {}",
              SHMID, OverlayfsManager::logLevelToString(logLevel));
-
-  for (auto exec : s.executablesBlacklist().split(";")) {
-    m_overlayfsManager.blacklistExecutable(exec.toStdString());
-  }
 
   for (auto& suffix : s.skipFileSuffixes()) {
     if (suffix.isEmpty()) {
@@ -162,13 +96,6 @@ OverlayfsConnector::OverlayfsConnector()
   for (auto& dir : s.skipDirectories()) {
     m_overlayfsManager.addSkipDirectory(dir.toStdString());
   }
-
-  // m_LogWorker.moveToThread(&m_WorkerThread);
-
-  // connect(&m_WorkerThread, SIGNAL(started()), &m_LogWorker, SLOT(process()));
-  // connect(&m_LogWorker, SIGNAL(finished()), &m_WorkerThread, SLOT(quit()));
-
-  // m_WorkerThread.start(QThread::LowestPriority);
 }
 
 OverlayfsConnector::~OverlayfsConnector()

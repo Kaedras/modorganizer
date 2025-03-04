@@ -113,7 +113,6 @@ private:
 
   bool spawnLootcli(QWidget* parent, bool didUpdateMasterList);
 
-  void processStdout();
   void processMessage(const lootcli::Message& m);
 
   Report createReport() const;

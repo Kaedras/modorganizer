@@ -40,31 +40,6 @@ using UsvfsConnectorException = OverlayfsConnectorException;
 
 // TODO: this class currently contains mostly placeholders
 
-// class LogWorker : public QThread
-// {
-//
-//   Q_OBJECT
-//
-// public:
-//   LogWorker();
-//   ~LogWorker();
-//
-// public slots:
-//
-//   void process();
-//   void exit();
-//
-// signals:
-//
-//   void outputLog(const QString& message);
-//   void finished();
-//
-// private:
-//   std::string m_Buffer;
-//   bool m_QuitRequested;
-//   QFile m_LogFile;
-// };
-
 class OverlayfsConnectorException : public std::exception
 {
 
@@ -100,8 +75,6 @@ public:
 
 private:
   OverlayfsManager& m_overlayfsManager;
-  // LogWorker m_LogWorker;
-  // QThread m_WorkerThread;
 };
 
 std::vector<pid_t> getRunningOverlayfsProcesses();

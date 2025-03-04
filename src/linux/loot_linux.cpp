@@ -389,23 +389,6 @@ void Loot::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
   emit finished();
 }
 
-void Loot::processStdout()
-{
-  QString lootOut = m_lootProcess->readAllStandardOutput();
-  emit output(lootOut);
-  QStringList lines = lootOut.split('\n');
-  for (const auto& line : lines) {
-    const auto m = lootcli::parseMessage(line.toStdString());
-
-    if (m.type == lootcli::MessageType::None) {
-      log::error("unrecognised loot output: '{}'", line);
-      continue;
-    }
-
-    processMessage(m);
-  }
-}
-
 void Loot::processMessage(const lootcli::Message& m)
 {
   switch (m.type) {
