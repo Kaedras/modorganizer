@@ -98,9 +98,9 @@ public:
 
   const QString& filename() const { return m_file; }
 
-  const QString& filenameWs() const { return m_wsFile; }
+  const QString& filenameWs() const { return m_file; }
 
-  const QString& filenameWsLowerCase() const { return m_wsLcFile; }
+  const QString& filenameWsLowerCase() const { return m_lcFile; }
 
   const MOShared::DirectoryEntryFileKey& key() const { return m_key; }
 
@@ -225,9 +225,9 @@ private:
   mutable std::size_t m_indexGuess;
 
   const QString m_virtualParentPath;
-  const QString m_wsFile, m_wsLcFile;
-  const MOShared::DirectoryEntryFileKey m_key;
   const QString m_file;
+  const QString m_lcFile;
+  const MOShared::DirectoryEntryFileKey m_key;
   const bool m_isDirectory;
 
   int m_originID;

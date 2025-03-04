@@ -1,5 +1,4 @@
 #include "modidlineedit.h"
-#include <QWhatsThis>
 
 #include <QEvent>
 #include <QWhatsThisClickedEvent>

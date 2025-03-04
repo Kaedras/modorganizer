@@ -76,8 +76,8 @@ FileTreeItem::FileTreeItem(FileTreeModel* model, FileTreeItem* parent,
                            QString dataRelativeParentPath, bool isDirectory,
                            QString file)
     : m_model(model), m_parent(parent), m_indexGuess(NoIndexGuess),
-      m_virtualParentPath(dataRelativeParentPath), m_wsFile(file),
-      m_wsLcFile(file.toLower()), m_key(m_wsLcFile), m_file(file),
+      m_virtualParentPath(dataRelativeParentPath),
+      m_file(file), m_lcFile(m_file.toLower()), m_key(m_file),
       m_isDirectory(isDirectory), m_originID(-1), m_flags(NoFlags), m_loaded(false),
       m_expanded(false), m_sortingStale(true)
 {}
