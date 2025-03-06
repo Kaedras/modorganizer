@@ -33,7 +33,7 @@ int run(int argc, char* argv[])
 
   QString str;
   for (int i = 0; i < argc; i++) {
-    str += argv[i] + ' ';
+    str.append(argv[i]).append(' ');
   }
   if (auto r = cl.process(str.toStdWString())) {
     return *r;
