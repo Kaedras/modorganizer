@@ -68,9 +68,17 @@ std::vector<Process> getRunningProcesses()
   std::vector<Process> v;
   fs::directory_iterator it("/proc");
 
-  for (const auto& folder : it) {
-    pid_t pid = stoi(folder.path().filename());
-    v.emplace_back(pid, getProcessParentID((DWORD)pid), getProcessName((DWORD)pid));
+  for (const auto& item : it) {
+    if (!item.is_directory())
+    {
+      continue;
+    }
+    try {
+      // directory name may not be an integer, in which case it can be ignored
+      pid_t pid = stoi(item.path().filename());
+      v.emplace_back(pid, getProcessParentID((DWORD)pid), getProcessName((DWORD)pid));
+    } catch (const std::invalid_argument& e) {
+    }
   }
 
   return v;
