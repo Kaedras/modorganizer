@@ -60,7 +60,7 @@ bool Process::canAccess() const
 {
   fs::path statusPath = "/proc/" + to_string(m_pid) + "/status";
   fs::perms p         = filesystem::status(statusPath).permissions();
-  return p == fs::perms::others_read;
+  return (p & fs::perms::others_read) != fs::perms::none;
 }
 
 std::vector<Process> getRunningProcesses()
