@@ -230,7 +230,7 @@ std::pair<QString, int> getSteamExecutable(QWidget* parent)
   }
 
   // try flatpak
-  GError* e;
+  GError* e = nullptr;
   FlatpakInstallation* installation = flatpak_installation_new_user(nullptr, &e);
   if (e != nullptr) {
     g_error_free(e);
