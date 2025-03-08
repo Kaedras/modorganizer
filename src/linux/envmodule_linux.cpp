@@ -110,22 +110,21 @@ QString getProcessName(DWORD pid)
 DWORD getProcessParentID(DWORD pid)
 {
   // see proc_pid_stat(5) manpage for documentation
+  int ppid;
 
-  ifstream stat(format("/proc/{}/stat", pid));
-  stat.exceptions(std::ios::failbit);
-  try {
-    int readPid;
-    string comm;
-    char state;
-    int ppid;
-
-    stat >> readPid >> comm >> state >> ppid;
-
-    return ppid;
-  } catch (const std::exception& ex) {
-    log::warn("could not get ppid of pid {}: {}", pid, ex.what());
+  FILE* file = fopen(format("/proc/{}/stat", pid).c_str(), "r");
+  if (file == nullptr) {
+    const int error = errno;
+    log::warn("could not get ppid of pid {}: {}", pid, strerror(error));
     return 0;
   }
+  int items = fscanf(file, "%*llu (%*[^)]%*[)] %*c %d", &ppid);
+  if (items != 1) {
+    const int error = errno;
+    log::warn("could not get ppid of pid {}: {}", pid, strerror(error));
+    return 0;
+  }
+  return ppid;
 }
 
 }  // namespace env
