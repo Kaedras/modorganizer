@@ -39,56 +39,69 @@ std::string makeRightsDetails(const QFileInfo& info)
 
   auto permissions = info.permissions();
 
-  s += "owner: ";
+  int user = 0;
+  int group = 0;
+  int others = 0;
+
   if (permissions.testFlag(QFileDevice::ReadOwner)) {
     s += "r";
+    user += 4;
   } else {
     s += "-";
   }
   if (permissions.testFlag(QFileDevice::WriteOwner)) {
     s += "w";
+    user += 2;
   } else {
     s += "-";
   }
   if (permissions.testFlag(QFileDevice::ExeOwner)) {
     s += "x";
+    user += 1;
   } else {
     s += "-";
   }
 
-  s += " group: ";
   if (permissions.testFlag(QFileDevice::ReadGroup)) {
     s += "r";
+    group += 4;
   } else {
     s += "-";
   }
   if (permissions.testFlag(QFileDevice::WriteGroup)) {
     s += "w";
+    group += 2;
   } else {
     s += "-";
   }
   if (permissions.testFlag(QFileDevice::ExeGroup)) {
     s += "x";
+    group += 1;
   } else {
     s += "-";
   }
 
-  s += " others: ";
   if (permissions.testFlag(QFileDevice::ReadOther)) {
     s += "r";
+    others += 4;
   } else {
     s += "-";
   }
   if (permissions.testFlag(QFileDevice::WriteOther)) {
     s += "w";
+    others += 2;
   } else {
     s += "-";
   }
   if (permissions.testFlag(QFileDevice::ExeOther)) {
     s += "x";
+    others += 1;
   } else {
     s += "-";
   }
+
+  // append octal representation
+  s += format(" ({}{}{})", user, group, others);
 
   return s;
 }
