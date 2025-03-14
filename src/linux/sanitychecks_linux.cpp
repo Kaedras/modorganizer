@@ -25,4 +25,16 @@ int checkMicrosoftStore(const QDir& gameDir)
   return 0;
 }
 
+int checkIncompatibilities(const env::Environment& e)
+{
+  STUB();
+  return 0;
+}
+
+int checkIncompatibleModule(const env::Module& m)
+{
+  STUB();
+  return 0;
+}
+
 }  // namespace sanity
