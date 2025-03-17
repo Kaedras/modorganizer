@@ -6,6 +6,12 @@
 #include <log.h>
 #include <utility.h>
 
+#ifdef __unix__
+static const auto shortcutExtension = QStringLiteral(".desktop");
+#else
+static const auto shortcutExtension = QStringLiteral(".lnk");
+#endif
+
 namespace env
 {
 
@@ -137,7 +143,7 @@ QString Shortcut::shortcutFilename() const
     return {};
   }
 
-  return m_name % u".lnk"_s;
+  return m_name % shortcutExtension;
 }
 
 QString toString(Shortcut::Locations loc)
