@@ -45,14 +45,14 @@ bool Shortcut::add(Locations loc)
       QString("#!/usr/bin/env xdg-open\n"
               "[Desktop Entry]\n"
               "Name=%1\n"
-              "Exec=\"%2 %3\"\n"
-              "Icon=\"%4\"\n"
+              "Exec=%2 %3\n"
+              "Icon=%4\n"
               "Path=%5\n"
               "StartupNotify=true\n"
               "Type=Application\n")
           .arg(m_name, m_target, m_arguments, m_icon, m_workingDirectory);
 
-  QFile file(path + "/" + m_name + ".desktop");
+  QFile file = shortcutPath(loc);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     log::error("could not create shortcut at {}: {}", file.fileName(),
                file.errorString());
@@ -61,16 +61,7 @@ bool Shortcut::add(Locations loc)
 
   QTextStream out(&file);
   out << fileContent;
-  file.close();
   return true;
-
-  // TODO: use xdg-desktop portal?
-  // QDBusMessage message =
-  // QDBusMessage::createMethodCall("org.freedesktop.portal.DynamicLauncher.PrepareInstall");
-  // QDBusMessage message =
-  // QDBusMessage::createMethodCall("org.freedesktop.portal.Desktop",
-  // "org/freedesktop/portal/Desktop", "org.freedesktop.portal.DynamicLauncher",
-  // "SupportedLauncherTypes");
 }
 
 bool Shortcut::remove(Locations loc)
