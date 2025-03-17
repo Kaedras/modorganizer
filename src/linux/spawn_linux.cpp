@@ -1,7 +1,7 @@
 #include "env.h"
 #include "envos.h"
 #include "envsecurity.h"
-#include "overlayfs/OverlayfsManager.h"
+#include "overlayfs/overlayfsmanager.h"
 #include "settings.h"
 #include "shared/util.h"
 #include "spawn.h"
@@ -499,7 +499,7 @@ extern QString makeSteamArguments(const QString& username, const QString& passwo
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
   if (sp.hooked) {
-    if (!OverlayfsManager::getInstance().mount()) {
+    if (!OverlayFsManager::getInstance().mount()) {
       return -1;
     }
   }
@@ -548,7 +548,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   }
 
   if (sp.hooked) {
-    if (!OverlayfsManager::getInstance().mount()) {
+    if (!OverlayFsManager::getInstance().mount()) {
       return -1;
     }
   }

@@ -27,7 +27,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QString>
 #include <QThread>
 #include <exception>
-#include <overlayfs/OverlayfsManager.h>
+#include <overlayfs/overlayfsmanager.h>
 #include <uibase/executableinfo.h>
 #include <uibase/filemapping.h>
 #include <uibase/log.h>
@@ -70,7 +70,7 @@ public:
       const QList<MOBase::ExecutableForcedLoadSetting>& forcedLibraries);
 
 private:
-  OverlayfsManager& m_overlayfsManager;
+  OverlayFsManager& m_overlayfsManager;
 };
 
 std::vector<pid_t> getRunningOverlayfsProcesses();

@@ -68,7 +68,7 @@
 #include <libbsarchpp/Bsa.h>
 
 #ifdef __unix__
-#include <overlayfs/overlayfs.h>
+#include <overlayfs/overlayfsmanager.h>
 #else
 #include <Psapi.h>
 #include <Shlobj.h>

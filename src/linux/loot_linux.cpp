@@ -270,7 +270,7 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
 {
   const auto logLevel = m_core.settings().diagnostics().lootLogLevel();
 
-  if (!OverlayfsManager::getInstance().mount()) {
+  if (!OverlayFsManager::getInstance().mount()) {
     emit log(log::Levels::Error, tr("failed to start loot: error mounting overlayfs"));
     return false;
   }
@@ -350,7 +350,7 @@ const std::vector<QString>& Loot::warnings() const
 
 void Loot::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-  OverlayfsManager::getInstance().umount();
+  OverlayFsManager::getInstance().umount();
 
   if (exitStatus == QProcess::CrashExit) {
     if (m_cancel) {

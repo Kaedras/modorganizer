@@ -19,7 +19,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "overlayfsconnector.h"
 #include "organizercore.h"
-#include "overlayfs/overlayfs.h"
+#include "overlayfs/overlayfsmanager.h"
 #include "settings.h"
 #include "shared/util.h"
 #include <QCoreApplication>
@@ -65,7 +65,7 @@ LogLevel toOverlayfsLogLevel(log::Levels level)
 }
 
 OverlayfsConnector::OverlayfsConnector()
-    : m_overlayfsManager(OverlayfsManager::getInstance(
+    : m_overlayfsManager(OverlayFsManager::getInstance(
           (qApp->property("dataPath").toString() +
            QStringLiteral("/logs/overlayfs-%1.log")
                .arg(QDateTime::currentDateTimeUtc().toString(u"yyyy-MM-dd_hh-mm-ss"_s)))
@@ -80,17 +80,17 @@ OverlayfsConnector::OverlayfsConnector()
   log::debug("initializing overlayfs:\n"
              " . instance: {}\n"
              " . log: {}",
-             SHMID, OverlayfsManager::logLevelToString(logLevel));
+             SHMID, OverlayFsManager::logLevelToString(logLevel));
 
   for (auto& suffix : s.skipFileSuffixes()) {
     if (suffix.isEmpty()) {
       continue;
     }
-    m_overlayfsManager.addToFileSuffixBlacklist(suffix.toStdString());
+    m_overlayfsManager.addSkipFileSuffix(suffix.toStdString());
   }
 
   for (auto& dir : s.skipDirectories()) {
-    m_overlayfsManager.addToDirectoryBlacklist(dir.toStdString());
+    m_overlayfsManager.addSkipDirectory(dir.toStdString());
   }
 }
 
@@ -159,17 +159,17 @@ void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
   m_overlayfsManager.setDebugMode(false);
   m_overlayfsManager.setLogLevel(toOverlayfsLogLevel(logLevel));
 
-  m_overlayfsManager.clearFileSuffixBlacklist();
+  m_overlayfsManager.clearSkipFileSuffixes();
   for (auto& suffix : skipFileSuffixes) {
     if (suffix.isEmpty()) {
       continue;
     }
-    m_overlayfsManager.addToFileSuffixBlacklist(suffix.toStdString());
+    m_overlayfsManager.addSkipFileSuffix(suffix.toStdString());
   }
 
-  m_overlayfsManager.clearDirectoryBlacklist();
+  m_overlayfsManager.clearSkipDirectories();
   for (auto& dir : skipDirectories) {
-    m_overlayfsManager.addToDirectoryBlacklist(dir.toStdString());
+    m_overlayfsManager.addSkipDirectory(dir.toStdString());
   }
 }
 

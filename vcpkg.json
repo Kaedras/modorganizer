@@ -31,6 +31,10 @@
         {
           "name": "usvfs",
           "platform": "windows"
+        },
+        {
+          "name": "mo2-overlayfs",
+          "platform": "linux"
         }
       ]
     }

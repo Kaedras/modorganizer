@@ -8,8 +8,7 @@ else ()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
     pkg_check_modules(LIBFLATPAK REQUIRED flatpak)
-    # TODO: add this package
-    #	find_package(overlayfs CONFIG REQUIRED)
+    find_package(mo2-overlayfs CONFIG REQUIRED)
 endif ()
 
 find_package(directx-headers CONFIG REQUIRED)
@@ -68,8 +67,7 @@ set(PRIVATE_WIN32_LIBS
         usvfs::usvfs Version Dbghelp)
 
 set(PRIVATE_UNIX_LIBS
-        # TODO: add this library
-        #		overlayfs
+        mo2::overlayfs
         ${LIBSECRET_LIBRARIES}
         ${LIBFLATPAK_LIBRARIES}
 )

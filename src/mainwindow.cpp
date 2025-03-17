@@ -178,7 +178,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #endif  // TEST_MODELS
 
 #ifdef __unix__
-#include <overlayfs/overlayfs.h>
+#include <overlayfs/overlayfsmanager.h>
 inline QString formatSystemMessageToQString(int e)
 {
   return QString::fromLocal8Bit(strerror(e));
