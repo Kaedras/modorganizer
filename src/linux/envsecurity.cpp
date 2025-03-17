@@ -4,9 +4,9 @@
 #include "envmodule.h"
 #include "stub.h"
 #include <log.h>
-#include <utility.h>
-#include <sys/types.h>
 #include <pwd.h>
+#include <sys/types.h>
+#include <utility.h>
 
 namespace env
 {
@@ -109,16 +109,18 @@ FileSecurity getFileSecurity(const QString& path)
   fs.owner = info.ownerId() == getuid() ? "(this user)" : info.owner();
   // if the calling process is owner
   if (info.ownerId() == getuid()) {
-    fs.rights.normalRights = info.permission(QFile::Permission::ReadUser) && info.permission(QFile::Permission::WriteUser);
+    fs.rights.normalRights = info.permission(QFile::Permission::ReadUser) &&
+                             info.permission(QFile::Permission::WriteUser);
     fs.rights.hasExecute = info.permission(QFile::Permission::ExeUser);
   }
   // if the calling process is in group
   else if (info.groupId() == getgid()) {
-    fs.rights.normalRights = info.permission(QFile::Permission::ReadGroup) && info.permission(QFile::Permission::WriteGroup);
+    fs.rights.normalRights = info.permission(QFile::Permission::ReadGroup) &&
+                             info.permission(QFile::Permission::WriteGroup);
     fs.rights.hasExecute = info.permission(QFile::Permission::ExeGroup);
-  }
-  else {
-    fs.rights.normalRights = info.permission(QFile::Permission::ReadOther) && info.permission(QFile::Permission::WriteOther);
+  } else {
+    fs.rights.normalRights = info.permission(QFile::Permission::ReadOther) &&
+                             info.permission(QFile::Permission::WriteOther);
     fs.rights.hasExecute = info.permission(QFile::Permission::ExeOther);
   }
 

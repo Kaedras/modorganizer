@@ -69,8 +69,7 @@ std::vector<Process> getRunningProcesses()
   fs::directory_iterator it("/proc");
 
   for (const auto& item : it) {
-    if (!item.is_directory())
-    {
+    if (!item.is_directory()) {
       continue;
     }
     try {

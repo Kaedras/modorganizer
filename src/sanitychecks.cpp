@@ -12,8 +12,7 @@ using namespace Qt::StringLiterals;
 // executables file types
 static const QStringList FileTypes = {u"*.so"_s};
 // files that are likely to be eaten
-static const QStringList files({u"helper"_s, u"nxmhandler"_s,
-                                u"loot/lootcli"_s});
+static const QStringList files({u"helper"_s, u"nxmhandler"_s, u"loot/lootcli"_s});
 #else
 // executables file types
 static const QStringList FileTypes = {u"*.dll"_s, u"*.exe"_s};
