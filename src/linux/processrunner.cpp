@@ -7,13 +7,12 @@
 #include <iplugingame.h>
 #include <log.h>
 #include <report.h>
-
-#include <sys/syscall.h>
 #include <unistd.h>
 
 #include "stub.h"
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 std::vector<HANDLE> getRunningUSVFSProcesses()
 {
@@ -40,7 +39,7 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
   bool virtualizedBin = binPath.startsWith(trailedModsPath, Qt::CaseInsensitive);
   if (virtualizedCwd || virtualizedBin) {
     if (virtualizedCwd) {
-      int cwdOffset       = cwdPath.indexOf('/', trailedModsPath.length());
+      qsizetype cwdOffset = cwdPath.indexOf('/', trailedModsPath.length());
       QString adjustedCwd = cwdPath.mid(cwdOffset, -1);
       cwdPath             = game->dataDirectory().absolutePath();
       if (cwdOffset >= 0)
@@ -48,14 +47,14 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
     }
 
     if (virtualizedBin) {
-      int binOffset       = binPath.indexOf('/', trailedModsPath.length());
+      qsizetype binOffset = binPath.indexOf('/', trailedModsPath.length());
       QString adjustedBin = binPath.mid(binOffset, -1);
       binPath             = game->dataDirectory().absolutePath();
       if (binOffset >= 0)
         binPath += adjustedBin;
     }
 
-    QString cmdline = QString("launch \"%1\" \"%2\" %3")
+    QString cmdline = QString(R"(launch "%1" "%2" %3)")
                           .arg(QDir::toNativeSeparators(cwdPath),
                                QDir::toNativeSeparators(binPath), sp.arguments);
 
@@ -65,14 +64,14 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
   }
 }
 
-std::optional<ProcessRunner::Results> singleWait(HANDLE handle, DWORD pid)
+std::optional<ProcessRunner::Results> singleWait(int pidFd, pid_t pid)
 {
-  if (handle == ::INVALID_HANDLE_VALUE) {
+  if (pidFd == -1) {
     return ProcessRunner::Error;
   }
 
   // const auto res = WaitForSingleObject(handle, 50);
-  pollfd pfd    = {handle, POLLIN, 0};
+  pollfd pfd    = {pidFd, POLLIN, 0};
   const int res = poll(&pfd, 1, 50);
 
   switch (res) {
@@ -89,7 +88,7 @@ std::optional<ProcessRunner::Results> singleWait(HANDLE handle, DWORD pid)
   case -1:  // fall-through
   default: {
     // error
-    const auto e = ::GetLastError();
+    const int e = errno;
     log::error("failed waiting for {}, {}", pid, formatSystemMessage(e));
     return ProcessRunner::Error;
   }
@@ -149,7 +148,7 @@ InterestingProcess findInterestingProcessInTrees(const env::Process& root)
 {
   // Certain process names we wish to "hide" for aesthetic reason:
   static const std::vector<QString> hiddenList = {
-      QFileInfo(QCoreApplication::applicationFilePath()).fileName(), "conhost.exe"};
+      QFileInfo(QCoreApplication::applicationFilePath()).fileName()};
 
   if (root.children().empty()) {
     return {};
@@ -228,7 +227,7 @@ const std::chrono::milliseconds Infinite(-1);
 
 // waits for completion, times out after `wait` if not Infinite
 //
-std::optional<ProcessRunner::Results> timedWait(HANDLE handle, DWORD pid,
+std::optional<ProcessRunner::Results> timedWait(int pidFd, pid_t pid,
                                                 UILocker::Session* ls,
                                                 std::chrono::milliseconds wait,
                                                 std::atomic<bool>& interrupt)
@@ -242,7 +241,7 @@ std::optional<ProcessRunner::Results> timedWait(HANDLE handle, DWORD pid,
 
   while (!interrupt) {
     // wait for a very short while, allows for processing events below
-    const auto r = singleWait(handle, pid);
+    const auto r = singleWait(pidFd, pid);
 
     if (r) {
       // the process has either completed or an error was returned
@@ -294,11 +293,12 @@ std::optional<ProcessRunner::Results> timedWait(HANDLE handle, DWORD pid,
   return ProcessRunner::ForceUnlocked;
 }
 
-ProcessRunner::Results waitForAllChildProcesses(HANDLE job, UILocker::Session* ls,
+ProcessRunner::Results waitForAllChildProcesses(UILocker::Session* ls,
                                                 std::atomic<bool>& interrupt)
 {
   siginfo_t info;
   while (!interrupt) {
+    // wait for any child processes
     if (waitid(P_ALL, -1, &info, WNOWAIT) < 0) {
       return ProcessRunner::Completed;
     }
@@ -307,7 +307,7 @@ ProcessRunner::Results waitForAllChildProcesses(HANDLE job, UILocker::Session* l
   log::debug("waiting for processes interrupted");
   return ProcessRunner::ForceUnlocked;
 }
-/*
+
 ProcessRunner::Results waitForProcessesThreadImpl(HANDLE job, UILocker::Session* ls,
                                                   std::atomic<bool>& interrupt)
 {
@@ -322,8 +322,8 @@ ProcessRunner::Results waitForProcessesThreadImpl(HANDLE job, UILocker::Session*
   auto wait = defaultWait;
 
   while (!interrupt) {
-    auto ip = getInterestingProcess(job);
-    if (!ip.handle) {
+    InterestingProcess ip = getInterestingProcess(job);
+    if (ip.handle.get() != -1) {
       // nothing to wait on
       return ProcessRunner::Completed;
     }
@@ -366,12 +366,12 @@ ProcessRunner::Results waitForProcessesThreadImpl(HANDLE job, UILocker::Session*
 
   log::debug("waiting for processes interrupted");
   return ProcessRunner::ForceUnlocked;
-}*/
+}
 
 void waitForProcessesThread(ProcessRunner::Results& result, HANDLE job,
                             UILocker::Session* ls, std::atomic<bool>& interrupt)
 {
-  result = waitForAllChildProcesses(job, ls, interrupt);
+  result = waitForProcessesThreadImpl(job, ls, interrupt);
 
   // the session can be null when running shortcuts with locking disabled
   if (ls) {
@@ -462,7 +462,7 @@ ProcessRunner::Results waitForProcess(HANDLE initialProcess, LPDWORD exitCode,
   if (exitCode && r != ProcessRunner::Running) {
     siginfo_t info;
 
-    if (waitid(P_PIDFD, initialProcess, &info, WUNTRACED) != 0) {
+    if (waitid(P_PIDFD, initialProcess, &info, WEXITED) != 0) {
       const auto e = errno;
       log::warn("failed to get exit code of process, {}", strerror(e));
     }
