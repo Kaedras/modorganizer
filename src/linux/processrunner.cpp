@@ -823,6 +823,11 @@ std::optional<ProcessRunner::Results> ProcessRunner::runBinary()
   // ModOrganizer.exe is spawned instead to launch it
   adjustForVirtualized(game, m_sp, settings);
 
+  // appID is required to get the prefix location
+  if (m_sp.binary.suffix() == "exe") {
+    m_sp.steamAppID = m_core.managedGame()->steamAPPId();
+  }
+
   // run the binary
   m_handle = startBinary(parent, m_sp);
   if (!m_handle.isValid()) {
