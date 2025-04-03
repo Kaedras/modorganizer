@@ -512,38 +512,60 @@ bool helperExec(QWidget* parent, const QString& moDirectory, const QString& comm
 {
   const QString fileName = QDir(moDirectory).path() % u"/helper"_s;
 
-  QProcess process;
+  const pid_t pid = fork();
 
-  process.setWorkingDirectory(moDirectory);
-  process.startCommand(fileName % u" "_s % commandLine);
-
-  if (!process.waitForStarted(1000)) {
-    spawn::dialogs::helperFailed(parent, process.error(), process.errorString(),
-                                 fileName, moDirectory, commandLine);
-
+  // error
+  if (pid == -1) {
+    const int e = errno;
+    spawn::dialogs::helperFailed(parent, e, u"fork()"_s, fileName, moDirectory,
+                                 commandLine);
     return false;
   }
 
+  // child
+  if (pid == 0) {
+    // create argument list for execv
+    vector<const char*> args = {fileName.toLocal8Bit()};
+    QStringList spArgs       = QProcess::splitCommand(commandLine);
+    for (const auto& arg : spArgs) {
+      args.push_back(arg.toLocal8Bit());
+    }
+    // array must be terminated by a null pointer
+    args.push_back(nullptr);
+
+    chdir(QDir(moDirectory).absolutePath().toLocal8Bit());
+
+    execv(args[0], const_cast<char* const*>(args.data()));
+
+    // exec only returns on error
+    const int e = errno;
+    spawn::dialogs::helperFailed(parent, e, u"execv()"_s, fileName, moDirectory,
+                                 commandLine);
+    return false;
+  }
+
+  // parent
   if (async) {
     return true;
   }
 
-  if (!process.waitForFinished()) {
-    spawn::dialogs::helperFailed(parent, process.error(), process.errorString(),
-                                 fileName, moDirectory, commandLine);
-
+  int wstatus = 0;
+  if (waitpid(pid, &wstatus, 0) == -1) {
+    const int e = errno;
+    spawn::dialogs::helperFailed(parent, e, u"waitpid()"_s, fileName, moDirectory,
+                                 commandLine);
     return false;
   }
 
-  int exitCode = process.exitCode();
-  if (exitCode != 0) {
-    spawn::dialogs::helperFailed(parent, process.error(), process.errorString(),
-                                 fileName, moDirectory, commandLine);
-
-    return false;
+  if (WIFEXITED(wstatus)) {
+    return WEXITSTATUS(wstatus) == 0;
   }
 
-  return true;
+  spawn::dialogs::helperFailed(parent, ECANCELED,
+                               u"Process did not terminate normally"_s, fileName,
+                               moDirectory, commandLine);
+
+  return false;
 }
 
 bool adminLaunch(QWidget* parent, const std::filesystem::path& moPath,
