@@ -201,37 +201,46 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
     }
   }
 
-  // create argument list for execv
-  vector<const char*> args = {sp.binary.absoluteFilePath().toLocal8Bit()};
-  QStringList spArgs       = QProcess::splitCommand(sp.arguments);
-  for (const auto& arg : spArgs) {
-    args.push_back(arg.toLocal8Bit());
-  }
-  // array must be terminated by a null pointer
-  args.push_back(nullptr);
-
   pid_t pid = fork();
-  if (pid == 0) {
-    // child
-    chdir(sp.binary.absolutePath().toLocal8Bit());
 
-    execv(args[0], const_cast<char* const*>(args.data()));
-  } else {
-    // parent
-    int result = pidfd_open(pid, 0);
-    if (result == -1) {
-      const int e = errno;
-      log::error("error getting pidfd for pid {}, {}", pid, strerror(e));
-      return e;
-    }
-    processHandle = result;
-    return 0;
+  // error
+  if (pid == -1) {
+    const int e = errno;
+    log::error("error running {}, {}", sp.binary.absoluteFilePath().toStdString(),
+               strerror(e));
+    return e;
   }
 
-  const int e = errno;
-  log::error("error running {}, {}", sp.binary.absoluteFilePath().toStdString(),
-             strerror(e));
-  return e;
+  // child
+  if (pid == 0) {
+    // create argument list for execv
+    vector<const char*> args = {sp.binary.absoluteFilePath().toLocal8Bit()};
+    QStringList spArgs       = QProcess::splitCommand(sp.arguments);
+    for (const auto& arg : spArgs) {
+      args.push_back(arg.toLocal8Bit());
+    }
+    // array must be terminated by a null pointer
+    args.push_back(nullptr);
+
+    chdir(sp.binary.absolutePath().toLocal8Bit());
+    execv(args[0], const_cast<char* const*>(args.data()));
+
+    // exec only returns on error
+    const int e = errno;
+    log::error("error running {}, {}", sp.binary.absoluteFilePath().toStdString(),
+               strerror(e));
+    return e;
+  }
+
+  // parent
+  int result = pidfd_open(pid, 0);
+  if (result == -1) {
+    const int e = errno;
+    log::error("error getting pidfd for pid {}, {}", pid, strerror(e));
+    return e;
+  }
+  processHandle = result;
+  return 0;
 }
 
 int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
@@ -414,7 +423,7 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
   HANDLE handle = ::INVALID_HANDLE_VALUE;
   int e;
-  if (sp.binary.suffix() == "exe") {
+  if (sp.binary.suffix() == "exe"_L1) {
     e = spawnProton(sp, handle);
   } else {
     e = spawn(sp, handle);
@@ -459,45 +468,41 @@ bool isBatchFile(const QFileInfo& target)
   return target.suffix() == "sh"_L1;
 }
 
-bool isExeFile(const QFileInfo& target)
+bool isLinuxExecutable(const QFileInfo& target)
 {
-  return target.isExecutable() && target.isFile();
+  // just treat everything that is not a directory and has executable permissions as
+  // executable, this should also work for shell scripts
+  return target.isExecutable() && !target.isDir();
 }
 
-QFileInfo getCmdPath()
+bool isWindowsExecutable(const QFileInfo& target)
 {
-  return QFileInfo(u"/bin/sh"_s);
+  return target.suffix() == "exe"_L1;
+}
+
+bool isExecutable(const QFileInfo& target)
+{
+  return isLinuxExecutable(target) || isWindowsExecutable(target);
+}
+
+bool isExeFile(const QFileInfo& target)
+{
+  return isExecutable(target);
 }
 
 extern bool isJavaFile(const QFileInfo& target);
 
 FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& target)
 {
-  if (isExeFile(target)) {
-    return {target, "", FileExecutionTypes::Executable};
-  }
-
-  if (isBatchFile(target)) {
-    return {getCmdPath(),
-            QStringLiteral(R"(-c "%1")")
+  if (isJavaFile(target)) {
+    return {QFileInfo("java"),
+            QStringLiteral(R"(-jar "%1")")
                 .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
             FileExecutionTypes::Executable};
   }
 
-  if (isJavaFile(target)) {
-    auto java = findJavaInstallation(target.absoluteFilePath());
-
-    if (java.isEmpty()) {
-      java = QFileDialog::getOpenFileName(parent, QObject::tr("Select executable"),
-                                          QString());
-    }
-
-    if (!java.isEmpty()) {
-      return {QFileInfo(java),
-              QStringLiteral(R"(-jar "%1")")
-                  .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
-              FileExecutionTypes::Executable};
-    }
+  if (isExecutable(target)) {
+    return {target, "", FileExecutionTypes::Executable};
   }
 
   return {{}, {}, FileExecutionTypes::Other};
