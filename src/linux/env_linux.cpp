@@ -33,15 +33,15 @@ Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
 
 std::optional<QString> getAssocString(const QFileInfo& file)
 {
-  STUB();
+  STUB_PARAM(file.absolutePath().toStdString());
   return {};
   // const auto ext = "."s + file.suffix().toStdString();
 }
 
 std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
 {
-  int exeBegin = 0;
-  int exeEnd   = -1;
+  qsizetype exeBegin = 0;
+  qsizetype exeEnd   = -1;
 
   if (cmd[0] == '"') {
     // surrounded by double-quotes, so find the next one
@@ -54,7 +54,8 @@ std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
     }
   } else {
     // no double-quotes, find the first whitespace
-    exeEnd = cmd.indexOf(QRegularExpression("\\s"));
+    static const QRegularExpression regex("\\s");
+    exeEnd = cmd.indexOf(regex);
     if (exeEnd == -1) {
       exeEnd = cmd.size();
     }
@@ -73,7 +74,18 @@ QString processPath(HANDLE process = ::INVALID_HANDLE_VALUE)
   if (process == 0) {
     return {};
   }
-  std::filesystem::path exe("/proc/" + std::to_string(process) + "/exe");
+
+  pid_t pid;
+  if (process == ::INVALID_HANDLE_VALUE) {
+    pid = getpid();
+  } else {
+    pid = pidfd_getpid(process);
+    if (pid == -1) {
+      return {};
+    }
+  }
+
+  std::filesystem::path exe("/proc/" + std::to_string(pid) + "/exe");
   return QString::fromStdString(read_symlink(exe));
 }
 
@@ -89,7 +101,7 @@ QString processFilename(HANDLE process = ::INVALID_HANDLE_VALUE)
 
 Association getAssociation(const QFileInfo& targetInfo)
 {
-  STUB();
+  STUB_PARAM(targetInfo.absolutePath().toStdString());
   return {};
 }
 

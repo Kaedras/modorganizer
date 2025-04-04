@@ -97,13 +97,12 @@ Process getProcessTree(HANDLE h)
 
 QString getProcessName(DWORD pid)
 {
-  ifstream comm("/proc/" + to_string(pid) + "/comm");
-  if (!comm.is_open()) {
-    log::error("error reading process info for pid {}", pid);
+  error_code ec;
+  auto path = filesystem::read_symlink("/proc/" + to_string(pid) + "/exe", ec);
+  if (ec) {
+    return {};
   }
-  string name;
-  comm >> name;
-  return QString::fromUtf8(name);
+  return QFileInfo(path).fileName();
 }
 
 DWORD getProcessParentID(DWORD pid)

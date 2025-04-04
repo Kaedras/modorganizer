@@ -2,7 +2,6 @@
 #include "env.h"
 #include "instancemanager.h"
 #include "loglist.h"
-#include "messagedialog.h"
 #include "moapplication.h"
 #include "multiprocess.h"
 #include "organizercore.h"
@@ -10,6 +9,7 @@
 #include "thread_utils.h"
 #include <log.h>
 #include <report.h>
+#include <sys/prctl.h>
 #include <sys/resource.h>
 
 using namespace MOBase;
@@ -23,7 +23,7 @@ thread_local std::terminate_handler g_prevTerminateHandler = nullptr;
 
 int run(int argc, char* argv[]);
 
-int main(int argc, char* argv[])
+void initCoredumps()
 {
   // let the kernel handle core dumps for now
 
@@ -40,15 +40,18 @@ int main(int argc, char* argv[])
     filter.close();
   } else {
     const int e = errno;
-    log::warn("Error writing coredump_filter, {}. Kernel may not be built with "
-              "CONFIG_ELF_CORE.",
-              strerror(e));
+    log::error("Error writing coredump_filter, {}. Kernel may not be built with "
+               "CONFIG_ELF_CORE.",
+               strerror(e));
   }
 
   // todo: clean up old crash dumps, move them into crashDumps folder
 
   // todo: test with systemd (coredumpctl)
+}
 
+int main(int argc, char* argv[])
+{
   const int r = run(argc, argv);
   std::cout << "mod organizer done\n";
   return r;
@@ -57,7 +60,6 @@ int main(int argc, char* argv[])
 int run(int argc, char* argv[])
 {
   MOShared::SetThisThreadName("main");
-  setExceptionHandlers();
   // setExceptionHandlers();
 
   cl::CommandLine cl;
@@ -71,6 +73,8 @@ int run(int argc, char* argv[])
   }
 
   initLogging();
+
+  initCoredumps();
 
   // must be after logging
   TimeThis tt("main() multiprocess");

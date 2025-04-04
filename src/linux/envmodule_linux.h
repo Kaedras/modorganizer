@@ -25,45 +25,50 @@ typedef struct tagVS_FIXEDFILEINFO
 namespace env
 {
 // compatibility class for HandlePtr
-class PidfdCloser
+class FdCloser
 {
 public:
-  explicit PidfdCloser(int pidfd) : m_pidfd(pidfd) {}
-  PidfdCloser() = default;
+  explicit FdCloser(int fd) : m_fd(fd) {}
+  FdCloser() = default;
 
-  PidfdCloser& operator=(int pidfd)
+  FdCloser& operator=(int fd)
   {
-    if (m_pidfd != -1) {
-      close(m_pidfd);
+    if (m_fd != -1) {
+      close(m_fd);
     }
-    m_pidfd = pidfd;
+    m_fd = fd;
 
     return *this;
   }
 
-  ~PidfdCloser()
+  operator bool() const noexcept
   {
-    if (m_pidfd != -1) {
-      close(m_pidfd);
+    return m_fd != -1;
+  }
+
+  ~FdCloser()
+  {
+    if (m_fd != -1) {
+      close(m_fd);
     }
   }
 
-  int get() const { return m_pidfd; }
+  int get() const { return m_fd; }
 
   int release()
   {
-    int tmp = m_pidfd;
-    m_pidfd = -1;
+    int tmp = m_fd;
+    m_fd = -1;
     return tmp;
   }
 
-  bool isValid() const { return m_pidfd != -1; }
+  bool isValid() const { return m_fd != -1; }
 
 private:
-  int m_pidfd = -1;
+  int m_fd = -1;
 };
 
-using HandlePtr = PidfdCloser;
+using HandlePtr = FdCloser;
 
 }  // namespace env
 #endif  // ENVMODULE_LINUX_H
