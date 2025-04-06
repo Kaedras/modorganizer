@@ -403,7 +403,7 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
                        info->gameName().compare(gameName, Qt::CaseInsensitive) == 0)
                      if (info->getLastNexusUpdate().addSecs(-3600) <
                          QDateTime::fromSecsSinceEpoch(
-                             update[u"latest_file_update"_s].toInt(), Qt::UTC))
+                             update[u"latest_file_update"_s].toInt(), QTimeZone::utc()))
                        return true;
                    return false;
                  });

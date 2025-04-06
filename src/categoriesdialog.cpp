@@ -223,25 +223,25 @@ void CategoriesDialog::fillTable()
     table->insertRow(row);
     //    table->setVerticalHeaderItem(row, new QTableWidgetItem("  "));
 
-    QScopedPointer<QTableWidgetItem> idItem(new QTableWidgetItem());
+    std::unique_ptr<QTableWidgetItem> idItem(new QTableWidgetItem());
     idItem->setData(Qt::DisplayRole, category.ID());
 
-    QScopedPointer<QTableWidgetItem> nameItem(new QTableWidgetItem(category.name()));
-    QScopedPointer<QTableWidgetItem> parentIDItem(new QTableWidgetItem());
+    std::unique_ptr<QTableWidgetItem> nameItem(new QTableWidgetItem(category.name()));
+    std::unique_ptr<QTableWidgetItem> parentIDItem(new QTableWidgetItem());
     parentIDItem->setData(Qt::DisplayRole, category.parentID());
-    QScopedPointer<QTableWidgetItem> nexusCatItem(new QTableWidgetItem());
+    std::unique_ptr<QTableWidgetItem> nexusCatItem(new QTableWidgetItem());
 
-    table->setItem(row, 0, idItem.take());
-    table->setItem(row, 1, nameItem.take());
-    table->setItem(row, 2, parentIDItem.take());
-    table->setItem(row, 3, nexusCatItem.take());
+    table->setItem(row, 0, idItem.release());
+    table->setItem(row, 1, nameItem.release());
+    table->setItem(row, 2, parentIDItem.release());
+    table->setItem(row, 3, nexusCatItem.release());
   }
 
   for (const auto& nexusCat : categories.m_NexusMap) {
-    QScopedPointer<QListWidgetItem> nexusItem(new QListWidgetItem());
+    std::unique_ptr<QListWidgetItem> nexusItem(new QListWidgetItem());
     nexusItem->setData(Qt::DisplayRole, nexusCat.second.name());
     nexusItem->setData(Qt::UserRole, nexusCat.second.ID());
-    list->addItem(nexusItem.take());
+    list->addItem(nexusItem.release());
     auto item = table->item(categories.resolveNexusID(nexusCat.first) - 1, 3);
     if (item != nullptr) {
       auto itemData = item->data(Qt::UserRole).toList();
@@ -314,7 +314,7 @@ void CategoriesDialog::nexusImport_clicked()
       data.append(QVariant(name));
       data.append(QVariant(nexusID));
       nexusData.insert(nexusData.size(), data);
-      QScopedPointer<QTableWidgetItem> nexusCatItem(
+      std::unique_ptr<QTableWidgetItem> nexusCatItem(
           new QTableWidgetItem(nexusLabel.join(u", "_s)));
       nexusCatItem->setData(Qt::UserRole, nexusData);
       if (!table->findItems(name, Qt::MatchExactly).size()) {
@@ -322,24 +322,24 @@ void CategoriesDialog::nexusImport_clicked()
         table->insertRow(table->rowCount());
         //    table->setVerticalHeaderItem(row, new QTableWidgetItem("  "));
 
-        QScopedPointer<QTableWidgetItem> idItem(new QTableWidgetItem());
+        std::unique_ptr<QTableWidgetItem> idItem(new QTableWidgetItem());
         idItem->setData(Qt::DisplayRole, ++m_HighestID);
 
-        QScopedPointer<QTableWidgetItem> nameItem(new QTableWidgetItem(name));
-        QScopedPointer<QTableWidgetItem> parentIDItem(new QTableWidgetItem());
+        std::unique_ptr<QTableWidgetItem> nameItem(new QTableWidgetItem(name));
+        std::unique_ptr<QTableWidgetItem> parentIDItem(new QTableWidgetItem());
         parentIDItem->setData(Qt::DisplayRole, 0);  // No parent
 
-        table->setItem(row, 0, idItem.take());
-        table->setItem(row, 1, nameItem.take());
-        table->setItem(row, 2, parentIDItem.take());
+        table->setItem(row, 0, idItem.release());
+        table->setItem(row, 1, nameItem.release());
+        table->setItem(row, 2, parentIDItem.release());
 
         if (importDialog.assign()) {
-          table->setItem(row, 3, nexusCatItem.take());
+          table->setItem(row, 3, nexusCatItem.release());
         }
       } else {
         for (auto item : table->findItems(name, Qt::MatchContains | Qt::MatchWrap)) {
           if (item->column() == 1 && item->text() == name && importDialog.remap()) {
-            table->setItem(item->row(), 3, nexusCatItem.take());
+            table->setItem(item->row(), 3, nexusCatItem.release());
           } else if (importDialog.remap()) {
             QScopedPointer<QTableWidgetItem> blankItem(new QTableWidgetItem());
             blankItem->setData(Qt::UserRole, QVariantList());
@@ -362,10 +362,10 @@ void CategoriesDialog::nxmGameInfoAvailable(QString gameName, QVariant,
   list->clear();
   for (const auto& category : categories) {
     auto catMap = category.toMap();
-    QScopedPointer<QListWidgetItem> nexusItem(new QListWidgetItem());
+    std::unique_ptr<QListWidgetItem> nexusItem(new QListWidgetItem());
     nexusItem->setData(Qt::DisplayRole, catMap[u"name"_s].toString());
     nexusItem->setData(Qt::UserRole, catMap[u"category_id"_s].toInt());
-    list->addItem(nexusItem.take());
+    list->addItem(nexusItem.release());
   }
 }
 

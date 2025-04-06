@@ -666,7 +666,7 @@ void ModList::changeModPriority(std::vector<int> sourceIndices, int newPriority)
 
   // sort the moving mods by ascending priorities
   std::sort(sourceIndices.begin(), sourceIndices.end(),
-            [=](const int& LHS, const int& RHS) {
+            [=, this](const int& LHS, const int& RHS) {
               return m_Profile->getModPriority(LHS) > m_Profile->getModPriority(RHS);
             });
 
@@ -682,7 +682,7 @@ void ModList::changeModPriority(std::vector<int> sourceIndices, int newPriority)
 
   // sort the moving mods by descending priorities
   std::sort(sourceIndices.begin(), sourceIndices.end(),
-            [=](const int& LHS, const int& RHS) {
+            [=, this](const int& LHS, const int& RHS) {
               return m_Profile->getModPriority(LHS) < m_Profile->getModPriority(RHS);
             });
 
@@ -1351,7 +1351,7 @@ void ModList::shiftModsPriority(const QModelIndexList& indices, int offset)
     auto index = idx.data(IndexRole).toInt();
     allIndex.push_back(index);
   }
-  std::sort(allIndex.begin(), allIndex.end(), [=](int lhs, int rhs) {
+  std::sort(allIndex.begin(), allIndex.end(), [=, this](int lhs, int rhs) {
     bool cmp = m_Profile->getModPriority(lhs) < m_Profile->getModPriority(rhs);
     return offset > 0 ? !cmp : cmp;
   });

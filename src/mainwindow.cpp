@@ -492,25 +492,25 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
   m_Tutorial.expose(u"espList"_s, m_OrganizerCore.pluginList());
 
   m_OrganizerCore.setUserInterface(this);
-  connect(m_OrganizerCore.modList(), &ModList::showMessage, [=](auto&& message) {
+  connect(m_OrganizerCore.modList(), &ModList::showMessage, [=, this](auto&& message) {
     showMessage(message);
   });
   connect(m_OrganizerCore.modList(), &ModList::modRenamed,
-          [=](auto&& oldName, auto&& newName) {
+          [=, this](auto&& oldName, auto&& newName) {
             modRenamed(oldName, newName);
           });
-  connect(m_OrganizerCore.modList(), &ModList::modUninstalled, [=](auto&& name) {
+  connect(m_OrganizerCore.modList(), &ModList::modUninstalled, [=, this](auto&& name) {
     modRemoved(name);
   });
-  connect(m_OrganizerCore.modList(), &ModList::fileMoved, [=](auto&&... args) {
+  connect(m_OrganizerCore.modList(), &ModList::fileMoved, [=, this](auto&&... args) {
     fileMoved(args...);
   });
   connect(m_OrganizerCore.installationManager(), &InstallationManager::modReplaced,
-          [=](auto&& name) {
+          [=, this](auto&& name) {
             modRemoved(name);
           });
   connect(m_OrganizerCore.downloadManager(), &DownloadManager::showMessage,
-          [=](auto&& message) {
+          [=, this](auto&& message) {
             showMessage(message);
           });
   for (const QString& fileName : m_PluginContainer.pluginFileNames()) {
@@ -549,7 +549,7 @@ void MainWindow::setupModList()
 {
   ui->modList->setup(m_OrganizerCore, m_CategoryFactory, this, ui);
 
-  connect(&ui->modList->actions(), &ModListViewActions::overwriteCleared, [=]() {
+  connect(&ui->modList->actions(), &ModListViewActions::overwriteCleared, [=, this]() {
     scheduleCheckForProblems();
   });
   connect(&ui->modList->actions(), &ModListViewActions::originModified, this,
@@ -2662,7 +2662,7 @@ QMenu* MainWindow::openFolderMenu()
   FolderMenu->addAction(tr("Open MO2 Plugins folder"), this, SLOT(openPluginsFolder()));
   FolderMenu->addAction(tr("Open MO2 Stylesheets folder"), this,
                         SLOT(openStylesheetsFolder()));
-  FolderMenu->addAction(tr("Open MO2 Logs folder"), [=] {
+  FolderMenu->addAction(tr("Open MO2 Logs folder"), [=, this] {
     ui->logList->openLogsFolder();
   });
 
@@ -3372,8 +3372,8 @@ void MainWindow::nxmModInfoAvailable(QString gameName, int modID, QVariant userD
     }
 
     mod->setLastNexusQuery(QDateTime::currentDateTimeUtc());
-    mod->setNexusLastModified(
-        QDateTime::fromSecsSinceEpoch(result["updated_timestamp"].toInt(), Qt::UTC));
+    mod->setNexusLastModified(QDateTime::fromSecsSinceEpoch(
+        result["updated_timestamp"].toInt(), QTimeZone::utc()));
 
     m_OrganizerCore.modList()->notifyChange(ModInfo::getIndex(mod->name()));
   }
@@ -3643,7 +3643,7 @@ void MainWindow::extractBSATriggered(QTreeWidgetItem* item)
 void MainWindow::on_bsaList_customContextMenuRequested(const QPoint& pos)
 {
   QMenu menu;
-  menu.addAction(tr("Extract..."), [=, item = ui->bsaList->itemAt(pos)]() {
+  menu.addAction(tr("Extract..."), [=, this, item = ui->bsaList->itemAt(pos)]() {
     extractBSATriggered(item);
   });
 

@@ -108,7 +108,7 @@ QList<RowData> QtGroupingProxy::belongsTo(const QModelIndex& idx)
     int role         = i.key();
     QVariant variant = i.value();
 
-    if (variant.type() == QVariant::List) {
+    if (variant.typeId() == QVariant::List) {
       // a list of variants get's expanded to multiple rows
       QVariantList list = variant.toList();
       for (int i = 0; i < list.length(); i++) {
@@ -358,8 +358,8 @@ int QtGroupingProxy::columnCount(const QModelIndex& index) const
 
 static bool variantLess(const QVariant& LHS, const QVariant& RHS)
 {
-  if ((LHS.type() == RHS.type()) &&
-      ((LHS.type() == QVariant::Int) || (LHS.type() == QVariant::UInt))) {
+  if ((LHS.typeId() == RHS.typeId()) &&
+      ((LHS.typeId() == QVariant::Int) || (LHS.typeId() == QVariant::UInt))) {
     return LHS.toInt() < RHS.toInt();
   }
 

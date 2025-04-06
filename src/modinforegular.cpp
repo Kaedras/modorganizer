@@ -362,9 +362,9 @@ void ModInfoRegular::nxmDescriptionAvailable(QString, int, QVariant,
     else
       setEndorsedState(EndorsedState::ENDORSED_FALSE);
   }
-  m_LastNexusQuery = QDateTime::currentDateTimeUtc();
-  m_NexusLastModified =
-      QDateTime::fromSecsSinceEpoch(result[u"updated_timestamp"_s].toInt(), Qt::UTC);
+  m_LastNexusQuery    = QDateTime::currentDateTimeUtc();
+  m_NexusLastModified = QDateTime::fromSecsSinceEpoch(
+      result[u"updated_timestamp"_s].toInt(), QTimeZone::utc());
   m_MetaInfoChanged = true;
   saveMeta();
   disconnect(sender(), SIGNAL(descriptionAvailable(QString, int, QVariant, QVariant)));

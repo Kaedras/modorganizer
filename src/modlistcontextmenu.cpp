@@ -21,7 +21,7 @@ ModListGlobalContextMenu::ModListGlobalContextMenu(OrganizerCore& core,
                                                    QWidget* parent)
     : QMenu(parent)
 {
-  connect(this, &QMenu::aboutToShow, [=, &core] {
+  connect(this, &QMenu::aboutToShow, [=, &core, this] {
     populate(core, view, index);
   });
 }
@@ -150,7 +150,7 @@ bool ModListChangeCategoryMenu::populate(QMenu* menu, CategoryFactory* factory,
       }
 
       int id = factory->getCategoryID(i);
-      QScopedPointer<QCheckBox> checkBox(new QCheckBox(targetMenu));
+      std::unique_ptr<QCheckBox> checkBox(new QCheckBox(targetMenu));
       bool enabled = categories.find(id) != categories.end();
       checkBox->setText(factory->getCategoryName(i).replace('&', u"&&"_s));
       if (enabled) {
@@ -158,10 +158,10 @@ bool ModListChangeCategoryMenu::populate(QMenu* menu, CategoryFactory* factory,
       }
       checkBox->setChecked(enabled);
 
-      QScopedPointer<QWidgetAction> checkableAction(new QWidgetAction(targetMenu));
-      checkableAction->setDefaultWidget(checkBox.take());
+      std::unique_ptr<QWidgetAction> checkableAction(new QWidgetAction(targetMenu));
+      checkableAction->setDefaultWidget(checkBox.release());
       checkableAction->setData(id);
-      targetMenu->addAction(checkableAction.take());
+      targetMenu->addAction(checkableAction.release());
 
       if (factory->hasChildren(i)) {
         if (populate(targetMenu, factory, mod, factory->getCategoryID(i)) || enabled) {
@@ -177,7 +177,7 @@ ModListPrimaryCategoryMenu::ModListPrimaryCategoryMenu(CategoryFactory* categori
                                                        ModInfo::Ptr mod, QMenu* parent)
     : QMenu(tr("Primary Category"), parent)
 {
-  connect(this, &QMenu::aboutToShow, [=]() {
+  connect(this, &QMenu::aboutToShow, [=, this]() {
     populate(categories, mod);
   });
 }
@@ -243,7 +243,7 @@ ModListContextMenu::ModListContextMenu(const QModelIndex& index, OrganizerCore& 
     bool expanded = view->isExpanded(viewIndex);
     addSeparator();
     addAction(tr("Collapse all"), view, &QTreeView::collapseAll);
-    addAction(tr("Collapse others"), [=]() {
+    addAction(tr("Collapse others"), [=, this]() {
       m_view->collapseAll();
       m_view->setExpanded(viewIndex, expanded);
     });
@@ -267,7 +267,7 @@ ModListContextMenu::ModListContextMenu(const QModelIndex& index, OrganizerCore& 
 
   // add information for all except foreign
   if (!info->isForeign()) {
-    QAction* infoAction = addAction(tr("Information..."), [=]() {
+    QAction* infoAction = addAction(tr("Information..."), [=, this]() {
       view->actions().displayModInformation(m_index.data(ModList::IndexRole).toInt());
     });
     setDefaultAction(infoAction);
@@ -342,14 +342,14 @@ void ModListContextMenu::addCategoryContextMenus(ModInfo::Ptr mod)
 {
   ModListChangeCategoryMenu* categoriesMenu =
       new ModListChangeCategoryMenu(m_categories, mod, this);
-  connect(categoriesMenu, &QMenu::aboutToHide, [=]() {
+  connect(categoriesMenu, &QMenu::aboutToHide, [=, this]() {
     m_actions.setCategories(m_selected, m_index, categoriesMenu->categories());
   });
   addMenuAsPushButton(categoriesMenu);
 
   ModListPrimaryCategoryMenu* primaryCategoryMenu =
       new ModListPrimaryCategoryMenu(m_categories, mod, this);
-  connect(primaryCategoryMenu, &QMenu::aboutToHide, [=]() {
+  connect(primaryCategoryMenu, &QMenu::aboutToHide, [=, this]() {
     int category = primaryCategoryMenu->primaryCategory();
     if (category != -1) {
       m_actions.setPrimaryCategory(m_selected, category);
@@ -361,20 +361,20 @@ void ModListContextMenu::addCategoryContextMenus(ModInfo::Ptr mod)
 void ModListContextMenu::addOverwriteActions(ModInfo::Ptr mod)
 {
   if (QDir(mod->absolutePath()).count() > 2) {
-    addAction(tr("Sync to Mods..."), [=]() {
+    addAction(tr("Sync to Mods..."), [=, this]() {
       m_core.syncOverwrite();
     });
-    addAction(tr("Create Mod..."), [=]() {
+    addAction(tr("Create Mod..."), [=, this]() {
       m_actions.createModFromOverwrite();
     });
-    addAction(tr("Move content to Mod..."), [=]() {
+    addAction(tr("Move content to Mod..."), [=, this]() {
       m_actions.moveOverwriteContentToExistingMod();
     });
-    addAction(tr("Clear Overwrite..."), [=]() {
+    addAction(tr("Clear Overwrite..."), [=, this]() {
       m_actions.clearOverwrite();
     });
   }
-  addAction(tr("Open in Explorer"), [=]() {
+  addAction(tr("Open in Explorer"), [=, this]() {
     m_actions.openExplorer(m_selected);
   });
 }
@@ -384,10 +384,10 @@ void ModListContextMenu::addSeparatorActions(ModInfo::Ptr mod)
   addCategoryContextMenus(mod);
   addSeparator();
 
-  addAction(tr("Rename Separator..."), [=]() {
+  addAction(tr("Rename Separator..."), [=, this]() {
     m_actions.renameMod(m_index);
   });
-  addAction(tr("Remove Separator..."), [=]() {
+  addAction(tr("Remove Separator..."), [=, this]() {
     m_actions.removeMods(m_selected);
   });
   addSeparator();
@@ -396,12 +396,12 @@ void ModListContextMenu::addSeparatorActions(ModInfo::Ptr mod)
     addSendToContextMenu();
     addSeparator();
   }
-  addAction(tr("Select Color..."), [=]() {
+  addAction(tr("Select Color..."), [=, this]() {
     m_actions.setColor(m_selected, m_index);
   });
 
   if (mod->color().isValid()) {
-    addAction(tr("Reset Color"), [=]() {
+    addAction(tr("Reset Color"), [=, this]() {
       m_actions.resetColor(m_selected);
     });
   }
@@ -419,39 +419,39 @@ void ModListContextMenu::addForeignActions(ModInfo::Ptr mod)
 void ModListContextMenu::addBackupActions(ModInfo::Ptr mod)
 {
   auto flags = mod->getFlags();
-  addAction(tr("Restore Backup"), [=]() {
+  addAction(tr("Restore Backup"), [=, this]() {
     m_actions.restoreBackup(m_index);
   });
-  addAction(tr("Remove Backup..."), [=]() {
+  addAction(tr("Remove Backup..."), [=, this]() {
     m_actions.removeMods(m_selected);
   });
   addSeparator();
   if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_INVALID) != flags.end()) {
-    addAction(tr("Ignore missing data"), [=]() {
+    addAction(tr("Ignore missing data"), [=, this]() {
       m_actions.ignoreMissingData(m_selected);
     });
   }
   if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_ALTERNATE_GAME) !=
       flags.end()) {
-    addAction(tr("Mark as converted/working"), [=]() {
+    addAction(tr("Mark as converted/working"), [=, this]() {
       m_actions.markConverted(m_selected);
     });
   }
   addSeparator();
   if (mod->nexusId() > 0) {
-    addAction(tr("Visit on Nexus"), [=]() {
+    addAction(tr("Visit on Nexus"), [=, this]() {
       m_actions.visitOnNexus(m_selected);
     });
   }
 
   const auto url = mod->parseCustomURL();
   if (url.isValid()) {
-    addAction(tr("Visit on %1").arg(url.host()), [=]() {
+    addAction(tr("Visit on %1").arg(url.host()), [=, this]() {
       m_actions.visitWebPage(m_selected);
     });
   }
 
-  addAction(tr("Open in Explorer"), [=]() {
+  addAction(tr("Open in Explorer"), [=, this]() {
     m_actions.openExplorer(m_selected);
   });
 }
@@ -464,32 +464,32 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   addSeparator();
 
   if (mod->downgradeAvailable()) {
-    addAction(tr("Change versioning scheme"), [=]() {
+    addAction(tr("Change versioning scheme"), [=, this]() {
       m_actions.changeVersioningScheme(m_index);
     });
   }
 
   if (mod->nexusId() > 0)
-    addAction(tr("Force-check updates"), [=]() {
+    addAction(tr("Force-check updates"), [=, this]() {
       m_actions.checkModsForUpdates(m_selected);
     });
   if (mod->updateIgnored()) {
-    addAction(tr("Un-ignore update"), [=]() {
+    addAction(tr("Un-ignore update"), [=, this]() {
       m_actions.setIgnoreUpdate(m_selected, false);
     });
   } else {
     if (mod->updateAvailable() || mod->downgradeAvailable()) {
-      addAction(tr("Ignore update"), [=]() {
+      addAction(tr("Ignore update"), [=, this]() {
         m_actions.setIgnoreUpdate(m_selected, true);
       });
     }
   }
   addSeparator();
 
-  addAction(tr("Enable selected"), [=]() {
+  addAction(tr("Enable selected"), [=, this]() {
     m_core.modList()->setActive(m_selected, true);
   });
-  addAction(tr("Disable selected"), [=]() {
+  addAction(tr("Disable selected"), [=, this]() {
     m_core.modList()->setActive(m_selected, false);
   });
 
@@ -500,22 +500,22 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
     addSeparator();
   }
 
-  addAction(tr("Rename Mod..."), [=]() {
+  addAction(tr("Rename Mod..."), [=, this]() {
     m_actions.renameMod(m_index);
   });
-  addAction(tr("Reinstall Mod"), [=]() {
+  addAction(tr("Reinstall Mod"), [=, this]() {
     m_actions.reinstallMod(m_index);
   });
-  addAction(tr("Remove Mod..."), [=]() {
+  addAction(tr("Remove Mod..."), [=, this]() {
     m_actions.removeMods(m_selected);
   });
-  addAction(tr("Create Backup"), [=]() {
+  addAction(tr("Create Backup"), [=, this]() {
     m_actions.createBackup(m_index);
   });
 
   if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_HIDDEN_FILES) !=
       flags.end()) {
-    addAction(tr("Restore hidden files"), [=]() {
+    addAction(tr("Restore hidden files"), [=, this]() {
       m_actions.restoreHiddenFiles(m_selected);
     });
   }
@@ -523,11 +523,11 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   addSeparator();
 
   if (m_index.column() == ModList::COL_NOTES) {
-    addAction(tr("Select Color..."), [=]() {
+    addAction(tr("Select Color..."), [=, this]() {
       m_actions.setColor(m_selected, m_index);
     });
     if (mod->color().isValid()) {
-      addAction(tr("Reset Color"), [=]() {
+      addAction(tr("Reset Color"), [=, this]() {
         m_actions.resetColor(m_selected);
       });
     }
@@ -537,20 +537,20 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   if (mod->nexusId() > 0 && Settings::instance().nexus().endorsementIntegration()) {
     switch (mod->endorsedState()) {
     case EndorsedState::ENDORSED_TRUE: {
-      addAction(tr("Un-Endorse"), [=]() {
+      addAction(tr("Un-Endorse"), [=, this]() {
         m_actions.setEndorsed(m_selected, false);
       });
     } break;
     case EndorsedState::ENDORSED_FALSE: {
-      addAction(tr("Endorse"), [=]() {
+      addAction(tr("Endorse"), [=, this]() {
         m_actions.setEndorsed(m_selected, true);
       });
-      addAction(tr("Won't endorse"), [=]() {
+      addAction(tr("Won't endorse"), [=, this]() {
         m_actions.willNotEndorsed(m_selected);
       });
     } break;
     case EndorsedState::ENDORSED_NEVER: {
-      addAction(tr("Endorse"), [=]() {
+      addAction(tr("Endorse"), [=, this]() {
         m_actions.setEndorsed(m_selected, true);
       });
     } break;
@@ -565,7 +565,7 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   if (mod->nexusId() > 0 &&
       (mod->getNexusCategory() > 0 || !mod->installationFile().isEmpty()) &&
       !mod->isSeparator()) {
-    addAction(tr("Remap Category (From Nexus)"), [=]() {
+    addAction(tr("Remap Category (From Nexus)"), [=, this]() {
       m_actions.remapCategory(m_selected);
     });
   }
@@ -573,12 +573,12 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   if (mod->nexusId() > 0 && Settings::instance().nexus().trackedIntegration()) {
     switch (mod->trackedState()) {
     case TrackedState::TRACKED_FALSE: {
-      addAction(tr("Start tracking"), [=]() {
+      addAction(tr("Start tracking"), [=, this]() {
         m_actions.setTracked(m_selected, true);
       });
     } break;
     case TrackedState::TRACKED_TRUE: {
-      addAction(tr("Stop tracking"), [=]() {
+      addAction(tr("Stop tracking"), [=, this]() {
         m_actions.setTracked(m_selected, false);
       });
     } break;
@@ -593,14 +593,14 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   addSeparator();
 
   if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_INVALID) != flags.end()) {
-    addAction(tr("Ignore missing data"), [=]() {
+    addAction(tr("Ignore missing data"), [=, this]() {
       m_actions.ignoreMissingData(m_selected);
     });
   }
 
   if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_ALTERNATE_GAME) !=
       flags.end()) {
-    addAction(tr("Mark as converted/working"), [=]() {
+    addAction(tr("Mark as converted/working"), [=, this]() {
       m_actions.markConverted(m_selected);
     });
   }
@@ -608,19 +608,19 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
   addSeparator();
 
   if (mod->nexusId() > 0) {
-    addAction(tr("Visit on Nexus"), [=]() {
+    addAction(tr("Visit on Nexus"), [=, this]() {
       m_actions.visitOnNexus(m_selected);
     });
   }
 
   const auto url = mod->parseCustomURL();
   if (url.isValid()) {
-    addAction(tr("Visit on %1").arg(url.host()), [=]() {
+    addAction(tr("Visit on %1").arg(url.host()), [=, this]() {
       m_actions.visitWebPage(m_selected);
     });
   }
 
-  addAction(tr("Open in Explorer"), [=]() {
+  addAction(tr("Open in Explorer"), [=, this]() {
     m_actions.openExplorer(m_selected);
   });
 }

@@ -204,7 +204,7 @@ void PluginListView::onSortButtonClicked()
   m_core->savePluginList();
 
   topLevelWidget()->setEnabled(false);
-  Guard g([=]() {
+  Guard g([=, this]() {
     topLevelWidget()->setEnabled(true);
   });
 
@@ -252,15 +252,15 @@ void PluginListView::setup(OrganizerCore& core, MainWindow* mw, Ui::MainWindow* 
   setItemDelegateForColumn(PluginList::COL_FLAGS, new GenericIconDelegate(this));
 
   // counter
-  connect(core.pluginList(), &PluginList::writePluginsList, [=] {
+  connect(core.pluginList(), &PluginList::writePluginsList, [=, this] {
     updatePluginCount();
   });
-  connect(core.pluginList(), &PluginList::esplist_changed, [=] {
+  connect(core.pluginList(), &PluginList::esplist_changed, [=, this] {
     updatePluginCount();
   });
 
   // sort
-  connect(mwui->sortButton, &QPushButton::clicked, [=] {
+  connect(mwui->sortButton, &QPushButton::clicked, [=, this] {
     onSortButtonClicked();
   });
 
@@ -270,7 +270,7 @@ void PluginListView::setup(OrganizerCore& core, MainWindow* mw, Ui::MainWindow* 
   connect(ui.filter, &QLineEdit::textChanged, this, &PluginListView::onFilterChanged);
 
   // highlight mod list when selected
-  connect(selectionModel(), &QItemSelectionModel::selectionChanged, [=] {
+  connect(selectionModel(), &QItemSelectionModel::selectionChanged, [=, this] {
     std::set<QString> mods;
     auto& directoryEntry = *m_core->directoryStructure();
     auto pluginIndices   = indexViewToModel(selectionModel()->selectedRows());
@@ -290,10 +290,10 @@ void PluginListView::setup(OrganizerCore& core, MainWindow* mw, Ui::MainWindow* 
   });
 
   // using a lambda here to avoid storing the mod list actions
-  connect(this, &QTreeView::customContextMenuRequested, [=](auto&& pos) {
+  connect(this, &QTreeView::customContextMenuRequested, [=, this](auto&& pos) {
     onCustomContextMenuRequested(pos);
   });
-  connect(this, &QTreeView::doubleClicked, [=](auto&& index) {
+  connect(this, &QTreeView::doubleClicked, [=, this](auto&& index) {
     onDoubleClicked(index);
   });
 }
@@ -302,9 +302,10 @@ void PluginListView::onCustomContextMenuRequested(const QPoint& pos)
 {
   try {
     PluginListContextMenu menu(indexViewToModel(indexAt(pos)), *m_core, this);
-    connect(&menu, &PluginListContextMenu::openModInformation, [=](auto&& modIndex) {
-      m_modActions->displayModInformation(modIndex);
-    });
+    connect(&menu, &PluginListContextMenu::openModInformation,
+            [=, this](auto&& modIndex) {
+              m_modActions->displayModInformation(modIndex);
+            });
     menu.exec(viewport()->mapToGlobal(pos));
   } catch (const std::exception& e) {
     reportError(tr("Exception: ").arg(e.what()));

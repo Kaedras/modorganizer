@@ -233,7 +233,7 @@ void ModListViewActions::checkModsForUpdates() const
   } else {
     QString apiKey;
     if (GlobalSettings::nexusApiKey(apiKey)) {
-      m_core.doAfterLogin([=]() {
+      m_core.doAfterLogin([=, this]() {
         checkModsForUpdates();
       });
       NexusInterface::instance().getAccessManager()->apiCheck(apiKey);
@@ -313,7 +313,7 @@ void ModListViewActions::checkModsForUpdates(
   } else {
     QString apiKey;
     if (GlobalSettings::nexusApiKey(apiKey)) {
-      m_core.doAfterLogin([=]() {
+      m_core.doAfterLogin([=, this]() {
         checkModsForUpdates(IDs);
       });
       NexusInterface::instance().getAccessManager()->apiCheck(apiKey);
@@ -558,7 +558,7 @@ void ModListViewActions::displayModInformation(ModInfo::Ptr modInfo,
       dialog->show();
       dialog->raise();
       dialog->activateWindow();
-      connect(dialog, &QDialog::finished, [=]() {
+      connect(dialog, &QDialog::finished, [=, this]() {
         m_core.modList()->modInfoChanged(modInfo);
         dialog->deleteLater();
         m_core.refreshDirectoryStructure();
@@ -572,7 +572,7 @@ void ModListViewActions::displayModInformation(ModInfo::Ptr modInfo,
     ModInfoDialog dialog(m_core, m_core.pluginContainer(), modInfo, m_view, m_parent);
     connect(&dialog, &ModInfoDialog::originModified, this,
             &ModListViewActions::originModified);
-    connect(&dialog, &ModInfoDialog::modChanged, [=](unsigned int index) {
+    connect(&dialog, &ModInfoDialog::modChanged, [=, this](unsigned int index) {
       auto idx = m_view->indexModelToView(m_core.modList()->index(index, 0));
       m_view->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect |
                                                 QItemSelectionModel::Rows);
@@ -717,7 +717,7 @@ void ModListViewActions::sendModsToFirstConflict(const QModelIndexList& indexes)
 
   std::set<int> priorities;
   std::transform(conflicts.begin(), conflicts.end(),
-                 std::inserter(priorities, priorities.end()), [=](auto index) {
+                 std::inserter(priorities, priorities.end()), [=, this](auto index) {
                    return m_core.currentProfile()->getModPriority(index);
                  });
 
@@ -741,7 +741,7 @@ void ModListViewActions::sendModsToLastConflict(const QModelIndexList& indexes) 
 
   std::set<int> priorities;
   std::transform(conflicts.begin(), conflicts.end(),
-                 std::inserter(priorities, priorities.end()), [=](auto index) {
+                 std::inserter(priorities, priorities.end()), [=, this](auto index) {
                    return m_core.currentProfile()->getModPriority(index);
                  });
 
@@ -1105,7 +1105,7 @@ void ModListViewActions::setTracked(const QModelIndexList& indices, bool tracked
 void ModListViewActions::setEndorsed(const QModelIndexList& indices,
                                      bool endorsed) const
 {
-  m_core.loggedInAction(m_parent, [=] {
+  m_core.loggedInAction(m_parent, [=, this] {
     if (indices.size() > 1) {
       MessageDialog::showMessage(
           tr("Endorsing multiple mods will take a while. Please wait..."), m_parent);
