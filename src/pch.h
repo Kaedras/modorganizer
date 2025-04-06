@@ -1,3 +1,6 @@
+#ifndef PCH_H
+#define PCH_H
+
 // std
 #include <algorithm>
 #include <assert.h>
@@ -268,3 +271,5 @@
 #include <QtGui/QtGui>
 #include <QtPlugin>
 #include <QtTest/QtTest>
+
+#endif  // PCH_H

@@ -1,3 +1,6 @@
+#ifndef MODINFODIALOGCONFLICTSMODELS_H
+#define MODINFODIALOGCONFLICTSMODELS_H
+
 #include "shared/fileentry.h"
 
 #include <QModelIndex>
@@ -117,3 +120,5 @@ class AdvancedConflictListModel : public ConflictListModel
 public:
   AdvancedConflictListModel(QTreeView* tree);
 };
+
+#endif  // MODINFODIALOGCONFLICTSMODELS_H
