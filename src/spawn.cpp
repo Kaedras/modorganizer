@@ -278,7 +278,7 @@ bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDire
 
     const auto c = dialogs::confirmStartSteam(parent, sp, details);
 
-    if (c == QDialogButtonBox::Yes) {
+    if (c == QMessageBox::Yes) {
       log::debug("user wants to start steam");
 
       if (!startSteam(parent)) {
@@ -292,7 +292,7 @@ bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDire
         log::error("steam is still not running, hoping for the best");
         return true;
       }
-    } else if (c == QDialogButtonBox::No) {
+    } else if (c == QMessageBox::No) {
       log::debug("user declined to start steam");
       return true;
     } else {
@@ -305,10 +305,10 @@ bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDire
     log::debug("steam is running but is not accessible, asking to restart MO");
     const auto c = dialogs::confirmRestartAsAdminForSteam(parent, sp);
 
-    if (c == QDialogButtonBox::Yes) {
+    if (c == QMessageBox::Yes) {
       restartAsAdmin(parent);
       return false;
-    } else if (c == QDialogButtonBox::No) {
+    } else if (c == QMessageBox::No) {
       log::debug("user declined to restart MO, continuing");
       return true;
     } else {
