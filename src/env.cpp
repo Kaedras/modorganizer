@@ -138,24 +138,28 @@ QString Environment::timezone() const
   };
 
   QString s;
-  const auto now      = QDateTime::currentDateTime();
-  const int utcOffset = timeZone.offsetFromUtc(now);
-  const int dstOffset =
-      now.isDaylightTime()
-          ? timeZone.daylightTimeOffset(now)
-          : timeZone.daylightTimeOffset(timeZone.nextTransition(now).atUtc);
+  const QDateTime now     = QDateTime::currentDateTime();
+  const int currentOffset = timeZone.offsetFromUtc(now);
+  const int otherOffset   = timeZone.offsetFromUtc(timeZone.nextTransition(now).atUtc);
 
-  const auto stdName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
-  const auto std     = QStringLiteral("%1, %2").arg(stdName, offsetString(utcOffset));
+  QString currentName, otherName;
+  if (timeZone.isDaylightTime(now)) {
+    currentName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
+    otherName   = timeZone.displayName(QTimeZone::TimeType::StandardTime);
+  } else {
+    currentName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
+    otherName   = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
+  }
 
-  const auto dstName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
-  const auto dst =
-      QStringLiteral("%1, %2").arg(dstName, offsetString(utcOffset + dstOffset));
+  const QString current =
+      QStringLiteral("%1, %2").arg(currentName, offsetString(currentOffset));
+  const QString other =
+      QStringLiteral("%1, %2").arg(otherName, offsetString(otherOffset));
 
   if (timeZone.isDaylightTime(now)) {
-    s = dst % u" (dst is active, std is "_s % std % ')';
+    s = current % u" (dst is active, std is "_s % other % ')';
   } else {
-    s = std % u" (std is active, dst is "_s % dst % ')';
+    s = current % u" (std is active, dst is "_s % other % ')';
   }
 
   return s;
