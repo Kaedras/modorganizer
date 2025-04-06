@@ -245,10 +245,10 @@ bool ModListByPriorityProxy::canDropMimeData(const QMimeData* data,
     int firstRowPriority = Profile::MaximumPriority;
     for (auto sourceRow : dropInfo.rows()) {
       hasSeparator = hasSeparator || ModInfo::getByIndex(sourceRow)->isSeparator();
-      if (m_sortOrder == Qt::AscendingOrder &&
-              m_profile->getModPriority(sourceRow) < firstRowPriority ||
-          m_sortOrder == Qt::DescendingOrder &&
-              m_profile->getModPriority(sourceRow) > firstRowPriority) {
+      if ((m_sortOrder == Qt::AscendingOrder &&
+           m_profile->getModPriority(sourceRow) < firstRowPriority) ||
+          (m_sortOrder == Qt::DescendingOrder &&
+           m_profile->getModPriority(sourceRow) > firstRowPriority)) {
         firstRowIndex    = sourceRow;
         firstRowPriority = m_profile->getModPriority(sourceRow);
       }
