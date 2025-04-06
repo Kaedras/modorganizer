@@ -17,7 +17,7 @@ inline QString GETENV(const char* varName)
   return qgetenv(varName);
 }
 // write, create file, fail if file is not created
-static inline constexpr int fileFlags =  O_WRONLY | O_CREAT | O_EXCL;
+static inline constexpr int fileFlags = O_WRONLY | O_CREAT | O_EXCL;
 // rw for user, group
 static inline constexpr int fileMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 #else
@@ -29,7 +29,7 @@ inline QString GETENV(const char* varName)
   return qEnvironmentVariable(varName);
 }
 // write, create file, fail if file is not created
-static inline constexpr int fileFlags =  _O_WRONLY | _O_CREAT | _O_EXCL;
+static inline constexpr int fileFlags = _O_WRONLY | _O_CREAT | _O_EXCL;
 // rw
 static inline constexpr int fileMode = _S_IREAD | _S_IWRITE;
 #endif
@@ -146,7 +146,7 @@ QString Environment::timezone() const
           : timeZone.daylightTimeOffset(timeZone.nextTransition(now).atUtc);
 
   const auto stdName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
-  const auto std = QStringLiteral("%1, %2").arg(stdName, offsetString(utcOffset));
+  const auto std     = QStringLiteral("%1, %2").arg(stdName, offsetString(utcOffset));
 
   const auto dstName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
   const auto dst =

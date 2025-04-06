@@ -81,8 +81,8 @@ void Profile::touchFile(QString fileName)
 
 Profile::Profile(const QString& name, IPluginGame const* gamePlugin,
                  GameFeatures const& gameFeatures, bool useDefaultSettings)
-    : m_GameFeatures(gameFeatures),
-      m_GamePlugin(gamePlugin), m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
+    : m_GameFeatures(gameFeatures), m_GamePlugin(gamePlugin),
+      m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
 {
   QString profilesDir = Settings::instance().paths().profiles();
   QDir profileBase(profilesDir);
@@ -144,9 +144,9 @@ Profile::Profile(const QDir& directory, IPluginGame const* gamePlugin,
 }
 
 Profile::Profile(const Profile& reference)
-    : m_Directory(reference.m_Directory),
-      m_GameFeatures(reference.m_GameFeatures),
-      m_GamePlugin(reference.m_GamePlugin), m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
+    : m_Directory(reference.m_Directory), m_GameFeatures(reference.m_GameFeatures),
+      m_GamePlugin(reference.m_GamePlugin),
+      m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
 
 {
   m_Settings = new QSettings(m_Directory.absoluteFilePath(u"settings.ini"_s),
