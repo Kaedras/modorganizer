@@ -12,6 +12,10 @@
     "boost-signals2",
     "boost-thread",
     "boost-uuid",
+    {
+      "name": "breakpad",
+      "platform": "linux"
+    },
     "spdlog",
     "lz4",
     "libbsarchpp",

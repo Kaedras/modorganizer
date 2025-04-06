@@ -17,15 +17,8 @@ using DWORD      = uint32_t;
 using SYSTEMTIME = timespec;
 using LPCWSTR    = const wchar_t*;
 
-// pidfd_open returns -1 on error
-static inline constexpr int INVALID_HANDLE_VALUE = -1;
 #define ERROR_ACCESS_DENIED EACCES
 #define ERROR_CANCELLED ECANCELED
-
-inline int GetLastError()
-{
-  return errno;
-}
 
 inline DWORD GetProcessId(HANDLE h)
 {

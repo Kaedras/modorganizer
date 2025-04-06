@@ -8,8 +8,15 @@
 #include "shared/util.h"
 #include "stub.h"
 #include <log.h>
-#include <sys/resource.h>
+#include <sys/prctl.h>
 #include <utility.h>
+
+// fixes an error message in breakpad
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+#include <client/linux/handler/exception_handler.h>
+#include <client/linux/minidump_writer/minidump_writer.h>
 
 using namespace std;
 using namespace Qt::StringLiterals;
@@ -18,6 +25,10 @@ namespace env
 {
 
 using namespace MOBase;
+
+extern DWORD findOtherPid();
+extern HandlePtr dumpFile(const QString& dir);
+extern QString dumpFileName(const QString& dir);
 
 Console::Console() : m_hasConsole(true), m_in(stdin), m_out(stdout), m_err(stderr) {}
 
@@ -38,45 +49,16 @@ std::optional<QString> getAssocString(const QFileInfo& file)
   // const auto ext = "."s + file.suffix().toStdString();
 }
 
-std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
-{
-  qsizetype exeBegin = 0;
-  qsizetype exeEnd   = -1;
-
-  if (cmd[0] == '"') {
-    // surrounded by double-quotes, so find the next one
-    exeBegin = 1;
-    exeEnd   = cmd.indexOf('"', exeBegin);
-
-    if (exeEnd == -1) {
-      log::error("missing terminating double-quote in command line '{}'", cmd);
-      return {};
-    }
-  } else {
-    // no double-quotes, find the first whitespace
-    static const QRegularExpression regex("\\s");
-    exeEnd = cmd.indexOf(regex);
-    if (exeEnd == -1) {
-      exeEnd = cmd.size();
-    }
-  }
-
-  QString exe  = cmd.mid(exeBegin, exeEnd - exeBegin).trimmed();
-  QString args = cmd.mid(exeEnd + 1).trimmed();
-
-  return {std::move(exe), std::move(args)};
-}
-
 // returns the filename of the given process or the current one
 //
-QString processPath(HANDLE process = ::INVALID_HANDLE_VALUE)
+QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
 {
   if (process == 0) {
     return {};
   }
 
   pid_t pid;
-  if (process == ::INVALID_HANDLE_VALUE) {
+  if (process == INVALID_HANDLE_VALUE) {
     pid = getpid();
   } else {
     pid = pidfd_getpid(process);
@@ -87,16 +69,6 @@ QString processPath(HANDLE process = ::INVALID_HANDLE_VALUE)
 
   std::filesystem::path exe("/proc/" + std::to_string(pid) + "/exe");
   return QString::fromStdString(read_symlink(exe));
-}
-
-QString processFilename(HANDLE process = ::INVALID_HANDLE_VALUE)
-{
-  const auto p = processPath(process);
-  if (p.isEmpty()) {
-    return {};
-  }
-
-  return QFileInfo(p).fileName();
 }
 
 Association getAssociation(const QFileInfo& targetInfo)
@@ -113,37 +85,52 @@ bool registryValueExists([[maybe_unused]] const QString& key,
 
 void deleteRegistryKeyIfEmpty([[maybe_unused]] const QString& name) {}
 
-bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
+bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
 {
-  // check if gcore is available
-  if (QStandardPaths::findExecutable(u"gcore"_s).isEmpty()) {
+  string dumpPath;
+
+  HandlePtr file = dumpFile(dir);
+  if (!file) {
+    std::cerr << "nowhere to write the dump file\n";
     return false;
   }
 
-  // set core limit to enable core dumps
-  rlimit core_limits{RLIM_INFINITY, RLIM_INFINITY};
-  setrlimit(RLIMIT_CORE, &core_limits);
+  using namespace google_breakpad;
 
-  std::unique_ptr<QProcess> p = std::make_unique<QProcess>();
-  p->setProgram(u"gcore"_s);
-  p->setArguments({u"-d"_s, dir});
-  p->start();
-
-  bool result = p->waitForFinished();
-
-  // todo: compress core dump
-
-  // reset limits
-  core_limits = {0, 0};
-  setrlimit(RLIMIT_CORE, &core_limits);
+  ExceptionHandler::CrashContext blob{{}, process};
+  bool result = WriteMinidump(file.get(), process, &blob, sizeof(blob));
+  if (!result) {
+    const int e = errno;
+    cerr << "Error creating minidump, " << strerror(e) << "\n";
+  }
 
   return result;
 }
 
+bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
+{
+  pid_t target = pidfd_getpid(process);
+  if (target == -1) {
+    const int e = errno;
+    cerr << "Error getting pid from pidfd, " << strerror(e) << "\n";
+    return false;
+  }
+
+  return createMiniDumpForPid(dir, target, type);
+}
+
 bool coredumpOther(CoreDumpTypes type)
 {
-  STUB();
-  return {};
+  std::cout << "creating minidump for a running process\n";
+  const pid_t pid = findOtherPid();
+  if (pid == 0) {
+    std::cerr << "no other process found\n";
+    return false;
+  }
+
+  std::cout << "found other process with pid " << pid << "\n";
+
+  return createMiniDumpForPid(nullptr, pid, type);
 }
 
 }  // namespace env

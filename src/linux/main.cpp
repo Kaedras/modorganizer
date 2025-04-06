@@ -10,45 +10,55 @@
 #include <log.h>
 #include <report.h>
 #include <sys/prctl.h>
-#include <sys/resource.h>
+
+// fixes an error message in breakpad
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+
+#include <client/linux/handler/exception_handler.h>
 
 using namespace MOBase;
+using namespace std;
+namespace fs = std::filesystem;
 
-// 1 GiB limit, compressed size will be much lower
-static constexpr rlim_t coreDumpSizeLimit = 1024 * 1024 * 1024;
-// anonymous private mappings
-static constexpr int coreDumpFilter = 0b000'0001;
+namespace env
+{
+extern HandlePtr dumpFile(const QString& dir);
+}  // namespace env
+
+static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
+                         void* context, bool succeeded)
+{
+  if (succeeded) {
+    std::cout << "Dump path: " << descriptor.path() << "\n";
+    auto h = env::dumpFile(OrganizerCore::getGlobalCoreDumpPath());
+
+    // get filename from fd
+    error_code ec;
+    fs::path filename = fs::read_symlink("/proc/self/fd/" + to_string(h.get()), ec);
+    if (ec) {
+      cerr << "Error getting filename from fd, " << ec.message() << "\n";
+      return succeeded;
+    }
+
+    // rename file
+    fs::rename(descriptor.path(), filename, ec);
+    if (ec) {
+      cerr << "Error renaming minidump, " << ec.message() << "\n";
+      return succeeded;
+    }
+
+    cout << "Renamed minidump to " << filename << "\n";
+  } else {
+    cerr << "Error creating minidump\n";
+  }
+  return succeeded;
+}
 
 thread_local std::terminate_handler g_prevTerminateHandler = nullptr;
 
 int run(int argc, char* argv[]);
-
-void initCoredumps()
-{
-  // let the kernel handle core dumps for now
-
-  // set core dump limit to enable crash dumps
-  // currently the produced core dump will be ~600 MiB, bz2 compression reduces the size
-  // to ~15 MiB
-  rlimit core_limits{coreDumpSizeLimit, coreDumpSizeLimit};
-  setrlimit(RLIMIT_CORE, &core_limits);
-
-  // set core dump filter
-  std::ofstream filter("/proc/self/coredump_filter");
-  if (filter.is_open()) {
-    filter << coreDumpFilter << std::endl;
-    filter.close();
-  } else {
-    const int e = errno;
-    log::error("Error writing coredump_filter, {}. Kernel may not be built with "
-               "CONFIG_ELF_CORE.",
-               strerror(e));
-  }
-
-  // todo: clean up old crash dumps, move them into crashDumps folder
-
-  // todo: test with systemd (coredumpctl)
-}
 
 int main(int argc, char* argv[])
 {
@@ -60,7 +70,15 @@ int main(int argc, char* argv[])
 int run(int argc, char* argv[])
 {
   MOShared::SetThisThreadName("main");
-  // setExceptionHandlers();
+  google_breakpad::MinidumpDescriptor descriptor(".");
+  google_breakpad::ExceptionHandler eh(descriptor, nullptr, dumpCallback, nullptr, true,
+                                       -1);
+
+  // allow ptrace from any process, required for crashdump command
+  if (prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY) == -1) {
+    const int e = errno;
+    log::warn("Error in prctl(PR_SET_PTRACER), {}", strerror(e));
+  }
 
   cl::CommandLine cl;
 
@@ -73,8 +91,6 @@ int run(int argc, char* argv[])
   }
 
   initLogging();
-
-  initCoredumps();
 
   // must be after logging
   TimeThis tt("main() multiprocess");
@@ -156,6 +172,13 @@ int run(int argc, char* argv[])
         }
       }
 
+      // value should exist by now
+      string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
+      if (!path.empty()) {
+        descriptor = google_breakpad::MinidumpDescriptor(path);
+        eh.set_minidump_descriptor(descriptor);
+      }
+
       // check if the command line wants to run something right now
       if (auto r = cl.runPostOrganizer(app.core())) {
         return *r;
@@ -182,32 +205,4 @@ int run(int argc, char* argv[])
   }
 }
 
-void onTerminate() noexcept
-{
-  const auto path = OrganizerCore::getGlobalCoreDumpPath();
-  const auto type = OrganizerCore::getGlobalCoreDumpType();
-
-  const auto r = env::coredump(path.isEmpty() ? QString() : path, type);
-
-  if (r) {
-    log::error("ModOrganizer has crashed, core dump created.");
-  } else {
-    log::error("ModOrganizer has crashed, core dump failed");
-  }
-  try {
-    throw;
-  } catch (const std::exception& e) {
-    log::error(e.what());
-  } catch (...) {
-  }
-}
-
-void setExceptionHandlers()
-{
-  if (g_prevTerminateHandler) {
-    // already called
-    return;
-  }
-
-  g_prevTerminateHandler = std::set_terminate(onTerminate);
-}
+void setExceptionHandlers() {}

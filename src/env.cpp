@@ -4,7 +4,6 @@
 #include "envmodule.h"
 #include "envos.h"
 #include "envsecurity.h"
-#include "envshortcut.h"
 #include "settings.h"
 #include "shared/util.h"
 #include <log.h>
@@ -17,13 +16,22 @@ inline QString GETENV(const char* varName)
 {
   return qgetenv(varName);
 }
+// write, create file, fail if file is not created
+static inline constexpr int fileFlags =  O_WRONLY | O_CREAT | O_EXCL;
+// rw for user, group
+static inline constexpr int fileMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 #else
+#pragma warning(disable : 4996)
 static inline const QString defaultName = QStringLiteral("ModOrganizer.exe");
 static inline const char pathSeparator  = ';';
 inline QString GETENV(const char* varName)
 {
   return qEnvironmentVariable(varName);
 }
+// write, create file, fail if file is not created
+static inline constexpr int fileFlags =  _O_WRONLY | _O_CREAT | _O_EXCL;
+// rw
+static inline constexpr int fileMode = _S_IREAD | _S_IWRITE;
 #endif
 
 using namespace Qt::StringLiterals;
@@ -31,11 +39,10 @@ using namespace Qt::StringLiterals;
 namespace env
 {
 
-extern QString processPath(HANDLE process = INVALID_HANDLE_VALUE);
-extern QString processFilename(HANDLE process = INVALID_HANDLE_VALUE);
-extern bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
-
 using namespace MOBase;
+
+extern QString processPath(HANDLE process = INVALID_HANDLE_VALUE);
+extern bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type);
 
 ModuleNotification::ModuleNotification(QObject* o, std::function<void(Module)> f)
     : m_cookie(nullptr), m_object(o), m_f(std::move(f))
@@ -345,9 +352,48 @@ QString toString(Service::Status st)
   }
 }
 
+std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
+{
+  qsizetype exeBegin = 0;
+  qsizetype exeEnd   = -1;
+
+  if (cmd[0] == '"') {
+    // surrounded by double-quotes, so find the next one
+    exeBegin = 1;
+    exeEnd   = cmd.indexOf('"', exeBegin);
+
+    if (exeEnd == -1) {
+      log::error("missing terminating double-quote in command line '{}'", cmd);
+      return {};
+    }
+  } else {
+    // no double-quotes, find the first whitespace
+    static const QRegularExpression regex("\\s");
+    exeEnd = cmd.indexOf(regex);
+    if (exeEnd == -1) {
+      exeEnd = cmd.size();
+    }
+  }
+
+  QString exe  = cmd.mid(exeBegin, exeEnd - exeBegin).trimmed();
+  QString args = cmd.mid(exeEnd + 1).trimmed();
+
+  return {std::move(exe), std::move(args)};
+}
+
 QString thisProcessPath()
 {
   return processPath();
+}
+
+QString processFilename(HANDLE process = INVALID_HANDLE_VALUE)
+{
+  const auto p = processPath(process);
+  if (p.isEmpty()) {
+    return {};
+  }
+
+  return QFileInfo(p).fileName();
 }
 
 DWORD findOtherPid()
@@ -393,22 +439,90 @@ DWORD findOtherPid()
 
 QString tempDir()
 {
-  return QStandardPaths::standardLocations(QStandardPaths::TempLocation).first();
+  return std::move(
+      QStandardPaths::standardLocations(QStandardPaths::TempLocation).first());
 }
 
-std::wstring safeVersion()
+QString safeVersion()
 {
   try {
     // this can throw
-    return MOShared::createVersionInfo().string().toStdWString() + L"-";
+    return MOShared::createVersionInfo().string() % u"-"_s;
   } catch (...) {
     return {};
   }
 }
 
-HandlePtr tempFile(const QString& dir);
+int tempFile(const QString& dir)
+{
+  // maximum tries of incrementing the counter
+  const int MaxTries = 100;
 
-HandlePtr dumpFile(const QString& dir);
+  // UTC time and date will be in the filename
+  const QDateTime time = QDateTime::currentDateTimeUtc();
+
+  // "ModOrganizer-YYYYMMDDThhmmss.dmp", with a possible "-i" appended, where
+  // i can go until MaxTries
+  const QString prefix =
+      u"ModOrganizer-"_s % safeVersion() % time.toString(u"yyyyMMddThhmmss"_s);
+  const QString ext = u".dmp"_s;
+
+  // first path to try, without counter in it
+  QString path = dir % "/" % prefix % ext;
+
+  for (int i = 0; i < MaxTries; ++i) {
+    std::cout << "trying file '" << path.toStdString() << "'\n";
+
+    if (!QFile::exists(path)) {
+      int fd = open(path.toStdString().c_str(), fileFlags, fileMode);
+      if (fd == INVALID_HANDLE_VALUE) {
+        const auto e = GetLastError();
+        // probably no write access
+        std::cerr << "failed to create dump file, " << formatSystemMessage(e) << "\n";
+
+        return INVALID_HANDLE_VALUE;
+      }
+      std::cout << "using file '" << path.toStdString() << "'\n";
+      return fd;
+    }
+    // try again with "-i"
+    path = dir % u"/"_s % prefix % u"-"_s % QString::number(i + 1) % ext;
+  }
+
+  std::cerr << "can't create dump file, ran out of filenames\n";
+  return {};
+}
+
+HandlePtr dumpFile(const QString& dir)
+{
+  // try the given directory, if any
+  if (!dir.isEmpty()) {
+    int fd = tempFile(dir);
+    if (fd != INVALID_HANDLE_VALUE) {
+      return HandlePtr(fd);
+    }
+  }
+
+  // try the current directory
+  int fd = tempFile(u"."_s);
+  if (fd != INVALID_HANDLE_VALUE) {
+    return HandlePtr(fd);
+  }
+
+  std::clog << "cannot write dump file in current directory\n";
+
+  // try the temp directory
+  const auto temp = tempDir();
+
+  if (!temp.isEmpty()) {
+    fd = tempFile(temp);
+    if (fd != INVALID_HANDLE_VALUE) {
+      return HandlePtr(fd);
+    }
+  }
+
+  return {};
+}
 
 CoreDumpTypes coreDumpTypeFromString(const std::string& s)
 {

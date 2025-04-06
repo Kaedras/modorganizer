@@ -9,6 +9,7 @@ else ()
     pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
     pkg_check_modules(LIBFLATPAK REQUIRED flatpak)
     find_package(mo2-overlayfs CONFIG REQUIRED)
+    find_package(unofficial-breakpad CONFIG REQUIRED)
 endif ()
 
 find_package(directx-headers CONFIG REQUIRED)
@@ -70,6 +71,7 @@ set(PRIVATE_UNIX_LIBS
         mo2::overlayfs
         ${LIBSECRET_LIBRARIES}
         ${LIBFLATPAK_LIBRARIES}
+        unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
 )
 
 if (UNIX)

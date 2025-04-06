@@ -404,34 +404,6 @@ QString formatCommandLine(const QFileInfo& targetInfo, const QString& cmd)
   return s.trimmed();
 }
 
-std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
-{
-  int exeBegin = 0;
-  int exeEnd   = -1;
-
-  if (cmd[0] == '"') {
-    // surrounded by double-quotes, so find the next one
-    exeBegin = 1;
-    exeEnd   = cmd.indexOf('"', exeBegin);
-
-    if (exeEnd == -1) {
-      log::error("missing terminating double-quote in command line '{}'", cmd);
-      return {};
-    }
-  } else {
-    // no double-quotes, find the first whitespace
-    exeEnd = cmd.indexOf(QRegularExpression("\\s"));
-    if (exeEnd == -1) {
-      exeEnd = cmd.size();
-    }
-  }
-
-  QString exe  = cmd.mid(exeBegin, exeEnd - exeBegin).trimmed();
-  QString args = cmd.mid(exeEnd + 1).trimmed();
-
-  return {std::move(exe), std::move(args)};
-}
-
 Association getAssociation(const QFileInfo& targetInfo)
 {
   log::debug("getting association for '{}', extension is '.{}'",
@@ -621,7 +593,7 @@ bool registryValueExists(const QString& keyName, const QString& valueName)
 
 // returns the filename of the given process or the current one
 //
-std::filesystem::path processPath(HANDLE process = INVALID_HANDLE_VALUE)
+QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
 {
   // double the buffer size 10 times
   const int MaxTries = 10;
@@ -654,9 +626,8 @@ std::filesystem::path processPath(HANDLE process = INVALID_HANDLE_VALUE)
       // if GetModuleFileName() works, `writtenSize` does not include the null
       // terminator
       const std::wstring s(buffer.get(), writtenSize);
-      const std::filesystem::path path(s);
 
-      return path;
+      return QString::fromStdWString(s);
     }
   }
 
@@ -670,109 +641,6 @@ std::filesystem::path processPath(HANDLE process = INVALID_HANDLE_VALUE)
   }
 
   std::wcerr << L"failed to get filename for " << what << L"\n";
-  return {};
-}
-
-std::wstring processFilename(HANDLE process = INVALID_HANDLE_VALUE)
-{
-  const auto p = processPath(process);
-  if (p.empty()) {
-    return {};
-  }
-
-  return p.filename().native();
-}
-
-std::wstring processFilename(HANDLE process = INVALID_HANDLE_VALUE)
-{
-  const auto p = processPath(process);
-  if (p.empty()) {
-    return {};
-  }
-
-  return p.filename().native();
-}
-
-HandlePtr tempFile(const std::wstring dir)
-{
-  // maximum tries of incrementing the counter
-  const int MaxTries = 100;
-
-  // UTC time and date will be in the filename
-  const auto now = std::time(0);
-  const auto tm  = std::gmtime(&now);
-
-  // "ModOrganizer-YYYYMMDDThhmmss.dmp", with a possible "-i" appended, where
-  // i can go until MaxTries
-  std::wostringstream oss;
-  oss << L"ModOrganizer-" << safeVersion() << std::setw(4) << (1900 + tm->tm_year)
-      << std::setw(2) << std::setfill(L'0') << (tm->tm_mon + 1) << std::setw(2)
-      << std::setfill(L'0') << tm->tm_mday << "T" << std::setw(2) << std::setfill(L'0')
-      << tm->tm_hour << std::setw(2) << std::setfill(L'0') << tm->tm_min << std::setw(2)
-      << std::setfill(L'0') << tm->tm_sec;
-
-  const std::wstring prefix = oss.str();
-  const std::wstring ext    = L".dmp";
-
-  // first path to try, without counter in it
-  std::wstring path = dir + L"\\" + prefix + ext;
-
-  for (int i = 0; i < MaxTries; ++i) {
-    std::wclog << L"trying file '" << path << L"'\n";
-
-    HandlePtr h(CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW,
-                            FILE_ATTRIBUTE_NORMAL, nullptr));
-
-    if (h.get() != INVALID_HANDLE_VALUE) {
-      // worked
-      return h;
-    }
-
-    const auto e = GetLastError();
-
-    if (e != ERROR_FILE_EXISTS) {
-      // probably no write access
-      std::wcerr << L"failed to create dump file, " << formatSystemMessage(e) << L"\n";
-
-      return {};
-    }
-
-    // try again with "-i"
-    path = dir + L"\\" + prefix + L"-" + std::to_wstring(i + 1) + ext;
-  }
-
-  std::wcerr << L"can't create dump file, ran out of filenames\n";
-  return {};
-}
-
-HandlePtr dumpFile(const wchar_t* dir)
-{
-  // try the given directory, if any
-  if (dir) {
-    HandlePtr h = tempFile(dir);
-    if (h.get() != INVALID_HANDLE_VALUE) {
-      return h;
-    }
-  }
-
-  // try the current directory
-  HandlePtr h = tempFile(L".");
-  if (h.get() != INVALID_HANDLE_VALUE) {
-    return h;
-  }
-
-  std::wclog << L"cannot write dump file in current directory\n";
-
-  // try the temp directory
-  const auto temp = tempDir();
-
-  if (!temp.empty()) {
-    h = tempFile(temp.c_str());
-    if (h.get() != INVALID_HANDLE_VALUE) {
-      return h;
-    }
-  }
-
   return {};
 }
 

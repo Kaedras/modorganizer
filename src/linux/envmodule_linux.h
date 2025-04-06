@@ -41,10 +41,7 @@ public:
     return *this;
   }
 
-  operator bool() const noexcept
-  {
-    return m_fd != -1;
-  }
+  operator bool() const noexcept { return m_fd != -1; }
 
   ~FdCloser()
   {
@@ -58,7 +55,7 @@ public:
   int release()
   {
     int tmp = m_fd;
-    m_fd = -1;
+    m_fd    = -1;
     return tmp;
   }
 
