@@ -1950,9 +1950,9 @@ PluginList::ESPInfo::ESPInfo(const QString& name, bool forceLoaded, bool forceEn
                              bool mediumSupported, bool blueprintSupported)
     : name(name), fullPath(fullPath), enabled(forceLoaded), forceLoaded(forceLoaded),
       forceEnabled(forceEnabled), forceDisabled(forceDisabled), priority(0),
-      loadOrder(-1), originName(originName), hasIni(hasIni),
-      archives(archives.begin(), archives.end()), modSelected(false),
-      isMasterOfSelectedPlugin(false)
+      loadOrder(-1), originName(originName), modSelected(false),
+      isMasterOfSelectedPlugin(false), hasIni(hasIni),
+      archives(archives.begin(), archives.end())
 {
   try {
     ESP::File file(ToWString(fullPath));

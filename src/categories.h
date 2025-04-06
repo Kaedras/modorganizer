@@ -92,8 +92,8 @@ public:
   {
     Category(int sortValue, int id, const QString name, int parentID,
              std::vector<NexusCategory> nexusCats)
-        : m_SortValue(sortValue), m_ID(id), m_Name(name), m_HasChildren(false),
-          m_ParentID(parentID), m_NexusCats(std::move(nexusCats))
+        : m_SortValue(sortValue), m_ID(id), m_ParentID(parentID), m_Name(name),
+          m_NexusCats(std::move(nexusCats)), m_HasChildren(false)
     {}
 
     friend bool operator<(const Category& LHS, const Category& RHS)
