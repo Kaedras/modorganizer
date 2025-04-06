@@ -17,6 +17,8 @@ ModListProxy::~ModListProxy()
 
 void ModListProxy::connectSignals()
 {
+  m_Connections.reserve(4);
+
   m_Connections.push_back(m_Proxied->onModInstalled(
       callSignalIfPluginActive(m_OrganizerProxy, m_ModInstalled)));
   m_Connections.push_back(

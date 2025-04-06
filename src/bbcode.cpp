@@ -78,7 +78,7 @@ public:
         while (nextTagPos != -1 && closeTagPos != -1 && nextTagPos < closeTagPos) {
           closeTagPos        = input.indexOf(closeTag, closeTagPos + closeTag.size(),
                                              Qt::CaseInsensitive);
-          nextTagSearchIndex = input.indexOf("]", nextTagPos);
+          nextTagSearchIndex = input.indexOf(u"]"_s, nextTagPos);
           nextTagPos = nextTag.match(input, nextTagSearchIndex).capturedStart(0);
         }
         if (closeTagPos == -1) {
@@ -120,7 +120,8 @@ public:
             }
           } else {
             if (tagName == '*') {
-              temp.remove(QRegularExpression("(\\[/\\*\\])?(<br/>)?$"));
+              static const QRegularExpression regex(u"(\\[/\\*\\])?(<br/>)?$"_s);
+              temp.remove(regex);
             }
             return temp.replace(tagIter->second.first, tagIter->second.second);
           }
@@ -142,90 +143,90 @@ public:
 private:
   BBCodeMap() : m_TagNameExp(u"[a-zA-Z*]*=?"_s)
   {
-    m_TagMap["b"] =
-        std::make_pair(QRegularExpression("\\[b\\](.*)\\[/b\\]"), "<b>\\1</b>");
-    m_TagMap["i"] =
-        std::make_pair(QRegularExpression("\\[i\\](.*)\\[/i\\]"), "<i>\\1</i>");
-    m_TagMap["u"] =
-        std::make_pair(QRegularExpression("\\[u\\](.*)\\[/u\\]"), "<u>\\1</u>");
-    m_TagMap["s"] =
-        std::make_pair(QRegularExpression("\\[s\\](.*)\\[/s\\]"), "<s>\\1</s>");
-    m_TagMap["sub"] =
-        std::make_pair(QRegularExpression("\\[sub\\](.*)\\[/sub\\]"), "<sub>\\1</sub>");
-    m_TagMap["sup"] =
-        std::make_pair(QRegularExpression("\\[sup\\](.*)\\[/sup\\]"), "<sup>\\1</sup>");
-    m_TagMap["size="] =
-        std::make_pair(QRegularExpression("\\[size=([^\\]]*)\\](.*)\\[/size\\]"),
+    m_TagMap[u"b"_s] =
+        std::make_pair(QRegularExpression(u"\\[b\\](.*)\\[/b\\]"_s), "<b>\\1</b>");
+    m_TagMap[u"i"_s] =
+        std::make_pair(QRegularExpression(u"\\[i\\](.*)\\[/i\\]"_s), "<i>\\1</i>");
+    m_TagMap[u"u"_s] =
+        std::make_pair(QRegularExpression(u"\\[u\\](.*)\\[/u\\]"_s), "<u>\\1</u>");
+    m_TagMap[u"s"_s] =
+        std::make_pair(QRegularExpression(u"\\[s\\](.*)\\[/s\\]"_s), "<s>\\1</s>");
+    m_TagMap[u"sub"_s] = std::make_pair(
+        QRegularExpression(u"\\[sub\\](.*)\\[/sub\\]"_s), "<sub>\\1</sub>");
+    m_TagMap[u"sup"_s] = std::make_pair(
+        QRegularExpression(u"\\[sup\\](.*)\\[/sup\\]"_s), "<sup>\\1</sup>");
+    m_TagMap[u"size="_s] =
+        std::make_pair(QRegularExpression(u"\\[size=([^\\]]*)\\](.*)\\[/size\\]"_s),
                        "<font size=\"\\1\">\\2</font>");
-    m_TagMap["color="] =
-        std::make_pair(QRegularExpression("\\[color=([^\\]]*)\\](.*)\\[/color\\]"), "");
-    m_TagMap["font="] =
-        std::make_pair(QRegularExpression("\\[font=([^\\]]*)\\](.*)\\[/font\\]"),
+    m_TagMap[u"color="_s] = std::make_pair(
+        QRegularExpression(u"\\[color=([^\\]]*)\\](.*)\\[/color\\]"_s), "");
+    m_TagMap[u"font="_s] =
+        std::make_pair(QRegularExpression(u"\\[font=([^\\]]*)\\](.*)\\[/font\\]"_s),
                        "<font style=\"font-family: \\1;\">\\2</font>");
-    m_TagMap["center"] =
-        std::make_pair(QRegularExpression("\\[center\\](.*)\\[/center\\]"),
+    m_TagMap[u"center"_s] =
+        std::make_pair(QRegularExpression(u"\\[center\\](.*)\\[/center\\]"_s),
                        "<div align=\"center\">\\1</div>");
-    m_TagMap["right"] =
-        std::make_pair(QRegularExpression("\\[right\\](.*)\\[/right\\]"),
+    m_TagMap[u"right"_s] =
+        std::make_pair(QRegularExpression(u"\\[right\\](.*)\\[/right\\]"_s),
                        "<div align=\"right\">\\1</div>");
-    m_TagMap["quote"] =
-        std::make_pair(QRegularExpression("\\[quote\\](.*)\\[/quote\\]"),
+    m_TagMap[u"quote"_s] =
+        std::make_pair(QRegularExpression(u"\\[quote\\](.*)\\[/quote\\]"_s),
                        "<figure class=\"quote\"><blockquote>\\1</blockquote></figure>");
-    m_TagMap["quote="] =
-        std::make_pair(QRegularExpression("\\[quote=([^\\]]*)\\](.*)\\[/quote\\]"),
+    m_TagMap[u"quote="_s] =
+        std::make_pair(QRegularExpression(u"\\[quote=([^\\]]*)\\](.*)\\[/quote\\]"_s),
                        "<figure class=\"quote\"><blockquote>\\2</blockquote></figure>");
-    m_TagMap["spoiler"] =
-        std::make_pair(QRegularExpression("\\[spoiler\\](.*)\\[/spoiler\\]"),
+    m_TagMap[u"spoiler"_s] =
+        std::make_pair(QRegularExpression(u"\\[spoiler\\](.*)\\[/spoiler\\]"_s),
                        "<details><summary>Spoiler:  <div "
                        "class=\"bbc_spoiler_show\">Show</div></summary><div "
                        "class=\"spoiler_content\">\\1</div></details>");
-    m_TagMap["code"] = std::make_pair(QRegularExpression("\\[code\\](.*)\\[/code\\]"),
-                                      "<code>\\1</code>");
-    m_TagMap["heading"] =
-        std::make_pair(QRegularExpression("\\[heading\\](.*)\\[/heading\\]"),
+    m_TagMap[u"code"_s] = std::make_pair(
+        QRegularExpression(u"\\[code\\](.*)\\[/code\\]"_s), "<code>\\1</code>");
+    m_TagMap[u"heading"_s] =
+        std::make_pair(QRegularExpression(u"\\[heading\\](.*)\\[/heading\\]"_s),
                        "<h2><strong>\\1</strong></h2>");
-    m_TagMap["line"] = std::make_pair(QRegularExpression("\\[line\\]"), "<hr>");
+    m_TagMap[u"line"_s] = std::make_pair(QRegularExpression(u"\\[line\\]"_s), "<hr>");
 
     // lists
-    m_TagMap["list"] =
-        std::make_pair(QRegularExpression("\\[list\\](.*)\\[/list\\]"), "<ul>\\1</ul>");
-    m_TagMap["list="] = std::make_pair(
-        QRegularExpression("\\[list.*\\](.*)\\[/list\\]"), "<ol>\\1</ol>");
-    m_TagMap["ul"] =
-        std::make_pair(QRegularExpression("\\[ul\\](.*)\\[/ul\\]"), "<ul>\\1</ul>");
-    m_TagMap["ol"] =
-        std::make_pair(QRegularExpression("\\[ol\\](.*)\\[/ol\\]"), "<ol>\\1</ol>");
-    m_TagMap["li"] =
-        std::make_pair(QRegularExpression("\\[li\\](.*)\\[/li\\]"), "<li>\\1</li>");
+    m_TagMap[u"list"_s] = std::make_pair(
+        QRegularExpression(u"\\[list\\](.*)\\[/list\\]"_s), "<ul>\\1</ul>");
+    m_TagMap[u"list="_s] = std::make_pair(
+        QRegularExpression(u"\\[list.*\\](.*)\\[/list\\]"_s), "<ol>\\1</ol>");
+    m_TagMap[u"ul"_s] =
+        std::make_pair(QRegularExpression(u"\\[ul\\](.*)\\[/ul\\]"_s), "<ul>\\1</ul>");
+    m_TagMap[u"ol"_s] =
+        std::make_pair(QRegularExpression(u"\\[ol\\](.*)\\[/ol\\]"_s), "<ol>\\1</ol>");
+    m_TagMap[u"li"_s] =
+        std::make_pair(QRegularExpression(u"\\[li\\](.*)\\[/li\\]"_s), "<li>\\1</li>");
 
     // tables
-    m_TagMap["table"] = std::make_pair(
-        QRegularExpression("\\[table\\](.*)\\[/table\\]"), "<table>\\1</table>");
-    m_TagMap["tr"] =
-        std::make_pair(QRegularExpression("\\[tr\\](.*)\\[/tr\\]"), "<tr>\\1</tr>");
-    m_TagMap["th"] =
-        std::make_pair(QRegularExpression("\\[th\\](.*)\\[/th\\]"), "<th>\\1</th>");
-    m_TagMap["td"] =
-        std::make_pair(QRegularExpression("\\[td\\](.*)\\[/td\\]"), "<td>\\1</td>");
+    m_TagMap[u"table"_s] = std::make_pair(
+        QRegularExpression(u"\\[table\\](.*)\\[/table\\]"_s), "<table>\\1</table>");
+    m_TagMap[u"tr"_s] =
+        std::make_pair(QRegularExpression(u"\\[tr\\](.*)\\[/tr\\]"_s), "<tr>\\1</tr>");
+    m_TagMap[u"th"_s] =
+        std::make_pair(QRegularExpression(u"\\[th\\](.*)\\[/th\\]"_s), "<th>\\1</th>");
+    m_TagMap[u"td"_s] =
+        std::make_pair(QRegularExpression(u"\\[td\\](.*)\\[/td\\]"_s), "<td>\\1</td>");
 
     // web content
-    m_TagMap["url"] = std::make_pair(QRegularExpression("\\[url\\](.*)\\[/url\\]"),
-                                     "<a href=\"\\1\">\\1</a>");
-    m_TagMap["url="] =
-        std::make_pair(QRegularExpression("\\[url=([^\\]]*)\\](.*)\\[/url\\]"),
+    m_TagMap[u"url"_s] = std::make_pair(
+        QRegularExpression(u"\\[url\\](.*)\\[/url\\]"_s), "<a href=\"\\1\">\\1</a>");
+    m_TagMap[u"url="_s] =
+        std::make_pair(QRegularExpression(u"\\[url=([^\\]]*)\\](.*)\\[/url\\]"_s),
                        "<a href=\"\\1\">\\2</a>");
-    m_TagMap["img"] = std::make_pair(
+    m_TagMap[u"img"_s] = std::make_pair(
         QRegularExpression(
-            "\\[img(?:\\s*width=\\d+\\s*,?\\s*height=\\d+)?\\](.*)\\[/img\\]"),
+            u"\\[img(?:\\s*width=\\d+\\s*,?\\s*height=\\d+)?\\](.*)\\[/img\\]"_s),
         "<img src=\"\\1\">");
-    m_TagMap["img="] =
-        std::make_pair(QRegularExpression("\\[img=([^\\]]*)\\](.*)\\[/img\\]"),
+    m_TagMap[u"img="_s] =
+        std::make_pair(QRegularExpression(u"\\[img=([^\\]]*)\\](.*)\\[/img\\]"_s),
                        "<img src=\"\\2\" alt=\"\\1\">");
-    m_TagMap["email="] = std::make_pair(
-        QRegularExpression("\\[email=\"?([^\\]]*)\"?\\](.*)\\[/email\\]"),
+    m_TagMap[u"email="_s] = std::make_pair(
+        QRegularExpression(u"\\[email=\"?([^\\]]*)\"?\\](.*)\\[/email\\]"_s),
         "<a href=\"mailto:\\1\">\\2</a>");
-    m_TagMap["youtube"] =
-        std::make_pair(QRegularExpression("\\[youtube\\](.*)\\[/youtube\\]"),
+    m_TagMap[u"youtube"_s] =
+        std::make_pair(QRegularExpression(u"\\[youtube\\](.*)\\[/youtube\\]"_s),
                        "<a "
                        "href=\"https://www.youtube.com/watch?v=\\1\">https://"
                        "www.youtube.com/watch?v=\\1</a>");
@@ -238,25 +239,26 @@ private:
     }
 
     // this tag is in fact greedy
-    m_TagMap["*"] = std::make_pair(QRegularExpression("\\[\\*\\](.*)"), "<li>\\1</li>");
+    m_TagMap[u"*"_s] =
+        std::make_pair(QRegularExpression(u"\\[\\*\\](.*)"_s), "<li>\\1</li>");
 
-    m_ColorMap.insert(std::make_pair<QString, QString>("red", "FF0000"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("green", "00FF00"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("blue", "0000FF"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("black", "000000"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("gray", "7F7F7F"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("white", "FFFFFF"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("yellow", "FFFF00"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("cyan", "00FFFF"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("magenta", "FF00FF"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("brown", "A52A2A"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("orange", "FFA500"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("gold", "FFD700"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("deepskyblue", "00BFFF"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("salmon", "FA8072"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("dodgerblue", "1E90FF"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("greenyellow", "ADFF2F"));
-    m_ColorMap.insert(std::make_pair<QString, QString>("peru", "CD853F"));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"red"_s, u"FF0000"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"green"_s, u"00FF00"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"blue"_s, u"0000FF"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"black"_s, u"000000"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"gray"_s, u"7F7F7F"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"white"_s, u"FFFFFF"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"yellow"_s, u"FFFF00"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"cyan"_s, u"00FFFF"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"magenta"_s, u"FF00FF"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"brown"_s, u"A52A2A"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"orange"_s, u"FFA500"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"gold"_s, u"FFD700"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"deepskyblue"_s, u"00BFFF"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"salmon"_s, u"FA8072"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"dodgerblue"_s, u"1E90FF"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"greenyellow"_s, u"ADFF2F"_s));
+    m_ColorMap.insert(std::make_pair<QString, QString>(u"peru"_s, u"CD853F"_s));
   }
 
 private:

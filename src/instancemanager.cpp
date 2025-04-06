@@ -468,7 +468,7 @@ std::vector<Instance::Object> Instance::objectsForDeletion() const
     if (!inRoots) {
       // not in roots, this is a path that was changed by the user; make
       // sure it exists
-      if (QFileInfo(f.path).exists()) {
+      if (QFileInfo::exists(f.path)) {
         cleanFiles.push_back({prettyFile(f.path), f.mandatoryDelete});
       }
     }
@@ -816,8 +816,7 @@ SetupInstanceResults setupInstance(Instance& instance, PluginContainer& pc)
     // instance
 
     reportError(QObject::tr("Cannot open instance '%1', failed to read INI file %2.")
-                    .arg(instance.displayName())
-                    .arg(instance.iniPath()));
+                    .arg(instance.displayName(), instance.iniPath()));
 
     return SetupInstanceResults::SelectAnother;
   }
@@ -833,8 +832,7 @@ SetupInstanceResults setupInstance(Instance& instance, PluginContainer& pc)
         QObject::tr(
             "Cannot open instance '%1', the managed game was not found in the INI "
             "file %2. Select the game managed by this instance.")
-            .arg(instance.displayName())
-            .arg(instance.iniPath()));
+            .arg(instance.displayName(), instance.iniPath()));
 
     return selectGame(instance, pc);
   }
@@ -846,8 +844,7 @@ SetupInstanceResults setupInstance(Instance& instance, PluginContainer& pc)
     reportError(
         QObject::tr("Cannot open instance '%1', the game plugin '%2' doesn't exist. It "
                     "may have been deleted by an antivirus. Select another instance.")
-            .arg(instance.displayName())
-            .arg(instance.gameName()));
+            .arg(instance.displayName(), instance.gameName()));
 
     return SetupInstanceResults::SelectAnother;
   }
@@ -861,9 +858,8 @@ SetupInstanceResults setupInstance(Instance& instance, PluginContainer& pc)
             "Cannot open instance '%1', the game directory '%2' doesn't exist or "
             "the game plugin '%3' doesn't recognize it. Select the game managed "
             "by this instance.")
-            .arg(instance.displayName())
-            .arg(instance.gameDirectory())
-            .arg(instance.gameName()));
+            .arg(instance.displayName(), instance.gameDirectory(),
+                 instance.gameName()));
 
     return selectGame(instance, pc);
   }

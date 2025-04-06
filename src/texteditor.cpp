@@ -517,7 +517,7 @@ TextEditorToolbar::TextEditorToolbar(TextEditor& editor)
   QObject::connect(&m_editor, &TextEditor::wordWrapChanged, [&](bool b) {
     onWordWrap(b);
   });
-  QObject::connect(&m_editor, &TextEditor::loaded, [&](QString f) {
+  QObject::connect(&m_editor, &TextEditor::loaded, [&](const QString& f) {
     onLoaded(f);
   });
 }

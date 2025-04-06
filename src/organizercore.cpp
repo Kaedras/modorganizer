@@ -571,8 +571,7 @@ void OrganizerCore::setCurrentProfile(const QString& profileName)
 
     reportError(tr("The selected profile '%1' does not exist. The profile '%2' will be "
                    "used instead")
-                    .arg(profileName)
-                    .arg(QDir(profileDir).dirName()));
+                    .arg(profileName, QDir(profileDir).dirName()));
   }
 
   // Keep the old profile to emit signal-changed:
@@ -1095,6 +1094,7 @@ bool OrganizerCore::previewFileWithAlternatives(QWidget* parent, QString fileNam
     }
   } else {
     std::vector<int> origins;
+    origins.reserve(file->getAlternatives().size() + 1);
 
     // start with the primary origin
     origins.push_back(file->getOrigin());
@@ -1383,7 +1383,7 @@ void OrganizerCore::updateModInDirectoryStructure(unsigned int index,
                                                   ModInfo::Ptr modInfo)
 {
   QMap<unsigned int, ModInfo::Ptr> allModInfo;
-  allModInfo[index] = modInfo;
+  allModInfo[index] = std::move(modInfo);
   updateModsInDirectoryStructure(allModInfo);
 }
 
@@ -1725,13 +1725,15 @@ void OrganizerCore::modStatusChanged(QList<unsigned int> index)
     }
     if (!modsToDisable.isEmpty()) {
       updateModsActiveState(modsToDisable.keys(), false);
-      for (auto idx : modsToDisable.keys()) {
-        if (m_DirectoryStructure->originExists(modsToDisable[idx]->name())) {
-          FilesOrigin& origin =
-              m_DirectoryStructure->getOriginByName(modsToDisable[idx]->name());
-          origin.enable(false);
-        }
-      }
+      std::for_each(
+          modsToDisable.keyBegin(), modsToDisable.keyEnd(),
+          [&](const unsigned int& idx) {
+            if (m_DirectoryStructure->originExists(modsToDisable[idx]->name())) {
+              FilesOrigin& origin =
+                  m_DirectoryStructure->getOriginByName(modsToDisable[idx]->name());
+              origin.enable(false);
+            }
+          });
       if (m_UserInterface != nullptr) {
         m_UserInterface->archivesWriter().write();
       }

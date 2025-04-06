@@ -2,6 +2,8 @@
 #include "expanderwidget.h"
 #include <utility.h>
 
+#include <utility>
+
 using namespace MOBase;
 using namespace Qt::StringLiterals;
 
@@ -72,8 +74,8 @@ void removeSection(QSettings& settings, const QString& section)
   removeImpl(settings, section, section, "");
 }
 
-ScopedGroup::ScopedGroup(QSettings& s, const QString& name)
-    : m_settings(s), m_name(name)
+ScopedGroup::ScopedGroup(QSettings& s, QString name)
+    : m_settings(s), m_name(std::move(name))
 {
   m_settings.beginGroup(m_name);
 }

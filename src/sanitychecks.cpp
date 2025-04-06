@@ -136,7 +136,7 @@ bool isFileBlocked(const QFileInfo& fi)
   }
 
   // file is blocked
-  log::warn("{}", QObject::tr("'%1': file is blocked (%2)").arg(path).arg(toString(z)));
+  log::warn("{}", QObject::tr("'%1': file is blocked (%2)").arg(path, toString(z)));
 
   return true;
 }

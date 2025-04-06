@@ -127,7 +127,7 @@ void SelfUpdater::testForUpdate(const Settings& settings)
               // Fill m_UpdateCandidates with version strictly greater than the
               // current version:
               m_UpdateCandidates.clear();
-              for (auto p : mreleases) {
+              for (const auto& p : mreleases) {
                 if (p.first > this->m_MOVersion) {
                   m_UpdateCandidates.insert(p);
                 }
@@ -337,7 +337,7 @@ void SelfUpdater::installUpdate()
     QCoreApplication::quit();
   } else {
     reportError(
-        tr("Failed to start %1: %2").arg(m_UpdateFile.fileName()).arg(r.toString()));
+        tr("Failed to start %1: %2").arg(m_UpdateFile.fileName(), r.toString()));
   }
 
   m_UpdateFile.remove();

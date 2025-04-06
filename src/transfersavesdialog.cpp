@@ -256,7 +256,7 @@ bool TransferSavesDialog::transferCharacters(
   OverwriteMode overwriteMode = OVERWRITE_ASK;
 
   for (SaveListItem const& save : saves) {
-    for (QString source : save->allFiles()) {
+    for (const QString& source : save->allFiles()) {
       QFileInfo sourceFile(source);
       QString destinationFile(
           destination.absoluteFilePath(sourceDirectory.relativeFilePath(source)));

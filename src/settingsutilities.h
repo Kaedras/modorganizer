@@ -141,7 +141,7 @@ void removeSection(QSettings& settings, const QString& section);
 class ScopedGroup
 {
 public:
-  ScopedGroup(QSettings& s, const QString& name);
+  ScopedGroup(QSettings& s, QString name);
   ~ScopedGroup();
 
   ScopedGroup(const ScopedGroup&)            = delete;

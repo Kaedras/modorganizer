@@ -110,9 +110,8 @@ void GeneralSettingsTab::addLanguages()
     const QString languageCode = match.captured(1);
     const QLocale locale(languageCode);
 
-    QString languageString = QStringLiteral("%1 (%2)")
-                                 .arg(locale.nativeLanguageName())
-                                 .arg(locale.nativeTerritoryName());
+    QString languageString = QStringLiteral("%1 (%2)").arg(
+        locale.nativeLanguageName(), locale.nativeTerritoryName());
 
     if (locale.language() == QLocale::Chinese) {
       if (languageCode == "zh_TW"_L1) {

@@ -4,6 +4,8 @@
 #include "utility.h"
 #include <log.h>
 
+#include <utility>
+
 using namespace MOBase;
 using namespace ImagesTabHelpers;
 using namespace Qt::StringLiterals;
@@ -1090,7 +1092,7 @@ bool Files::isFiltered() const
 }
 
 PaintContext::PaintContext(QWidget* w, Geometry geo)
-    : painter(w), geo(geo), file(nullptr), thumbIndex(0), fileIndex(0)
+    : painter(w), geo(std::move(geo)), file(nullptr), thumbIndex(0), fileIndex(0)
 {}
 
 }  // namespace ImagesTabHelpers

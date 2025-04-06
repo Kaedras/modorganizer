@@ -113,6 +113,7 @@ CreateInstanceDialog::CreateInstanceDialog(const PluginContainer& pc, Settings* 
   ui->setupUi(this);
   m_originalNext = ui->next->text();
 
+  m_pages.reserve(9);
   m_pages.push_back(std::make_unique<IntroPage>(*this));
   m_pages.push_back(std::make_unique<TypePage>(*this));
   m_pages.push_back(std::make_unique<GamePage>(*this));
@@ -325,6 +326,7 @@ void CreateInstanceDialog::finish()
 
   try {
     std::vector<std::unique_ptr<DirectoryCreator>> dirs;
+    dirs.reserve(6);
 
     // creating all these directories; if any of them fail, this throws and
     // any newly created directory will be deleted in DirectoryCreator's dtor

@@ -410,6 +410,7 @@ void GamePage::warnUnrecognized(const QString& path)
 std::vector<IPluginGame*> GamePage::sortedGamePlugins() const
 {
   std::vector<IPluginGame*> v;
+  v.reserve(m_pc.plugins<IPluginGame>().size());
 
   // all game plugins
   for (auto* game : m_pc.plugins<IPluginGame>()) {
@@ -427,6 +428,7 @@ std::vector<IPluginGame*> GamePage::sortedGamePlugins() const
 void GamePage::createGames()
 {
   m_games.clear();
+  m_games.reserve(sortedGamePlugins().size());
 
   for (auto* game : sortedGamePlugins()) {
     m_games.push_back(std::make_unique<Game>(game));
@@ -691,8 +693,7 @@ bool GamePage::confirmUnknown(const QString& path, IPluginGame* game)
                           "<span style=\"white-space: nowrap; font-weight: "
                           "bold;\">%2</span> or "
                           "for any other game Mod Organizer can manage.")
-                  .arg(path)
-                  .arg(game->displayGameName()))
+                  .arg(path, game->displayGameName()))
           .button({QObject::tr("Use this folder for %1").arg(game->displayGameName()),
                    QObject::tr("I know what I'm doing"), QMessageBox::Ignore})
           .button({QObject::tr("Cancel"), QMessageBox::Cancel})
@@ -714,9 +715,8 @@ IPluginGame* GamePage::confirmOtherGame(const QString& path, IPluginGame* select
                   "<span style=\"white-space: nowrap; font-weight: bold;\">%2</span>, "
                   "not "
                   "<span style=\"white-space: nowrap; font-weight: bold;\">%3</span>.")
-                  .arg(path)
-                  .arg(guessedGame->displayGameName())
-                  .arg(selectedGame->displayGameName()))
+                  .arg(path, guessedGame->displayGameName(),
+                       selectedGame->displayGameName()))
           .button({QObject::tr("Manage %1 instead").arg(guessedGame->displayGameName()),
                    QMessageBox::Ok})
           .button({QObject::tr("Use this folder for %1")
@@ -819,6 +819,7 @@ void VariantsPage::fillList()
   }
 
   // for each variant, create a checkable button and add it
+  m_buttons.reserve(g->gameVariants().size());
   for (auto& v : g->gameVariants()) {
     auto* b = new QCommandLinkButton(v);
     b->setCheckable(true);

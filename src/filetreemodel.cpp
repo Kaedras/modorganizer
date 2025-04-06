@@ -1077,7 +1077,7 @@ QVariant FileTreeModel::displayData(const FileTreeItem* item, int column) const
       }
 
       if (auto n = item->compressedFileSize()) {
-        return QStringLiteral("%1 (%2)").arg(fs).arg(localizedByteSize(*n));
+        return QStringLiteral("%1 (%2)").arg(fs, localizedByteSize(*n));
       } else {
         return fs;
       }

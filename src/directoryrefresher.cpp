@@ -141,7 +141,7 @@ std::string DirectoryStats::toCsv() const
       << QString::number(filesInsertedInRegister)
       << QString::number(filesAssignedInRegister);
 
-  return oss.join(",").toStdString();
+  return oss.join(u","_s).toStdString();
 }
 
 void dumpStats(std::vector<DirectoryStats>& stats)
@@ -188,6 +188,7 @@ void DirectoryRefresher::setMods(
   QMutexLocker locker(&m_RefreshLock);
 
   m_Mods.clear();
+  m_Mods.reserve(mods.size());
   for (auto mod = mods.begin(); mod != mods.end(); ++mod) {
     QString name      = std::get<0>(*mod);
     ModInfo::Ptr info = ModInfo::getByIndex(ModInfo::getIndex(name));
@@ -224,11 +225,13 @@ void DirectoryRefresher::addModBSAToStructure(DirectoryEntry* root,
   }
 
   std::vector<QString> lo;
+  lo.reserve(loadOrder.size());
   for (auto&& s : loadOrder) {
     lo.push_back(s);
   }
 
   std::vector<QString> archivesW;
+  archivesW.reserve(archives.size());
   for (auto&& a : archives) {
     archivesW.push_back(a);
   }
@@ -487,7 +490,7 @@ void DirectoryRefresher::refresh()
                             0, dummy);
     }
 
-    std::sort(m_Mods.begin(), m_Mods.end(), [](auto lhs, auto rhs) {
+    std::sort(m_Mods.begin(), m_Mods.end(), [](const auto& lhs, const auto& rhs) {
       return lhs.priority < rhs.priority;
     });
 

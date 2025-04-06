@@ -249,6 +249,7 @@ void InstanceManagerDialog::updateInstances()
   auto& m = InstanceManager::singleton();
 
   m_instances.clear();
+  m_instances.reserve(m.globalInstancePaths().size());
 
   for (auto&& d : m.globalInstancePaths()) {
     m_instances.push_back(std::make_unique<Instance>(d, false));

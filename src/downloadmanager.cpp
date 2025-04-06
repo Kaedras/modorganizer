@@ -193,13 +193,12 @@ void DownloadManager::DownloadInfo::setName(QString newName, bool renameFile)
       (m_State == DownloadManager::STATE_DOWNLOADING) ||
       (m_State == DownloadManager::STATE_PAUSED)) {
     newName.append(UNFINISHED);
-    oldMetaFileName = QStringLiteral("%1%2.meta").arg(m_FileName).arg(UNFINISHED);
+    oldMetaFileName = QStringLiteral("%1%2.meta").arg(m_FileName, UNFINISHED);
   }
   if (renameFile) {
     if ((newName != m_Output.fileName()) && !m_Output.rename(newName)) {
-      reportError(tr("failed to rename \"%1\" to \"%2\"")
-                      .arg(m_Output.fileName())
-                      .arg(newName));
+      reportError(
+          tr("failed to rename \"%1\" to \"%2\"").arg(m_Output.fileName(), newName));
       return;
     }
 
@@ -354,6 +353,7 @@ void DownloadManager::refreshList()
     const QStringList supportedExtensions =
         m_OrganizerCore->installationManager()->getSupportedExtensions();
     std::vector<QString> nameFilters;
+    nameFilters.reserve(supportedExtensions.size() + 1);
     for (const auto& extension : supportedExtensions) {
       nameFilters.push_back(u"."_s % extension.toLower());
     }
@@ -533,7 +533,7 @@ void DownloadManager::removePending(QString gameName, int modID, int fileID)
   QString gameShortName = gameName;
   QStringList games(m_ManagedGame->validShortNames());
   games += m_ManagedGame->gameShortName();
-  for (auto game : games) {
+  for (const auto& game : games) {
     MOBase::IPluginGame* gamePlugin = m_OrganizerCore->getGame(game);
     if (gamePlugin != nullptr &&
         gamePlugin->gameNexusName().compare(gameName, Qt::CaseInsensitive) == 0) {
@@ -573,8 +573,7 @@ void DownloadManager::startDownload(QNetworkReply* reply, DownloadInfo* newDownl
 
   if (!newDownload->m_Output.open(mode)) {
     reportError(tr("failed to download %1: could not open output file: %2")
-                    .arg(reply->url().toString())
-                    .arg(newDownload->m_Output.fileName()));
+                    .arg(reply->url().toString(), newDownload->m_Output.fileName()));
     return;
   }
 
@@ -672,8 +671,7 @@ void DownloadManager::addNXMDownload(const QString& url)
         m_ParentWidget, tr("Wrong Game"),
         tr("The download link is for a mod for \"%1\" but this instance of MO "
            "has been set up for \"%2\".")
-            .arg(nxmInfo.game())
-            .arg(m_ManagedGame->gameShortName()),
+            .arg(nxmInfo.game(), m_ManagedGame->gameShortName()),
         QMessageBox::Ok);
     return;
   }
@@ -1308,9 +1306,8 @@ QString DownloadManager::getDisplayName(int index) const
   if (!info->m_FileInfo->name.isEmpty()) {
     doc.setHtml(info->m_FileInfo->name);
     return QStringLiteral("%1 (%2, v%3)")
-        .arg(doc.toPlainText())
-        .arg(getFileTypeString(info->m_FileInfo->fileCategory))
-        .arg(info->m_FileInfo->version.displayString());
+        .arg(doc.toPlainText(), getFileTypeString(info->m_FileInfo->fileCategory),
+             info->m_FileInfo->version.displayString());
   } else {
     doc.setHtml(info->m_FileName);
     return doc.toPlainText();
@@ -1644,8 +1641,8 @@ void DownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 
         info->m_Progress.second = tr("%1% - %2 - ~%3")
                                       .arg(info->m_Progress.first)
-                                      .arg(MOBase::localizedByteSpeed(speed))
-                                      .arg(MOBase::localizedTimeRemaining(remaining));
+                                      .arg(MOBase::localizedByteSpeed(speed),
+                                           MOBase::localizedTimeRemaining(remaining));
 
         TaskProgressManager::instance().updateProgress(info->m_TaskProgressId,
                                                        bytesReceived, bytesTotal);
@@ -1758,7 +1755,7 @@ void DownloadManager::nxmFilesAvailable(QString, int, QVariant userData,
 
   bool found = false;
 
-  for (QVariant file : files) {
+  for (const QVariant& file : files) {
     QVariantMap fileInfo    = file.toMap();
     QString fileName        = fileInfo[u"file_name"_s].toString();
     QString fileNameVariant = fileName.mid(0).replace(' ', '_');
@@ -1797,7 +1794,7 @@ void DownloadManager::nxmFilesAvailable(QString, int, QVariant userData,
                   return lhs.toMap()[u"uploaded_timestamp"_s].toInt() >
                          rhs.toMap()[u"uploaded_timestamp"_s].toInt();
                 });
-      for (QVariant file : files) {
+      for (const QVariant& file : files) {
         QVariantMap fileInfo = file.toMap();
         if (fileInfo["category_id"].toInt() != NexusInterface::FileStatus::REMOVED &&
             fileInfo["category_id"].toInt() != NexusInterface::FileStatus::ARCHIVED)
@@ -1854,7 +1851,7 @@ void DownloadManager::nxmFileInfoAvailable(QString gameName, int modID, int file
 
   QStringList games(m_ManagedGame->validShortNames());
   games += m_ManagedGame->gameShortName();
-  for (auto game : games) {
+  for (const auto& game : games) {
     MOBase::IPluginGame* gamePlugin = m_OrganizerCore->getGame(game);
     if (gamePlugin != nullptr &&
         gamePlugin->gameNexusName().compare(gameName, Qt::CaseInsensitive) == 0) {
@@ -2090,7 +2087,7 @@ void DownloadManager::nxmFileInfoFromMd5Available(QString gameName, QVariant use
   QString gameShortName = gameName;
   QStringList games(m_ManagedGame->validShortNames());
   games += m_ManagedGame->gameShortName();
-  for (auto game : games) {
+  for (const auto& game : games) {
     MOBase::IPluginGame* gamePlugin = m_OrganizerCore->getGame(game);
     if (gamePlugin != nullptr &&
         gamePlugin->gameNexusName().compare(gameName, Qt::CaseInsensitive) == 0) {

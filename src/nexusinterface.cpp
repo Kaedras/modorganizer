@@ -1232,8 +1232,8 @@ NexusInterface::NXMRequestInfo::NXMRequestInfo(
     int modID, NexusInterface::NXMRequestInfo::Type type, QVariant userData,
     const QString& subModule, MOBase::IPluginGame const* game)
     : m_ModID(modID), m_ModVersion("0"), m_FileID(0), m_Reply(nullptr), m_Type(type),
-      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(userData), m_Timeout(nullptr),
-      m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
+      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(std::move(userData)),
+      m_Timeout(nullptr), m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
       m_URL(get_management_url()), m_SubModule(subModule),
       m_NexusGameID(game->nexusGameID()), m_GameName(game->gameNexusName()),
       m_Endorse(false), m_Track(false), m_Hash(QByteArray())
@@ -1242,20 +1242,21 @@ NexusInterface::NXMRequestInfo::NXMRequestInfo(
 NexusInterface::NXMRequestInfo::NXMRequestInfo(
     int modID, QString modVersion, NexusInterface::NXMRequestInfo::Type type,
     QVariant userData, const QString& subModule, MOBase::IPluginGame const* game)
-    : m_ModID(modID), m_ModVersion(modVersion), m_FileID(0), m_Reply(nullptr),
-      m_Type(type), m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(userData),
-      m_Timeout(nullptr), m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
-      m_URL(get_management_url()), m_SubModule(subModule),
-      m_NexusGameID(game->nexusGameID()), m_GameName(game->gameNexusName()),
-      m_Endorse(false), m_Track(false), m_Hash(QByteArray())
+    : m_ModID(modID), m_ModVersion(std::move(modVersion)), m_FileID(0),
+      m_Reply(nullptr), m_Type(type), m_UpdatePeriod(UpdatePeriod::NONE),
+      m_UserData(std::move(userData)), m_Timeout(nullptr), m_Reroute(false),
+      m_ID(s_NextID.fetchAndAddAcquire(1)), m_URL(get_management_url()),
+      m_SubModule(subModule), m_NexusGameID(game->nexusGameID()),
+      m_GameName(game->gameNexusName()), m_Endorse(false), m_Track(false),
+      m_Hash(QByteArray())
 {}
 
 NexusInterface::NXMRequestInfo::NXMRequestInfo(Type type, QVariant userData,
                                                const QString& subModule,
                                                MOBase::IPluginGame const* game)
     : m_ModID(0), m_ModVersion("0"), m_FileID(0), m_Reply(nullptr), m_Type(type),
-      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(userData), m_Timeout(nullptr),
-      m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
+      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(std::move(userData)),
+      m_Timeout(nullptr), m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
       m_URL(get_management_url()), m_SubModule(subModule),
       m_NexusGameID(game->nexusGameID()), m_GameName(game->gameNexusName()),
       m_Endorse(false), m_Track(false), m_Hash(QByteArray())
@@ -1265,7 +1266,7 @@ NexusInterface::NXMRequestInfo::NXMRequestInfo(
     int modID, int fileID, NexusInterface::NXMRequestInfo::Type type, QVariant userData,
     const QString& subModule, MOBase::IPluginGame const* game)
     : m_ModID(modID), m_ModVersion("0"), m_FileID(fileID), m_Reply(nullptr),
-      m_Type(type), m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(userData),
+      m_Type(type), m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(std::move(userData)),
       m_Timeout(nullptr), m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
       m_URL(get_management_url()), m_SubModule(subModule),
       m_NexusGameID(game->nexusGameID()), m_GameName(game->gameNexusName()),
@@ -1275,8 +1276,8 @@ NexusInterface::NXMRequestInfo::NXMRequestInfo(
 NexusInterface::NXMRequestInfo::NXMRequestInfo(Type type, QVariant userData,
                                                const QString& subModule)
     : m_ModID(0), m_ModVersion("0"), m_FileID(0), m_Reply(nullptr), m_Type(type),
-      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(userData), m_Timeout(nullptr),
-      m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
+      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(std::move(userData)),
+      m_Timeout(nullptr), m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
       m_URL(get_management_url()), m_SubModule(subModule), m_NexusGameID(0),
       m_GameName(""), m_Endorse(false), m_Track(false), m_Hash(QByteArray())
 {}
@@ -1285,7 +1286,7 @@ NexusInterface::NXMRequestInfo::NXMRequestInfo(
     UpdatePeriod period, NexusInterface::NXMRequestInfo::Type type, QVariant userData,
     const QString& subModule, MOBase::IPluginGame const* game)
     : m_ModID(0), m_ModVersion("0"), m_FileID(0), m_Reply(nullptr), m_Type(type),
-      m_UpdatePeriod(period), m_UserData(userData), m_Timeout(nullptr),
+      m_UpdatePeriod(period), m_UserData(std::move(userData)), m_Timeout(nullptr),
       m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
       m_URL(get_management_url()), m_SubModule(subModule),
       m_NexusGameID(game->nexusGameID()), m_GameName(game->gameNexusName()),
@@ -1296,8 +1297,8 @@ NexusInterface::NXMRequestInfo::NXMRequestInfo(
     QByteArray& hash, NexusInterface::NXMRequestInfo::Type type, QVariant userData,
     const QString& subModule, MOBase::IPluginGame const* game)
     : m_ModID(0), m_ModVersion("0"), m_FileID(0), m_Reply(nullptr), m_Type(type),
-      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(userData), m_Timeout(nullptr),
-      m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
+      m_UpdatePeriod(UpdatePeriod::NONE), m_UserData(std::move(userData)),
+      m_Timeout(nullptr), m_Reroute(false), m_ID(s_NextID.fetchAndAddAcquire(1)),
       m_URL(get_management_url()), m_SubModule(subModule),
       m_NexusGameID(game->nexusGameID()), m_GameName(game->gameNexusName()),
       m_Endorse(false), m_Track(false), m_Hash(hash)

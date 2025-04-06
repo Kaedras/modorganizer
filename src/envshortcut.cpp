@@ -28,8 +28,7 @@ Shortcut::Shortcut(const Executable& exe) : Shortcut()
   m_target = QFileInfo(qApp->applicationFilePath()).absoluteFilePath();
 
   m_arguments = QStringLiteral("\"moshortcut://%1:%2\"")
-                    .arg(i.isPortable() ? "" : i.displayName())
-                    .arg(exe.title());
+                    .arg(i.isPortable() ? "" : i.displayName(), exe.title());
 
   m_description = QStringLiteral("Run %1 with ModOrganizer").arg(exe.title());
 
@@ -84,7 +83,7 @@ bool Shortcut::exists(Locations loc) const
     return false;
   }
 
-  return QFileInfo(path).exists();
+  return QFileInfo::exists(path);
 }
 
 bool Shortcut::toggle(Locations loc)

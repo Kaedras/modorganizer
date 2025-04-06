@@ -28,7 +28,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 
-OverwriteInfoDialog::OverwriteInfoDialog(ModInfo::Ptr modInfo, QWidget* parent)
+OverwriteInfoDialog::OverwriteInfoDialog(const ModInfo::Ptr& modInfo, QWidget* parent)
     : QDialog(parent), ui(new Ui::OverwriteInfoDialog), m_FileSystemModel(nullptr),
       m_DeleteAction(nullptr), m_RenameAction(nullptr), m_OpenAction(nullptr)
 {
@@ -85,14 +85,14 @@ void OverwriteInfoDialog::done(int r)
   QDialog::done(r);
 }
 
-void OverwriteInfoDialog::setModInfo(ModInfo::Ptr modInfo)
+void OverwriteInfoDialog::setModInfo(const ModInfo::Ptr& modInfo)
 {
   m_ModInfo = modInfo;
-  if (QDir(modInfo->absolutePath()).exists()) {
-    m_FileSystemModel->setRootPath(modInfo->absolutePath());
+  if (QDir(m_ModInfo->absolutePath()).exists()) {
+    m_FileSystemModel->setRootPath(m_ModInfo->absolutePath());
   } else {
     throw MyException(
-        tr("mod not found: %1").arg(qUtf8Printable(modInfo->absolutePath())));
+        tr("mod not found: %1").arg(qUtf8Printable(m_ModInfo->absolutePath())));
   }
 }
 

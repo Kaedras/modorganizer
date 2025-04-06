@@ -221,8 +221,7 @@ QVariant DownloadList::data(const QModelIndex& index, int role) const
         return QStringLiteral("%1 (ID %2) %3<br><span>%4</span>")
             .arg(info->modName)
             .arg(m_manager.getModID(index.row()))
-            .arg(info->version.canonicalString())
-            .arg(info->description.mid(0, 4096));
+            .arg(info->version.canonicalString(), info->description.mid(0, 4096));
       }
       return text;
     }

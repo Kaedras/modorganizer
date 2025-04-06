@@ -70,6 +70,5 @@ void UpdateDialog::setVersions(const QString& oldVersion, const QString& newVers
 {
   ui->updateLabel->setText(tr("Mod Organizer %1 is available.  The current version is "
                               "%2.  Updating will not affect your mods or profiles.")
-                               .arg(newVersion)
-                               .arg(oldVersion));
+                               .arg(newVersion, oldVersion));
 }

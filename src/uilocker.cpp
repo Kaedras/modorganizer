@@ -620,7 +620,7 @@ void UILocker::disableAll()
 
 void UILocker::enableAll()
 {
-  for (auto w : m_disabled) {
+  for (const auto& w : m_disabled) {
     if (w) {
       w->setEnabled(true);
     }

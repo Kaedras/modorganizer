@@ -233,9 +233,9 @@ void ModInfoRegular::readMeta()
 
   // Plugin settings:
   metaFile.beginGroup(u"Plugins");
-  for (auto pluginName : metaFile.childGroups()) {
+  for (const auto& pluginName : metaFile.childGroups()) {
     metaFile.beginGroup(pluginName);
-    for (auto settingKey : metaFile.childKeys()) {
+    for (const auto& settingKey : metaFile.childKeys()) {
       m_PluginSettings[pluginName][settingKey] = metaFile.value(settingKey);
     }
     metaFile.endGroup();

@@ -18,6 +18,8 @@ DownloadManagerProxy::~DownloadManagerProxy()
 
 void DownloadManagerProxy::connectSignals()
 {
+  m_Connections.reserve(4);
+
   m_Connections.push_back(m_Proxied->onDownloadComplete(
       callSignalIfPluginActive(m_OrganizerProxy, m_DownloadComplete)));
   m_Connections.push_back(m_Proxied->onDownloadFailed(

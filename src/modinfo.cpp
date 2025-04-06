@@ -156,6 +156,7 @@ std::vector<ModInfo::Ptr> ModInfo::getByModID(QString game, int modID)
   }
 
   std::vector<ModInfo::Ptr> result;
+  result.reserve(match.size());
   for (auto iter : match) {
     result.push_back(getByIndex(iter));
   }
@@ -304,7 +305,7 @@ bool ModInfo::checkAllForUpdate(PluginContainer* pluginContainer, QObject* recei
   QDateTime earliest = QDateTime::currentDateTimeUtc();
   QDateTime latest   = QDateTime::fromMSecsSinceEpoch(0);
   std::set<QString> games;
-  for (auto mod : s_Collection) {
+  for (const auto& mod : s_Collection) {
     if (mod->canBeUpdated()) {
       if (mod->getLastNexusUpdate() < earliest)
         earliest = mod->getLastNexusUpdate();
@@ -359,26 +360,26 @@ bool ModInfo::checkAllForUpdate(PluginContainer* pluginContainer, QObject* recei
                          "in order to parse the remaining mods."));
     }
 
-    for (auto game : organizedGames)
+    for (const auto& game : organizedGames)
       NexusInterface::instance().requestUpdates(game.second, receiver, QVariant(),
                                                 game.first, QString());
   } else if (earliest < QDateTime::currentDateTimeUtc().addMonths(-1)) {
-    for (auto gameName : games)
+    for (const auto& gameName : games)
       NexusInterface::instance().requestUpdateInfo(gameName,
                                                    NexusInterface::UpdatePeriod::MONTH,
                                                    receiver, QVariant(true), QString());
   } else if (earliest < QDateTime::currentDateTimeUtc().addDays(-7)) {
-    for (auto gameName : games)
+    for (const auto& gameName : games)
       NexusInterface::instance().requestUpdateInfo(
           gameName, NexusInterface::UpdatePeriod::MONTH, receiver, QVariant(false),
           QString());
   } else if (earliest < QDateTime::currentDateTimeUtc().addDays(-1)) {
-    for (auto gameName : games)
+    for (const auto& gameName : games)
       NexusInterface::instance().requestUpdateInfo(
           gameName, NexusInterface::UpdatePeriod::WEEK, receiver, QVariant(false),
           QString());
   } else {
-    for (auto gameName : games)
+    for (const auto& gameName : games)
       NexusInterface::instance().requestUpdateInfo(
           gameName, NexusInterface::UpdatePeriod::DAY, receiver, QVariant(false),
           QString());
@@ -393,11 +394,11 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
                                                         bool markUpdated)
 {
   std::set<QSharedPointer<ModInfo>> finalMods;
-  for (QVariant result : updateData) {
+  for (const QVariant& result : updateData) {
     QVariantMap update = result.toMap();
     std::copy_if(s_Collection.begin(), s_Collection.end(),
                  std::inserter(finalMods, finalMods.end()),
-                 [=](QSharedPointer<ModInfo> info) -> bool {
+                 [=](const QSharedPointer<ModInfo>& info) -> bool {
                    if (info->nexusId() == update[u"mod_id"_s].toInt() &&
                        info->gameName().compare(gameName, Qt::CaseInsensitive) == 0)
                      if (info->getLastNexusUpdate().addSecs(-3600) <
@@ -409,7 +410,7 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
   }
 
   if (addOldMods)
-    for (auto mod : s_Collection)
+    for (const auto& mod : s_Collection)
       if (mod->getLastNexusUpdate() < QDateTime::currentDateTimeUtc().addMonths(-1) &&
           mod->gameName().compare(gameName, Qt::CaseInsensitive) == 0)
         finalMods.insert(mod);
@@ -418,7 +419,7 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
     std::set<QSharedPointer<ModInfo>> updates;
     std::copy_if(s_Collection.begin(), s_Collection.end(),
                  std::inserter(updates, updates.end()),
-                 [=](QSharedPointer<ModInfo> info) -> bool {
+                 [=](const QSharedPointer<ModInfo>& info) -> bool {
                    if (info->gameName().compare(gameName, Qt::CaseInsensitive) == 0 &&
                        info->canBeUpdated())
                      return true;
@@ -427,7 +428,7 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
     std::set<QSharedPointer<ModInfo>> diff;
     std::set_difference(updates.begin(), updates.end(), finalMods.begin(),
                         finalMods.end(), std::inserter(diff, diff.end()));
-    for (auto skipped : diff) {
+    for (const auto& skipped : diff) {
       skipped->setLastNexusUpdate(QDateTime::currentDateTimeUtc());
     }
   }
@@ -439,10 +440,10 @@ void ModInfo::manualUpdateCheck(QObject* receiver, std::multimap<QString, int> I
   std::vector<QSharedPointer<ModInfo>> mods;
   std::set<std::pair<QString, int>> organizedGames;
 
-  for (auto ID : IDs) {
-    for (auto matchedMod : getByModID(ID.first, ID.second)) {
+  for (const auto& ID : IDs) {
+    for (const auto& matchedMod : getByModID(ID.first, ID.second)) {
       bool alreadyMatched = false;
-      for (auto mod : mods) {
+      for (const auto& mod : mods) {
         if (mod == matchedMod) {
           alreadyMatched = true;
           break;
@@ -457,7 +458,7 @@ void ModInfo::manualUpdateCheck(QObject* receiver, std::multimap<QString, int> I
                               return mod->nexusId() <= 0;
                             }),
              mods.end());
-  for (auto mod : mods) {
+  for (const auto& mod : mods) {
     mod->setLastNexusUpdate(QDateTime());
   }
 
@@ -469,12 +470,12 @@ void ModInfo::manualUpdateCheck(QObject* receiver, std::multimap<QString, int> I
   if (mods.size()) {
     log::info("Checking updates for {} mods...", mods.size());
 
-    for (auto mod : mods) {
+    for (const auto& mod : mods) {
       organizedGames.insert(
           std::make_pair<QString, int>(mod->gameName().toLower(), mod->nexusId()));
     }
 
-    for (auto game : organizedGames) {
+    for (const auto& game : organizedGames) {
       NexusInterface::instance().requestUpdates(game.second, receiver, QVariant(),
                                                 game.first, QString());
     }
@@ -566,7 +567,7 @@ QUrl ModInfo::parseCustomURL() const
     return {};
   }
 
-  const auto url = QUrl::fromUserInput(this->url());
+  auto url = QUrl::fromUserInput(this->url());
 
   if (!url.isValid()) {
     log::error("mod '{}' has an invalid custom url '{}'", name(), this->url());

@@ -6,8 +6,8 @@
 
 using namespace MOBase;
 
-PersistentCookieJar::PersistentCookieJar(const QString& fileName, QObject* parent)
-    : QNetworkCookieJar(parent), m_FileName(fileName)
+PersistentCookieJar::PersistentCookieJar(QString fileName, QObject* parent)
+    : QNetworkCookieJar(parent), m_FileName(std::move(fileName))
 {
   restore();
 }

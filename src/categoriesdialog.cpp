@@ -154,7 +154,8 @@ void CategoriesDialog::commitChanges()
     if (ui->categoriesTable->item(index, 3) != nullptr)
       nexusData = ui->categoriesTable->item(index, 3)->data(Qt::UserRole).toList();
     std::vector<CategoryFactory::NexusCategory> nexusCats;
-    for (auto nexusCat : nexusData) {
+    nexusCats.reserve(nexusData.size());
+    for (const auto& nexusCat : nexusData) {
       nexusCats.push_back(CategoryFactory::NexusCategory(
           nexusCat.toList()[0].toString(), nexusCat.toList()[1].toInt()));
     }

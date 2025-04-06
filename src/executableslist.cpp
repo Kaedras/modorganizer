@@ -30,6 +30,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFileInfo>
 
 #include <algorithm>
+#include <utility>
 
 using namespace MOBase;
 using namespace Qt::StringLiterals;
@@ -111,6 +112,7 @@ void ExecutablesList::load(const MOBase::IPluginGame* game, const Settings& s)
 void ExecutablesList::store(Settings& s)
 {
   std::vector<std::map<QString, QVariant>> v;
+  v.reserve(this->size());
 
   for (const auto& item : *this) {
     std::map<QString, QVariant> map;
@@ -136,6 +138,7 @@ ExecutablesList::getPluginExecutables(MOBase::IPluginGame const* game) const
   Q_ASSERT(game != nullptr);
 
   std::vector<Executable> v;
+  v.reserve(game->executables().size());
 
   for (const ExecutableInfo& info : game->executables()) {
     if (!info.isValid()) {
@@ -372,7 +375,7 @@ void ExecutablesList::dump() const
   }
 }
 
-Executable::Executable(QString title) : m_title(title) {}
+Executable::Executable(QString title) : m_title(std::move(title)) {}
 
 Executable::Executable(const MOBase::ExecutableInfo& info, Flags flags)
     : m_title(info.title()), m_binaryInfo(info.binary()),

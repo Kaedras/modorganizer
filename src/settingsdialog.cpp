@@ -38,6 +38,8 @@ SettingsDialog::SettingsDialog(PluginContainer* pluginContainer, Settings& setti
 {
   ui->setupUi(this);
 
+  m_tabs.reserve(8);
+
   m_tabs.push_back(
       std::unique_ptr<SettingsTab>(new GeneralSettingsTab(settings, *this)));
   m_tabs.push_back(std::unique_ptr<SettingsTab>(new ThemeSettingsTab(settings, *this)));

@@ -18,9 +18,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "loglist.h"
+
 #include "copyeventfilter.h"
 #include "env.h"
 #include "organizercore.h"
+#include <utility>
 
 #ifdef __unix__
 static constexpr const char* userEnvVariable = "USER";
@@ -372,7 +374,7 @@ void initLogging()
   log::createDefault(conf);
 
   log::getDefault().setCallback([](log::Entry e) {
-    LogModel::instance().add(e);
+    LogModel::instance().add(std::move(e));
   });
 
   log::getDefault().addToBlacklist(std::string("\\") + getenv(userEnvVariable),

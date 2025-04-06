@@ -39,6 +39,7 @@ void CSVBuilder::setEscapeMode(CSVBuilder::EFieldType type, CSVBuilder::EQuoteMo
 void CSVBuilder::setFields(const std::vector<std::pair<QString, EFieldType>>& fields)
 {
   std::vector<QString> fieldNames;
+  fieldNames.reserve(fields.size());
   std::map<QString, EFieldType> fieldTypes;
 
   for (auto iter = fields.begin(); iter != fields.end(); ++iter) {

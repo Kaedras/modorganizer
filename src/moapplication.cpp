@@ -422,8 +422,7 @@ void MOApplication::externalMessage(const QString& message)
         reportError(
             tr("This shortcut or command line is for instance '%1', but the current "
                "instance is '%2'.")
-                .arg(*i)
-                .arg(ci->displayName()));
+                .arg(*i, ci->displayName()));
 
         return;
       }
@@ -434,8 +433,7 @@ void MOApplication::externalMessage(const QString& message)
         reportError(
             tr("This shortcut or command line is for profile '%1', but the current "
                "profile is '%2'.")
-                .arg(*p)
-                .arg(m_core->profileName()));
+                .arg(*p, m_core->profileName()));
 
         return;
       }
@@ -703,7 +701,7 @@ QString MOSplash::getSplashPath(const Settings& settings, const QString& dataPat
   }
 
   // try splash from instance directory
-  const QString splashPath = dataPath % u"/splash.png"_s;
+  QString splashPath = dataPath % u"/splash.png"_s;
   if (QFile::exists(splashPath)) {
     QImage image(splashPath);
     if (!image.isNull()) {

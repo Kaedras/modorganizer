@@ -1,6 +1,7 @@
 #include "game_features.h"
 
 #include <algorithm>
+#include <ranges>
 
 #include <QTimer>
 
@@ -244,7 +245,7 @@ void GameFeatures::updateCurrentFeatures()
   // plugin is disabled or unregistered)
   //
 
-  for (auto& [info, _] : m_allFeatures) {
+  for (auto& info : m_allFeatures | std::views::keys) {
     updateCurrentFeatures(info);
   }
 }

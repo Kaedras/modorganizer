@@ -1396,7 +1396,7 @@ void ModListViewActions::clearOverwrite() const
             tr("About to recursively delete:\n") + overwriteDir.absolutePath(),
             QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok) {
       QStringList delList;
-      for (auto f :
+      for (const auto& f :
            overwriteDir.entryList(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot))
         delList.push_back(overwriteDir.absoluteFilePath(f));
       if (shellDelete(delList, true)) {

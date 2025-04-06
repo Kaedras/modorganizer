@@ -4,6 +4,7 @@
 #include "shared/filesorigin.h"
 #include "utility.h"
 #include <filesystem>
+#include <ranges>
 
 #include "iplugingame.h"
 #include "moddatachecker.h"
@@ -104,11 +105,14 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
   if (m_Core.directoryStructure()->originExists(u"data"_s)) {
     dataIDs.push_back(m_Core.directoryStructure()->getOriginByName(u"data"_s).getID());
   }
-  for (const auto& origin : m_Core.managedGame()->secondaryDataDirectories().keys()) {
-    if (m_Core.directoryStructure()->originExists(origin)) {
-      dataIDs.push_back(m_Core.directoryStructure()->getOriginByName(origin).getID());
-    }
-  }
+  std::for_each(m_Core.managedGame()->secondaryDataDirectories().keyBegin(),
+                m_Core.managedGame()->secondaryDataDirectories().keyEnd(),
+                [&](const QString& origin) {
+                  if (m_Core.directoryStructure()->originExists(origin)) {
+                    dataIDs.push_back(
+                        m_Core.directoryStructure()->getOriginByName(origin).getID());
+                  }
+                });
 
   QString name = this->name();
 

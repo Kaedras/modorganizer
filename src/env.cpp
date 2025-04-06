@@ -146,11 +146,11 @@ QString Environment::timezone() const
           : timeZone.daylightTimeOffset(timeZone.nextTransition(now).atUtc);
 
   const auto stdName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
-  const auto std = QStringLiteral("%1, %2").arg(stdName).arg(offsetString(utcOffset));
+  const auto std = QStringLiteral("%1, %2").arg(stdName, offsetString(utcOffset));
 
   const auto dstName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
   const auto dst =
-      QStringLiteral("%1, %2").arg(dstName).arg(offsetString(utcOffset + dstOffset));
+      QStringLiteral("%1, %2").arg(dstName, offsetString(utcOffset + dstOffset));
 
   if (timeZone.isDaylightTime(now)) {
     s = dst % u" (dst is active, std is "_s % std % ')';
@@ -308,10 +308,8 @@ Service::Status Service::status() const
 
 QString Service::toString() const
 {
-  return QString("service '%1', start=%2, status=%3")
-      .arg(m_name)
-      .arg(env::toString(m_startType))
-      .arg(env::toString(m_status));
+  return QStringLiteral("service '%1', start=%2, status=%3")
+      .arg(m_name, env::toString(m_startType), env::toString(m_status));
 }
 
 QString toString(Service::StartType st)

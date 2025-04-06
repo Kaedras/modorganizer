@@ -38,6 +38,8 @@ OrganizerProxy::~OrganizerProxy()
 
 void OrganizerProxy::connectSignals()
 {
+  m_Connections.reserve(10);
+
   m_Connections.push_back(
       m_Proxied->onAboutToRun(callSignalIfPluginActive(this, m_AboutToRun, true)));
   m_Connections.push_back(

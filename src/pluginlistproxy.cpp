@@ -16,6 +16,8 @@ PluginListProxy::~PluginListProxy()
 
 void PluginListProxy::connectSignals()
 {
+  m_Connections.reserve(3);
+
   m_Connections.push_back(
       m_Proxied->onRefreshed(callSignalIfPluginActive(m_OrganizerProxy, m_Refreshed)));
   m_Connections.push_back(m_Proxied->onPluginMoved(
