@@ -571,11 +571,11 @@ GeneralConflictsTab::GeneralConflictsTab(ConflictsTab* tab, Ui::ModInfoDialog* p
     m_tab->activateItems(ui->overwriteTree);
   });
 
-  QObject::connect(ui->overwrittenTree, &QTreeView::doubleClicked, [&](auto&& item) {
+  QObject::connect(ui->overwrittenTree, &QTreeView::doubleClicked, [&](auto&&) {
     m_tab->activateItems(ui->overwrittenTree);
   });
 
-  QObject::connect(ui->noConflictTree, &QTreeView::doubleClicked, [&](auto&& item) {
+  QObject::connect(ui->noConflictTree, &QTreeView::doubleClicked, [&](auto&&) {
     m_tab->activateItems(ui->noConflictTree);
   });
 

@@ -76,7 +76,7 @@ std::vector<Process> getRunningProcesses()
       // directory name may not be an integer, in which case it can be ignored
       pid_t pid = stoi(item.path().filename());
       v.emplace_back(pid, getProcessParentID((DWORD)pid), getProcessName((DWORD)pid));
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
     }
   }
 

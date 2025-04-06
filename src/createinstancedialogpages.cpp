@@ -101,7 +101,7 @@ void Page::next()
   m_dlg.next();
 }
 
-bool Page::action(CreateInstanceDialog::Actions a)
+bool Page::action(CreateInstanceDialog::Actions)
 {
   // no-op
   return false;

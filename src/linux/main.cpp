@@ -27,8 +27,8 @@ namespace env
 extern HandlePtr dumpFile(const QString& dir);
 }  // namespace env
 
-static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor,
-                         void* context, bool succeeded)
+static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void*,
+                         bool succeeded)
 {
   if (succeeded) {
     std::cout << "Dump path: " << descriptor.path() << "\n";

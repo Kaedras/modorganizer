@@ -101,7 +101,7 @@ void ValidationProgressDialog::stop()
   hide();
 }
 
-void ValidationProgressDialog::showEvent(QShowEvent* e)
+void ValidationProgressDialog::showEvent(QShowEvent*)
 {
   if (m_first) {
     if (m_settings) {

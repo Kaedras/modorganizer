@@ -48,7 +48,7 @@ void ModInfoDialogTab::saveState(Settings&)
   // no-op
 }
 
-void ModInfoDialogTab::restoreState(const Settings& s)
+void ModInfoDialogTab::restoreState(const Settings&)
 {
   // no-op
 }

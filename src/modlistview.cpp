@@ -768,13 +768,13 @@ void ModListView::setup(OrganizerCore& core, CategoryFactory& factory, MainWindo
 
   // update the proxy when changing the sort column/direction and the group
   connect(m_sortProxy, &QAbstractItemModel::layoutAboutToBeChanged,
-          [this](auto&& parents, auto&& hint) {
+          [this](auto&&, auto&& hint) {
             if (hint == QAbstractItemModel::VerticalSortHint) {
               updateGroupByProxy();
             }
           });
   connect(ui.groupBy, QOverload<int>::of(&QComboBox::currentIndexChanged),
-          [=, this](int index) {
+          [=, this](int) {
             updateGroupByProxy();
             onModFilterActive(m_sortProxy->isFilterActive());
           });

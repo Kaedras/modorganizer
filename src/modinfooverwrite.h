@@ -23,7 +23,7 @@ public:
   virtual bool setName(const QString&) override { return false; }
   virtual void setComments(const QString&) override {}
   virtual void setNotes(const QString&) override {}
-  virtual void setGameName(const QString& gameName) override {}
+  virtual void setGameName(const QString&) override {}
   virtual void setNexusID(int) override {}
   virtual void setNewestVersion(const MOBase::VersionInfo&) override {}
   virtual void ignoreUpdate(bool) override {}
@@ -74,23 +74,21 @@ public:
   virtual void addInstalledFile(int, int) override {}
   virtual std::set<std::pair<int, int>> installedFiles() const override { return {}; }
 
-  virtual QVariant pluginSetting(const QString& pluginName, const QString& key,
+  virtual QVariant pluginSetting(const QString&, const QString&,
                                  const QVariant& defaultValue) const override
   {
     return defaultValue;
   }
-  virtual std::map<QString, QVariant>
-  pluginSettings(const QString& pluginName) const override
+  virtual std::map<QString, QVariant> pluginSettings(const QString&) const override
   {
     return {};
   }
-  virtual bool setPluginSetting(const QString& pluginName, const QString& key,
-                                const QVariant& value) override
+  virtual bool setPluginSetting(const QString&, const QString&,
+                                const QVariant&) override
   {
     return false;
   }
-  virtual std::map<QString, QVariant>
-  clearPluginSettings(const QString& pluginName) override
+  virtual std::map<QString, QVariant> clearPluginSettings(const QString&) override
   {
     return {};
   }

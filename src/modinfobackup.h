@@ -15,7 +15,7 @@ public:
   virtual bool updateIgnored() const override { return false; }
   virtual bool downgradeAvailable() const override { return false; }
   virtual bool updateNXMInfo() override { return false; }
-  virtual void setGameName(const QString& gameName) override {}
+  virtual void setGameName(const QString&) override {}
   virtual void setNexusID(int) override {}
   virtual void endorse(bool) override {}
   virtual void ignoreUpdate(bool) override {}

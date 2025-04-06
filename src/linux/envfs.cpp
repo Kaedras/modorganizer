@@ -11,7 +11,7 @@ using namespace std;
 namespace env
 {
 
-void setHandleCloserThreadCount(std::size_t n) {}
+void setHandleCloserThreadCount(std::size_t) {}
 
 void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
                       DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)

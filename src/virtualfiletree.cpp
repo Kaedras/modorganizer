@@ -23,26 +23,20 @@ protected:
   /**
    * No mutable operations allowed.
    */
-  bool beforeReplace(IFileTree const* dstTree, FileTreeEntry const* destination,
-                     FileTreeEntry const* source) override
+  bool beforeReplace(IFileTree const*, FileTreeEntry const*,
+                     FileTreeEntry const*) override
   {
     return false;
   }
-  bool beforeInsert(IFileTree const* entry, FileTreeEntry const* name) override
-  {
-    return false;
-  }
-  bool beforeRemove(IFileTree const* entry, FileTreeEntry const* name) override
-  {
-    return false;
-  }
-  std::shared_ptr<FileTreeEntry> makeFile(std::shared_ptr<const IFileTree> parent,
-                                          QString name) const override
+  bool beforeInsert(IFileTree const*, FileTreeEntry const*) override { return false; }
+  bool beforeRemove(IFileTree const*, FileTreeEntry const*) override { return false; }
+  std::shared_ptr<FileTreeEntry> makeFile(std::shared_ptr<const IFileTree>,
+                                          QString) const override
   {
     return nullptr;
   }
-  std::shared_ptr<IFileTree> makeDirectory(std::shared_ptr<const IFileTree> parent,
-                                           QString name) const override
+  std::shared_ptr<IFileTree> makeDirectory(std::shared_ptr<const IFileTree>,
+                                           QString) const override
   {
     return nullptr;
   }
