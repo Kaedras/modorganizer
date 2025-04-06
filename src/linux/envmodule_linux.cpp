@@ -116,7 +116,7 @@ DWORD getProcessParentID(DWORD pid)
     log::warn("could not get ppid of pid {}: {}", pid, strerror(error));
     return 0;
   }
-  int items = fscanf(file, "%*llu (%*[^)]%*[)] %*c %d", &ppid);
+  int items = fscanf(file, "%*u (%*[^)]%*[)] %*c %d", &ppid);
   if (items != 1) {
     const int error = errno;
     log::warn("could not get ppid of pid {}: {}", pid, strerror(error));
