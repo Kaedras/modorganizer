@@ -851,7 +851,7 @@ void ModListViewActions::changeVersioningScheme(const QModelIndex& index) const
         VersionInfo::SCHEME_REGULAR, VersionInfo::SCHEME_DECIMALMARK,
         VersionInfo::SCHEME_NUMBERSANDLETTERS};
 
-    for (int i = 0;
+    for (size_t i = 0;
          i < sizeof(schemes) / sizeof(VersionInfo::VersionScheme) && !success; ++i) {
       VersionInfo verOld(info->version().canonicalString(), schemes[i]);
       VersionInfo verNew(info->newestVersion().canonicalString(), schemes[i]);

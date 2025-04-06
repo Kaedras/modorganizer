@@ -775,7 +775,7 @@ OrganizerCore::doInstall(const QString& archivePath, GuessedValue<QString> modNa
     connect(
         this, &OrganizerCore::directoryStructureReady, this,
         [=, this] {
-          const int modIndex = ModInfo::getIndex(modName);
+          const unsigned int modIndex = ModInfo::getIndex(modName);
           if (modIndex != UINT_MAX) {
             const auto modInfo = ModInfo::getByIndex(modIndex);
             m_ModList.notifyModInstalled(modInfo.get());

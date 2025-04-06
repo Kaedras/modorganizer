@@ -240,7 +240,7 @@ bool ModListByPriorityProxy::canDropMimeData(const QMimeData* data,
 
   if (dropInfo.isModDrop()) {
     bool hasSeparator          = false;
-    unsigned int firstRowIndex = -1;
+    unsigned int firstRowIndex = UINT_MAX;
 
     int firstRowPriority = Profile::MaximumPriority;
     for (auto sourceRow : dropInfo.rows()) {
@@ -255,7 +255,7 @@ bool ModListByPriorityProxy::canDropMimeData(const QMimeData* data,
     }
 
     bool firstRowSeparator =
-        firstRowIndex != -1 && ModInfo::getByIndex(firstRowIndex)->isSeparator();
+        firstRowIndex != UINT_MAX && ModInfo::getByIndex(firstRowIndex)->isSeparator();
 
     // row = -1 and valid parent means we're dropping onto an item, we don't want to
     // drop separators onto items or items into their own separator

@@ -383,7 +383,7 @@ void PluginList::fixPluginRelationships()
   }
 
   // Ensure masters are up top and normal plugins are down below
-  for (int i = 0; i < m_ESPs.size(); i++) {
+  for (size_t i = 0; i < m_ESPs.size(); i++) {
     ESPInfo& plugin = m_ESPs[i];
     if (plugin.hasLightExtension || plugin.hasMasterExtension ||
         plugin.isMasterFlagged) {
@@ -414,7 +414,7 @@ void PluginList::fixPluginRelationships()
   }
 
   // Ensure master/child relationships are observed
-  for (int i = 0; i < m_ESPs.size(); i++) {
+  for (size_t i = 0; i < m_ESPs.size(); i++) {
     ESPInfo& plugin = m_ESPs[i];
     int newPriority = plugin.priority;
     for (const auto& master : plugin.masters) {
@@ -435,7 +435,7 @@ void PluginList::fixPriorities()
 {
   std::vector<std::pair<int, int>> espPrios;
 
-  for (int i = 0; i < m_ESPs.size(); ++i) {
+  for (size_t i = 0; i < m_ESPs.size(); ++i) {
     int prio = m_ESPs[i].priority;
     if (prio == -1) {
       prio = INT_MAX;
@@ -448,7 +448,7 @@ void PluginList::fixPriorities()
               return lhs.first < rhs.first;
             });
 
-  for (int i = 0; i < espPrios.size(); ++i) {
+  for (size_t i = 0; i < espPrios.size(); ++i) {
     m_ESPs[espPrios[i].second].priority = i;
   }
 }
@@ -474,7 +474,7 @@ void PluginList::enableESP(const QString& name, bool enable)
 
 int PluginList::findPluginByPriority(int priority)
 {
-  for (int i = 0; i < m_ESPs.size(); i++) {
+  for (size_t i = 0; i < m_ESPs.size(); i++) {
     if (m_ESPs[i].priority == priority) {
       return i;
     }
@@ -1192,7 +1192,7 @@ void PluginList::generatePluginIndexes()
   std::vector<int> coreLightPlugins;
   std::vector<int> coreMediumPlugins;
 
-  for (int l = 0; l < m_ESPs.size(); ++l) {
+  for (size_t l = 0; l < m_ESPs.size(); ++l) {
     int i = m_ESPsByPriority.at(l);
     if (!m_ESPs[i].enabled) {
       m_ESPs[i].index = QString();
