@@ -10,6 +10,7 @@
 #include <ctime>
 #include <deque>
 #include <exception>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iomanip>
@@ -53,6 +54,21 @@
 
 // openssl
 #include <tlhelp32.h>
+#else
+// unix
+#include <flatpak/flatpak.h>
+#include <libsecret/secret.h>
+#include <poll.h>
+#include <pwd.h>
+extern "C"
+{
+#include <sys/pidfd.h>
+}
+#include <sys/prctl.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 
 // boost
