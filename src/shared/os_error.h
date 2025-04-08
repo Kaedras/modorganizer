@@ -25,7 +25,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
-#include "../linux/compatibility.h"
+#include <uibase/linux/compatibility.h>
 #endif
 
 namespace MOShared
@@ -34,7 +34,7 @@ namespace MOShared
 class os_error : public std::runtime_error
 {
 public:
-  os_error(const std::string& message, int errorcode = ::GetLastError())
+  os_error(const std::string& message, int errorcode = GetLastError())
       : runtime_error(constructMessage(message, errorcode)), m_ErrorCode(errorcode)
   {}
   int getErrorCode() const { return m_ErrorCode; }
