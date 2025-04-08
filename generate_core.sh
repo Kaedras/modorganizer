@@ -34,6 +34,10 @@ EXECUTABLE="ModOrganizer"
 minidump-2-core -v "$DUMP" > $CORE_FILE 2> $OUTPUT_FILE
 
 # open output file and get all symbol files
+# convert e.g.
+# 0x7fcef1023000-0x7fcef119f000, ChkSum: 0x00000000, GUID: 7EFAC761-FB86-46DD-0C43-BF1C48B430B8,  "/usr/lib64/libc.so.6"
+# to
+# /usr/lib64/libc.so.6
 FILES=$(grep -w GUID "$OUTPUT_FILE" | grep / | sed -e 's/.*GUID: .*,  //' | sed -e 's/\"//' | sed -e 's/\"//')
 
 # source: https://stackoverflow.com/a/20460402
