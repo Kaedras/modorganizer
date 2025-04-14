@@ -59,6 +59,8 @@ using namespace MOBase;
 using namespace MOShared;
 using namespace Qt::StringLiterals;
 
+extern bool isFileLocked(const QString& fileName) noexcept(false);
+
 static QString TruncateString(const QString& text)
 {
   QString new_text = text;
@@ -755,23 +757,20 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
   for (ESPInfo& esp : m_ESPs) {
     const FileEntryPtr fileEntry = directoryStructure.findFile(esp.name);
     if (fileEntry.get() != nullptr) {
-      QString fileName;
       bool archive = false;
       int originid = fileEntry->getOrigin(archive);
 
-      fileName = QStringLiteral("%1/%2")
-                     .arg(QDir::toNativeSeparators(
-                         directoryStructure.getOriginByID(originid).getPath()))
-                     .arg(esp.name);
+      QString fileName = QStringLiteral("%1/%2").arg(
+          QDir::toNativeSeparators(
+              directoryStructure.getOriginByID(originid).getPath()),
+          esp.name);
 
-      QFile file(fileName);
-      QLockFile lockFile(fileName);
-      if (!lockFile.tryLock()) {
+      if (isFileLocked(fileName)) {
         // file is locked, probably the game is running
         return false;
       }
-      lockFile.unlock();
-      if (!file.isOpen()) {
+      QFile file(fileName);
+      if (!file.open(QIODeviceBase::ReadWrite)) {
         throw std::runtime_error(QObject::tr("failed to access %1: %2")
                                      .arg(fileName, file.errorString())
                                      .toUtf8()
