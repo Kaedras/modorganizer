@@ -613,8 +613,7 @@ ProcessRunner& ProcessRunner::setFromShortcut(const MOShortcut& shortcut)
               "This shortcut is for instance '%1' but Mod Organizer is currently "
               "running for '%2'. Exit Mod Organizer before running the shortcut or "
               "change the active instance.")
-              .arg(shortcut.instanceDisplayName())
-              .arg(currentInstance->displayName()));
+              .arg(shortcut.instanceDisplayName(), currentInstance->displayName()));
 
       throw std::exception();
     }
@@ -626,9 +625,9 @@ ProcessRunner& ProcessRunner::setFromShortcut(const MOShortcut& shortcut)
   if (exe != exes->end()) {
     setFromExecutable(*exe);
   } else {
-    MOBase::reportError(QObject::tr("Executable '%1' does not exist in instance '%2'.")
-                            .arg(shortcut.executableName())
-                            .arg(currentInstance->displayName()));
+    MOBase::reportError(
+        QObject::tr("Executable '%1' does not exist in instance '%2'.")
+            .arg(shortcut.executableName(), currentInstance->displayName()));
 
     throw std::exception();
   }

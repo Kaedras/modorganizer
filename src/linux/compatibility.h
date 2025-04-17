@@ -1,7 +1,6 @@
 #ifndef COMPATIBILITY_H
 #define COMPATIBILITY_H
 
-#include <cerrno>
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/wait.h>

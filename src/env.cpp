@@ -370,7 +370,7 @@ std::pair<QString, QString> splitExeAndArguments(const QString& cmd)
     }
   } else {
     // no double-quotes, find the first whitespace
-    static const QRegularExpression regex("\\s");
+    static const QRegularExpression regex(u"\\s"_s);
     exeEnd = cmd.indexOf(regex);
     if (exeEnd == -1) {
       exeEnd = cmd.size();

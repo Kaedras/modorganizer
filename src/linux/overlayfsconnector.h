@@ -22,8 +22,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "envdump.h"
 #include <QDebug>
-#include <QFile>
-#include <QList>
 #include <QString>
 #include <QThread>
 #include <exception>

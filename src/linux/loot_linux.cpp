@@ -184,7 +184,7 @@ QString Loot::Dirty::toString(bool isClean) const
 {
   if (isClean) {
     return QObject::tr("Verified clean by %1")
-        .arg(cleaningUtility.isEmpty() ? "?" : cleaningUtility);
+        .arg(cleaningUtility.isEmpty() ? u"?"_s : cleaningUtility);
   }
 
   QString s = cleaningString();
@@ -205,7 +205,7 @@ QString Loot::Dirty::cleaningString() const
 {
   return QObject::tr("%1 found %2 ITM record(s), %3 deleted reference(s) and %4 "
                      "deleted navmesh(es).")
-      .arg(cleaningUtility.isEmpty() ? "?" : cleaningUtility)
+      .arg(cleaningUtility.isEmpty() ? u"?"_s : cleaningUtility)
       .arg(itm)
       .arg(deletedReferences)
       .arg(deletedNavmesh);

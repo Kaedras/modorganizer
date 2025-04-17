@@ -495,7 +495,7 @@ extern bool isJavaFile(const QFileInfo& target);
 FileExecutionContext getFileExecutionContext(QWidget* parent, const QFileInfo& target)
 {
   if (isJavaFile(target)) {
-    return {QFileInfo("java"),
+    return {QFileInfo(u"java"_s),
             QStringLiteral(R"(-jar "%1")")
                 .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
             FileExecutionTypes::Executable};

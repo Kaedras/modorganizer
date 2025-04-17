@@ -121,7 +121,7 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
   for (const auto& map : mapping) {
     if (progress.wasCanceled()) {
       m_overlayfsManager.clearMappings();
-      throw OverlayfsConnectorException("Overlayfs mapping canceled by user");
+      throw OverlayfsConnectorException(u"Overlayfs mapping canceled by user"_s);
     }
     progress.setValue(value++);
     if (value % 10 == 0) {
