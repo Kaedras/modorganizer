@@ -199,7 +199,9 @@ void Environment::dump(const Settings& s) const
 
   log::debug("displays:");
   for (const auto& d : metrics().displays()) {
-    log::debug(" . {} - {}", d->name(), d->model());
+    log::debug(" . {}*{} {} dpi={} on {}, model: {}", d->geometry().width(),
+               d->geometry().height(), round(d->refreshRate()), d->logicalDotsPerInch(),
+               d->name(), d->model());
   }
 
   const auto r = metrics().desktopGeometry();
