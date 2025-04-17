@@ -413,6 +413,7 @@ bool startSteam(QWidget* parent)
     return false;
   }
 
+  // todo: check whether steam should really be detached
   QProcess p;
   p.setProgram(binary);
   p.setArguments(QProcess::splitCommand(arguments));

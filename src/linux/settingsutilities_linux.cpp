@@ -201,9 +201,8 @@ bool setSecret(const QString& key, const QString& data) noexcept(false)
   try {
     if (data.isEmpty()) {
       return deleteSecret(key);
-    } else {
-      return addSecret(key, data);
     }
+    return addSecret(key, data);
   } catch (...) {
     throw;
   }

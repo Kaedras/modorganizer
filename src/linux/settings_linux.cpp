@@ -96,7 +96,6 @@ bool GlobalSettings::nexusApiKey(QString& apiKey)
     log::error("error getting nexus api key: {}", e.what());
     return false;
   }
-  return false;
 }
 
 bool GlobalSettings::setNexusApiKey(const QString& apiKey)

@@ -1,7 +1,8 @@
-#include <QString>
 #include "../shared/os_error.h"
+#include <QString>
 
-bool isFileLocked(const QString& fileName) noexcept(false) {
+bool isFileLocked(const QString& fileName) noexcept(false)
+{
   HANDLE file =
       ::CreateFile(fileName.toStdWString().c_str(), GENERIC_READ | GENERIC_WRITE, 0,
                    nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);

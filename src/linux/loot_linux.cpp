@@ -283,7 +283,7 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   parameters << u"--game"_s << m_core.managedGame()->lootGameName() << u"--gamePath"_s
              << m_core.managedGame()->gameDirectory().absolutePath()
              << u"--pluginListPath"_s
-             << QString(u"%1/loadorder.txt"_s).arg(m_core.profilePath())
+             << QStringLiteral("%1/loadorder.txt").arg(m_core.profilePath())
              << u"--logLevel"_s << QString::fromStdString(logLevelToString(logLevel))
              << u"--out"_s << LootReportPath << u"--language"_s
              << m_core.settings().interface().language();
@@ -415,6 +415,8 @@ void Loot::processMessage(const lootcli::Message& m)
     emit progress(m.progress);
     break;
   }
+  case lootcli::MessageType::None:
+    break;
   }
 }
 
