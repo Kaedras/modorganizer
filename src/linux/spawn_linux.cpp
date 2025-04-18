@@ -247,7 +247,6 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 {
   // check steam path first to fail early if it is not found
   QString steamPath = findSteamCached();
-  // QString steamPath = "/home/michael/.local/share/Steam";
   if (steamPath.isEmpty()) {
     log::error("could not find steam installation path");
     return -1;
@@ -422,7 +421,7 @@ bool startSteam(QWidget* parent)
 
 HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
-  HANDLE handle = ::INVALID_HANDLE_VALUE;
+  HANDLE handle = INVALID_HANDLE_VALUE;
   int e;
   if (sp.binary.suffix() == "exe"_L1) {
     e = spawnProton(sp, handle);
@@ -442,7 +441,7 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 
   default: {
     dialogs::spawnFailed(parent, sp, e);
-    return ::INVALID_HANDLE_VALUE;
+    return INVALID_HANDLE_VALUE;
   }
   }
 }
