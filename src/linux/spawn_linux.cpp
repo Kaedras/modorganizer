@@ -252,12 +252,6 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     return -1;
   }
 
-  if (sp.hooked) {
-    if (!OverlayFsManager::getInstance().mount()) {
-      return -1;
-    }
-  }
-
   // appID is required to get the proton version to use as well as the compatdata path
   if (sp.steamAppID.isEmpty()) {
     log::error("cannot run proton application {} because appid is empty",
@@ -278,6 +272,12 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   QString proton = findProtonByAppID(sp.steamAppID);
   if (proton.isEmpty()) {
     return -1;
+  }
+
+  if (sp.hooked) {
+    if (!OverlayFsManager::getInstance().mount()) {
+      return -1;
+    }
   }
 
   // create argument list for execv
@@ -436,10 +436,16 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 
   case EACCES: {
     startBinaryAdmin(parent, sp);
-    return ::INVALID_HANDLE_VALUE;
+    if (sp.hooked) {
+      OverlayFsManager::getInstance().umount();
+    }
+    return INVALID_HANDLE_VALUE;
   }
 
   default: {
+    if (sp.hooked) {
+      OverlayFsManager::getInstance().umount();
+    }
     dialogs::spawnFailed(parent, sp, e);
     return INVALID_HANDLE_VALUE;
   }
