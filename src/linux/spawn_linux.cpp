@@ -450,9 +450,16 @@ QString findJavaInstallation(const QString& jarFile)
 {
   (void)jarFile;
 
-  auto s = getenv("JAVA_HOME");
-  if (s != nullptr) {
-    QString tmp = QString::fromUtf8(s);
+  // try PATH
+  QString java = QStandardPaths::findExecutable(u"java"_s);
+  if (!java.isEmpty()) {
+    return java;
+  }
+
+  // try JAVA_HOME
+  char* javaHome = getenv("JAVA_HOME");
+  if (javaHome != nullptr) {
+    QString tmp = QString::fromUtf8(javaHome);
     if (!tmp.endsWith('/')) {
       tmp += '/';
     }
