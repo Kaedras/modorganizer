@@ -25,10 +25,10 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
 {
   const QString modsPath = settings.paths().mods();
 
-  // Check if this a request with either an executable or a working directory
-  // under our mods folder then will start the process in a virtualized
-  // "environment" with the appropriate paths fixed:
-  // (i.e. mods\FNIS\path\exe => game\data\path\exe)
+  // If this a request with either an executable or a working directory
+  // inside a mod directory, the paths have to be rewritten to launch the executable
+  // inside overlay fs
+  // (i.e. mods/FNIS/path/exe => game/data/path/exe)
   QString cwdPath         = sp.currentDirectory.absolutePath();
   QString trailedModsPath = modsPath;
   if (!trailedModsPath.endsWith('/')) {
@@ -54,13 +54,8 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
         binPath += adjustedBin;
     }
 
-    QString cmdline = QString(R"(launch "%1" "%2" %3)")
-                          .arg(QDir::toNativeSeparators(cwdPath),
-                               QDir::toNativeSeparators(binPath), sp.arguments);
-
-    sp.binary    = QFileInfo(QCoreApplication::applicationFilePath());
-    sp.arguments = cmdline;
-    sp.currentDirectory.setPath(QCoreApplication::applicationDirPath());
+    sp.binary    = QFileInfo(binPath);
+    sp.currentDirectory.setPath(cwdPath);
   }
 }
 
@@ -818,8 +813,7 @@ std::optional<ProcessRunner::Results> ProcessRunner::runBinary()
     return Error;
   }
 
-  // if the executable is inside the mods folder another instance of
-  // ModOrganizer.exe is spawned instead to launch it
+  // rewrite paths if the executable is inside the mods folder
   adjustForVirtualized(game, m_sp, settings);
 
   // appID is required to get the prefix location
