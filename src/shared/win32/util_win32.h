@@ -15,4 +15,4 @@ inline FILETIME ToFILETIME(std::filesystem::file_time_type t)
 
 }  // namespace MOShared
 
-#endif //UTIL_WIN32_H
+#endif  // UTIL_WIN32_H

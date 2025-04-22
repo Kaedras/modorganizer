@@ -31,7 +31,8 @@ std::string os_error::constructMessage(const std::string& input, int inErrorCode
 
   int errorCode = inErrorCode != -1 ? inErrorCode : errno;
 
-  finalMessage << " (errorcode " << errorCode << ") (" << strerror(errorCode) << " [" << errorCode << "])";
+  finalMessage << " (errorcode " << errorCode << ") (" << strerror(errorCode) << " ["
+               << errorCode << "])";
 
   return finalMessage.str();
 }

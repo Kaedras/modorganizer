@@ -1,6 +1,6 @@
-#include "util.h"
 #include "../env.h"
 #include "../mainwindow.h"
+#include "util.h"
 #include "windows_error.h"
 #include <uibase/log.h>
 #include <usvfs/usvfs.h>
@@ -157,6 +157,5 @@ void SetThisThreadName(const QString& s)
     SetThreadDescription(GetCurrentThread(), s.toStdWString().c_str());
   }
 }
-
 
 }  // namespace MOShared

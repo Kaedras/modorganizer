@@ -54,7 +54,7 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
         binPath += adjustedBin;
     }
 
-    sp.binary    = QFileInfo(binPath);
+    sp.binary = QFileInfo(binPath);
     sp.currentDirectory.setPath(cwdPath);
   }
 }
