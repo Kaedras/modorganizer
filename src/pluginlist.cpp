@@ -682,7 +682,7 @@ void PluginList::readLockedOrderFrom(const QString& fileName)
     }
 
     // If the priority is larger than the number of plugins, just keep it locked
-    if (priority >= m_ESPsByPriority.size()) {
+    if (static_cast<unsigned int>(priority) >= m_ESPsByPriority.size()) {
       m_LockedOrder[pluginName] = priority;
       continue;
     }
@@ -703,7 +703,7 @@ void PluginList::readLockedOrderFrom(const QString& fileName)
     }
 
     // Find the next higher priority we can set the plugin to
-    while (++priority < m_ESPs.size()) {
+    while (static_cast<unsigned int>(++priority) < m_ESPs.size()) {
       if (!m_ESPs[m_ESPsByPriority.at(priority)].forceLoaded && !alreadyLocked()) {
         m_LockedOrder[pluginName] = priority;
         break;
@@ -711,7 +711,7 @@ void PluginList::readLockedOrderFrom(const QString& fileName)
     }
 
     // See if we walked off the end of the plugin list
-    if (priority >= m_ESPs.size()) {
+    if (static_cast<unsigned int>(priority) >= m_ESPs.size()) {
       // I guess go ahead and lock it here at the end of the list?
       m_LockedOrder[pluginName] = priority;
       continue;

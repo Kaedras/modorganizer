@@ -280,7 +280,7 @@ bool ModListByPriorityProxy::canDropMimeData(const QMimeData* data,
   }
 
   // the row may be outside of the children list if we insert at the end
-  if (!parent.isValid() && row >= m_Root.children.size()) {
+  if (!parent.isValid() && std::cmp_greater_equal(row, m_Root.children.size())) {
     return false;
   }
 
@@ -304,7 +304,7 @@ bool ModListByPriorityProxy::dropMimeData(const QMimeData* data, Qt::DropAction 
 
     if (row >= 0) {
       if (!parent.isValid()) {
-        if (row < m_Root.children.size()) {
+        if (static_cast<unsigned int>(row) < m_Root.children.size()) {
 
           if (m_sortOrder == Qt::AscendingOrder) {
             sourceRow = m_Root.children[row]->index;
@@ -354,9 +354,9 @@ bool ModListByPriorityProxy::dropMimeData(const QMimeData* data, Qt::DropAction 
             row--;
           }
 
-          if (row < item->children.size()) {
+          if (static_cast<unsigned int>(row) < item->children.size()) {
             sourceRow = item->children[row]->index;
-          } else if (parent.row() + 1 < m_Root.children.size()) {
+          } else if (std::cmp_less(parent.row() + 1, m_Root.children.size())) {
             sourceRow = m_Root.children[parent.row() + 1]->index;
           }
         }

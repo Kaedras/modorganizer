@@ -280,7 +280,8 @@ int QtGroupingProxy::indexOfParentCreate(const QModelIndex& parent) const
   struct ParentCreate pc;
   for (int i = 0; i < m_parentCreateList.size(); i++) {
     pc = m_parentCreateList[i];
-    if (pc.parentCreateIndex == parent.internalId() && pc.row == parent.row())
+    if (std::cmp_equal(pc.parentCreateIndex, parent.internalId()) &&
+        pc.row == parent.row())
       return i;
   }
   // there is no parentCreate yet for this index, so let's create one.

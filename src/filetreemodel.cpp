@@ -149,7 +149,7 @@ public:
       m_first = -1;
     }
 
-    if (m_current >= m_parentItem.children().size()) {
+    if (std::cmp_greater_equal(m_current, m_parentItem.children().size())) {
       return m_parentItem.children().end();
     }
 
@@ -278,7 +278,7 @@ bool FileTreeModel::showHiddenFiles() const
 QModelIndex FileTreeModel::index(int row, int col, const QModelIndex& parentIndex) const
 {
   if (auto* parentItem = itemFromIndex(parentIndex)) {
-    if (row < 0 || row >= parentItem->children().size()) {
+    if (row < 0 || std::cmp_greater_equal(row, parentItem->children().size())) {
       log::error("row {} out of range for {}", row, parentItem->debugName());
       return {};
     }
@@ -506,7 +506,8 @@ FileTreeItem* FileTreeModel::itemFromIndex(const QModelIndex& index) const
     return nullptr;
   }
 
-  if (index.row() < 0 || index.row() >= parentItem->children().size()) {
+  if (index.row() < 0 ||
+      std::cmp_greater_equal(index.row(), parentItem->children().size())) {
     log::error("FileTreeModel::itemFromIndex(): row {} is out of range for {}",
                index.row(), parentItem->debugName());
 

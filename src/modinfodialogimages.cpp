@@ -349,7 +349,7 @@ void ImagesTab::ensureVisible(std::size_t i, Visibility v)
   const auto last =
       (v == Visibility::Full ? first + fullyVisible : first + partiallyVisible);
 
-  if (i < first) {
+  if (std::cmp_less(i, first)) {
     // go up
     ui->imagesScrollerVBar->setValue(static_cast<int>(i));
   } else if (i >= last) {

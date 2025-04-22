@@ -8,7 +8,7 @@ namespace MOShared
 
 QString tail(const QString& source, const size_t count)
 {
-  if (count >= source.length()) {
+  if (std::cmp_greater_equal(count, source.length())) {
     return source;
   }
 

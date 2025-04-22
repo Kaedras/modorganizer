@@ -995,7 +995,8 @@ void ModListView::onDoubleClicked(const QModelIndex& index)
   bool indexOk = false;
   int modIndex = index.data(ModList::IndexRole).toInt(&indexOk);
 
-  if (!indexOk || modIndex < 0 || modIndex >= ModInfo::getNumMods()) {
+  if (!indexOk || modIndex < 0 ||
+      std::cmp_greater_equal(modIndex, ModInfo::getNumMods())) {
     return;
   }
 
