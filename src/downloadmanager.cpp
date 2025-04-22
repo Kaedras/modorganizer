@@ -676,7 +676,7 @@ void DownloadManager::addNXMDownload(const QString& url)
     return;
   }
 
-  for (auto tuple : m_PendingDownloads) {
+  for (const auto& tuple : m_PendingDownloads) {
     if (std::get<0>(tuple).compare(foundGame->gameShortName(), Qt::CaseInsensitive) ==
             0,
         std::get<1>(tuple) == nxmInfo.modId() &&
@@ -1074,7 +1074,7 @@ void DownloadManager::queryInfo(int index)
     if (choices.size() == 1) {
       info->m_FileInfo->gameName = choices[0].first;
     } else {
-      for (auto choice : choices) {
+      for (const auto& choice : choices) {
         selection.addChoice(choice.first, choice.second, choice.first);
       }
       if (selection.exec() == QDialog::Accepted) {

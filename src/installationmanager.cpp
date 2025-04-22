@@ -279,7 +279,7 @@ QStringList InstallationManager::extractFiles(
 
   for (auto& entry : files) {
     auto path = entry->path();
-    result.append(QDir::tempPath().append("/").append(path));
+    result.append(QDir::tempPath() % '/' % path);
     m_TempFilesToDelete.insert(path);
   }
 
@@ -695,7 +695,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
 
   if (version.isEmpty()) {
     QDateTime lastMod = fileInfo.lastModified();
-    version           = "d" + lastMod.toString("yyyy.M.d");
+    version           = 'd' % lastMod.toString(u"yyyy.M.d"_s);
   }
 
   {  // guess the mod name and mod if from the file name if there was no meta

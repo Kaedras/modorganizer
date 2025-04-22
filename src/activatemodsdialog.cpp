@@ -33,7 +33,7 @@ using namespace Qt::StringLiterals;
 
 ActivateModsDialog::ActivateModsDialog(SaveGameInfo::MissingAssets const& missingAssets,
                                        QWidget* parent)
-    : TutorableDialog("ActivateMods", parent), ui(new Ui::ActivateModsDialog)
+    : TutorableDialog(u"ActivateMods"_s, parent), ui(new Ui::ActivateModsDialog)
 {
   ui->setupUi(this);
 
