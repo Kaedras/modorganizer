@@ -246,9 +246,10 @@ void DownloadList::aboutToUpdate()
 
 void DownloadList::update(int row)
 {
-  if (row < 0)
+  if (row < 0) {
+    beginResetModel();
     emit endResetModel();
-  else if (row < this->rowCount())
+  } else if (row < this->rowCount())
     emit dataChanged(
         this->index(row, 0, QModelIndex()),
         this->index(row, this->columnCount(QModelIndex()) - 1, QModelIndex()));
