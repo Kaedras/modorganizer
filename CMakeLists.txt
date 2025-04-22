@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
 
-if (UNIX)
-	find_package(OpenGL REQUIRED)
-endif()
-
 # TODO: clean include directives
 set(MO2_CMAKE_DEPRECATED_UIBASE_INCLUDE ON)
 
