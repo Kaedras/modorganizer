@@ -16,36 +16,35 @@ public:
   OriginConnection& operator=(const OriginConnection&) = delete;
 
   std::pair<FilesOrigin&, bool>
-  getOrCreate(const std::wstring& originName, const std::wstring& directory,
-              int priority, const boost::shared_ptr<FileRegister>& fileRegister,
+  getOrCreate(const QString& originName, const QString& directory, int priority,
+              const boost::shared_ptr<FileRegister>& fileRegister,
               const boost::shared_ptr<OriginConnection>& originConnection,
               DirectoryStats& stats);
 
-  FilesOrigin& createOrigin(const std::wstring& originName,
-                            const std::wstring& directory, int priority,
-                            boost::shared_ptr<FileRegister> fileRegister,
+  FilesOrigin& createOrigin(const QString& originName, const QString& directory,
+                            int priority, boost::shared_ptr<FileRegister> fileRegister,
                             boost::shared_ptr<OriginConnection> originConnection);
 
-  bool exists(const std::wstring& name);
+  bool exists(const QString& name);
 
   FilesOrigin& getByID(OriginID ID);
   const FilesOrigin* findByID(OriginID ID) const;
-  FilesOrigin& getByName(const std::wstring& name);
+  FilesOrigin& getByName(const QString& name);
 
   void changePriorityLookup(int oldPriority, int newPriority);
 
-  void changeNameLookup(const std::wstring& oldName, const std::wstring& newName);
+  void changeNameLookup(const QString& oldName, const QString& newName);
 
 private:
   std::atomic<OriginID> m_NextID;
   std::map<OriginID, FilesOrigin> m_Origins;
-  std::map<std::wstring, OriginID> m_OriginsNameMap;
+  std::map<QString, OriginID> m_OriginsNameMap;
   mutable std::mutex m_Mutex;
 
   OriginID createID();
 
-  FilesOrigin& createOriginNoLock(const std::wstring& originName,
-                                  const std::wstring& directory, int priority,
+  FilesOrigin& createOriginNoLock(const QString& originName, const QString& directory,
+                                  int priority,
                                   boost::shared_ptr<FileRegister> fileRegister,
                                   boost::shared_ptr<OriginConnection> originConnection);
 };

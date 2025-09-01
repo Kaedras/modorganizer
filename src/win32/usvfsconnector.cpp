@@ -18,10 +18,10 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "usvfsconnector.h"
-#include "envmodule.h"
-#include "organizercore.h"
-#include "settings.h"
-#include "shared/util.h"
+#include "../envmodule.h"
+#include "../organizercore.h"
+#include "../settings.h"
+#include "../shared/util.h"
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QProgressDialog>
@@ -31,6 +31,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <qstandardpaths.h>
 #include <sstream>
 #include <usvfs/usvfs.h>
+#include <utility.h>
 
 static const char SHMID[] = "mod_organizer_instance";
 using namespace MOBase;
@@ -130,8 +131,7 @@ UsvfsConnector::UsvfsConnector()
   const LogLevel logLevel = toUsvfsLogLevel(s.diagnostics().logLevel());
   const auto dumpType     = toUsvfsCrashDumpsType(s.diagnostics().coreDumpType());
   const auto delay        = duration_cast<milliseconds>(s.diagnostics().spawnDelay());
-  std::string dumpPath =
-      MOShared::ToString(OrganizerCore::getGlobalCoreDumpPath(), true);
+  std::string dumpPath = MOBase::ToString(OrganizerCore::getGlobalCoreDumpPath(), true);
 
   usvfsParameters* params = usvfsCreateParameters();
 

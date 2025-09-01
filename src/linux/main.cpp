@@ -9,11 +9,60 @@
 #include "thread_utils.h"
 #include <log.h>
 #include <report.h>
+#include <sys/prctl.h>
+
+// fixes an error message in breakpad
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+#include <client/linux/handler/exception_handler.h>
 
 using namespace MOBase;
+using namespace std;
+namespace fs = std::filesystem;
 
-thread_local LPTOP_LEVEL_EXCEPTION_FILTER g_prevExceptionFilter = nullptr;
-thread_local std::terminate_handler g_prevTerminateHandler      = nullptr;
+namespace env
+{
+extern HandlePtr dumpFile(const QString& dir);
+}  // namespace env
+
+static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void*,
+                         bool succeeded)
+{
+  if (succeeded) {
+    auto h = env::dumpFile(OrganizerCore::getGlobalCoreDumpPath());
+
+    // get filename from fd
+    error_code ec;
+    fs::path filename = fs::read_symlink("/proc/self/fd/" + to_string(h.get()), ec);
+    if (ec) {
+      cerr << "Error getting filename from fd, " << ec.message() << "\n";
+      return succeeded;
+    }
+
+    // rename file
+    fs::rename(descriptor.path(), filename, ec);
+    if (ec) {
+      cerr << "Error renaming minidump, " << ec.message() << "\n";
+      return succeeded;
+    }
+
+    // check if the crash dump path is set
+    string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
+    if (!path.empty()) {
+      fs::rename(filename, path / filename, ec);
+      if (ec) {
+        cerr << "Error moving minidump to " << path << ", " << ec.message() << "\n";
+      }
+    }
+
+  } else {
+    cerr << "Error creating minidump\n";
+  }
+  return succeeded;
+}
+
+thread_local std::terminate_handler g_prevTerminateHandler = nullptr;
 
 int run(int argc, char* argv[]);
 
@@ -27,10 +76,23 @@ int main(int argc, char* argv[])
 int run(int argc, char* argv[])
 {
   MOShared::SetThisThreadName("main");
-  setExceptionHandlers();
+  google_breakpad::MinidumpDescriptor descriptor(".");
+  google_breakpad::ExceptionHandler eh(descriptor, nullptr, dumpCallback, nullptr, true,
+                                       -1);
+
+  // allow ptrace from any process. required for crashdump command
+  if (prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY) == -1) {
+    const int e = errno;
+    log::warn("Error in prctl(PR_SET_PTRACER), {}", strerror(e));
+  }
 
   cl::CommandLine cl;
-  if (auto r = cl.process(GetCommandLineW())) {
+
+  QString str;
+  for (int i = 0; i < argc; i++) {
+    str.append(argv[i]).append(' ');
+  }
+  if (auto r = cl.process(ToNativeString(str))) {
     return *r;
   }
 
@@ -39,7 +101,6 @@ int run(int argc, char* argv[])
   // must be after logging
   TimeThis tt("main() multiprocess");
 
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   MOApplication app(argc, argv);
 
   // check if the command line wants to run something right now
@@ -117,6 +178,16 @@ int run(int argc, char* argv[])
         }
       }
 
+      // value should exist by now
+      string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
+      if (!path.empty()) {
+        descriptor = google_breakpad::MinidumpDescriptor(path);
+        eh.set_minidump_descriptor(descriptor);
+
+        // move old crash dumps into the crash dump folder
+        system(std::string("mv *.dmp " + path + "/").c_str());
+      }
+
       // check if the command line wants to run something right now
       if (auto r = cl.runPostOrganizer(app.core())) {
         return *r;
@@ -143,50 +214,4 @@ int run(int argc, char* argv[])
   }
 }
 
-LONG WINAPI onUnhandledException(_EXCEPTION_POINTERS* ptrs)
-{
-  const auto path = OrganizerCore::getGlobalCoreDumpPath();
-  const auto type = OrganizerCore::getGlobalCoreDumpType();
-
-  const auto r = env::coredump(path.empty() ? nullptr : path.c_str(), type);
-
-  if (r) {
-    log::error("ModOrganizer has crashed, core dump created.");
-  } else {
-    log::error("ModOrganizer has crashed, core dump failed");
-  }
-
-  // g_prevExceptionFilter somehow sometimes point to this function, making this
-  // recurse and create hundreds of core dump, not sure why
-  if (g_prevExceptionFilter && ptrs && g_prevExceptionFilter != onUnhandledException)
-    return g_prevExceptionFilter(ptrs);
-  else
-    return EXCEPTION_CONTINUE_SEARCH;
-}
-
-void onTerminate() noexcept
-{
-  __try {
-    // force an exception to get a valid stack trace for this thread
-    *(int*)0 = 42;
-  } __except (onUnhandledException(GetExceptionInformation()),
-              EXCEPTION_EXECUTE_HANDLER) {
-  }
-
-  if (g_prevTerminateHandler) {
-    g_prevTerminateHandler();
-  } else {
-    std::abort();
-  }
-}
-
-void setExceptionHandlers()
-{
-  if (g_prevExceptionFilter) {
-    // already called
-    return;
-  }
-
-  g_prevExceptionFilter  = SetUnhandledExceptionFilter(onUnhandledException);
-  g_prevTerminateHandler = std::set_terminate(onTerminate);
-}
+void setExceptionHandlers() {}

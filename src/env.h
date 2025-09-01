@@ -1,6 +1,10 @@
 #ifndef ENV_ENV_H
 #define ENV_ENV_H
 
+#include <QString>
+#include <set>
+#include <vector>
+
 class Settings;
 
 namespace env
@@ -9,8 +13,10 @@ namespace env
 class Module;
 class Process;
 class SecurityProduct;
-class WindowsInfo;
+class OsInfo;
 class Metrics;
+
+#ifdef _WIN32
 
 // used by DesktopDCPtr, calls ReleaseDC(0, dc) as the deleter
 //
@@ -75,16 +81,6 @@ struct COMReleaser
 template <class T>
 using COMPtr = std::unique_ptr<T, COMReleaser>;
 
-// used by MallocPtr, calls std::free() as the deleter
-//
-struct MallocFreer
-{
-  void operator()(void* p) { std::free(p); }
-};
-
-template <class T>
-using MallocPtr = std::unique_ptr<T, MallocFreer>;
-
 // used by LocalPtr, calls LocalFree() as the deleter
 //
 template <class T>
@@ -110,6 +106,18 @@ struct CoTaskMemFreer
 
 template <class T>
 using CoTaskMemPtr = std::unique_ptr<T, CoTaskMemFreer<T>>;
+
+#endif
+
+// used by MallocPtr, calls std::free() as the deleter
+//
+struct MallocFreer
+{
+  void operator()(void* p) { std::free(p); }
+};
+
+template <class T>
+using MallocPtr = std::unique_ptr<T, MallocFreer>;
 
 // creates a console in the constructor and destroys it in the destructor,
 // also redirects standard streams
@@ -175,7 +183,7 @@ public:
 
   // information about the operating system
   //
-  const WindowsInfo& windowsInfo() const;
+  const OsInfo& getOSInfo() const;
 
   // information about the installed security products
   //
@@ -201,7 +209,7 @@ public:
 
 private:
   mutable std::vector<Module> m_modules;
-  mutable std::unique_ptr<WindowsInfo> m_windows;
+  mutable std::unique_ptr<OsInfo> m_os;
   mutable std::vector<SecurityProduct> m_security;
   mutable std::unique_ptr<Metrics> m_metrics;
 
@@ -286,7 +294,7 @@ void deleteRegistryKeyIfEmpty(const QString& name);
 
 // returns the path to this process
 //
-std::filesystem::path thisProcessPath();
+QString thisProcessPath();
 
 }  // namespace env
 

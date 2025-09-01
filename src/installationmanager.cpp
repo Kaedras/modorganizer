@@ -50,8 +50,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTextDocument>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <Shellapi.h>
-
 #include <boost/assign.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -59,6 +57,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace std::chrono_literals;
 
 InstallationResult::InstallationResult(IPluginInstaller::EInstallResult result)
     : m_result(result), m_name(), m_iniTweaks(false), m_backup(false), m_merged(false),
@@ -144,8 +143,9 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
 
   if (silent) {
     future = QtConcurrent::run([&]() -> bool {
-      return m_ArchiveHandler->extract(extractPath.toStdWString(), nullptr, nullptr,
-                                       errorCallback);
+      return m_ArchiveHandler->extract(
+          QFileInfo(extractPath).filesystemAbsoluteFilePath(), nullptr, nullptr,
+          errorCallback);
     });
     future.waitForFinished();
   } else {
@@ -200,11 +200,12 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
       }
     };
     Archive::FileChangeCallback fileChangeCallback =
-        [this, &currentFileName, &mutex](auto changeType, std::wstring const& file) {
+        [this, &currentFileName, &mutex](auto changeType,
+                                         std::filesystem::path const& file) {
           if (changeType == Archive::FileChangeType::EXTRACTION_START) {
             {
               std::scoped_lock guard(mutex);
-              currentFileName = QString::fromStdWString(file);
+              currentFileName = ToQString(file);
             }
             emit progressUpdate();
           }
@@ -436,7 +437,7 @@ InstallationResult InstallationManager::testOverwrite(GuessedValue<QString>& mod
         if (!QDir().mkdir(targetDirectory)) {
           // windows may keep the directory around for a moment, preventing its
           // re-creation. Not sure if this still happens with shellDelete
-          Sleep(100);
+          std::this_thread::sleep_for(100ms);
           QDir().mkdir(targetDirectory);
         }
         // restore the saved settings

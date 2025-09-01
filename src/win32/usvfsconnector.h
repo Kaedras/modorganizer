@@ -20,7 +20,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef USVFSCONNECTOR_H
 #define USVFSCONNECTOR_H
 
-#include "envdump.h"
+#include "../envdump.h"
 #include <QDebug>
 #include <QFile>
 #include <QList>

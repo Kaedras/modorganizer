@@ -16,18 +16,17 @@ DiagnosticsSettingsTab::DiagnosticsSettingsTab(Settings& s, SettingsDialog& d)
   ui->dumpsMaxEdit->setValue(settings().diagnostics().maxCoreDumps());
 
   QString logsPath = QUrl::fromLocalFile(qApp->property("dataPath").toString() + "/" +
-                                         QString::fromStdWString(AppConfig::logPath()))
+                                         AppConfig::logPath())
                          .toString();
 
   ui->diagnosticsExplainedLabel->setText(
       ui->diagnosticsExplainedLabel->text()
           .replace("LOGS_FULL_PATH", logsPath)
-          .replace("LOGS_DIR", QString::fromStdWString(AppConfig::logPath()))
-          .replace("DUMPS_FULL_PATH",
-                   QUrl::fromLocalFile(
-                       QString::fromStdWString(OrganizerCore::getGlobalCoreDumpPath()))
-                       .toString())
-          .replace("DUMPS_DIR", QString::fromStdWString(AppConfig::dumpsDir())));
+          .replace("LOGS_DIR", AppConfig::logPath())
+          .replace(
+              "DUMPS_FULL_PATH",
+              QUrl::fromLocalFile(OrganizerCore::getGlobalCoreDumpPath()).toString())
+          .replace("DUMPS_DIR", AppConfig::dumpsDir()));
 }
 
 void DiagnosticsSettingsTab::setLogLevel()

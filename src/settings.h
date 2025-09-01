@@ -25,7 +25,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <questionboxmemory.h>
 #include <uibase/filterwidget.h>
 #include <uibase/log.h>
-#include <usvfs/usvfsparameters.h>
 
 #ifdef interface
 #undef interface

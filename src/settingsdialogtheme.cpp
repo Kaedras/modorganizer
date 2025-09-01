@@ -53,7 +53,7 @@ void ThemeSettingsTab::addStyles()
   ui->styleBox->insertSeparator(ui->styleBox->count());
 
   QDirIterator iter(QCoreApplication::applicationDirPath() + "/" +
-                        QString::fromStdWString(AppConfig::stylesheetsPath()),
+                        AppConfig::stylesheetsPath(),
                     QStringList("*.qss"), QDir::Files);
 
   while (iter.hasNext()) {
@@ -75,7 +75,7 @@ void ThemeSettingsTab::selectStyle()
 
 void ThemeSettingsTab::onExploreStyles()
 {
-  QString ssPath = QCoreApplication::applicationDirPath() + "/" +
-                   ToQString(AppConfig::stylesheetsPath());
+  QString ssPath =
+      QCoreApplication::applicationDirPath() + "/" + AppConfig::stylesheetsPath();
   shell::Explore(ssPath);
 }

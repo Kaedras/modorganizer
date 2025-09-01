@@ -588,7 +588,7 @@ void ModInfoDialog::feedFiles(std::vector<TabInfo*>& interestedTabs)
         continue;
       }
 
-      const auto filePath = QString::fromStdWString(entry.path().native());
+      const auto filePath = QFileInfo(entry.path()).filePath();
 
       // for each tab
       for (auto* tabInfo : interestedTabs) {
@@ -637,11 +637,11 @@ MOShared::FilesOrigin* ModInfoDialog::getOrigin()
 {
   auto* ds = m_core.directoryStructure();
 
-  if (!ds->originExists(m_mod->name().toStdWString())) {
+  if (!ds->originExists(m_mod->name())) {
     return nullptr;
   }
 
-  auto* origin = &ds->getOriginByName(m_mod->name().toStdWString());
+  auto* origin = &ds->getOriginByName(m_mod->name());
   if (origin->isDisabled()) {
     return nullptr;
   }

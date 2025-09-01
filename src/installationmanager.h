@@ -28,9 +28,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <uibase/iplugininstaller.h>
 
 #include <QObject>
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
-#include <QProgressDialog>
 #include <Windows.h>
+#endif
+#include <QProgressDialog>
 #include <map>
 #include <set>
 

@@ -1,7 +1,7 @@
 #ifndef PROCESSRUNNER_H
 #define PROCESSRUNNER_H
 
-#include "envmodule.h"
+#include "envprocess.h"
 #include "spawn.h"
 #include "uilocker.h"
 #include <executableinfo.h>

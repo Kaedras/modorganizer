@@ -4,6 +4,8 @@
 #include <QString>
 #include <vector>
 
+class QScreen;
+
 namespace env
 {
 
@@ -12,7 +14,7 @@ namespace env
 class Display
 {
 public:
-  Display(QString adapter, QString monitorDevice, bool primary);
+  Display(QScreen* screen, bool primary);
 
   // display name of the adapter running the monitor
   //
@@ -51,7 +53,7 @@ private:
   int m_dpi;
   int m_refreshRate;
 
-  void getSettings();
+  void getSettings(QScreen* screen);
 };
 
 // holds various information about Windows metrics

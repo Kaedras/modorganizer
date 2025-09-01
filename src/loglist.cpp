@@ -22,6 +22,12 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "env.h"
 #include "organizercore.h"
 
+#ifdef __unix__
+static constexpr const char* userEnvVariable = "USER";
+#else
+static constexpr const char* userEnvVariable = "USERNAME";
+#endif
+
 using namespace MOBase;
 
 static LogModel* g_instance = nullptr;
@@ -238,8 +244,7 @@ void LogList::clear()
 
 void LogList::openLogsFolder()
 {
-  QString logsPath = qApp->property("dataPath").toString() + "/" +
-                     QString::fromStdWString(AppConfig::logPath());
+  QString logsPath = qApp->property("dataPath").toString() + "/" + AppConfig::logPath();
   shell::Explore(logsPath);
 }
 
@@ -368,17 +373,18 @@ void initLogging()
     LogModel::instance().add(e);
   });
 
-  log::getDefault().addToBlacklist(std::string("\\") + getenv("USERNAME"),
+  log::getDefault().addToBlacklist(std::string("\\") + getenv(userEnvVariable),
                                    "\\USERNAME");
-  log::getDefault().addToBlacklist(std::string("/") + getenv("USERNAME"), "/USERNAME");
+  log::getDefault().addToBlacklist(std::string("/") + getenv(userEnvVariable),
+                                   "/USERNAME");
 
   qInstallMessageHandler(qtLogCallback);
 }
 
-bool createAndMakeWritable(const std::wstring& subPath)
+bool createAndMakeWritable(const QString& subPath)
 {
   QString const dataPath = qApp->property("dataPath").toString();
-  QString fullPath       = dataPath + "/" + QString::fromStdWString(subPath);
+  QString fullPath       = dataPath + "/" + subPath;
 
   if (!QDir(fullPath).exists() && !QDir().mkdir(fullPath)) {
     QMessageBox::critical(nullptr, QObject::tr("Error"),
@@ -393,8 +399,8 @@ bool createAndMakeWritable(const std::wstring& subPath)
 
 bool setLogDirectory(const QString& dir)
 {
-  const auto logFile = dir + "/" + QString::fromStdWString(AppConfig::logPath()) + "/" +
-                       QString::fromStdWString(AppConfig::logFileName());
+  const auto logFile =
+      dir + "/" + AppConfig::logPath() + "/" + AppConfig::logFileName();
 
   if (!createAndMakeWritable(AppConfig::logPath())) {
     return false;

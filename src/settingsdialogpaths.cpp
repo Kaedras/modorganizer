@@ -71,7 +71,7 @@ PathsSettingsTab::PathsSettingsTab(Settings& s, SettingsDialog& d)
 void PathsSettingsTab::update()
 {
   using Setter    = void (PathSettings::*)(const QString&);
-  using Directory = std::tuple<QString, Setter, std::wstring>;
+  using Directory = std::tuple<QString, Setter, QString>;
 
   QString basePath = settings().paths().base();
 
@@ -88,7 +88,7 @@ void PathsSettingsTab::update()
                   AppConfig::profilesPath()}}) {
     QString path;
     Setter setter;
-    std::wstring defaultName;
+    QString defaultName;
     std::tie(path, setter, defaultName) = dir;
 
     QString realPath = path;
@@ -106,8 +106,7 @@ void PathsSettingsTab::update()
       }
     }
 
-    if (QFileInfo(realPath) !=
-        QFileInfo(basePath + "/" + QString::fromStdWString(defaultName))) {
+    if (QFileInfo(realPath) != QFileInfo(basePath + "/" + defaultName)) {
       (settings().paths().*setter)(path);
     } else {
       (settings().paths().*setter)("");

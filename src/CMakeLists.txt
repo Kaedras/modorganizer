@@ -2,7 +2,24 @@ cmake_minimum_required(VERSION 3.16)
 
 find_package(mo2-cmake CONFIG REQUIRED)
 
-find_package(usvfs CONFIG REQUIRED)
+if (UNIX)
+	find_package(mo2-overlayfs CONFIG REQUIRED)
+	find_package(unofficial-breakpad CONFIG REQUIRED)
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+	pkg_check_modules(LIBFLATPAK REQUIRED flatpak)
+	set(OS_SPECIFIC_INCLUDE_DIRS ${LIBSECRET_INCLUDE_DIRS} ${LIBFLATPAK_INCLUDE_DIRS})
+	set(OS_SPECIFIC_PRIVATE_DEPS
+			mo2::overlayfs
+			unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
+			${LIBSECRET_LIBRARIES}
+			${LIBFLATPAK_LIBRARIES}
+	)
+else()
+	find_package(usvfs CONFIG REQUIRED)
+	set(OS_SPECIFIC_INCLUDE_DIRS)
+	set(OS_SPECIFIC_PRIVATE_DEPS Shlwapi Bcrypt Version Dbghelp usvfs::usvfs)
+endif()
 
 find_package(mo2-uibase CONFIG REQUIRED)
 find_package(mo2-archive CONFIG REQUIRED)
@@ -10,7 +27,7 @@ find_package(mo2-lootcli-header CONFIG REQUIRED)
 find_package(mo2-bsatk CONFIG REQUIRED)
 find_package(mo2-esptk CONFIG REQUIRED)
 find_package(mo2-dds-header CONFIG REQUIRED)
-find_package(mo2-libbsarch CONFIG REQUIRED)
+find_package(libbsarchpp CONFIG REQUIRED)
 
 find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets)
 find_package(Boost CONFIG REQUIRED COMPONENTS program_options thread interprocess signals2 uuid accumulators)
@@ -22,6 +39,8 @@ add_executable(organizer)
 set_target_properties(organizer PROPERTIES
 	OUTPUT_NAME "ModOrganizer"
 	WIN32_EXECUTABLE TRUE)
+
+target_include_directories(organizer PUBLIC ${CMAKE_SOURCE_DIR}/src ${OS_SPECIFIC_INCLUDE_DIRS})
 
 # disable translations because we want to be able to install somewhere else if
 # required
@@ -37,20 +56,29 @@ mo2_set_project_to_run_from_install(
 	organizer EXECUTABLE ${CMAKE_INSTALL_PREFIX}/${_bin}/ModOrganizer.exe)
 
 target_link_libraries(organizer PRIVATE
-	Shlwapi Bcrypt
-	usvfs::usvfs mo2::uibase mo2::archive mo2::libbsarch
+	mo2::uibase mo2::archive libbsarchpp
 	mo2::bsatk mo2::esptk mo2::lootcli-header
 	Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
-	Qt6::WebEngineWidgets Qt6::WebSockets Version Dbghelp)
+	Qt6::WebEngineWidgets Qt6::WebSockets
+	${OS_SPECIFIC_PRIVATE_DEPS}
+)
 
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
-		DESTINATION ${_bin}/dlls
-		CONFIGURATIONS Release RelWithDebInfo
-		RENAME dlls.manifest)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.debug.qt6"
-		DESTINATION ${_bin}/dlls
-		CONFIGURATIONS Debug
-		RENAME dlls.manifest)
+if (UNIX)
+	# todo: remove this workaround
+	find_package(Qt6 REQUIRED COMPONENTS Test)
+	target_link_libraries(organizer PRIVATE Qt::Test fmt)
+endif()
+
+if (WIN32)
+	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
+			DESTINATION ${_bin}/dlls
+			CONFIGURATIONS Release RelWithDebInfo
+			RENAME dlls.manifest)
+	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.debug.qt6"
+			DESTINATION ${_bin}/dlls
+			CONFIGURATIONS Debug
+			RENAME dlls.manifest)
+endif()
 
 if (NOT MO2_SKIP_STYLESHEETS_INSTALL)
 	install(
@@ -71,7 +99,7 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
 
 # install dependencies DLLs
-install(FILES $<TARGET_FILE:mo2::libbsarch> DESTINATION ${_bin}/dlls)
+install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/dlls)
 install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
 
 # this may copy over the ones from uibase/usvfs
@@ -84,20 +112,27 @@ install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
 #
 install(FILES
 	$<TARGET_FILE:mo2::uibase>
-	$<TARGET_FILE:usvfs_x64::usvfs_dll>
-	$<TARGET_FILE:usvfs_x86::usvfs_dll>
-	$<TARGET_FILE:usvfs_x64::usvfs_proxy>
-	$<TARGET_FILE:usvfs_x86::usvfs_proxy>
 DESTINATION ${_bin})
 
-# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
-if (NOT MO2_INSTALL_IS_BIN)
-	install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
+if(WIN32)
+	install(FILES
+			$<TARGET_FILE:usvfs_x64::usvfs_dll>
+			$<TARGET_FILE:usvfs_x86::usvfs_dll>
+			$<TARGET_FILE:usvfs_x64::usvfs_proxy>
+			$<TARGET_FILE:usvfs_x86::usvfs_proxy>
+			DESTINATION ${_bin})
 endif()
 
-mo2_deploy_qt(
-	DIRECTORY ${_bin}
-	BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
+if (WIN32)
+	# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
+	if (NOT MO2_INSTALL_IS_BIN)
+		install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
+	endif()
+
+	mo2_deploy_qt(
+		DIRECTORY ${_bin}
+		BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
+endif()
 
 # set source groups for VS
 mo2_add_filter(NAME src/application GROUPS

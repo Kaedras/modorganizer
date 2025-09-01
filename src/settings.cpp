@@ -261,7 +261,7 @@ std::size_t Settings::refreshThreadCount() const
 
 void Settings::setRefreshThreadCount(std::size_t n) const
 {
-  return set(m_Settings, "Settings", "refresh_thread_count", n);
+  return set(m_Settings, "Settings", "refresh_thread_count", QVariant::fromValue(n));
 }
 
 std::optional<QVersionNumber> Settings::version() const
@@ -1668,32 +1668,28 @@ QString PathSettings::base() const
 
 QString PathSettings::downloads(bool resolve) const
 {
-  return getConfigurablePath("download_directory", ToQString(AppConfig::downloadPath()),
-                             resolve);
+  return getConfigurablePath("download_directory", AppConfig::downloadPath(), resolve);
 }
 
 QString PathSettings::cache(bool resolve) const
 {
-  return getConfigurablePath("cache_directory", ToQString(AppConfig::cachePath()),
-                             resolve);
+  return getConfigurablePath("cache_directory", AppConfig::cachePath(), resolve);
 }
 
 QString PathSettings::mods(bool resolve) const
 {
-  return getConfigurablePath("mod_directory", ToQString(AppConfig::modsPath()),
-                             resolve);
+  return getConfigurablePath("mod_directory", AppConfig::modsPath(), resolve);
 }
 
 QString PathSettings::profiles(bool resolve) const
 {
-  return getConfigurablePath("profiles_directory", ToQString(AppConfig::profilesPath()),
-                             resolve);
+  return getConfigurablePath("profiles_directory", AppConfig::profilesPath(), resolve);
 }
 
 QString PathSettings::overwrite(bool resolve) const
 {
-  return getConfigurablePath("overwrite_directory",
-                             ToQString(AppConfig::overwritePath()), resolve);
+  return getConfigurablePath("overwrite_directory", AppConfig::overwritePath(),
+                             resolve);
 }
 
 void PathSettings::setBase(const QString& path)
@@ -1986,8 +1982,8 @@ void NexusSettings::setCategoryMappings(bool b) const
 
 void NexusSettings::registerAsNXMHandler(bool force)
 {
-  const auto nxmPath = QCoreApplication::applicationDirPath() + "/" +
-                       QString::fromStdWString(AppConfig::nxmHandlerExe());
+  const auto nxmPath =
+      QCoreApplication::applicationDirPath() + "/" + AppConfig::nxmHandlerExe();
 
   const auto executable = QCoreApplication::applicationFilePath();
 
@@ -2038,50 +2034,6 @@ std::vector<std::chrono::seconds> NexusSettings::validationTimeouts() const
   return v;
 }
 
-void NexusSettings::dump() const
-{
-  const auto iniPath = InstanceManager::singleton().globalInstancesRootPath() + "/" +
-                       QString::fromStdWString(AppConfig::nxmHandlerIni());
-
-  if (!QFileInfo(iniPath).exists()) {
-    log::debug("nxm ini not found at {}", iniPath);
-    return;
-  }
-
-  QSettings s(iniPath, QSettings::IniFormat);
-  if (const auto st = s.status(); st != QSettings::NoError) {
-    log::debug("can't read nxm ini from {}", iniPath);
-    return;
-  }
-
-  log::debug("nxmhandler settings:");
-
-  QSettings handler("HKEY_CURRENT_USER\\Software\\Classes\\nxm\\",
-                    QSettings::NativeFormat);
-  log::debug(" . primary: {}", handler.value("shell/open/command/Default").toString());
-
-  const auto noregister = getOptional<bool>(s, "General", "noregister");
-
-  if (noregister) {
-    log::debug(" . noregister: {}", *noregister);
-  } else {
-    log::debug(" . noregister: (not found)");
-  }
-
-  ScopedReadArray sra(s, "handlers");
-
-  sra.for_each([&] {
-    const auto games      = sra.get<QVariant>("games");
-    const auto executable = sra.get<QVariant>("executable");
-    const auto arguments  = sra.get<QVariant>("arguments");
-
-    log::debug(" . handler:");
-    log::debug("    . games:      {}", games.toString());
-    log::debug("    . executable: {}", executable.toString());
-    log::debug("    . arguments:  {}", arguments.toString());
-  });
-}
-
 SteamSettings::SteamSettings(Settings& parent, QSettings& settings)
     : m_Parent(parent), m_Settings(settings)
 {}
@@ -2104,7 +2056,7 @@ void SteamSettings::setAppID(const QString& id)
 bool SteamSettings::login(QString& username, QString& password) const
 {
   username = get<QString>(m_Settings, "Settings", "steam_username", "");
-  password = getWindowsCredential("steam_password");
+  password = getSecret("steam_password");
 
   return !username.isEmpty() && !password.isEmpty();
 }
@@ -2118,7 +2070,7 @@ void SteamSettings::setLogin(QString username, QString password)
     set(m_Settings, "Settings", "steam_username", username);
   }
 
-  if (!setWindowsCredential("steam_password", password)) {
+  if (!setSecret("steam_password", password)) {
     const auto e = GetLastError();
     log::error("Storing or deleting password failed: {}", formatSystemMessage(e));
   }
@@ -2420,24 +2372,7 @@ std::chrono::seconds DiagnosticsSettings::spawnDelay() const
 
 void DiagnosticsSettings::setSpawnDelay(std::chrono::seconds t)
 {
-  set(m_Settings, "Settings", "spawn_delay", t.count());
-}
-
-void GlobalSettings::updateRegistryKey()
-{
-  const QString OldOrganization  = "Tannin";
-  const QString OldApplication   = "Mod Organizer";
-  const QString OldInstanceValue = "CurrentInstance";
-
-  const QString OldRootKey = "Software\\" + OldOrganization;
-
-  if (env::registryValueExists(OldRootKey + "\\" + OldApplication, OldInstanceValue)) {
-    QSettings old(OldOrganization, OldApplication);
-    setCurrentInstance(old.value(OldInstanceValue).toString());
-    old.remove(OldInstanceValue);
-  }
-
-  env::deleteRegistryKeyIfEmpty(OldRootKey);
+  set(m_Settings, "Settings", "spawn_delay", QVariant::fromValue(t.count()));
 }
 
 QString GlobalSettings::currentInstance()
@@ -2500,7 +2435,7 @@ void GlobalSettings::setHideAssignCategoriesQuestion(bool b)
 
 bool GlobalSettings::nexusApiKey(QString& apiKey)
 {
-  QString tempKey = getWindowsCredential("APIKEY");
+  QString tempKey = getSecret("APIKEY");
   if (tempKey.isEmpty())
     return false;
 
@@ -2510,7 +2445,7 @@ bool GlobalSettings::nexusApiKey(QString& apiKey)
 
 bool GlobalSettings::setNexusApiKey(const QString& apiKey)
 {
-  if (!setWindowsCredential("APIKEY", apiKey)) {
+  if (!setSecret("APIKEY", apiKey)) {
     const auto e = GetLastError();
     log::error("Storing API key failed: {}", formatSystemMessage(e));
     return false;
@@ -2526,7 +2461,7 @@ bool GlobalSettings::clearNexusApiKey()
 
 bool GlobalSettings::hasNexusApiKey()
 {
-  return !getWindowsCredential("APIKEY").isEmpty();
+  return !getSecret("APIKEY").isEmpty();
 }
 
 void GlobalSettings::resetDialogs()

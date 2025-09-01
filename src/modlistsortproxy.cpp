@@ -586,12 +586,12 @@ bool ModListSortProxy::filterAcceptsRow(int source_row, const QModelIndex& paren
     return false;
   }
 
-  unsigned int index = ULONG_MAX;
+  unsigned int index = UINT_MAX;
   {
     bool ok = false;
     index   = idx.data(ModList::IndexRole).toInt(&ok);
     if (!ok) {
-      index = ULONG_MAX;
+      index = UINT_MAX;
     }
   }
 

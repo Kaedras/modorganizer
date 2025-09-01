@@ -6,21 +6,21 @@
 namespace MOShared
 {
 
-std::wstring tail(const std::wstring& source, const size_t count)
+QString tail(const QString& source, const qsizetype count)
 {
   if (count >= source.length()) {
     return source;
   }
 
-  return source.substr(source.length() - count);
+  return source.sliced(source.length() - count);
 }
 
 FilesOrigin::FilesOrigin()
     : m_ID(0), m_Disabled(false), m_Name(), m_Path(), m_Priority(0)
 {}
 
-FilesOrigin::FilesOrigin(OriginID ID, const std::wstring& name,
-                         const std::wstring& path, int priority,
+FilesOrigin::FilesOrigin(OriginID ID, const QString& name, const QString& path,
+                         int priority,
                          boost::shared_ptr<MOShared::FileRegister> fileRegister,
                          boost::shared_ptr<MOShared::OriginConnection> originConnection)
     : m_ID(ID), m_Disabled(false), m_Name(name), m_Path(path), m_Priority(priority),
@@ -32,13 +32,13 @@ void FilesOrigin::setPriority(int priority)
   m_Priority = priority;
 }
 
-void FilesOrigin::setName(const std::wstring& name)
+void FilesOrigin::setName(const QString& name)
 {
   m_OriginConnection.lock()->changeNameLookup(m_Name, name);
 
   // change path too
   if (tail(m_Path, m_Name.length()) == m_Name) {
-    m_Path = m_Path.substr(0, m_Path.length() - m_Name.length()).append(name);
+    m_Path = m_Path.sliced(0, m_Path.length() - m_Name.length()).append(name);
   }
 
   m_Name = name;
@@ -102,7 +102,7 @@ void FilesOrigin::removeFile(FileIndex index)
   }
 }
 
-bool FilesOrigin::containsArchive(std::wstring archiveName)
+bool FilesOrigin::containsArchive(QString archiveName)
 {
   std::scoped_lock lock(m_Mutex);
 

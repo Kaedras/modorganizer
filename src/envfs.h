@@ -2,6 +2,8 @@
 #define ENV_ENVFS_H
 
 #include "thread_utils.h"
+#include <QDateTime>
+#include <QString>
 #include <thread>
 
 namespace env
@@ -9,24 +11,24 @@ namespace env
 
 struct File
 {
-  std::wstring name;
-  std::wstring lcname;
-  FILETIME lastModified;
+  QString name;
+  QString lcname;
+  QDateTime lastModified;
   uint64_t size;
 
-  File(std::wstring_view name, FILETIME ft, uint64_t size);
+  File(QStringView name, QDateTime ft, uint64_t size);
 };
 
 struct Directory
 {
-  std::wstring name;
-  std::wstring lcname;
+  QString name;
+  QString lcname;
 
   std::vector<Directory> dirs;
   std::vector<File> files;
 
   Directory();
-  Directory(std::wstring_view name);
+  Directory(QStringView name);
 };
 
 template <class T>
@@ -165,27 +167,25 @@ private:
   std::list<ThreadInfo> m_threads;
 };
 
-using DirStartF = void(void*, std::wstring_view);
-using DirEndF   = void(void*, std::wstring_view);
-using FileF     = void(void*, std::wstring_view, FILETIME, uint64_t);
-
-void setHandleCloserThreadCount(std::size_t n);
+using DirStartF = void(void*, QStringView);
+using DirEndF   = void(void*, QStringView);
+using FileF     = void(void*, QStringView, QDateTime, uint64_t);
 
 class DirectoryWalker
 {
 public:
-  void forEachEntry(const std::wstring& path, void* cx, DirStartF* dirStartF,
+  void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF,
                     DirEndF* dirEndF, FileF* fileF);
 
 private:
   std::vector<std::unique_ptr<unsigned char[]>> m_buffers;
 };
 
-void forEachEntry(const std::wstring& path, void* cx, DirStartF* dirStartF,
-                  DirEndF* dirEndF, FileF* fileF);
+void forEachEntry(const QString& path, void* cx, DirStartF* dirStartF, DirEndF* dirEndF,
+                  FileF* fileF);
 
-Directory getFilesAndDirs(const std::wstring& path);
-Directory getFilesAndDirsWithFind(const std::wstring& path);
+Directory getFilesAndDirs(const QString& path);
+Directory getFilesAndDirsWithFind(const QString& path);
 
 }  // namespace env
 

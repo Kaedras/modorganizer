@@ -238,11 +238,11 @@ std::shared_ptr<ArchiveFileTree> ArchiveFileTree::makeTree(Archive const& archiv
       continue;
     }
 
-    files.push_back(
-        std::make_tuple(QString::fromStdWString(data[i]->getArchiveFilePath())
-                            .replace("\\", "/")
-                            .split("/", Qt::SkipEmptyParts),
-                        data[i]->isDirectory(), (int)i));
+    files.push_back(std::make_tuple(
+        QString::fromStdWString(data[i]->getArchiveFilePath().generic_wstring())
+            .replace("\\", "/")
+            .split("/", Qt::SkipEmptyParts),
+        data[i]->isDirectory(), (int)i));
   }
 
   auto tree = std::make_shared<ArchiveFileTreeImpl>(nullptr, "", -1, std::move(files));

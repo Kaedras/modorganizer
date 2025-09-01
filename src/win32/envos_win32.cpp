@@ -1,6 +1,7 @@
-#include "envwindows.h"
 #include "env.h"
 #include "envmodule.h"
+#include "envos.h"
+#include "envprocess.h"
 #include <log.h>
 #include <utility.h>
 
@@ -8,6 +9,52 @@ namespace env
 {
 
 using namespace MOBase;
+
+class WindowsInfo final : public OsInfo
+{
+public:
+  struct Release
+  {
+    // the BuildLab entry from the registry, may be empty
+    QString buildLab;
+
+    // release ID such as 1809, may be empty
+    QString ID;
+
+    // some sub-build number, undocumented, may be empty
+    uint32_t UBR;
+
+    Release() : UBR(0) {}
+  };
+
+  const Version& reportedVersion() const override;
+  const Version& realVersion() const override;
+  std::optional<bool> isElevated() const override;
+  QString toString() const override;
+  WindowsInfo();
+  bool compatibilityMode() const override;
+
+private:
+  Version m_reported, m_real;
+  Release m_release;
+  std::optional<bool> m_elevated;
+
+  // uses RtlGetVersion() to get the version number as reported by Windows
+  //
+  Version getReportedVersion(HINSTANCE ntdll) const;
+
+  // uses RtlGetNtVersionNumbers() to get the real version number
+  //
+  Version getRealVersion(HINSTANCE ntdll) const;
+
+  // gets various information from the registry
+  //
+  Release getRelease() const;
+
+  // gets whether the process is elevated
+  //
+  std::optional<bool> getElevated() const;
+};
 
 WindowsInfo::WindowsInfo()
 {
@@ -46,10 +93,10 @@ const WindowsInfo::Version& WindowsInfo::realVersion() const
   return m_real;
 }
 
-const WindowsInfo::Release& WindowsInfo::release() const
-{
-  return m_release;
-}
+// const WindowsInfo::Release& WindowsInfo::release() const
+//{
+//   return m_release;
+// }
 
 std::optional<bool> WindowsInfo::isElevated() const
 {
@@ -228,6 +275,11 @@ std::optional<bool> WindowsInfo::getElevated() const
   }
 
   return (e.TokenIsElevated != 0);
+}
+
+std::unique_ptr<OsInfo> CreateInfo()
+{
+  return std::make_unique<WindowsInfo>();
 }
 
 }  // namespace env

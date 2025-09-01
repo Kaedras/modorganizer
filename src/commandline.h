@@ -1,6 +1,7 @@
 #ifndef MODORGANIZER_COMMANDLINE_INCLUDED
 #define MODORGANIZER_COMMANDLINE_INCLUDED
 #include "moshortcut.h"
+#include "shared/nativeString.h"
 #include <memory>
 #include <vector>
 
@@ -57,8 +58,8 @@ public:
 
   // remembers the given values
   //
-  void set(const std::wstring& originalLine, po::variables_map vm,
-           std::vector<std::wstring> untouched);
+  void set(const nativeString& originalLine, po::variables_map vm,
+           std::vector<nativeString> untouched);
 
   // called as soon as the command line has been parsed; return something to
   // exit immediately
@@ -123,7 +124,7 @@ protected:
 
   // returns the original command line
   //
-  const std::wstring& originalCmd() const;
+  const nativeString& originalCmd() const;
 
   // variables
   //
@@ -131,12 +132,12 @@ protected:
 
   // returns unparsed options, only used by launch
   //
-  const std::vector<std::wstring>& untouched() const;
+  const std::vector<nativeString>& untouched() const;
 
 private:
-  std::wstring m_original;
+  nativeString m_original;
   po::variables_map m_vm;
-  std::vector<std::wstring> m_untouched;
+  std::vector<nativeString> m_untouched;
 };
 
 // generates a crash dump for another MO process
@@ -170,10 +171,10 @@ protected:
   Meta meta() const override;
   std::optional<int> runEarly() override;
 
-  int SpawnWaitProcess(LPCWSTR workingDirectory, LPCWSTR commandLine);
+  int SpawnWaitProcess(nativeCString workingDirectory, nativeCString commandLine);
 
-  LPCWSTR UntouchedCommandLineArguments(int parseArgCount,
-                                        std::vector<std::wstring>& parsedArgs);
+  nativeCString UntouchedCommandLineArguments(int parseArgCount,
+                                              std::vector<nativeString>& parsedArgs);
 };
 
 // runs a program or an executable
@@ -273,7 +274,7 @@ public:
   // returns an empty optional if execution should continue, or a return code
   // if MO must quit
   //
-  std::optional<int> process(const std::wstring& line);
+  std::optional<int> process(const nativeString& line);
 
   // called as soon as the MOApplication has been created; this handles a few
   // global actions and forwards to the command, if any

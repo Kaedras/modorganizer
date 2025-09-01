@@ -37,7 +37,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFile>
 #include <QPainter>
 #include <QProxyStyle>
-#include <QSSLSocket>
+#include <QSslSocket>
 #include <QStringList>
 #include <QStyleFactory>
 #include <QStyleOption>
@@ -53,6 +53,21 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
                         "processorArchitecture='x86' "                                 \
                         "version='1.0.0.0' "                                           \
                         "type='win32' \"")
+
+namespace
+{
+#ifdef __unix__
+std::string ToNative(const QString& str)
+{
+  return str.toStdString();
+}
+#else
+std::wstring ToNative(const QString& str)
+{
+  return str.toStdWString();
+}
+#endif
+}  // namespace
 
 using namespace MOBase;
 using namespace MOShared;
@@ -200,7 +215,7 @@ int MOApplication::setup(MOMultiProcess& multiProcess, bool forceSelect)
     return 1;
   }
 
-  log::debug("command line: '{}'", QString::fromWCharArray(GetCommandLineW()));
+  log::debug("command line: '{}'", QApplication::arguments().join(' '));
 
   log::info("starting Mod Organizer version {} revision {} in {}, usvfs: {}",
             createVersionInfo().string(), GITID, QCoreApplication::applicationDirPath(),
@@ -326,8 +341,8 @@ int MOApplication::run(MOMultiProcess& multiProcess)
 
   // tutorials
   log::debug("initializing tutorials");
-  TutorialManager::init(qApp->applicationDirPath() + "/" +
-                            QString::fromStdWString(AppConfig::tutorialsPath()) + "/",
+  TutorialManager::init(qApp->applicationDirPath() + "/" + AppConfig::tutorialsPath() +
+                            "/",
                         m_core.get());
 
   // styling
@@ -402,7 +417,7 @@ void MOApplication::externalMessage(const QString& message)
   } else {
     cl::CommandLine cl;
 
-    if (auto r = cl.process(message.toStdWString())) {
+    if (auto r = cl.process(ToNative(message))) {
       log::debug("while processing external message, command line wants to "
                  "exit; ignoring");
 
@@ -500,8 +515,7 @@ void MOApplication::purgeOldFiles()
   }
 
   // cycle log file
-  removeOldFiles(qApp->property("dataPath").toString() + "/" +
-                     QString::fromStdWString(AppConfig::logPath()),
+  removeOldFiles(qApp->property("dataPath").toString() + "/" + AppConfig::logPath(),
                  "usvfs*.log", 5, QDir::Name);
 }
 
@@ -533,9 +547,8 @@ bool MOApplication::setStyleFile(const QString& styleName)
   }
   // set new stylesheet or clear it
   if (styleName.length() != 0) {
-    QString styleSheetName = applicationDirPath() + "/" +
-                             MOBase::ToQString(AppConfig::stylesheetsPath()) + "/" +
-                             styleName;
+    QString styleSheetName =
+        applicationDirPath() + "/" + AppConfig::stylesheetsPath() + "/" + styleName;
     if (QFile::exists(styleSheetName)) {
       m_styleWatcher.addPath(styleSheetName);
       updateStyle(styleSheetName);

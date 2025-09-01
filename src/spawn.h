@@ -20,11 +20,16 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SPAWN_H
 #define SPAWN_H
 
+#ifdef __unix__
+#include <linux/compatibility.h>
+#else
 #define WIN32_LEAN_AND_MEAN
-#include <QDir>
-#include <QFileInfo>
 #include <tchar.h>
 #include <windows.h>
+#endif
+
+#include <QDir>
+#include <QFileInfo>
 
 class Settings;
 
@@ -100,8 +105,7 @@ namespace helper
  * @param dataPath the path taht contains the .bsa-files, usually the data directory of
  *the game
  **/
-bool backdateBSAs(QWidget* parent, const std::wstring& moPath,
-                  const std::wstring& dataPath);
+bool backdateBSAs(QWidget* parent, const QString& moPath, const QString& dataPath);
 
 /**
  * @brief waits for the current process to exit and restarts it as an administrator
@@ -109,8 +113,8 @@ bool backdateBSAs(QWidget* parent, const std::wstring& moPath,
  * @param moFile file name of modOrganizer
  * @param workingDir current working directory
  **/
-bool adminLaunch(QWidget* parent, const std::wstring& moPath,
-                 const std::wstring& moFile, const std::wstring& workingDir);
+bool adminLaunch(QWidget* parent, const QString& moPath, const QString& moFile,
+                 const QString& workingDir);
 
 }  // namespace helper
 

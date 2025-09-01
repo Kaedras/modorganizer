@@ -85,7 +85,7 @@ void SyncOverwriteDialog::readTree(const QString& path,
     QTreeWidgetItem* newItem = new QTreeWidgetItem(subTree, QStringList(file));
 
     if (fileInfo.isDir()) {
-      DirectoryEntry* subDir = directoryStructure->findSubDirectory(ToWString(file));
+      DirectoryEntry* subDir = directoryStructure->findSubDirectory(file);
       if (subDir != nullptr) {
         readTree(fileInfo.absoluteFilePath(), subDir, newItem);
       } else {
@@ -94,21 +94,19 @@ void SyncOverwriteDialog::readTree(const QString& path,
         newItem = nullptr;
       }
     } else {
-      const FileEntryPtr entry = directoryStructure->findFile(ToWString(file));
+      const FileEntryPtr entry = directoryStructure->findFile(file);
       QComboBox* combo         = new QComboBox(ui->syncTree);
       combo->addItem(tr("<don't sync>"), -1);
       if (entry.get() != nullptr) {
         bool ignore;
         int origin = entry->getOrigin(ignore);
-        addToComboBox(combo,
-                      ToQString(m_DirectoryStructure->getOriginByID(origin).getName()),
+        addToComboBox(combo, m_DirectoryStructure->getOriginByID(origin).getName(),
                       origin);
         const auto& alternatives = entry->getAlternatives();
         for (const auto& alt : alternatives) {
-          addToComboBox(
-              combo,
-              ToQString(m_DirectoryStructure->getOriginByID(alt.originID()).getName()),
-              alt.originID());
+          addToComboBox(combo,
+                        m_DirectoryStructure->getOriginByID(alt.originID()).getName(),
+                        alt.originID());
         }
         combo->setCurrentIndex(combo->count() - 1);
       } else {
@@ -152,8 +150,7 @@ void SyncOverwriteDialog::applyTo(QTreeWidgetItem* item, const QString& path,
         if (originID != -1) {
           FilesOrigin& origin = m_DirectoryStructure->getOriginByID(originID);
           QString source      = m_SourcePath + "/" + filePath;
-          QString destination =
-              modDirectory + "/" + ToQString(origin.getName()) + "/" + filePath;
+          QString destination = modDirectory + "/" + origin.getName() + "/" + filePath;
           if (!QFile::remove(destination)) {
             reportError(tr("failed to remove %1").arg(destination));
           } else if (!QFile::rename(source, destination)) {

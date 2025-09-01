@@ -4,6 +4,8 @@
 #include <log.h>
 #include <report.h>
 
+using namespace std::chrono_literals;
+
 static const char s_Key[]  = "mo-43d1a3ad-eeb0-4818-97c9-eda5216c29b5";
 static const int s_Timeout = 5000;
 
@@ -50,7 +52,7 @@ void MOMultiProcess::sendMessage(const QString& message)
   bool connected = false;
   for (int i = 0; i < 2 && !connected; ++i) {
     if (i > 0) {
-      Sleep(250);
+      std::this_thread::sleep_for(250ms);
     }
 
     // other process may be just starting up

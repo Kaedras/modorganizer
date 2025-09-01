@@ -49,6 +49,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <regex>
 
 using namespace MOBase;
+using namespace std::chrono_literals;
+using namespace Qt::StringLiterals;
 
 // TODO limit number of downloads, also display download during nxm requests, store
 // modid/fileid with downloads
@@ -282,7 +284,7 @@ void DownloadManager::pauseAll()
     }
   }
 
-  ::Sleep(100);
+  std::this_thread::sleep_for(100ms);
 
   bool done       = false;
   QTime startTime = QTime::currentTime();
@@ -300,7 +302,7 @@ void DownloadManager::pauseAll()
       }
     }
     if (!done) {
-      ::Sleep(100);
+      std::this_thread::sleep_for(100ms);
     }
   }
 }
@@ -355,12 +357,12 @@ void DownloadManager::refreshList()
 
     const QStringList supportedExtensions =
         m_OrganizerCore->installationManager()->getSupportedExtensions();
-    std::vector<std::wstring> nameFilters;
+    std::vector<QString> nameFilters;
     for (const auto& extension : supportedExtensions) {
-      nameFilters.push_back(L"." + extension.toLower().toStdWString());
+      nameFilters.push_back("." + extension.toLower());
     }
 
-    nameFilters.push_back(QString(UNFINISHED).toLower().toStdWString());
+    nameFilters.push_back(QString(UNFINISHED).toLower());
 
     QDir dir(QDir::fromNativeSeparators(m_OutputDirectory));
 
@@ -379,33 +381,32 @@ void DownloadManager::refreshList()
       shellDelete(orphans, true);
     }
 
-    std::set<std::wstring> seen;
+    std::set<QString> seen;
 
     struct Context
     {
       DownloadManager& self;
-      std::set<std::wstring>& seen;
-      std::vector<std::wstring>& extensions;
+      std::set<QString>& seen;
+      std::vector<QString>& extensions;
     };
 
     Context cx = {*this, seen, nameFilters};
 
     for (auto&& d : m_ActiveDownloads) {
-      cx.seen.insert(d->m_FileName.toLower().toStdWString());
-      cx.seen.insert(
-          QFileInfo(d->m_Output.fileName()).fileName().toLower().toStdWString());
+      cx.seen.insert(d->m_FileName.toLower());
+      cx.seen.insert(QFileInfo(d->m_Output.fileName()).fileName().toLower());
     }
 
     env::forEachEntry(
-        QDir::toNativeSeparators(m_OutputDirectory).toStdWString(), &cx, nullptr,
-        nullptr, [](void* data, std::wstring_view f, FILETIME, uint64_t size) {
+        QDir::toNativeSeparators(m_OutputDirectory), &cx, nullptr, nullptr,
+        [](void* data, QStringView f, QDateTime, uint64_t size) {
           auto& cx = *static_cast<Context*>(data);
 
-          std::wstring lc = MOShared::ToLowerCopy(f);
+          QString lc = MOShared::ToLowerCopy(f);
 
           bool interestingExt = false;
           for (auto&& ext : cx.extensions) {
-            if (lc.ends_with(ext)) {
+            if (lc.endsWith(ext)) {
               interestingExt = true;
               break;
             }
@@ -419,8 +420,8 @@ void DownloadManager::refreshList()
             return;
           }
 
-          QString fileName = QDir::fromNativeSeparators(cx.self.m_OutputDirectory) +
-                             "/" + QString::fromWCharArray(f.data(), f.size());
+          QString fileName =
+              QDir::fromNativeSeparators(cx.self.m_OutputDirectory) % u"/"_s % f;
 
           DownloadInfo* info = DownloadInfo::createFromMeta(
               fileName, cx.self.m_ShowHidden, cx.self.m_OutputDirectory, size);
@@ -431,8 +432,7 @@ void DownloadManager::refreshList()
 
           cx.self.m_ActiveDownloads.push_front(info);
           cx.seen.insert(std::move(lc));
-          cx.seen.insert(
-              QFileInfo(info->m_Output.fileName()).fileName().toLower().toStdWString());
+          cx.seen.insert(QFileInfo(info->m_Output.fileName()).fileName().toLower());
         });
 
     log::debug("saw {} downloads", m_ActiveDownloads.size());
@@ -1153,8 +1153,7 @@ void DownloadManager::queryInfoMd5(int index, bool askIfNotFound)
 
   QFile downloadFile(info->m_FileName);
   if (!downloadFile.exists()) {
-    downloadFile.setFileName(m_OrganizerCore->downloadsPath() + "\\" +
-                             info->m_FileName);
+    downloadFile.setFileName(m_OrganizerCore->downloadsPath() + "/" + info->m_FileName);
   }
   if (!downloadFile.exists()) {
     log::error("Can't find download file '{}'", info->m_FileName);

@@ -11,7 +11,7 @@ using namespace MOBase;
 OriginConnection::OriginConnection() : m_NextID(0) {}
 
 std::pair<FilesOrigin&, bool> OriginConnection::getOrCreate(
-    const std::wstring& originName, const std::wstring& directory, int priority,
+    const QString& originName, const QString& directory, int priority,
     const boost::shared_ptr<FileRegister>& fileRegister,
     const boost::shared_ptr<OriginConnection>& originConnection, DirectoryStats& stats)
 {
@@ -34,8 +34,8 @@ std::pair<FilesOrigin&, bool> OriginConnection::getOrCreate(
 }
 
 FilesOrigin&
-OriginConnection::createOrigin(const std::wstring& originName,
-                               const std::wstring& directory, int priority,
+OriginConnection::createOrigin(const QString& originName, const QString& directory,
+                               int priority,
                                boost::shared_ptr<FileRegister> fileRegister,
                                boost::shared_ptr<OriginConnection> originConnection)
 {
@@ -45,7 +45,7 @@ OriginConnection::createOrigin(const std::wstring& originName,
                             originConnection);
 }
 
-bool OriginConnection::exists(const std::wstring& name)
+bool OriginConnection::exists(const QString& name)
 {
   std::scoped_lock lock(m_Mutex);
   return m_OriginsNameMap.find(name) != m_OriginsNameMap.end();
@@ -70,7 +70,7 @@ const FilesOrigin* OriginConnection::findByID(OriginID ID) const
   }
 }
 
-FilesOrigin& OriginConnection::getByName(const std::wstring& name)
+FilesOrigin& OriginConnection::getByName(const QString& name)
 {
   std::scoped_lock lock(m_Mutex);
 
@@ -80,14 +80,12 @@ FilesOrigin& OriginConnection::getByName(const std::wstring& name)
     return m_Origins[iter->second];
   } else {
     std::ostringstream stream;
-    stream << QObject::tr("invalid origin name: ").toStdString()
-           << ToString(name, true);
+    stream << QObject::tr("invalid origin name: ").toStdString() << name.toStdString();
     throw std::runtime_error(stream.str());
   }
 }
 
-void OriginConnection::changeNameLookup(const std::wstring& oldName,
-                                        const std::wstring& newName)
+void OriginConnection::changeNameLookup(const QString& oldName, const QString& newName)
 {
   std::scoped_lock lock(m_Mutex);
 
@@ -109,7 +107,7 @@ OriginID OriginConnection::createID()
 }
 
 FilesOrigin& OriginConnection::createOriginNoLock(
-    const std::wstring& originName, const std::wstring& directory, int priority,
+    const QString& originName, const QString& directory, int priority,
     boost::shared_ptr<FileRegister> fileRegister,
     boost::shared_ptr<OriginConnection> originConnection)
 {

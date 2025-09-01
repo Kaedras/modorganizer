@@ -19,8 +19,7 @@ public:
 
   bool indexValid(FileIndex index) const;
 
-  FileEntryPtr createFile(std::wstring name, DirectoryEntry* parent,
-                          DirectoryStats& stats);
+  FileEntryPtr createFile(QString name, DirectoryEntry* parent, DirectoryStats& stats);
 
   FileEntryPtr getFile(FileIndex index) const;
 

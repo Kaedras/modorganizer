@@ -23,6 +23,10 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <filesystem>
 #include <string>
 
+#ifdef __unix__
+#include <linux/compatibility.h>
+#endif
+
 #include <uibase/log.h>
 #include <uibase/versioning.h>
 
@@ -37,17 +41,11 @@ bool FileExists(const std::wstring& filename);
 
 bool FileExists(const std::wstring& searchPath, const std::wstring& filename);
 
-std::string ToString(const std::wstring& source, bool utf8);
-std::wstring ToWString(const std::string& source, bool utf8);
-
-std::string& ToLowerInPlace(std::string& text);
-std::string ToLowerCopy(const std::string& text);
-
-std::wstring& ToLowerInPlace(std::wstring& text);
-std::wstring ToLowerCopy(const std::wstring& text);
-std::wstring ToLowerCopy(std::wstring_view text);
+QString& ToLowerInPlace(QString& text);
+QString ToLowerCopy(QStringView text);
 
 bool CaseInsensitiveEqual(const std::wstring& lhs, const std::wstring& rhs);
+bool CaseInsensitiveEqual(const QString& lhs, const QString& rhs);
 
 MOBase::Version createVersionInfo();
 QString getUsvfsVersionString();

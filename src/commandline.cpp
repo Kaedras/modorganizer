@@ -10,6 +10,35 @@
 #include <log.h>
 #include <report.h>
 
+#ifdef __unix__
+#include "linux/stub.h"
+
+using command_line_parser = boost::program_options::command_line_parser;
+
+std::vector<nativeString> split_main(const nativeString& line)
+{
+  return boost::program_options::split_unix(std::forward<const nativeString&>(line));
+}
+
+inline const char* GetCommandLineNative()
+{
+  return qApp->arguments().join(' ').toStdString().c_str();
+}
+#else
+using command_line_parser = boost::program_options::wcommand_line_parser;
+
+std::vector<nativeString> split_main(const nativeString& line)
+{
+  return boost::program_options::split_winmain(std::forward<const nativeString&>(line));
+}
+
+inline const wchar_t* GetCommandLineNative()
+{
+  return GetCommandLineW();
+}
+
+#endif
+
 namespace cl
 {
 
@@ -54,10 +83,10 @@ CommandLine::CommandLine() : m_command(nullptr)
       CrashDumpCommand, LaunchCommand>();
 }
 
-std::optional<int> CommandLine::process(const std::wstring& line)
+std::optional<int> CommandLine::process(const nativeString& line)
 {
   try {
-    auto args = po::split_winmain(line);
+    auto args = split_main(line);
     if (!args.empty()) {
       // remove program name
       args.erase(args.begin());
@@ -66,7 +95,7 @@ std::optional<int> CommandLine::process(const std::wstring& line)
     // parsing the first part of the command line, including global options and
     // command name, but not the rest, which will be collected below
 
-    auto parsed = po::wcommand_line_parser(args)
+    auto parsed = command_line_parser(args)
                       .options(m_allOptions)
                       .positional(m_positional)
                       .allow_unregistered()
@@ -98,7 +127,7 @@ std::optional<int> CommandLine::process(const std::wstring& line)
             if (!c->legacy()) {
               // parse the the remainder of the command line according to the
               // command's options
-              po::wcommand_line_parser parser(opts);
+              command_line_parser parser(opts);
 
               auto co = c->allOptions();
               parser.options(co);
@@ -148,7 +177,7 @@ std::optional<int> CommandLine::process(const std::wstring& line)
     }
 
     if (!opts.empty()) {
-      const auto qs = QString::fromStdWString(opts[0]);
+      const auto qs = ToQString(opts[0]);
 
       if (qs.startsWith("--")) {
         // assume that for something like `ModOrganizer.exe --bleh`, it's just
@@ -176,7 +205,7 @@ std::optional<int> CommandLine::process(const std::wstring& line)
       opts.erase(opts.begin());
 
       for (auto&& o : opts) {
-        m_untouched.push_back(QString::fromStdWString(o));
+        m_untouched.push_back(ToQString(o));
       }
     }
 
@@ -197,7 +226,7 @@ bool CommandLine::forwardToPrimary(MOMultiProcess& multiProcess)
   } else if (m_nxmLink) {
     multiProcess.sendMessage(*m_nxmLink);
   } else if (m_command && m_command->canForwardToPrimary()) {
-    multiProcess.sendMessage(QString::fromWCharArray(GetCommandLineW()));
+    multiProcess.sendMessage(ToQString(GetCommandLineNative()));
   } else {
     return false;
   }
@@ -522,8 +551,8 @@ po::positional_options_description Command::getPositional() const
   return {};
 }
 
-void Command::set(const std::wstring& originalLine, po::variables_map vm,
-                  std::vector<std::wstring> untouched)
+void Command::set(const nativeString& originalLine, po::variables_map vm,
+                  std::vector<nativeString> untouched)
 {
   m_original  = originalLine;
   m_vm        = vm;
@@ -555,7 +584,7 @@ bool Command::canForwardToPrimary() const
   return false;
 }
 
-const std::wstring& Command::originalCmd() const
+const nativeString& Command::originalCmd() const
 {
   return m_original;
 }
@@ -565,7 +594,7 @@ const po::variables_map& Command::vm() const
   return m_vm;
 }
 
-const std::vector<std::wstring>& Command::untouched() const
+const std::vector<nativeString>& Command::untouched() const
 {
   return m_untouched;
 }
@@ -622,46 +651,20 @@ std::optional<int> LaunchCommand::runEarly()
     return 1;
   }
 
-  std::vector<std::wstring> arg;
+  std::vector<nativeString> arg;
   auto args = UntouchedCommandLineArguments(2, arg);
 
   return SpawnWaitProcess(arg[1].c_str(), args);
 }
 
-int LaunchCommand::SpawnWaitProcess(LPCWSTR workingDirectory, LPCWSTR commandLine)
-{
-  PROCESS_INFORMATION pi{0};
-  STARTUPINFO si{0};
-  si.cb                        = sizeof(si);
-  std::wstring commandLineCopy = commandLine;
-
-  if (!CreateProcessW(NULL, &commandLineCopy[0], NULL, NULL, FALSE, 0, NULL,
-                      workingDirectory, &si, &pi)) {
-    // A bit of a problem where to log the error message here, at least this way you can
-    // get the message using a either DebugView or a live debugger:
-    std::wostringstream ost;
-    ost << L"CreateProcess failed: " << commandLine << ", " << GetLastError();
-    OutputDebugStringW(ost.str().c_str());
-    return -1;
-  }
-
-  WaitForSingleObject(pi.hProcess, INFINITE);
-
-  DWORD exitCode = (DWORD)-1;
-  ::GetExitCodeProcess(pi.hProcess, &exitCode);
-  CloseHandle(pi.hThread);
-  CloseHandle(pi.hProcess);
-  return static_cast<int>(exitCode);
-}
-
 // Parses the first parseArgCount arguments of the current process command line and
 // returns them in parsedArgs, the rest of the command line is returned untouched.
-LPCWSTR
+nativeCString
 LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
-                                             std::vector<std::wstring>& parsedArgs)
+                                             std::vector<nativeString>& parsedArgs)
 {
-  LPCWSTR cmd = GetCommandLineW();
-  LPCWSTR arg = nullptr;  // to skip executable name
+  nativeCString cmd = GetCommandLineNative();
+  nativeCString arg = nullptr;  // to skip executable name
   for (; parseArgCount >= 0 && *cmd; ++cmd) {
     if (*cmd == '"') {
       int escaped = 0;
@@ -671,9 +674,9 @@ LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
     if (*cmd == ' ') {
       if (arg)
         if (cmd - 1 > arg && *arg == '"' && *(cmd - 1) == '"')
-          parsedArgs.push_back(std::wstring(arg + 1, cmd - 1));
+          parsedArgs.push_back(nativeString(arg + 1, cmd - 1));
         else
-          parsedArgs.push_back(std::wstring(arg, cmd));
+          parsedArgs.push_back(nativeString(arg, cmd));
       arg = cmd + 1;
       --parseArgCount;
     }
@@ -824,9 +827,8 @@ std::optional<int> ReloadPluginCommand::runPostOrganizer(OrganizerCore& core)
 {
   const QString name = QString::fromStdString(vm()["PLUGIN"].as<std::string>());
 
-  QString filepath =
-      QDir(qApp->applicationDirPath() + "/" + ToQString(AppConfig::pluginPath()))
-          .absoluteFilePath(name);
+  QString filepath = QDir(qApp->applicationDirPath() + "/" + AppConfig::pluginPath())
+                         .absoluteFilePath(name);
 
   log::debug("reloading plugin from {}", filepath);
   core.pluginContainer().reloadPlugin(filepath);

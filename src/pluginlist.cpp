@@ -52,11 +52,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "shared/directoryentry.h"
 #include "shared/fileentry.h"
 #include "shared/filesorigin.h"
-#include "shared/windows_error.h"
+#include "shared/os_error.h"
 #include "viewmarkingscrollbar.h"
 
 using namespace MOBase;
 using namespace MOShared;
+
+extern bool isFileLocked(const QString& fileName);
 
 static QString TruncateString(const QString& text)
 {
@@ -159,10 +161,10 @@ void PluginList::highlightPlugins(const std::vector<unsigned int>& modIndices,
                                               << "*.esl");
       }
       const MOShared::FilesOrigin& origin =
-          directoryEntry.getOriginByName(selectedMod->internalName().toStdWString());
+          directoryEntry.getOriginByName(selectedMod->internalName());
       if (plugins.size() > 0) {
         for (auto plugin : plugins) {
-          MOShared::FileEntryPtr file = directoryEntry.findFile(plugin.toStdWString());
+          MOShared::FileEntryPtr file = directoryEntry.findFile(plugin);
           if (file && file->getOrigin() != origin.getID()) {
             const auto alternatives = file->getAlternatives();
             if (std::find_if(alternatives.begin(), alternatives.end(),
@@ -236,7 +238,7 @@ void PluginList::refresh(const QString& profileName,
     if (current.get() == nullptr) {
       continue;
     }
-    const QString& filename = ToQString(current->getName());
+    const QString& filename = current->getName();
 
     if (filename.endsWith(".esp", Qt::CaseInsensitive) ||
         filename.endsWith(".esm", Qt::CaseInsensitive) ||
@@ -269,7 +271,7 @@ void PluginList::refresh(const QString& profileName,
       QString baseName = QFileInfo(filename).completeBaseName();
 
       QString iniPath = baseName + ".ini";
-      bool hasIni     = baseDirectory.findFile(ToWString(iniPath)).get() != nullptr;
+      bool hasIni     = baseDirectory.findFile(iniPath).get() != nullptr;
       std::set<QString> loadedArchives;
       for (const auto& archiveName : archiveCandidates) {
         if (archiveName.startsWith(baseName, Qt::CaseInsensitive)) {
@@ -277,7 +279,7 @@ void PluginList::refresh(const QString& profileName,
         }
       }
 
-      QString originName    = ToQString(origin.getName());
+      QString originName    = origin.getName();
       unsigned int modIndex = ModInfo::getIndex(originName);
       if (modIndex != UINT_MAX) {
         ModInfo::Ptr modInfo = ModInfo::getByIndex(modIndex);
@@ -285,9 +287,9 @@ void PluginList::refresh(const QString& profileName,
       }
 
       m_ESPs.emplace_back(filename, forceLoaded, forceEnabled, forceDisabled,
-                          originName, ToQString(current->getFullPath()), hasIni,
-                          loadedArchives, lightPluginsAreSupported,
-                          mediumPluginsAreSupported, blueprintPluginsAreSupported);
+                          originName, current->getFullPath(), hasIni, loadedArchives,
+                          lightPluginsAreSupported, mediumPluginsAreSupported,
+                          blueprintPluginsAreSupported);
       m_ESPs.rbegin()->priority = -1;
     } catch (const std::exception& e) {
       reportError(tr("failed to update esp info for file %1 (source id: %2), error: %3")
@@ -773,47 +775,51 @@ bool PluginList::saveLoadOrder(DirectoryEntry& directoryStructure)
 
   for (ESPInfo& esp : m_ESPs) {
     std::wstring espName         = ToWString(esp.name);
-    const FileEntryPtr fileEntry = directoryStructure.findFile(espName);
+    const FileEntryPtr fileEntry = directoryStructure.findFile(esp.name);
     if (fileEntry.get() != nullptr) {
       QString fileName;
       bool archive = false;
       int originid = fileEntry->getOrigin(archive);
 
-      fileName = QString("%1\\%2")
-                     .arg(QDir::toNativeSeparators(ToQString(
-                         directoryStructure.getOriginByID(originid).getPath())))
+      fileName = QString("%1/%2")
+                     .arg(QDir::toNativeSeparators(
+                         directoryStructure.getOriginByID(originid).getPath()))
                      .arg(esp.name);
 
-      HANDLE file =
-          ::CreateFile(ToWString(fileName).c_str(), GENERIC_READ | GENERIC_WRITE, 0,
-                       nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-      if (file == INVALID_HANDLE_VALUE) {
-        if (::GetLastError() == ERROR_SHARING_VIOLATION) {
-          // file is locked, probably the game is running
-          return false;
-        } else {
-          throw windows_error(
-              QObject::tr("failed to access %1").arg(fileName).toUtf8().constData());
-        }
+      if (isFileLocked(fileName)) {
+        // file is locked, probably the game is running
+        return false;
+      }
+      QFile file(fileName);
+      if (!file.open(QIODeviceBase::ReadWrite)) {
+        throw std::runtime_error(QObject::tr("failed to access %1: %2")
+                                     .arg(fileName, file.errorString())
+                                     .toUtf8()
+                                     .constData());
       }
 
-      ULONGLONG temp = 0;
-      temp           = (145731ULL + esp.priority) * 24 * 60 * 60 * 10000000ULL;
+      // TODO: check if the calculation is correct
+      uint64_t temp = (145731ULL + esp.priority) * 24 * 60 * 60 * 10000000ULL;
 
-      FILETIME newWriteTime;
+      // QDateTime uses the epoch starting from January 1, 1970
+      // FILETIME uses the epoch starting from January 1, 1601
+      // There are 11644473600 seconds between these two dates
+      const uint64_t epochDifference =
+          116444736000000000ULL;  // 11644473600 seconds in 100-nanosecond intervals
 
-      newWriteTime.dwLowDateTime  = (DWORD)(temp & 0xFFFFFFFF);
-      newWriteTime.dwHighDateTime = (DWORD)(temp >> 32);
-      esp.time                    = newWriteTime;
+      QDateTime newWriteTime =
+          QDateTime::fromMSecsSinceEpoch((temp - epochDifference) / 10'000);
+
+      esp.time = newWriteTime;
       fileEntry->setFileTime(newWriteTime);
-      if (!::SetFileTime(file, nullptr, nullptr, &newWriteTime)) {
-        throw windows_error(QObject::tr("failed to set file time %1")
-                                .arg(fileName)
-                                .toUtf8()
-                                .constData());
+      bool result = file.setFileTime(newWriteTime, QFileDevice::FileModificationTime);
+      if (!result) {
+        throw std::runtime_error(QObject::tr("failed to set file time %1: %2")
+                                     .arg(fileName)
+                                     .arg(file.errorString())
+                                     .toUtf8()
+                                     .constData());
       }
-
-      CloseHandle(file);
     }
   }
   return true;

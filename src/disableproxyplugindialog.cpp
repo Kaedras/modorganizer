@@ -22,7 +22,7 @@ DisableProxyPluginDialog::DisableProxyPluginDialog(
 
   ui->requiredPlugins->setSelectionMode(QAbstractItemView::NoSelection);
   ui->requiredPlugins->setRowCount(required.size());
-  for (int i = 0; i < required.size(); ++i) {
+  for (size_t i = 0; i < required.size(); ++i) {
     ui->requiredPlugins->setItem(i, 0,
                                  new QTableWidgetItem(required[i]->localizedName()));
     ui->requiredPlugins->setItem(i, 1,

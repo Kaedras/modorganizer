@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "windows_error.h"
+#include "shared/os_error.h"
 #include <sstream>
 
 namespace MOShared
 {
 
-std::string windows_error::constructMessage(const std::string& input, int inErrorCode)
+std::string os_error::constructMessage(const std::string& input, int inErrorCode)
 {
   std::ostringstream finalMessage;
   finalMessage << input;

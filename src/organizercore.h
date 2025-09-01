@@ -35,7 +35,12 @@
 #include "selfupdater.h"
 #include "settings.h"
 #include "uilocker.h"
-#include "usvfsconnector.h"
+
+#ifdef _WIN32
+#include "win32/usvfsconnector.h"
+#else
+#include "linux/overlayfsconnector.h"
+#endif
 
 class ModListSortProxy;
 class PluginListSortProxy;
@@ -351,7 +356,7 @@ public:
 
   static env::CoreDumpTypes getGlobalCoreDumpType();
   static void setGlobalCoreDumpType(env::CoreDumpTypes type);
-  static std::wstring getGlobalCoreDumpPath();
+  static QString getGlobalCoreDumpPath();
 
 public:
   MOBase::IModRepositoryBridge* createNexusBridge() const;
@@ -525,7 +530,7 @@ private slots:
   void loginFailed(const QString& message);
 
 private:
-  static const unsigned int PROBLEM_MO1SCRIPTEXTENDERWORKAROUND = 1;
+  static constexpr unsigned int PROBLEM_MO1SCRIPTEXTENDERWORKAROUND = 1;
 
 private:
   IUserInterface* m_UserInterface;

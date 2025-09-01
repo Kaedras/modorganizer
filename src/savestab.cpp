@@ -6,6 +6,12 @@
 #include <isavegameinfowidget.h>
 #include <localsavegames.h>
 
+#ifdef __unix__
+#include <registry.h>
+#else
+#include <Windows.h>
+#endif
+
 using namespace MOBase;
 
 SavesTab::SavesTab(QWidget* window, OrganizerCore& core, Ui::MainWindow* mwui)

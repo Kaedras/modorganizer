@@ -11,6 +11,7 @@
 
 using namespace MOShared;
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 namespace fs = std::filesystem;
 
 // if there are more than 50 selected items in the conflict tree, don't bother
@@ -485,14 +486,14 @@ std::vector<QAction*> ConflictsTab::createGotoActions(const ConflictItem* item)
   for (const auto& alt : file->getAlternatives()) {
     const auto& o = ds.getOriginByID(alt.originID());
     if (o.getID() != origin()->getID()) {
-      mods.push_back(ToQString(o.getName()));
+      mods.push_back(o.getName());
     }
   }
 
   // add the real origin if different from this mod
   const FilesOrigin& realOrigin = ds.getOriginByID(file->getOrigin());
   if (realOrigin.getID() != origin()->getID()) {
-    mods.push_back(ToQString(realOrigin.getName()));
+    mods.push_back(realOrigin.getName());
   }
 
   std::sort(mods.begin(), mods.end(), [](const auto& a, const auto& b) {
@@ -601,8 +602,7 @@ bool GeneralConflictsTab::update()
     std::set<const DirectoryEntry*> checkedDirs;
 
     for (const auto& file : m_tab->origin()->getFiles()) {
-      if (QString::fromStdWString(file->getName())
-              .endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
+      if ((file->getName()).endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
         // skip hidden file conflicts
         continue;
       } else {
@@ -617,8 +617,7 @@ bool GeneralConflictsTab::update()
             // well
             break;
           } else {
-            if (QString::fromStdWString(parent->getName())
-                    .endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
+            if (parent->getName().endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
               hidden = true;
               break;
             }
@@ -632,9 +631,8 @@ bool GeneralConflictsTab::update()
       }
 
       // careful: these two strings are moved into createXItem() below
-      QString relativeName =
-          QDir::fromNativeSeparators(ToQString(file->getRelativePath()));
-      QString fileName = rootPath + relativeName;
+      QString relativeName = QDir::fromNativeSeparators((file->getRelativePath()));
+      QString fileName     = rootPath + relativeName;
 
       bool archive         = false;
       const int fileOrigin = file->getOrigin(archive);
@@ -715,19 +713,19 @@ ConflictItem GeneralConflictsTab::createOverwriteItem(
     const MOShared::AlternativesVector& alternatives)
 {
   const auto& ds = *m_core.directoryStructure();
-  std::wstring altString;
+  QString altString;
 
   for (const auto& alt : alternatives) {
-    if (!altString.empty()) {
-      altString += L", ";
+    if (!altString.isEmpty()) {
+      altString.append(", "_L1);
     }
 
     altString += ds.getOriginByID(alt.originID()).getName();
   }
 
-  auto origin = ToQString(ds.getOriginByID(alternatives.back().originID()).getName());
+  auto origin = ds.getOriginByID(alternatives.back().originID()).getName();
 
-  return ConflictItem(ToQString(altString), std::move(relativeName), QString(), index,
+  return ConflictItem(altString, std::move(relativeName), QString(), index,
                       std::move(fileName), true, std::move(origin), archive);
 }
 
@@ -746,7 +744,7 @@ ConflictItem GeneralConflictsTab::createOverwrittenItem(FileIndex index, int fil
   const auto& ds                = *m_core.directoryStructure();
   const FilesOrigin& realOrigin = ds.getOriginByID(fileOrigin);
 
-  QString after     = ToQString(realOrigin.getName());
+  QString after     = realOrigin.getName();
   QString altOrigin = after;
 
   return ConflictItem(QString(), std::move(relativeName), std::move(after), index,
@@ -953,8 +951,7 @@ void AdvancedConflictsTab::update()
     std::set<const DirectoryEntry*> checkedDirs;
 
     for (const auto& file : files) {
-      if (QString::fromStdWString(file->getName())
-              .endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
+      if (file->getName().endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
         // skip hidden file conflicts
         continue;
       } else {
@@ -969,8 +966,7 @@ void AdvancedConflictsTab::update()
             // well
             break;
           } else {
-            if (QString::fromStdWString(parent->getName())
-                    .endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
+            if (parent->getName().endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
               hidden = true;
               break;
             }
@@ -983,9 +979,8 @@ void AdvancedConflictsTab::update()
         }
       }
       // careful: these two strings are moved into createItem() below
-      QString relativeName =
-          QDir::fromNativeSeparators(ToQString(file->getRelativePath()));
-      QString fileName = rootPath + relativeName;
+      QString relativeName = QDir::fromNativeSeparators(file->getRelativePath());
+      QString fileName     = rootPath + relativeName;
 
       bool archive             = false;
       const int fileOrigin     = file->getOrigin(archive);
@@ -1010,7 +1005,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
 {
   const auto& ds = *m_core.directoryStructure();
 
-  std::wstring before, after;
+  QString before, after;
 
   auto currOrigin        = m_tab->origin();
   bool isCurrOrigArchive = archive;
@@ -1024,8 +1019,8 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
       if (showAllAlts) {
         for (const auto& alt : alternatives) {
           const auto& altOrigin = ds.getOriginByID(alt.originID());
-          if (!before.empty()) {
-            before += L", ";
+          if (!before.isEmpty()) {
+            before += ", "_L1;
           }
 
           before += altOrigin.getName();
@@ -1067,16 +1062,16 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
           if (iter < currModIter) {
             // mod comes before current
 
-            if (!before.empty()) {
-              before += L", ";
+            if (!before.isEmpty()) {
+              before += ", "_L1;
             }
 
             before += altOrigin.getName();
           } else if (iter > currModIter) {
             // mod comes after current
 
-            if (!after.empty()) {
-              after += L", ";
+            if (!after.isEmpty()) {
+              after += ", "_L1;
             }
 
             after += altOrigin.getName();
@@ -1084,8 +1079,8 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
         }
 
         // also add the active winner origin (the one outside alternatives) to 'after'
-        if (!after.empty()) {
-          after += L", ";
+        if (!after.isEmpty()) {
+          after += ", "_L1;
         }
         after += ds.getOriginByID(fileOrigin).getName();
 
@@ -1111,7 +1106,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
     }
   }
 
-  const bool hasAlts = !before.empty() || !after.empty();
+  const bool hasAlts = !before.isEmpty() || !after.isEmpty();
 
   if (!hasAlts) {
     // if both before and after are empty, it means this file has no conflicts
@@ -1121,10 +1116,7 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
     }
   }
 
-  auto beforeQS = QString::fromStdWString(before);
-  auto afterQS  = QString::fromStdWString(after);
-
-  return ConflictItem(std::move(beforeQS), std::move(relativeName), std::move(afterQS),
+  return ConflictItem(std::move(before), std::move(relativeName), std::move(after),
                       index, std::move(fileName), hasAlts, QString(),
                       isCurrOrigArchive);
 }

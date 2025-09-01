@@ -101,17 +101,16 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
   bool hasVisibleFiles  = false;
 
   std::vector<int> dataIDs;
-  if (m_Core.directoryStructure()->originExists(L"data")) {
-    dataIDs.push_back(m_Core.directoryStructure()->getOriginByName(L"data").getID());
+  if (m_Core.directoryStructure()->originExists("data")) {
+    dataIDs.push_back(m_Core.directoryStructure()->getOriginByName("data").getID());
   }
   for (const auto& origin : m_Core.managedGame()->secondaryDataDirectories().keys()) {
-    if (m_Core.directoryStructure()->originExists(origin.toStdWString())) {
-      dataIDs.push_back(
-          m_Core.directoryStructure()->getOriginByName(origin.toStdWString()).getID());
+    if (m_Core.directoryStructure()->originExists(origin)) {
+      dataIDs.push_back(m_Core.directoryStructure()->getOriginByName(origin).getID());
     }
   }
 
-  std::wstring name = ToWString(this->name());
+  QString name = this->name();
 
   if (m_Core.directoryStructure()->originExists(name)) {
     FilesOrigin& origin = m_Core.directoryStructure()->getOriginByName(name);
@@ -120,8 +119,7 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
 
     // for all files in this origin
     for (FileEntryPtr file : files) {
-      if (QString::fromStdWString(file->getName())
-              .endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
+      if (file->getName().endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
         hasHiddenFiles = true;
         // skip hidden file conflicts
         continue;
@@ -138,8 +136,7 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
             // well
             break;
           } else {
-            if (QString::fromStdWString(parent->getName())
-                    .endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
+            if (parent->getName().endsWith(ModInfo::s_HiddenExt, Qt::CaseInsensitive)) {
               hasHiddenFiles = hidden = true;
               break;
             }
@@ -177,7 +174,7 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
         if (file->getOrigin() != origin.getID()) {
           FilesOrigin& altOrigin =
               m_Core.directoryStructure()->getOriginByID(file->getOrigin());
-          unsigned int altIndex = ModInfo::getIndex(ToQString(altOrigin.getName()));
+          unsigned int altIndex = ModInfo::getIndex(altOrigin.getName());
           if (!file->isFromArchive()) {
             if (!archiveData.isValid())
               conflicts.m_OverwrittenList.insert(altIndex);
@@ -197,7 +194,7 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
               (altInfo.originID() != origin.getID())) {
             FilesOrigin& altOrigin =
                 m_Core.directoryStructure()->getOriginByID(altInfo.originID());
-            QString altOriginName = ToQString(altOrigin.getName());
+            QString altOriginName = altOrigin.getName();
             unsigned int altIndex = ModInfo::getIndex(altOriginName);
             if (!altInfo.isFromArchive()) {
               if (!archiveData.isValid()) {
@@ -278,7 +275,7 @@ ModInfoWithConflictInfo::isLooseArchiveConflicted() const
 
 bool ModInfoWithConflictInfo::isRedundant() const
 {
-  std::wstring name = ToWString(this->name());
+  QString name = this->name();
   if (m_Core.directoryStructure()->originExists(name)) {
     FilesOrigin& origin = m_Core.directoryStructure()->getOriginByName(name);
     std::vector<FileEntryPtr> files = origin.getFiles();

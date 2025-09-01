@@ -45,7 +45,9 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QStringList>  // for QStringList
 #include <QtGlobal>     // for qUtf8Printable
 
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 
 #include <assert.h>  // for assert
 #include <limits.h>  // for UINT_MAX, INT_MAX, etc
@@ -287,7 +289,7 @@ void Profile::createTweakedIniFile()
   if (QFile::exists(tweakedIni) && !shellDeleteQuiet(tweakedIni)) {
     const auto e = GetLastError();
     reportError(tr("failed to update tweaked ini file, wrong settings may be used: %1")
-                    .arg(QString::fromStdWString(formatSystemMessage(e))));
+                    .arg(ToQString(formatSystemMessage(e))));
     return;
   }
 
@@ -308,8 +310,8 @@ void Profile::createTweakedIniFile()
 
   if (error) {
     const auto e = ::GetLastError();
-    reportError(tr("failed to create tweaked ini: %1")
-                    .arg(QString::fromStdWString(formatSystemMessage(e))));
+    reportError(
+        tr("failed to create tweaked ini: %1").arg(ToQString(formatSystemMessage(e))));
   }
 }
 
@@ -1003,8 +1005,7 @@ QString Profile::absoluteIniFilePath(QString iniFile) const
 
 QString Profile::getProfileTweaks() const
 {
-  return QDir::cleanPath(
-      m_Directory.absoluteFilePath(ToQString(AppConfig::profileTweakIni())));
+  return QDir::cleanPath(m_Directory.absoluteFilePath(AppConfig::profileTweakIni()));
 }
 
 QString Profile::absolutePath() const

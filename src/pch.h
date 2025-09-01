@@ -31,6 +31,7 @@
 #include <vector>
 #include <wchar.h>
 
+#ifdef _WIN32
 // keep this header separated to avoid ordering issue since this must be
 // included before DbgHelp.h
 #include <Windows.h>
@@ -46,6 +47,7 @@
 #include <tchar.h>
 #include <wincred.h>
 #include <windowsx.h>
+#endif
 
 // boost
 #include <boost/algorithm/string.hpp>
@@ -69,8 +71,10 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+#ifdef _WIN32
 // openssl
 #include <tlhelp32.h>
+#endif
 
 // qt
 #include <QAbstractButton>
@@ -111,9 +115,9 @@
 #include <QDropEvent>
 #include <QElapsedTimer>
 #include <QEvent>
-#include <QFIleIconProvider>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QFileSystemModel>
 #include <QFileSystemWatcher>
@@ -156,6 +160,7 @@
 #include <QMessageBox>
 #include <QMetaType>
 #include <QMimeData>
+#include <QMimeDatabase>
 #include <QModelIndex>
 #include <QMouseEvent>
 #include <QMultiHash>

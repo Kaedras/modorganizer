@@ -19,7 +19,7 @@ namespace cid
 
 // returns "%base_dir%/dir"
 //
-QString makeDefaultPath(const std::wstring& dir);
+QString makeDefaultPath(const QString& dir);
 
 // remembers the original text of the given label and, if it contains a %1,
 // sets it in setText()

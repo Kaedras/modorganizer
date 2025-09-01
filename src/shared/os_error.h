@@ -17,20 +17,24 @@ You should have received a copy of the GNU General Public License
 along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WINDOWS_ERROR_H
-#define WINDOWS_ERROR_H
+#ifndef OS_ERROR_H
+#define OS_ERROR_H
 
 #include <stdexcept>
+#ifdef __unix__
+#include <linux/compatibility.h>
+#else
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 namespace MOShared
 {
 
-class windows_error : public std::runtime_error
+class os_error : public std::runtime_error
 {
 public:
-  windows_error(const std::string& message, int errorcode = ::GetLastError())
+  os_error(const std::string& message, int errorcode = ::GetLastError())
       : runtime_error(constructMessage(message, errorcode)), m_ErrorCode(errorcode)
   {}
   int getErrorCode() const { return m_ErrorCode; }
@@ -44,4 +48,4 @@ private:
 
 }  // namespace MOShared
 
-#endif  // WINDOWS_ERROR_H
+#endif  // OS_ERROR_H

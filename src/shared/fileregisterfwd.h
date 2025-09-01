@@ -8,16 +8,16 @@ namespace MOShared
 
 struct DirectoryEntryFileKey
 {
-  DirectoryEntryFileKey(std::wstring v) : value(std::move(v)), hash(getHash(value)) {}
+  DirectoryEntryFileKey(QString v) : value(std::move(v)), hash(getHash(value)) {}
 
   bool operator==(const DirectoryEntryFileKey& o) const { return (value == o.value); }
 
-  static std::size_t getHash(const std::wstring& value)
+  static std::size_t getHash(const QString& value)
   {
-    return std::hash<std::wstring>()(value);
+    return std::hash<QString>()(value);
   }
 
-  std::wstring value;
+  QString value;
   const std::size_t hash;
 };
 
@@ -41,18 +41,16 @@ constexpr OriginID InvalidOriginID   = -1;
 // -1
 class DataArchiveOrigin
 {
-  std::wstring name_ = L"";
-  int order_         = -1;
+  QString name_;
+  int order_ = -1;
 
 public:
   int order() const { return order_; }
-  const std::wstring& name() const { return name_; }
+  const QString& name() const { return name_; }
 
   bool isValid() const { return name_.size() > 0; }
 
-  DataArchiveOrigin(std::wstring name, int order)
-      : name_(std::move(name)), order_(order)
-  {}
+  DataArchiveOrigin(QString name, int order) : name_(std::move(name)), order_(order) {}
 
   DataArchiveOrigin() = default;
 };
@@ -81,7 +79,7 @@ struct DirectoryStats
 {
   static constexpr bool EnableInstrumentation = false;
 
-  std::string mod;
+  QString mod;
 
   std::chrono::nanoseconds dirTimes;
   std::chrono::nanoseconds fileTimes;
@@ -112,8 +110,8 @@ struct DirectoryStats
 
   DirectoryStats& operator+=(const DirectoryStats& o);
 
-  static std::string csvHeader();
-  std::string toCsv() const;
+  static QString csvHeader();
+  QString toCsv() const;
 };
 
 }  // namespace MOShared
