@@ -51,17 +51,14 @@ private:
   std::atomic<bool> m_stop;
 
   mutable QuickCache m_quickCache;
-  mutable Cache m_extensionCache;
+  mutable Cache m_mimeTypeCache;
   mutable Cache m_fileCache;
   mutable Waiter m_waiter;
 
   bool hasOwnIcon(const QString& path) const;
 
-  template <class T>
-  QPixmap getPixmapIcon(T&& t) const
-  {
-    return m_provider.icon(t).pixmap({m_iconSize, m_iconSize});
-  }
+  QPixmap getPixmapIcon(QFileIconProvider::IconType t) const;
+  QPixmap getPixmapIcon(const QString& t) const;
 
   void threadFun();
 
@@ -69,7 +66,7 @@ private:
   void queue(Cache& cache, QString path) const;
 
   QVariant fileIcon(const QString& path) const;
-  QVariant extensionIcon(const QStringView& ext) const;
+  QVariant mimeTypeIcon(const QStringView& type) const;
 };
 
 #endif  // MODORGANIZER_ICONFETCHER_INCLUDED
