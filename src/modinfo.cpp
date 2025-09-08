@@ -294,7 +294,7 @@ void ModInfo::updateIndices()
   }
 }
 
-ModInfo::ModInfo(OrganizerCore& core) : m_PrimaryCategory(-1), m_Core(core) {}
+ModInfo::ModInfo(OrganizerCore& core) : m_Core(core), m_PrimaryCategory(-1) {}
 
 bool ModInfo::checkAllForUpdate(PluginContainer* pluginContainer, QObject* receiver)
 {

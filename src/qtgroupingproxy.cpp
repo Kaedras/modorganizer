@@ -34,8 +34,8 @@ using namespace MOBase;
 
 QtGroupingProxy::QtGroupingProxy(QModelIndex rootNode, int groupedColumn,
                                  int groupedRole, unsigned int flags, int aggregateRole)
-    : QAbstractProxyModel(), m_rootNode(rootNode), m_groupedColumn(0),
-      m_groupedRole(groupedRole), m_aggregateRole(aggregateRole), m_flags(flags)
+    : QAbstractProxyModel(), m_rootNode(rootNode), m_groupedColumn(0), m_flags(flags),
+      m_groupedRole(groupedRole), m_aggregateRole(aggregateRole)
 {
   if (groupedColumn != -1) {
     setGroupedColumn(groupedColumn);

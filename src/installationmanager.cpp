@@ -77,7 +77,7 @@ static T resolveFunction(QLibrary& lib, const char* name)
   return temp;
 }
 
-InstallationManager::InstallationManager() : m_ParentWidget(nullptr), m_IsRunning(false)
+InstallationManager::InstallationManager() : m_IsRunning(false), m_ParentWidget(nullptr)
 {
   m_ArchiveHandler = CreateArchive();
   if (!m_ArchiveHandler->isValid()) {

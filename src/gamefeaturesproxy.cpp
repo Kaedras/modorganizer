@@ -5,7 +5,7 @@
 
 GameFeaturesProxy::GameFeaturesProxy(OrganizerProxy* coreProxy,
                                      GameFeatures& gameFeatures)
-    : m_CoreProxy(*coreProxy), m_Features(gameFeatures)
+    : m_Features(gameFeatures), m_CoreProxy(*coreProxy)
 {}
 
 bool GameFeaturesProxy::registerFeature(QStringList const& games,

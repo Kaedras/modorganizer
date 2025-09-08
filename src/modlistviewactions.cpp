@@ -39,8 +39,8 @@ ModListViewActions::ModListViewActions(OrganizerCore& core, FilterList& filters,
                                        ModListView* view, PluginListView* pluginView,
                                        QObject* nxmReceiver)
     : QObject(view), m_core(core), m_filters(filters), m_categories(categoryFactory),
-      m_view(view), m_pluginView(pluginView), m_parent(view->topLevelWidget()),
-      m_receiver(nxmReceiver)
+      m_view(view), m_pluginView(pluginView), m_receiver(nxmReceiver),
+      m_parent(view->topLevelWidget())
 {}
 
 int ModListViewActions::findInstallPriority(const QModelIndex& index) const

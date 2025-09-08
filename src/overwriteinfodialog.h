@@ -37,7 +37,7 @@ class OverwriteFileSystemModel : public QFileSystemModel
 
 public:
   OverwriteFileSystemModel(QObject* parent, OrganizerCore& organizer)
-      : QFileSystemModel(parent), m_Organizer(organizer), m_RegularColumnCount(0)
+      : QFileSystemModel(parent), m_RegularColumnCount(0), m_Organizer(organizer)
   {}
 
   virtual int columnCount(const QModelIndex& parent) const

@@ -77,8 +77,8 @@ void Profile::touchFile(QString fileName)
 
 Profile::Profile(const QString& name, IPluginGame const* gamePlugin,
                  GameFeatures const& gameFeatures, bool useDefaultSettings)
-    : m_ModListWriter(std::bind(&Profile::doWriteModlist, this)),
-      m_GamePlugin(gamePlugin), m_GameFeatures(gameFeatures)
+    : m_GameFeatures(gameFeatures), m_GamePlugin(gamePlugin),
+      m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
 {
   QString profilesDir = Settings::instance().paths().profiles();
   QDir profileBase(profilesDir);
@@ -119,7 +119,7 @@ Profile::Profile(const QString& name, IPluginGame const* gamePlugin,
 
 Profile::Profile(const QDir& directory, IPluginGame const* gamePlugin,
                  GameFeatures const& gameFeatures)
-    : m_Directory(directory), m_GamePlugin(gamePlugin), m_GameFeatures(gameFeatures),
+    : m_Directory(directory), m_GameFeatures(gameFeatures), m_GamePlugin(gamePlugin),
       m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
 {
   assert(gamePlugin != nullptr);
@@ -140,9 +140,9 @@ Profile::Profile(const QDir& directory, IPluginGame const* gamePlugin,
 }
 
 Profile::Profile(const Profile& reference)
-    : m_Directory(reference.m_Directory),
-      m_ModListWriter(std::bind(&Profile::doWriteModlist, this)),
-      m_GamePlugin(reference.m_GamePlugin), m_GameFeatures(reference.m_GameFeatures)
+    : m_Directory(reference.m_Directory), m_GameFeatures(reference.m_GameFeatures),
+      m_GamePlugin(reference.m_GamePlugin),
+      m_ModListWriter(std::bind(&Profile::doWriteModlist, this))
 
 {
   m_Settings =

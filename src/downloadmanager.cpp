@@ -227,8 +227,8 @@ QString DownloadManager::DownloadInfo::currentURL()
 }
 
 DownloadManager::DownloadManager(NexusInterface* nexusInterface, QObject* parent)
-    : m_NexusInterface(nexusInterface), m_DirWatcher(), m_ShowHidden(false),
-      m_ParentWidget(nullptr)
+    : m_NexusInterface(nexusInterface), m_ParentWidget(nullptr), m_DirWatcher(),
+      m_ShowHidden(false)
 {
   m_OrganizerCore = dynamic_cast<OrganizerCore*>(parent);
   connect(&m_DirWatcher, SIGNAL(directoryChanged(QString)), this,
