@@ -11,23 +11,33 @@ env:
 
 jobs:
   build:
-    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-2022, ubuntu-24.04 ]
+        include:
+          - os: windows-2022
+            build_dir: vsbuild
+          - os: ubuntu-24.04
+            build_dir: build
+
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Build ModOrganizer
         id: build-modorganizer
-        uses: ModOrganizer2/build-with-mob-action@master
+        uses: Kaedras/build-with-mob-action@master
         with:
           qt-modules: qtpositioning qtwebchannel qtwebengine qtwebsockets
-          mo2-dependencies: usvfs uibase bsatk esptk archive lootcli
+          mo2-dependencies: ${{ runner.os == 'Windows' && 'usvfs' || 'overlayfs' }} uibase bsatk esptk archive lootcli
 
       - name: Install ModOrganizer
         shell: pwsh
         run: |
-          cmake --install vsbuild --config RelWithDebInfo
+          cmake --install ${{ matrix.build_dir }} --config RelWithDebInfo
         working-directory: ./build/${{ github.event.repository.name }}
 
       - name: Package ModOrganizer
         uses: actions/upload-artifact@master
         with:
-          name: modorganizer
+          name: modorganizer-${{ runner.os }}
           path: ./install/bin
