@@ -15,10 +15,12 @@ if (UNIX)
 			${LIBSECRET_LIBRARIES}
 			${LIBFLATPAK_LIBRARIES}
 	)
+	set(LIBRARY_DIR lib)
 else()
 	find_package(usvfs CONFIG REQUIRED)
 	set(OS_SPECIFIC_INCLUDE_DIRS)
 	set(OS_SPECIFIC_PRIVATE_DEPS Shlwapi Bcrypt Version Dbghelp usvfs::usvfs)
+	set(LIBRARY_DIR dlls)
 endif()
 
 find_package(mo2-uibase CONFIG REQUIRED)
@@ -99,8 +101,8 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
 
 # install dependencies DLLs
-install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/dlls)
-install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/dlls)
+install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
+install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/${LIBRARY_DIR})
 
 # this may copy over the ones from uibase/usvfs
 # - when building with mob, this should not matter as the files should be identical
