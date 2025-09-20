@@ -88,10 +88,14 @@ Association getAssociation(const QFileInfo& targetInfo)
 
 bool registryValueExists(const QString&, const QString&)
 {
+  // no-op
   return false;
 }
 
-void deleteRegistryKeyIfEmpty(const QString&) {}
+void deleteRegistryKeyIfEmpty(const QString&)
+{
+  // no-op
+}
 
 QString thisProcessPath()
 {
