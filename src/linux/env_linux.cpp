@@ -122,11 +122,11 @@ int tempFile(const QString& dir)
   // "ModOrganizer-YYYYMMDDThhmmss.dmp", with a possible "-i" appended, where
   // i can go until MaxTries
   const QString prefix =
-      u"ModOrganizer-"_s % safeVersion() % time.toString(u"yyyyMMddThhmmss"_s);
+      "ModOrganizer-"_L1 % safeVersion() % time.toString(u"yyyyMMddThhmmss"_s);
   const QString ext = u".dmp"_s;
 
   // first path to try, without counter in it
-  QString path = dir % u"/"_s % prefix % ext;
+  QString path = dir % "/"_L1 % prefix % ext;
 
   for (int i = 0; i < MaxTries; ++i) {
     std::clog << "trying file '" << path.toStdString() << "'\n";
@@ -145,7 +145,7 @@ int tempFile(const QString& dir)
       return fd;
     }
     // try again with "-i"
-    path = dir % u"/"_s % prefix % u"-"_s % QString::number(i + 1) % ext;
+    path = dir % "/"_L1 % prefix % "-"_L1 % QString::number(i + 1) % ext;
   }
 
   std::cerr << "can't create dump file, ran out of filenames\n";
