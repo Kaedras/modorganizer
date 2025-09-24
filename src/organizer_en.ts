@@ -9573,6 +9573,14 @@ On Windows XP:
     </message>
 </context>
 <context>
+    <name>UsvfsConnector</name>
+    <message>
+        <location filename="win32/usvfsconnector.cpp" line="201"/>
+        <source>Preparing vfs</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ValidationProgressDialog</name>
     <message>
         <location filename="validationprogressdialog.ui" line="14"/>
