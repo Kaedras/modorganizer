@@ -191,9 +191,11 @@ confirmBlacklisted(QWidget* parent, const SpawnParameters& sp, Settings& setting
 namespace spawn
 {
 
+// functions with os-specific implementations
 void logSpawning(const SpawnParameters& sp, const QString& realCmd);
 bool restartAsAdmin(QWidget* parent);
 void startBinaryAdmin(QWidget* parent, const SpawnParameters& sp);
+bool startSteam(QWidget* parent);
 std::optional<QString> checkSteamFiles(const QDir& dir);
 
 struct SteamStatus
@@ -238,8 +240,6 @@ QString makeSteamArguments(const QString& username, const QString& password)
 
   return args;
 }
-
-bool startSteam(QWidget* parent);
 
 bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDirectory,
                 const QString& steamAppID, const Settings& settings)
