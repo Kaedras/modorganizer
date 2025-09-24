@@ -672,11 +672,12 @@ LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
         escaped = *cmd == '\\' ? escaped + 1 : 0;
     }
     if (*cmd == ' ') {
-      if (arg)
+      if (arg) {
         if (cmd - 1 > arg && *arg == '"' && *(cmd - 1) == '"')
           parsedArgs.push_back(nativeString(arg + 1, cmd - 1));
         else
           parsedArgs.push_back(nativeString(arg, cmd));
+      }
       arg = cmd + 1;
       --parseArgCount;
     }

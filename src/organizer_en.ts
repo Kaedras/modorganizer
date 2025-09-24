@@ -7043,27 +7043,27 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="commandline.cpp" line="755"/>
+        <location filename="commandline.cpp" line="756"/>
         <source>Executable &apos;%1&apos; not found in instance &apos;%2&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="commandline.cpp" line="781"/>
+        <location filename="commandline.cpp" line="782"/>
         <source>Failed to run &apos;%1&apos;. The logs might have more information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="commandline.cpp" line="790"/>
+        <location filename="commandline.cpp" line="791"/>
         <source>Failed to run &apos;%1&apos;. The logs might have more information. %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="commandline.cpp" line="872"/>
+        <location filename="commandline.cpp" line="873"/>
         <source>Download URL must start with https://</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="commandline.cpp" line="877"/>
+        <location filename="commandline.cpp" line="878"/>
         <source>Download started</source>
         <translation type="unfinished"></translation>
     </message>
