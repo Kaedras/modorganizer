@@ -7171,8 +7171,8 @@ p, li { white-space: pre-wrap; }
         <location filename="createinstancedialogpages.cpp" line="675"/>
         <location filename="createinstancedialogpages.cpp" line="696"/>
         <location filename="createinstancedialogpages.cpp" line="723"/>
-        <location filename="linux/spawn_linux.cpp" line="184"/>
-        <location filename="linux/spawn_linux.cpp" line="206"/>
+        <location filename="linux/spawn_linux.cpp" line="185"/>
+        <location filename="linux/spawn_linux.cpp" line="207"/>
         <location filename="settingsdialognexus.cpp" line="270"/>
         <location filename="settingsdialognexus.cpp" line="277"/>
         <location filename="settingsdialogworkarounds.cpp" line="230"/>
@@ -7499,10 +7499,10 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="175"/>
         <location filename="linux/spawn_linux.cpp" line="176"/>
-        <location filename="linux/spawn_linux.cpp" line="199"/>
+        <location filename="linux/spawn_linux.cpp" line="177"/>
         <location filename="linux/spawn_linux.cpp" line="200"/>
+        <location filename="linux/spawn_linux.cpp" line="201"/>
         <location filename="win32/spawn_win32.cpp" line="157"/>
         <location filename="win32/spawn_win32.cpp" line="158"/>
         <location filename="win32/spawn_win32.cpp" line="183"/>
@@ -7511,14 +7511,14 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="178"/>
+        <location filename="linux/spawn_linux.cpp" line="179"/>
         <location filename="win32/spawn_win32.cpp" line="160"/>
         <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="182"/>
-        <location filename="linux/spawn_linux.cpp" line="204"/>
+        <location filename="linux/spawn_linux.cpp" line="183"/>
+        <location filename="linux/spawn_linux.cpp" line="205"/>
         <location filename="spawn.cpp" line="118"/>
         <location filename="win32/spawn_win32.cpp" line="164"/>
         <location filename="win32/spawn_win32.cpp" line="188"/>
@@ -7526,21 +7526,21 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="183"/>
-        <location filename="linux/spawn_linux.cpp" line="205"/>
+        <location filename="linux/spawn_linux.cpp" line="184"/>
+        <location filename="linux/spawn_linux.cpp" line="206"/>
         <location filename="win32/spawn_win32.cpp" line="165"/>
         <location filename="win32/spawn_win32.cpp" line="189"/>
         <source>The program may fail to launch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="430"/>
+        <location filename="linux/spawn_linux.cpp" line="431"/>
         <location filename="win32/spawn_win32.cpp" line="423"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="431"/>
+        <location filename="linux/spawn_linux.cpp" line="432"/>
         <location filename="win32/spawn_win32.cpp" line="424"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>
@@ -8281,12 +8281,12 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/spawn_win32.cpp" line="580"/>
+        <location filename="win32/spawn_win32.cpp" line="593"/>
         <source>Select binary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/spawn_win32.cpp" line="581"/>
+        <location filename="win32/spawn_win32.cpp" line="594"/>
         <source>Binary</source>
         <translation type="unfinished"></translation>
     </message>

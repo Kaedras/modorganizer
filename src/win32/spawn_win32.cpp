@@ -426,6 +426,19 @@ bool startSteam(QWidget* parent)
   return true;
 }
 
+std::optional<QString> checkSteamFiles(const QDir& dir)
+{
+  static const QStringList steamFiles = {u"steam_api.dll"_s, u"steam_api64.dll"_s};
+
+  for (const auto& file : steamFiles) {
+    const QString filepath = dir.absoluteFilePath(file);
+    if (QFileInfo::exists(filepath)) {
+      return filepath;
+    }
+  }
+  return {};
+}
+
 HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
   HANDLE handle = INVALID_HANDLE_VALUE;

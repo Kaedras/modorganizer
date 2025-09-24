@@ -194,6 +194,7 @@ namespace spawn
 void logSpawning(const SpawnParameters& sp, const QString& realCmd);
 bool restartAsAdmin(QWidget* parent);
 void startBinaryAdmin(QWidget* parent, const SpawnParameters& sp);
+std::optional<QString> checkSteamFiles(const QDir& dir);
 
 struct SteamStatus
 {
@@ -254,18 +255,14 @@ bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDire
   bool steamRequired = false;
   QString details;
 
-  for (const auto& file : steamFiles) {
-    const QFileInfo fi(gameDirectory.absoluteFilePath(file));
-    if (fi.exists()) {
-      details = QString("managed game is located at '%1' and file '%2' exists")
-                    .arg(gameDirectory.absolutePath())
-                    .arg(fi.absoluteFilePath());
+  auto path = checkSteamFiles(gameDirectory);
+  if (path) {
+    details = QString("managed game is located at '%1' and file '%2' exists")
+                  .arg(gameDirectory.absolutePath())
+                  .arg(*path);
 
-      log::debug("{}", details);
-      steamRequired = true;
-
-      break;
-    }
+    log::debug("{}", details);
+    steamRequired = true;
   }
 
   if (!steamRequired) {
