@@ -31,18 +31,18 @@ std::string to_hex(void* bufferIn, size_t bufferSize)
   return temp.str();
 }
 
-LogLevel toOverlayfsLogLevel(log::Levels level)
+spdlog::level::level_enum toSpdLogLevel(log::Levels level)
 {
   switch (level) {
   case log::Info:
-    return LogLevel::Info;
+    return spdlog::level::info;
   case log::Warning:
-    return LogLevel::Warning;
+    return spdlog::level::warn;
   case log::Error:
-    return LogLevel::Error;
+    return spdlog::level::err;
   case log::Debug:
   default:
-    return LogLevel::Debug;
+    return spdlog::level::debug;
   }
 }
 
@@ -55,14 +55,14 @@ OverlayfsConnector::OverlayfsConnector()
 {
   const auto& s = Settings::instance();
 
-  const LogLevel logLevel = toOverlayfsLogLevel(s.diagnostics().logLevel());
+  const spdlog::level::level_enum logLevel = toSpdLogLevel(s.diagnostics().logLevel());
 
   m_overlayfsManager.setLogLevel(logLevel);
 
   log::debug("initializing overlayfs:\n"
              " . instance: {}\n"
              " . log: {}",
-             SHMID, OverlayFsManager::logLevelToString(logLevel));
+             SHMID, spdlog::level::to_short_c_str(logLevel));
 
   for (auto& suffix : s.skipFileSuffixes()) {
     if (suffix.isEmpty()) {
@@ -139,7 +139,7 @@ void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
   using namespace std::chrono;
 
   m_overlayfsManager.setDebugMode(false);
-  m_overlayfsManager.setLogLevel(toOverlayfsLogLevel(logLevel));
+  m_overlayfsManager.setLogLevel(toSpdLogLevel(logLevel));
 
   m_overlayfsManager.clearSkipFileSuffixes();
   for (auto& suffix : skipFileSuffixes) {
