@@ -52,6 +52,10 @@ target_include_directories(organizer PUBLIC ${CMAKE_SOURCE_DIR}/src ${OS_SPECIFI
 # required
 mo2_configure_target(organizer WARNINGS 4 TRANSLATIONS OFF)
 
+if(UNIX)
+	set_target_properties(organizer PROPERTIES INSTALL_RPATH ".:./lib/")
+endif()
+
 # we add translations "manually" to handle MO2_INSTALL_IS_BIN
 mo2_add_translations(organizer
 	INSTALL_RELEASE
@@ -102,12 +106,13 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 	DESTINATION ${_bin}/resources)
 
 # install ModOrganizer.exe itself
-install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin}
-	PERMISSIONS
-		OWNER_READ OWNER_WRITE OWNER_EXECUTE
-		GROUP_READ GROUP_EXECUTE
-		WORLD_READ WORLD_EXECUTE
-)
+if(WIN32)
+	install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
+else()
+	# install TARGETS is required for INSTALL_RPATH to take effect
+	# this also installs with correct permissions
+	install(TARGETS organizer DESTINATION ${_bin})
+endif()
 
 # install dependencies DLLs
 install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
