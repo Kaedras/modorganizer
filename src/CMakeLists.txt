@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
+if(UNIX)
+	find_package(OpenGL REQUIRED)
+endif()
+
 find_package(mo2-cmake CONFIG REQUIRED)
 
 if (UNIX)
