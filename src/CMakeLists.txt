@@ -98,7 +98,12 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 	DESTINATION ${_bin}/resources)
 
 # install ModOrganizer.exe itself
-install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
+install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin}
+	PERMISSIONS
+		OWNER_READ OWNER_WRITE OWNER_EXECUTE
+		GROUP_READ GROUP_EXECUTE
+		WORLD_READ WORLD_EXECUTE
+)
 
 # install dependencies DLLs
 install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
@@ -114,13 +119,7 @@ install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/${LIBRARY_DIR})
 #
 install(FILES
 	$<TARGET_FILE:mo2::uibase>
-	DESTINATION
-		${_bin}
-	PERMISSIONS
-		OWNER_READ OWNER_WRITE OWNER_EXECUTE
-		GROUP_READ GROUP_EXECUTE
-		WORLD_READ WORLD_EXECUTE
-)
+DESTINATION ${_bin})
 
 if(WIN32)
 	install(FILES
