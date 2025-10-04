@@ -1,14 +1,11 @@
 #include "envmodule.h"
 #include "env.h"
-#include "stub.h"
 
-#include <filesystem>
 #include <log.h>
 #include <utility.h>
 
 using namespace std;
 using namespace Qt::StringLiterals;
-namespace fs = std::filesystem;
 
 namespace env
 {
@@ -49,7 +46,7 @@ const QDateTime& Module::timestamp() const
 QString Module::timestampString() const
 {
   if (!m_timestamp.isValid()) {
-    return "(no timestamp)";
+    return u"(no timestamp)"_s;
   }
 
   return m_timestamp.toString(Qt::DateFormat::ISODate);
@@ -61,11 +58,11 @@ QString Module::toString() const
 
   // file size
   sl.push_back(displayPath());
-  sl.push_back(QString("%1 B").arg(m_fileSize));
+  sl.push_back(QStringLiteral("%1 B").arg(m_fileSize));
 
   // version
   if (m_version.isEmpty()) {
-    sl.push_back("(no version)");
+    sl.push_back(u"(no version)"_s);
   } else {
     if (!m_version.isEmpty()) {
       sl.push_back(m_version);
@@ -76,16 +73,16 @@ QString Module::toString() const
   if (m_timestamp.isValid()) {
     sl.push_back(m_timestamp.toString(Qt::DateFormat::ISODate));
   } else {
-    sl.push_back("(no timestamp)");
+    sl.push_back(u"(no timestamp)"_s);
   }
 
-  return sl.join(", ");
+  return sl.join(", "_L1);
 }
 
 QString Module::getVersion() const
 {
   if (m_path.contains(".so."_L1)) {
-    auto pos = m_path.indexOf(".so.");
+    auto pos = m_path.indexOf(".so."_L1);
     return m_path.sliced(pos);
   }
   return {};
