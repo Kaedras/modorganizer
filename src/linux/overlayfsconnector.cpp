@@ -9,6 +9,7 @@
 #include <QProgressDialog>
 #include <iomanip>
 #include <memory>
+#include <spdlog/spdlog.h>
 #include <sstream>
 
 static constexpr char SHMID[] = "mod_organizer_instance";
