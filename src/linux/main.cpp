@@ -50,6 +50,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, 
     // check if the crash dump path is set
     string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
     if (!path.empty()) {
+      fs::create_directory(path);
       fs::rename(filename, path / filename, ec);
       if (ec) {
         cerr << "Error moving minidump to " << path << ", " << ec.message() << "\n";
