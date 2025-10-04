@@ -85,8 +85,8 @@ QString Module::toString() const
 QString Module::getVersion() const
 {
   if (m_path.contains(".so."_L1)) {
-    auto pos = m_version.indexOf(".so.");
-    return m_version.sliced(pos);
+    auto pos = m_path.indexOf(".so.");
+    return m_path.sliced(pos);
   }
   return {};
 }
