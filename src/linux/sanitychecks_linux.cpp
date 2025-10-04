@@ -1,7 +1,6 @@
 #include "env.h"
 #include "envmodule.h"
 #include "settings.h"
-#include "stub.h"
 
 #include <QStandardPaths>
 #include <utility.h>
@@ -15,14 +14,13 @@ using namespace MOBase;
 
 int checkBlocked()
 {
-  STUB();
+  // no-op
   return 0;
 }
 
-int checkIncompatibleModule(const env::Module& m)
+int checkIncompatibleModule(const env::Module&)
 {
-  STUB();
-  (void)m;
+  // no-op
   return 0;
 }
 
