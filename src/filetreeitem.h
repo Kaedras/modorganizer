@@ -223,8 +223,8 @@ private:
   mutable std::size_t m_indexGuess;
 
   const QString m_virtualParentPath;
-  const MOShared::DirectoryEntryFileKey m_key;
   const QString m_file, m_lcFile;
+  const MOShared::DirectoryEntryFileKey m_key;
   const bool m_isDirectory;
 
   int m_originID;
