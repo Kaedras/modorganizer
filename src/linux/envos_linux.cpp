@@ -62,11 +62,11 @@ QString LinuxInfo::toString() const
   sl << m_release.name;
 
   if (!m_release.version.isEmpty()) {
-    sl << m_release.version;
+    sl << "version "_L1 % m_release.version;
   }
 
   // version
-  sl << u"Kernel "_s % m_versionString;  // kernel release including local version,
+  sl << "kernel "_L1 % m_versionString;  // kernel release including local version,
                                          // e.g. 6.9.9-gentoo
   sl << m_info.machine;                  // architecture, e.g. x86_64
   sl << m_info.version;                  // kernel version, e.g. #1 SMP PREEMPT_DYNAMIC
@@ -79,7 +79,7 @@ QString LinuxInfo::toString() const
 
   sl << u"elevated: "_s % elevated;
 
-  return sl.join(u", "_s);
+  return sl.join(", "_L1);
 }
 
 LinuxInfo::LinuxInfo()
@@ -116,18 +116,24 @@ LinuxInfo::Release LinuxInfo::getRelease() const
     QTextStream stream(&file);
     QString line;
     while (stream.readLineInto(&line)) {
-      if (line.startsWith("PRETTY_NAME"_L1)) {
+      if (line.startsWith("PRETTY_NAME="_L1)) {
         r.name = line.trimmed();
+        r.name.remove("PRETTY_NAME="_L1);
+        r.name.remove('"');
       }
 
       // both VERSION and VERSION_ID are optional fields
       // use VERSION if present
-      if (line.startsWith("VERSION"_L1)) {
+      if (line.startsWith("VERSION="_L1)) {
         r.version = line.trimmed();
+        r.version.remove("VERSION="_L1);
+        r.version.remove('"');
       }
       // use VERSION_ID instead
-      else if (line.startsWith("VERSION_ID"_L1) && r.version.isEmpty()) {
+      else if (line.startsWith("VERSION_ID="_L1) && r.version.isEmpty()) {
         r.version = line.trimmed();
+        r.version.remove("VERSION_ID="_L1);
+        r.version.remove('"');
       }
     }
 
@@ -152,6 +158,7 @@ void LinuxInfo::getVersion()
   if (uname(&m_info) != 0) {
     const int error = errno;
     log::error("error getting kernel version: {}", strerror(error));
+    return;
   }
   QString versionString = m_info.release;
   QStringList list      = versionString.split('.');
