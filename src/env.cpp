@@ -120,38 +120,27 @@ const Metrics& Environment::metrics() const
 
 QString Environment::timezone() const
 {
-  QTimeZone timeZone(QTimeZone::LocalTime);
-
-  auto offsetString = [](int o) {
-    return QStringLiteral("%1%2:%3")
-        .arg(o < 0 ? "" : "+")
-        .arg(QString::number(o / 3600), 2, QChar::fromLatin1('0'))
-        .arg(QString::number(o % 3600), 2, QChar::fromLatin1('0'));
-  };
-
   QString s;
-  const QDateTime now     = QDateTime::currentDateTime();
-  const int currentOffset = timeZone.offsetFromUtc(now);
-  const int otherOffset   = timeZone.offsetFromUtc(timeZone.nextTransition(now).atUtc);
 
-  QString currentName, otherName;
-  if (timeZone.isDaylightTime(now)) {
-    currentName = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
-    otherName   = timeZone.displayName(QTimeZone::TimeType::StandardTime);
+  QTimeZone timeZone(QTimeZone::LocalTime);
+  bool isDst = timeZone.isDaylightTime(QDateTime::currentDateTime());
+
+  QTimeZone::TimeType currentType =
+      isDst ? QTimeZone::DaylightTime : QTimeZone::StandardTime;
+  QTimeZone::TimeType otherType =
+      isDst ? QTimeZone::StandardTime : QTimeZone::DaylightTime;
+
+  QString current = QStringLiteral("%1, %2").arg(
+      timeZone.displayName(currentType, QTimeZone::LongName),
+      timeZone.displayName(currentType, QTimeZone::OffsetName));
+  QString other = QStringLiteral("%1, %2").arg(
+      timeZone.displayName(otherType, QTimeZone::LongName),
+      timeZone.displayName(otherType, QTimeZone::OffsetName));
+
+  if (isDst) {
+    s = current % " (dst is active, std is "_L1 % other % ')';
   } else {
-    currentName = timeZone.displayName(QTimeZone::TimeType::StandardTime);
-    otherName   = timeZone.displayName(QTimeZone::TimeType::DaylightTime);
-  }
-
-  const QString current =
-      QStringLiteral("%1, %2").arg(currentName, offsetString(currentOffset));
-  const QString other =
-      QStringLiteral("%1, %2").arg(otherName, offsetString(otherOffset));
-
-  if (timeZone.isDaylightTime(now)) {
-    s = current % u" (dst is active, std is "_s % other % ')';
-  } else {
-    s = current % u" (std is active, dst is "_s % other % ')';
+    s = current % " (std is active, dst is "_L1 % other % ')';
   }
 
   return s;
