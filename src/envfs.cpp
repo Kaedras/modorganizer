@@ -12,7 +12,7 @@ namespace env
 void forEachEntryImpl(void* cx, const QString& path, std::size_t depth,
                       DirStartF* dirStartF, DirEndF* dirEndF, FileF* fileF)
 {
-  QDirIterator it(QDir(path).path());
+  QDirIterator it(path, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
   while (it.hasNext()) {
     QFileInfo info = it.nextFileInfo();
     if (info.isDir()) {
