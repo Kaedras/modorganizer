@@ -873,6 +873,12 @@ InstallationResult InstallationManager::install(const QString& fileName,
   return installResult;
 }
 
+#ifdef _WIN32
+static const QString SEVENZIP_LIB = QStringLiteral("7z.dll");
+#else
+static const QString SEVENZIP_LIB = QStringLiteral("lib7zip.so");
+#endif
+
 QString InstallationManager::getErrorString(Archive::Error errorCode)
 {
   switch (errorCode) {
@@ -880,10 +886,10 @@ QString InstallationManager::getErrorString(Archive::Error errorCode)
     return tr("no error");
   } break;
   case Archive::Error::ERROR_LIBRARY_NOT_FOUND: {
-    return tr("7z.dll not found");
+    return tr("%1 not found").arg(SEVENZIP_LIB);
   } break;
   case Archive::Error::ERROR_LIBRARY_INVALID: {
-    return tr("7z.dll isn't valid");
+    return tr("%1 isn't valid").arg(SEVENZIP_LIB);
   } break;
   case Archive::Error::ERROR_ARCHIVE_NOT_FOUND: {
     return tr("archive not found");

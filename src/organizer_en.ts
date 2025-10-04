@@ -2402,47 +2402,47 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installationmanager.cpp" line="880"/>
+        <location filename="installationmanager.cpp" line="886"/>
         <source>no error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installationmanager.cpp" line="883"/>
-        <source>7z.dll not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="installationmanager.cpp" line="886"/>
-        <source>7z.dll isn&apos;t valid</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="installationmanager.cpp" line="889"/>
-        <source>archive not found</source>
+        <source>%1 not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="installationmanager.cpp" line="892"/>
-        <source>failed to open archive</source>
+        <source>%1 isn&apos;t valid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="installationmanager.cpp" line="895"/>
-        <source>unsupported archive type</source>
+        <source>archive not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="installationmanager.cpp" line="898"/>
-        <source>internal library error</source>
+        <source>failed to open archive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="installationmanager.cpp" line="901"/>
+        <source>unsupported archive type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="installationmanager.cpp" line="904"/>
+        <source>internal library error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="installationmanager.cpp" line="907"/>
         <source>archive invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installationmanager.cpp" line="905"/>
+        <location filename="installationmanager.cpp" line="911"/>
         <source>unknown archive error</source>
         <translation type="unfinished"></translation>
     </message>
