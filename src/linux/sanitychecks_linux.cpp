@@ -6,6 +6,8 @@
 #include <QStandardPaths>
 #include <utility.h>
 
+using namespace Qt::StringLiterals;
+
 namespace sanity
 {
 
@@ -28,9 +30,9 @@ std::vector<std::pair<QString, QString>> getSystemDirectories()
 {
   // folder ids and display names for logging
   const std::vector<std::pair<QStandardPaths::StandardLocation, QString>>
-      systemFolderIDs = {{QStandardPaths::DesktopLocation, "on the desktop"},
-                         {QStandardPaths::DocumentsLocation, "in Documents"},
-                         {QStandardPaths::DownloadLocation, "in Downloads"}};
+      systemFolderIDs = {{QStandardPaths::DesktopLocation, u"on the desktop"_s},
+                         {QStandardPaths::DocumentsLocation, u"in Documents"_s},
+                         {QStandardPaths::DownloadLocation, u"in Downloads"_s}};
 
   std::vector<std::pair<QString, QString>> systemDirs;
 
@@ -39,8 +41,8 @@ std::vector<std::pair<QString, QString>> getSystemDirectories()
 
     if (!dir.isEmpty()) {
       auto path = QDir::toNativeSeparators(dir).toLower();
-      if (!path.endsWith("/")) {
-        path += "/";
+      if (!path.endsWith('/')) {
+        path.append("/"_L1);
       }
 
       systemDirs.push_back({path, p.second});
