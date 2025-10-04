@@ -1,5 +1,8 @@
+#include "env.h"
 #include "envmodule.h"
 #include "settings.h"
+#include "stub.h"
+
 #include <QStandardPaths>
 #include <utility.h>
 
@@ -7,6 +10,19 @@ namespace sanity
 {
 
 using namespace MOBase;
+
+int checkBlocked()
+{
+  STUB();
+  return 0;
+}
+
+int checkIncompatibleModule(const env::Module& m)
+{
+  STUB();
+  (void)m;
+  return 0;
+}
 
 std::vector<std::pair<QString, QString>> getSystemDirectories()
 {
