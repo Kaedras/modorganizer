@@ -283,6 +283,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   // command is
   // STEAM_COMPAT_DATA_PATH=compatdata/<appid>
   // STEAM_COMPAT_CLIENT_INSTALL_PATH=<steam path>
+  // SteamAppId=<appid>
   // path/to/proton run application.exe
 
   // the application is located at steamapps/common/<appliation>
@@ -303,6 +304,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
   setenv("STEAM_COMPAT_DATA_PATH", compatData.toLocal8Bit(), 1);
   setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
+  setenv("SteamAppId", sp.steamAppID.toLocal8Bit(), 1);
   auto result = shell::ExecuteIn(proton,
                                  proton % " run "_L1 % sp.binary.absoluteFilePath() %
                                      " "_L1 % sp.arguments,
