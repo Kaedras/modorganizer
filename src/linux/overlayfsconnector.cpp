@@ -49,10 +49,9 @@ spdlog::level::level_enum toSpdLogLevel(log::Levels level)
 
 OverlayfsConnector::OverlayfsConnector()
     : m_overlayfsManager(OverlayFsManager::getInstance(
-          (qApp->property("dataPath").toString() +
-           QStringLiteral("/logs/overlayfs-%1.log")
-               .arg(QDateTime::currentDateTimeUtc().toString(u"yyyy-MM-dd_hh-mm-ss"_s)))
-              .toStdString()))
+          qApp->property("dataPath").toString() +
+          QStringLiteral("/logs/overlayfs-%1.log")
+              .arg(QDateTime::currentDateTimeUtc().toString(u"yyyy-MM-dd_hh-mm-ss"_s))))
 {
   const auto& s = Settings::instance();
 
@@ -69,11 +68,11 @@ OverlayfsConnector::OverlayfsConnector()
     if (suffix.isEmpty()) {
       continue;
     }
-    m_overlayfsManager.addSkipFileSuffix(suffix.toStdString());
+    m_overlayfsManager.addSkipFileSuffix(suffix);
   }
 
   for (auto& dir : s.skipDirectories()) {
-    m_overlayfsManager.addSkipDirectory(dir.toStdString());
+    m_overlayfsManager.addSkipDirectory(dir);
   }
 }
 
@@ -112,12 +111,10 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
     }
 
     if (map.isDirectory) {
-      m_overlayfsManager.addDirectory(map.source.toStdString(),
-                                      map.destination.toStdString());
+      m_overlayfsManager.addDirectory(map.source, map.destination);
       ++dirs;
     } else {
-      m_overlayfsManager.addFile(map.source.toStdString(),
-                                 map.destination.toStdString());
+      m_overlayfsManager.addFile(map.source, map.destination);
       ++files;
     }
   }
@@ -147,12 +144,12 @@ void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
     if (suffix.isEmpty()) {
       continue;
     }
-    m_overlayfsManager.addSkipFileSuffix(suffix.toStdString());
+    m_overlayfsManager.addSkipFileSuffix(suffix);
   }
 
   m_overlayfsManager.clearSkipDirectories();
   for (auto& dir : skipDirectories) {
-    m_overlayfsManager.addSkipDirectory(dir.toStdString());
+    m_overlayfsManager.addSkipDirectory(dir);
   }
 }
 
@@ -162,15 +159,14 @@ void OverlayfsConnector::updateForcedLibraries(
   m_overlayfsManager.clearLibraryForceLoads();
   for (const auto& setting : forcedLibraries) {
     if (setting.enabled()) {
-      m_overlayfsManager.forceLoadLibrary(setting.process().toStdString(),
-                                          setting.library().toStdString());
+      m_overlayfsManager.forceLoadLibrary(setting.process(), setting.library());
     }
   }
 }
 
 void OverlayfsConnector::setOverwritePath(const QString& path) const
 {
-  m_overlayfsManager.setUpperDir(path.toStdString());
+  m_overlayfsManager.setUpperDir(path);
 }
 
 std::vector<HANDLE> getRunningOverlayfsProcesses()
