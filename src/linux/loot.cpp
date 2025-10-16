@@ -334,7 +334,7 @@ void Loot::processStdout(const QString& lootOut)
 
 void Loot::processStderr(const QString& lootOut)
 {
-  emit output(lootOut);
+  emit log(log::Error, lootOut);
 }
 
 void Loot::cancel()
