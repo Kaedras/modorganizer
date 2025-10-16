@@ -41,7 +41,7 @@ QString Loot::Report::toMarkdown() const
   QString s;
 
   if (!okay) {
-    s += u"## "_s % tr("Loot failed to run") % u"\n"_s;
+    s += "## "_L1 % tr("Loot failed to run") % "\n"_L1;
 
     if (errors.empty() && warnings.empty()) {
       s += tr("No errors were reported. The log below might have more information.\n");
@@ -51,7 +51,7 @@ QString Loot::Report::toMarkdown() const
   s += errorsMarkdown();
 
   if (okay) {
-    s += u"\n"_s % successMarkdown();
+    s += "\n"_L1 % successMarkdown();
   }
 
   return s;
@@ -62,30 +62,30 @@ QString Loot::Report::successMarkdown() const
   QString s;
 
   if (!messages.empty()) {
-    s += u"### "_s % QObject::tr("General messages") % u"\n"_s;
+    s += "### "_L1 % QObject::tr("General messages") % "\n"_L1;
 
     for (auto&& m : messages) {
-      s += u" - "_s % m.toMarkdown() % u"\n"_s;
+      s += " - "_L1 % m.toMarkdown() % "\n"_L1;
     }
   }
 
   if (!plugins.empty()) {
     if (!s.isEmpty()) {
-      s += u"\n"_s;
+      s += "\n"_L1;
     }
 
-    s += u"### "_s % QObject::tr("Plugins") % u"\n"_s;
+    s += "### "_L1 % QObject::tr("Plugins") % "\n"_L1;
 
     for (auto&& p : plugins) {
       const auto ps = p.toMarkdown();
       if (!ps.isEmpty()) {
-        s += ps % u"\n"_s;
+        s += ps % "\n"_L1;
       }
     }
   }
 
   if (s.isEmpty()) {
-    s += u"**"_s % QObject::tr("No messages.") % u"**\n"_s;
+    s += "**"_L1 % QObject::tr("No messages.") % "**\n"_L1;
   }
 
   s += stats.toMarkdown();
@@ -98,22 +98,22 @@ QString Loot::Report::errorsMarkdown() const
   QString s;
 
   if (!errors.empty()) {
-    s += u"### "_s % tr("Errors") % u":\n"_s;
+    s += "### "_L1 % tr("Errors") % ":\n"_L1;
 
     for (auto&& e : errors) {
-      s += u" - "_s % e % u"\n"_s;
+      s += " - "_L1 % e % "\n"_L1;
     }
   }
 
   if (!warnings.empty()) {
     if (!s.isEmpty()) {
-      s += u"\n"_s;
+      s += "\n"_L1;
     }
 
-    s += u"### "_s % tr("Warnings") % u":\n"_s;
+    s += "### "_L1 % tr("Warnings") % ":\n"_L1;
 
     for (auto&& w : warnings) {
-      s += u" - "_s % w % u"\n"_s;
+      s += " - "_L1 % w % "\n"_L1;
     }
   }
 
@@ -131,45 +131,45 @@ QString Loot::Plugin::toMarkdown() const
   QString s;
 
   if (!incompatibilities.empty()) {
-    s += u" - **"_s % QObject::tr("Incompatibilities") % u": "_s;
+    s += " - **"_L1 % QObject::tr("Incompatibilities") % ": "_L1;
 
     QString fs;
     for (auto&& f : incompatibilities) {
       if (!fs.isEmpty()) {
-        fs += u", "_s;
+        fs += ", "_L1;
       }
 
       fs += f.displayName.isEmpty() ? f.name : f.displayName;
     }
 
-    s += fs % u"**\n"_s;
+    s += fs % "**\n"_L1;
   }
 
   if (!missingMasters.empty()) {
-    s += u" - **"_s % QObject::tr("Missing masters") % u": "_s;
+    s += " - **"_L1 % QObject::tr("Missing masters") % ": "_L1;
 
     QString ms;
     for (auto&& m : missingMasters) {
       if (!ms.isEmpty()) {
-        ms += u", "_s;
+        ms += ", "_L1;
       }
 
       ms += m;
     }
 
-    s += ms % u"**\n"_s;
+    s += ms % "**\n"_L1;
   }
 
   for (auto&& m : messages) {
-    s += u" - "_s % m.toMarkdown() % u"\n"_s;
+    s += " - "_L1 % m.toMarkdown() % "\n"_L1;
   }
 
   for (auto&& d : dirty) {
-    s += u" - "_s % d.toMarkdown(false) % u"\n"_s;
+    s += " - "_L1 % d.toMarkdown(false) % "\n"_L1;
   }
 
   if (!s.isEmpty()) {
-    s = u"#### "_s % name % u"\n"_s % s;
+    s = "#### "_L1 % name % "\n"_L1 % s;
   }
 
   return s;
@@ -185,7 +185,7 @@ QString Loot::Dirty::toString(bool isClean) const
   QString s = cleaningString();
 
   if (!info.isEmpty()) {
-    s += u" "_s % info;
+    s += " "_L1 % info;
   }
 
   return s;
@@ -212,12 +212,12 @@ QString Loot::Message::toMarkdown() const
 
   switch (type) {
   case log::Error: {
-    s += u"**"_s % QObject::tr("Error") % u"**: "_s;
+    s += "**"_L1 % QObject::tr("Error") % "**: "_L1;
     break;
   }
 
   case log::Warning: {
-    s += u"**"_s % QObject::tr("Warning") % u"**: "_s;
+    s += "**"_L1 % QObject::tr("Warning") % "**: "_L1;
     break;
   }
 
@@ -283,8 +283,8 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
              << u"--out"_s << LootReportPath << u"--language"_s
              << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
-  QString program = qApp->applicationDirPath() % u"/loot/lootcli"_s;
-  lootHandle->setWorkingDirectory(qApp->applicationDirPath() % u"/loot"_s);
+  QString program = qApp->applicationDirPath() % "/loot/lootcli"_L1;
+  lootHandle->setWorkingDirectory(qApp->applicationDirPath() % "/loot"_L1);
   lootHandle->setArguments(parameters);
   lootHandle->setProgram(program);
   lootHandle->start();
@@ -535,23 +535,23 @@ Loot::Plugin Loot::reportPlugin(const QJsonObject& plugin) const
     return {};
   }
 
-  if (plugin.contains(u"incompatibilities"_s)) {
+  if (plugin.contains("incompatibilities"_L1)) {
     p.incompatibilities = reportFiles(getOpt<QJsonArray>(plugin, "incompatibilities"));
   }
 
-  if (plugin.contains(u"messages"_s)) {
+  if (plugin.contains("messages"_L1)) {
     p.messages = reportMessages(getOpt<QJsonArray>(plugin, "messages"));
   }
 
-  if (plugin.contains(u"dirty"_s)) {
+  if (plugin.contains("dirty"_L1)) {
     p.dirty = reportDirty(getOpt<QJsonArray>(plugin, "dirty"));
   }
 
-  if (plugin.contains(u"clean"_s)) {
+  if (plugin.contains("clean"_L1)) {
     p.clean = reportDirty(getOpt<QJsonArray>(plugin, "clean"));
   }
 
-  if (plugin.contains(u"missingMasters"_s)) {
+  if (plugin.contains("missingMasters"_L1)) {
     p.missingMasters = reportStringArray(getOpt<QJsonArray>(plugin, "missingMasters"));
   }
 
