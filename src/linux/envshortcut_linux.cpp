@@ -15,7 +15,7 @@ QString iconPath(int resolution)
   QString res = QString::number(resolution);
   return QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)
              .first() %
-         u"/icons/hicolor/"_s % res % u"x"_s % res % u"/apps/"_s;
+         "/icons/hicolor/"_L1 % res % "x"_L1 % res % "/apps/"_L1;
 }
 
 }  // namespace
@@ -32,7 +32,7 @@ bool Shortcut::add(Locations loc)
     QIcon icon     = MOBase::iconForExecutable(m_icon);
     QPixmap pixmap = icon.pixmap(512);
     QImage image   = pixmap.toImage();
-    m_icon         = iconPath(image.size().width()) % u"mo2-"_s % m_name % u".png"_s;
+    m_icon         = iconPath(image.size().width()) % "mo2-"_L1 % m_name % ".png"_L1;
     // save icon to disk
     if (!image.save(m_icon)) {
       log::warn("error saving icon file {}", m_icon);
@@ -73,14 +73,14 @@ bool Shortcut::add(Locations loc)
   log::debug("shortcut file will be saved at '{}'", path);
 
   QString fileContent =
-      QString("#!/usr/bin/env xdg-open\n\n"
-              "[Desktop Entry]\n"
-              "Name=%1\n"
-              "Exec=%2 %3\n"
-              "Icon=%4\n"
-              "Path=%5\n"
-              "StartupNotify=true\n"
-              "Type=Application\n")
+      QStringLiteral("#!/usr/bin/env xdg-open\n\n"
+                     "[Desktop Entry]\n"
+                     "Name=%1\n"
+                     "Exec=%2 %3\n"
+                     "Icon=%4\n"
+                     "Path=%5\n"
+                     "StartupNotify=true\n"
+                     "Type=Application\n")
           .arg(m_name, m_target, m_arguments, m_icon, m_workingDirectory);
 
   QFile file(shortcutPath(loc));
