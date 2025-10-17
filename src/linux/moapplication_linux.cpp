@@ -10,5 +10,5 @@ using namespace Qt::StringLiterals;
 // export LD_DEBUG=libs for debugging
 void addDllsToPath()
 {
-  STUB();
+  // no-op
 }
