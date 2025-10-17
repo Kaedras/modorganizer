@@ -63,8 +63,8 @@ std::vector<Module> getLoadedModules()
   }
 
   // sorting by display name
-  std::sort(v.begin(), v.end(), [](auto&& a, auto&& b) {
-    return (a.displayPath().compare(b.displayPath(), Qt::CaseInsensitive) < 0);
+  ranges::sort(v, [](auto&& a, auto&& b) {
+    return a.displayPath().compare(b.displayPath(), Qt::CaseInsensitive) < 0;
   });
 
   return v;
