@@ -102,7 +102,7 @@ signals:
 public slots:
   void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
   void onReadyReadStandardOutput();
-  void onReadyReadStandardError();
+  void onReadyReadStandardError() const;
 
 private:
   OrganizerCore& m_core;
@@ -116,7 +116,7 @@ private:
   bool spawnLootcli(QWidget* parent, bool didUpdateMasterList);
 
   void processStdout(const QString& lootOut);
-  void processStderr(const QString& lootOut);
+  void processStderr(const QString& lootOut) const;
   void processMessage(const lootcli::Message& m);
 
   Report createReport() const;

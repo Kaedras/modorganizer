@@ -332,7 +332,7 @@ void Loot::processStdout(const QString& lootOut)
   }
 }
 
-void Loot::processStderr(const QString& lootOut)
+void Loot::processStderr(const QString& lootOut) const
 {
   emit log(log::Error, lootOut);
 }
@@ -411,7 +411,7 @@ void Loot::onReadyReadStandardOutput()
   processStdout(out);
 }
 
-void Loot::onReadyReadStandardError()
+void Loot::onReadyReadStandardError() const
 {
   QString out = m_lootProcess->readAllStandardError();
   processStderr(out);
