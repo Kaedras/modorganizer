@@ -250,7 +250,7 @@ bool Loot::start(QWidget* parent, bool didUpdateMasterList)
 
   log::debug("starting loot");
 
-  // vfs
+  // overlayfs
   m_core.prepareVFS();
 
   // spawning
