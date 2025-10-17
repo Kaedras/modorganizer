@@ -64,14 +64,14 @@ OverlayfsConnector::OverlayfsConnector()
              " . log: {}",
              SHMID, spdlog::level::to_short_c_str(logLevel));
 
-  for (auto& suffix : s.skipFileSuffixes()) {
+  for (const auto& suffix : s.skipFileSuffixes()) {
     if (suffix.isEmpty()) {
       continue;
     }
     m_overlayfsManager.addSkipFileSuffix(suffix);
   }
 
-  for (auto& dir : s.skipDirectories()) {
+  for (const auto& dir : s.skipDirectories()) {
     m_overlayfsManager.addSkipDirectory(dir);
   }
 }
