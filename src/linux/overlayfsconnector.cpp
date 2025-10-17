@@ -127,9 +127,9 @@ void OverlayfsConnector::updateMapping(const MappingType& mapping)
 }
 
 void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
-                                      env::CoreDumpTypes coreDumpType,
-                                      const QString& crashDumpsPath,
-                                      std::chrono::seconds spawnDelay,
+                                      env::CoreDumpTypes /*coreDumpType*/,
+                                      const QString& /*crashDumpsPath*/,
+                                      std::chrono::seconds /*spawnDelay*/,
                                       QString executableBlacklist,
                                       const QStringList& skipFileSuffixes,
                                       const QStringList& skipDirectories)
