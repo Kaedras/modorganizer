@@ -104,50 +104,44 @@ LinuxInfo::Release LinuxInfo::getRelease() const
   // documentation of os-release can be found here:
   // https://www.freedesktop.org/software/systemd/man/latest/os-release.html
 
-  auto parseRelease = [](const QString& fileName) -> Release {
-    Release r;
+  static const QStringList pathsToCheck{u"/etc/os-release"_s, u"/usr/lib/os-release"_s};
 
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-      log::warn("Error opening file {}, {}", fileName, file.errorString());
+  for (const auto& path : pathsToCheck) {
+    if (QFile::exists(path)) {
+      Release r;
+
+      QFile file(path);
+      if (!file.open(QIODevice::ReadOnly)) {
+        log::warn("Error opening file {}, {}", path, file.errorString());
+        return r;
+      }
+
+      QTextStream stream(&file);
+      QString line;
+      while (stream.readLineInto(&line)) {
+        if (line.startsWith("PRETTY_NAME="_L1)) {
+          r.name = line.trimmed();
+          r.name.remove("PRETTY_NAME="_L1);
+          r.name.remove('"');
+        }
+
+        // both VERSION and VERSION_ID are optional fields
+        // use VERSION if present
+        if (line.startsWith("VERSION="_L1)) {
+          r.version = line.trimmed();
+          r.version.remove("VERSION="_L1);
+          r.version.remove('"');
+        }
+        // use VERSION_ID instead
+        else if (line.startsWith("VERSION_ID="_L1) && r.version.isEmpty()) {
+          r.version = line.trimmed();
+          r.version.remove("VERSION_ID="_L1);
+          r.version.remove('"');
+        }
+      }
+
       return r;
     }
-
-    QTextStream stream(&file);
-    QString line;
-    while (stream.readLineInto(&line)) {
-      if (line.startsWith("PRETTY_NAME="_L1)) {
-        r.name = line.trimmed();
-        r.name.remove("PRETTY_NAME="_L1);
-        r.name.remove('"');
-      }
-
-      // both VERSION and VERSION_ID are optional fields
-      // use VERSION if present
-      if (line.startsWith("VERSION="_L1)) {
-        r.version = line.trimmed();
-        r.version.remove("VERSION="_L1);
-        r.version.remove('"');
-      }
-      // use VERSION_ID instead
-      else if (line.startsWith("VERSION_ID="_L1) && r.version.isEmpty()) {
-        r.version = line.trimmed();
-        r.version.remove("VERSION_ID="_L1);
-        r.version.remove('"');
-      }
-    }
-
-    return r;
-  };
-
-  // check /etc/os-release
-  if (QFile::exists(u"/etc/os-release"_s)) {
-    return parseRelease(u"/etc/os-release"_s);
-  }
-
-  // check /usr/lib/os-release
-  if (QFile::exists(u"/usr/lib/os-release"_s)) {
-    return parseRelease(u"/usr/lib/os-release"_s);
   }
 
   return {};
