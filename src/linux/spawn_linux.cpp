@@ -250,8 +250,8 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
     }
   }
 
-  auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(), sp.arguments,
-                                 sp.binary.absolutePath());
+  auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(), sp.binary.absolutePath(),
+                                 sp.arguments);
 
   if (result.success()) {
     processHandle = result.stealProcessHandle();
@@ -305,10 +305,10 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   setenv("STEAM_COMPAT_DATA_PATH", compatData.toLocal8Bit(), 1);
   setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
   setenv("SteamAppId", sp.steamAppID.toLocal8Bit(), 1);
-  auto result = shell::ExecuteIn(proton,
-                                 proton % " run "_L1 % sp.binary.absoluteFilePath() %
-                                     " "_L1 % sp.arguments,
-                                 sp.binary.absolutePath());
+
+  const QString params =
+      "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
+  auto result = shell::ExecuteIn(proton, sp.binary.absolutePath(), params);
 
   if (result.success()) {
     pidFd = result.stealProcessHandle();
