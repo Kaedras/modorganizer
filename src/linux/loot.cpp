@@ -289,8 +289,8 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   lootHandle->setProgram(program);
   lootHandle->start();
 
-  // wait for up to 500ms
-  if (!lootHandle->waitForStarted(500)) {
+  // wait for up to 1 second
+  if (!lootHandle->waitForStarted(1000)) {
     emit log(log::Levels::Error,
              tr("failed to start loot: %1").arg(lootHandle->errorString()));
     log::error("failed to start loot: {}", lootHandle->errorString().toStdString());
