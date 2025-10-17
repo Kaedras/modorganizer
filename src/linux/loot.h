@@ -82,7 +82,7 @@ public:
   };
 
   Loot(OrganizerCore& core);
-  ~Loot();
+  ~Loot() override;
 
   bool start(QWidget* parent, bool didUpdateMasterList);
   void cancel();
