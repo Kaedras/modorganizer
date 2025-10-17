@@ -293,7 +293,6 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   if (!lootHandle->waitForStarted(1000)) {
     emit log(log::Levels::Error,
              tr("failed to start loot: %1").arg(lootHandle->errorString()));
-    log::error("failed to start loot: {}", lootHandle->errorString().toStdString());
     return false;
   }
 
