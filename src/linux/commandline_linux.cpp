@@ -1,5 +1,4 @@
 #include "commandline.h"
-#include "env.h"
 #include "loglist.h"
 #include "organizercore.h"
 #include "shared/util.h"

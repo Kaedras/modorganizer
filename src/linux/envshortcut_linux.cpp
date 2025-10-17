@@ -1,8 +1,6 @@
 #include "env.h"
 #include "envshortcut.h"
 #include "executableslist.h"
-#include "filesystemutilities.h"
-#include "instancemanager.h"
 #include <QBuffer>
 #include <log.h>
 #include <utility.h>
