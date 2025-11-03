@@ -11,12 +11,12 @@ using namespace MOBase;
 
 inline int getDpi(QScreen* screen)
 {
-  return qRound(screen->physicalDotsPerInch());
+  return qRound(screen->logicalDotsPerInch());
 }
 
 Display::Display(QScreen* screen, bool primary)
     : m_adapter(screen->name()), m_monitorDevice(screen->model()), m_primary(primary),
-      m_resX(0), m_resY(0), m_dpi(0), m_refreshRate(0)
+      m_resX(0), m_resY(0), m_refreshRate(0)
 {
   getSettings(screen);
   m_dpi = getDpi(screen);
