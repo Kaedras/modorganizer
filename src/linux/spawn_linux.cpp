@@ -30,6 +30,13 @@ using namespace Qt::StringLiterals;
 
 static const QString steamFlatpak = u"com.valvesoftware.Steam"_s;
 
+// custom error codes
+static constexpr int PROTON_NOT_FOUND      = 200;
+static constexpr int COMPAT_DATA_NOT_FOUND = 201;
+static constexpr int STEAM_NOT_FOUND       = 202;
+static constexpr int APPID_EMPTY           = 203;
+static constexpr int MOUNT_ERROR           = 204;
+
 namespace spawn::dialogs
 {
 
@@ -161,9 +168,20 @@ QString makeDetails(const SpawnParameters& sp, DWORD code, const QString& more =
 
 QString makeContent(const SpawnParameters& sp, DWORD code)
 {
-  STUB();
-  (void)sp;
-  return {strerror(static_cast<int>(code))};
+  switch (code) {
+  case PROTON_NOT_FOUND:
+    return u"could not find proton executable"_s;
+  case COMPAT_DATA_NOT_FOUND:
+    return u"could not find compat data directory"_s;
+  case STEAM_NOT_FOUND:
+    return u"could not find steam installation path"_s;
+  case APPID_EMPTY:
+    return u"appid is empty"_s;
+  case MOUNT_ERROR:
+    return u"mount error"_s;
+  default:
+    return {strerror(static_cast<int>(code))};
+  }
 }
 
 QMessageBox::StandardButton badSteamPath(QWidget* parent)
@@ -246,7 +264,7 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
   if (sp.hooked) {
     if (!OverlayFsManager::getInstance().mount()) {
-      return -1;
+      return MOUNT_ERROR;
     }
   }
 
@@ -269,15 +287,12 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   // check the steam path first to fail early if it is not found
   QString steamPath = findSteamCached();
   if (steamPath.isEmpty()) {
-    log::error("could not find steam installation path");
-    return -1;
+    return STEAM_NOT_FOUND;
   }
 
   // appID is required to get the proton version to use as well as the compatdata path
   if (sp.steamAppID.isEmpty()) {
-    log::error("cannot run proton application {} because appid is empty",
-               sp.binary.path().toStdString());
-    return -1;
+    return APPID_EMPTY;
   }
 
   // command is
@@ -290,15 +305,18 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   // compatdata is located at steamapps/compatdata/<appid>
 
   QString compatData = findCompatDataByAppID(sp.steamAppID);
+  if (compatData.isEmpty()) {
+    return COMPAT_DATA_NOT_FOUND;
+  }
 
   QString proton = findProtonByAppID(sp.steamAppID);
   if (proton.isEmpty()) {
-    return -1;
+    return PROTON_NOT_FOUND;
   }
 
   if (sp.hooked) {
     if (!OverlayFsManager::getInstance().mount()) {
-      return -1;
+      return MOUNT_ERROR;
     }
   }
 
