@@ -41,17 +41,12 @@ using namespace Qt::StringLiterals;
 
 #ifdef __unix__
 #include "linux/compatibility.h"
-static constexpr bool FALSE                  = false;
-static const auto steamName                  = "steam"_L1;
-static const auto steamServiceName           = "steamwebhelper"_L1;
-static const std::vector<QString> steamFiles = {
-    "steam_api.dll", "steam_api64.dll", "libsteam_api.so", "lib/libsteam_api.so"};
-
+static constexpr bool FALSE        = false;
+static const auto steamName        = "steam"_L1;
+static const auto steamServiceName = "steamwebhelper"_L1;
 #else
-static const auto steamName                  = "Steam.exe"_L1;
-static const auto steamServiceName           = "SteamService.exe"_L1;
-static const std::vector<QString> steamFiles = {"steam_api.dll", "steam_api64.dll"};
-
+static const auto steamName        = "Steam.exe"_L1;
+static const auto steamServiceName = "SteamService.exe"_L1;
 #endif
 
 namespace spawn::dialogs
