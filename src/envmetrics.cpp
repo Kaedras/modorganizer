@@ -70,7 +70,7 @@ QString Display::toString() const
 
 void Display::getSettings(QScreen* screen)
 {
-  m_refreshRate = screen->refreshRate();
+  m_refreshRate = qRound(screen->refreshRate());
 
   QSize size = screen->size();
   m_resX     = size.width();
