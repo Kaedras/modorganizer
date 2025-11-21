@@ -86,8 +86,7 @@ void ServerInfo::addDownload(int bytesPerSecond)
   }
 
   if (m_lastDownloads.size() == MaxDownloadCount) {
-    std::rotate(m_lastDownloads.begin(), m_lastDownloads.begin() + 1,
-                m_lastDownloads.end());
+    std::ranges::rotate(m_lastDownloads, m_lastDownloads.begin() + 1);
 
     m_lastDownloads.back() = bytesPerSecond;
   } else {
@@ -101,7 +100,7 @@ void ServerList::add(ServerInfo s)
 {
   m_servers.push_back(std::move(s));
 
-  std::sort(m_servers.begin(), m_servers.end(), [](auto&& a, auto&& b) {
+  std::ranges::sort(m_servers, [](auto&& a, auto&& b) {
     return (a.preferred() < b.preferred());
   });
 }

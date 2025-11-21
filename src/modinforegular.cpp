@@ -511,7 +511,7 @@ bool ModInfoRegular::setName(const QString& name)
 
     s_ModsByName[m_Name] = index;
 
-    std::sort(s_Collection.begin(), s_Collection.end(), ModInfo::ByName);
+    std::ranges::sort(s_Collection, ModInfo::ByName);
     updateIndices();
   } else {  // otherwise mod isn't registered yet?
     m_Name = name;
@@ -730,8 +730,7 @@ int ModInfoRegular::getHighlight() const
   if (!isValid() && !m_Validated)
     return HIGHLIGHT_INVALID;
   auto flags = getFlags();
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_PLUGIN_SELECTED) !=
-      flags.end())
+  if (std::ranges::find(flags, ModInfo::FLAG_PLUGIN_SELECTED) != flags.end())
     return HIGHLIGHT_PLUGIN;
   return HIGHLIGHT_NONE;
 }

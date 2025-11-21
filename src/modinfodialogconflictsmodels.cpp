@@ -284,9 +284,9 @@ void ConflictListModel::doSort()
   };
 
   if (m_sortOrder == Qt::AscendingOrder) {
-    std::sort(m_items.begin(), m_items.end(), sortAsc);
+    std::ranges::sort(m_items, sortAsc);
   } else {
-    std::sort(m_items.begin(), m_items.end(), sortDesc);
+    std::ranges::sort(m_items, sortDesc);
   }
 }
 

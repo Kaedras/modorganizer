@@ -858,8 +858,7 @@ ModInfo::Ptr OrganizerCore::installDownload(int index, int priority)
       std::vector<ModInfo::Ptr> modInfo = ModInfo::getByModID(gameName, modID);
       for (auto iter = modInfo.begin(); iter != modInfo.end(); ++iter) {
         std::vector<ModInfo::EFlag> flags = (*iter)->getFlags();
-        if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_BACKUP) ==
-            flags.end()) {
+        if (std::ranges::find(flags, ModInfo::FLAG_BACKUP) == flags.end()) {
           modName.update((*iter)->name(), GUESS_PRESET);
           currentMod = *iter;
           (*iter)->saveMeta();

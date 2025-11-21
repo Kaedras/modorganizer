@@ -153,7 +153,7 @@ protected:
   {
 
     // Sort by name:
-    std::sort(std::begin(m_Files), std::end(m_Files), [](const auto& a, const auto& b) {
+    std::ranges::sort(m_Files, [](const auto& a, const auto& b) {
       return std::get<0>(a)[0].compare(std::get<0>(b)[0], Qt::CaseInsensitive) < 0;
     });
 

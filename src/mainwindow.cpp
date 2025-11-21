@@ -1148,10 +1148,10 @@ void MainWindow::createHelpMenu()
     }
   }
 
-  std::sort(tutorials.begin(), tutorials.end(),
-            [](const ActionList::value_type& LHS, const ActionList::value_type& RHS) {
-              return LHS.first < RHS.first;
-            });
+  std::ranges::sort(tutorials, [](const ActionList::value_type& LHS,
+                                  const ActionList::value_type& RHS) {
+    return LHS.first < RHS.first;
+  });
 
   for (auto iter = tutorials.begin(); iter != tutorials.end(); ++iter) {
     connect(iter->second, SIGNAL(triggered()), this, SLOT(tutorialTriggered()));
@@ -1532,17 +1532,14 @@ void MainWindow::updateToolMenu()
   std::vector<IPluginTool*> toolPlugins = m_PluginContainer.plugins<IPluginTool>();
 
   // Sort the plugins by display name
-  std::sort(std::begin(toolPlugins), std::end(toolPlugins),
-            [](IPluginTool* left, IPluginTool* right) {
-              return left->displayName().toLower() < right->displayName().toLower();
-            });
+  std::ranges::sort(toolPlugins, [](IPluginTool* left, IPluginTool* right) {
+    return left->displayName().toLower() < right->displayName().toLower();
+  });
 
   // Remove disabled plugins:
-  toolPlugins.erase(std::remove_if(std::begin(toolPlugins), std::end(toolPlugins),
-                                   [&](auto* tool) {
-                                     return !m_PluginContainer.isEnabled(tool);
-                                   }),
-                    toolPlugins.end());
+  std::erase_if(toolPlugins, [&](auto* tool) {
+    return !m_PluginContainer.isEnabled(tool);
+  });
 
   // Group the plugins into submenus
   QMap<QString, QList<QPair<QString, IPluginTool*>>> submenuMap;
@@ -1635,18 +1632,14 @@ void MainWindow::updateModPageMenu()
       m_PluginContainer.plugins<IPluginModPage>();
 
   // Sort the plugins by display name
-  std::sort(std::begin(modPagePlugins), std::end(modPagePlugins),
-            [](IPluginModPage* left, IPluginModPage* right) {
-              return left->displayName().toLower() < right->displayName().toLower();
-            });
+  std::ranges::sort(modPagePlugins, [](IPluginModPage* left, IPluginModPage* right) {
+    return left->displayName().toLower() < right->displayName().toLower();
+  });
 
   // Remove disabled plugins
-  modPagePlugins.erase(std::remove_if(std::begin(modPagePlugins),
-                                      std::end(modPagePlugins),
-                                      [&](auto* tool) {
-                                        return !m_PluginContainer.isEnabled(tool);
-                                      }),
-                       modPagePlugins.end());
+  std::erase_if(modPagePlugins, [&](auto* tool) {
+    return !m_PluginContainer.isEnabled(tool);
+  });
 
   for (auto* modPagePlugin : modPagePlugins) {
     registerModPage(modPagePlugin);
@@ -2005,7 +1998,7 @@ void MainWindow::updateBSAList(const QStringList& defaultArchives,
       items.push_back(std::make_pair(sortValue, newItem));
     }
   }
-  std::sort(items.begin(), items.end(), BySortValue);
+  std::ranges::sort(items, BySortValue);
 
   for (auto iter = items.begin(); iter != items.end(); ++iter) {
     int originID = iter->second->data(1, Qt::UserRole).toInt();

@@ -195,7 +195,7 @@ bool ModInfo::removeMod(unsigned int index)
       std::pair<QString, int>(modInfo->gameName(), modInfo->nexusId()));
   if (iter != s_ModsByModID.end()) {
     std::vector<unsigned int> indices = iter->second;
-    indices.erase(std::remove(indices.begin(), indices.end(), index), indices.end());
+    std::erase(indices, index);
     s_ModsByModID[std::pair<QString, int>(modInfo->gameName(), modInfo->nexusId())] =
         indices;
   }
@@ -271,7 +271,7 @@ void ModInfo::updateFromDisc(const QString& modsDirectory, OrganizerCore& core,
 
   s_Overwrite = createFromOverwrite(core);
 
-  std::sort(s_Collection.begin(), s_Collection.end(), ModInfo::ByName);
+  std::ranges::sort(s_Collection, ModInfo::ByName);
 
   parallelMap(std::begin(s_Collection), std::end(s_Collection), &ModInfo::prefetch,
               refreshThreadCount);
@@ -394,17 +394,17 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
   std::set<QSharedPointer<ModInfo>> finalMods;
   for (QVariant result : updateData) {
     QVariantMap update = result.toMap();
-    std::copy_if(s_Collection.begin(), s_Collection.end(),
-                 std::inserter(finalMods, finalMods.end()),
-                 [=](QSharedPointer<ModInfo> info) -> bool {
-                   if (info->nexusId() == update["mod_id"].toInt() &&
-                       info->gameName().compare(gameName, Qt::CaseInsensitive) == 0)
-                     if (info->getLastNexusUpdate().addSecs(-3600) <
-                         QDateTime::fromSecsSinceEpoch(
-                             update["latest_file_update"].toInt(), Qt::UTC))
-                       return true;
-                   return false;
-                 });
+    std::ranges::copy_if(
+        s_Collection, std::inserter(finalMods, finalMods.end()),
+        [=](QSharedPointer<ModInfo> info) -> bool {
+          if (info->nexusId() == update["mod_id"].toInt() &&
+              info->gameName().compare(gameName, Qt::CaseInsensitive) == 0)
+            if (info->getLastNexusUpdate().addSecs(-3600) <
+                QDateTime::fromSecsSinceEpoch(update["latest_file_update"].toInt(),
+                                              Qt::UTC))
+              return true;
+          return false;
+        });
   }
 
   if (addOldMods)
@@ -415,18 +415,17 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
 
   if (markUpdated) {
     std::set<QSharedPointer<ModInfo>> updates;
-    std::copy_if(s_Collection.begin(), s_Collection.end(),
-                 std::inserter(updates, updates.end()),
-                 [=](QSharedPointer<ModInfo> info) -> bool {
-                   if (info->gameName().compare(gameName, Qt::CaseInsensitive) == 0 &&
-                       info->canBeUpdated())
-                     return true;
-                   return false;
-                 });
+    std::ranges::copy_if(
+        s_Collection, std::inserter(updates, updates.end()),
+        [=](QSharedPointer<ModInfo> info) -> bool {
+          if (info->gameName().compare(gameName, Qt::CaseInsensitive) == 0 &&
+              info->canBeUpdated())
+            return true;
+          return false;
+        });
     std::set<QSharedPointer<ModInfo>> diff;
-    std::set_difference(updates.begin(), updates.end(), finalMods.begin(),
-                        finalMods.end(), std::inserter(diff, diff.end()));
-    for (auto skipped : diff) {
+    std::ranges::set_difference(updates, finalMods, std::inserter(diff, diff.end()));
+    for (const auto& skipped : diff) {
       skipped->setLastNexusUpdate(QDateTime::currentDateTimeUtc());
     }
   }
@@ -451,19 +450,17 @@ void ModInfo::manualUpdateCheck(QObject* receiver, std::multimap<QString, int> I
         mods.push_back(matchedMod);
     }
   }
-  mods.erase(std::remove_if(mods.begin(), mods.end(),
-                            [](ModInfo::Ptr mod) -> bool {
-                              return mod->nexusId() <= 0;
-                            }),
-             mods.end());
-  for (auto mod : mods) {
+  std::erase_if(mods, [](ModInfo::Ptr mod) -> bool {
+    return mod->nexusId() <= 0;
+  });
+  for (const auto& mod : mods) {
     mod->setLastNexusUpdate(QDateTime());
   }
 
-  std::sort(mods.begin(), mods.end(),
-            [](QSharedPointer<ModInfo> a, QSharedPointer<ModInfo> b) -> bool {
-              return a->getLastNexusUpdate() < b->getLastNexusUpdate();
-            });
+  std::ranges::sort(mods,
+                    [](QSharedPointer<ModInfo> a, QSharedPointer<ModInfo> b) -> bool {
+                      return a->getLastNexusUpdate() < b->getLastNexusUpdate();
+                    });
 
   if (mods.size()) {
     log::info("Checking updates for {} mods...", mods.size());
@@ -530,7 +527,7 @@ QStringList ModInfo::categories() const
 bool ModInfo::hasFlag(ModInfo::EFlag flag) const
 {
   std::vector<EFlag> flags = getFlags();
-  return std::find(flags.begin(), flags.end(), flag) != flags.end();
+  return std::ranges::find(flags, flag) != flags.end();
 }
 
 bool ModInfo::hasAnyOfTheseFlags(std::vector<ModInfo::EFlag> flags) const

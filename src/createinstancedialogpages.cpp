@@ -416,7 +416,7 @@ std::vector<IPluginGame*> GamePage::sortedGamePlugins() const
   }
 
   // natsort
-  std::sort(v.begin(), v.end(), [](auto* a, auto* b) {
+  std::ranges::sort(v, [](auto* a, auto* b) {
     return (naturalCompare(a->displayGameName(), b->displayGameName()) < 0);
   });
 

@@ -136,7 +136,7 @@ void CategoryFactory::loadCategories()
     }
     nexusMapFile.close();
   }
-  std::sort(m_Categories.begin(), m_Categories.end());
+  std::ranges::sort(m_Categories);
   setParents();
   if (needLoad)
     loadDefaultCategories();
@@ -492,10 +492,9 @@ int CategoryFactory::getCategoryIndex(int ID) const
 
 int CategoryFactory::getCategoryID(const QString& name) const
 {
-  auto iter = std::find_if(m_Categories.begin(), m_Categories.end(),
-                           [name](const Category& cat) -> bool {
-                             return cat.name() == name;
-                           });
+  auto iter = std::ranges::find_if(m_Categories, [name](const Category& cat) -> bool {
+    return cat.name() == name;
+  });
 
   if (iter != m_Categories.end()) {
     return iter->ID();

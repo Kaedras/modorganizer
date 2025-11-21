@@ -18,14 +18,12 @@ ModConflictIconDelegate::getIconsForFlags(std::vector<ModInfo::EConflictFlag> fl
   QList<QString> result;
 
   // Don't do flags for overwrite
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_OVERWRITE_CONFLICT) !=
-      flags.end())
+  if (std::ranges::find(flags, ModInfo::FLAG_OVERWRITE_CONFLICT) != flags.end())
     return result;
 
   // insert conflict icons to provide nicer alignment
   {  // insert loose file conflicts first
-    auto iter = std::find_first_of(flags.begin(), flags.end(), s_ConflictFlags.begin(),
-                                   s_ConflictFlags.end());
+    auto iter = std::ranges::find_first_of(flags, s_ConflictFlags);
     if (iter != flags.end()) {
       result.append(getFlagIcon(*iter));
       flags.erase(iter);
@@ -35,8 +33,8 @@ ModConflictIconDelegate::getIconsForFlags(std::vector<ModInfo::EConflictFlag> fl
   }
 
   {  // insert loose vs archive overwrite second
-    auto iter = std::find(flags.begin(), flags.end(),
-                          ModInfo::FLAG_ARCHIVE_LOOSE_CONFLICT_OVERWRITE);
+    auto iter =
+        std::ranges::find(flags, ModInfo::FLAG_ARCHIVE_LOOSE_CONFLICT_OVERWRITE);
     if (iter != flags.end()) {
       result.append(getFlagIcon(*iter));
       flags.erase(iter);
@@ -46,8 +44,8 @@ ModConflictIconDelegate::getIconsForFlags(std::vector<ModInfo::EConflictFlag> fl
   }
 
   {  // insert loose vs archive overwritten third
-    auto iter = std::find(flags.begin(), flags.end(),
-                          ModInfo::FLAG_ARCHIVE_LOOSE_CONFLICT_OVERWRITTEN);
+    auto iter =
+        std::ranges::find(flags, ModInfo::FLAG_ARCHIVE_LOOSE_CONFLICT_OVERWRITTEN);
     if (iter != flags.end()) {
       result.append(getFlagIcon(*iter));
       flags.erase(iter);
@@ -57,9 +55,7 @@ ModConflictIconDelegate::getIconsForFlags(std::vector<ModInfo::EConflictFlag> fl
   }
 
   {  // insert archive conflicts last
-    auto iter =
-        std::find_first_of(flags.begin(), flags.end(), s_ArchiveConflictFlags.begin(),
-                           s_ArchiveConflictFlags.end());
+    auto iter = std::ranges::find_first_of(flags, s_ArchiveConflictFlags);
     if (iter != flags.end()) {
       result.append(getFlagIcon(*iter));
       flags.erase(iter);

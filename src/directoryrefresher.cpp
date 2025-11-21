@@ -153,7 +153,7 @@ void dumpStats(std::vector<DirectoryStats>& stats)
     out << std::format("what,run,{}", DirectoryStats::csvHeader()) << "\n";
   }
 
-  std::sort(stats.begin(), stats.end(), [](auto&& a, auto&& b) {
+  std::ranges::sort(stats, [](auto&& a, auto&& b) {
     return naturalCompare(a.mod, b.mod) < 0;
   });
 
@@ -476,7 +476,7 @@ void DirectoryRefresher::refresh()
                             0, dummy);
     }
 
-    std::sort(m_Mods.begin(), m_Mods.end(), [](auto lhs, auto rhs) {
+    std::ranges::sort(m_Mods, [](auto lhs, auto rhs) {
       return lhs.priority < rhs.priority;
     });
 

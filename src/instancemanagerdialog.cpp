@@ -249,7 +249,7 @@ void InstanceManagerDialog::updateInstances()
   }
 
   // sort first, prepend portable after so it's always on top
-  std::sort(m_instances.begin(), m_instances.end(), [](auto&& a, auto&& b) {
+  std::ranges::sort(m_instances, [](auto&& a, auto&& b) {
     return (MOBase::naturalCompare(a->displayName(), b->displayName()) < 0);
   });
 

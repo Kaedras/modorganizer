@@ -468,7 +468,7 @@ void ModInfoDialog::reAddTabs(const std::vector<bool>& visibility, ModInfoTabIDs
     if (canSort) {
       // make sure the widget object name is found in the list
       const auto objectName = m_tabs[i].widget->objectName();
-      auto itor = std::find(orderedNames.begin(), orderedNames.end(), objectName);
+      auto itor             = std::ranges::find(orderedNames, objectName);
 
       if (itor == orderedNames.end()) {
         // this shouldn't happen, it means there's a tab in the UI that's no
@@ -481,13 +481,11 @@ void ModInfoDialog::reAddTabs(const std::vector<bool>& visibility, ModInfoTabIDs
 
   // sorting tabs
   if (canSort) {
-    std::sort(visibleTabs.begin(), visibleTabs.end(), [&](auto&& a, auto&& b) {
+    std::ranges::sort(visibleTabs, [&](auto&& a, auto&& b) {
       // looking the names in the ordered list
-      auto aItor =
-          std::find(orderedNames.begin(), orderedNames.end(), a->widget->objectName());
+      auto aItor = std::ranges::find(orderedNames, a->widget->objectName());
 
-      auto bItor =
-          std::find(orderedNames.begin(), orderedNames.end(), b->widget->objectName());
+      auto bItor = std::ranges::find(orderedNames, b->widget->objectName());
 
       // this shouldn't happen, it was checked above
       Q_ASSERT(aItor != orderedNames.end() && bItor != orderedNames.end());

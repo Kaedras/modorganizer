@@ -1398,7 +1398,7 @@ void PluginSettings::registerPlugin(IPlugin* plugin)
 
 void PluginSettings::unregisterPlugin(IPlugin* plugin)
 {
-  auto it = std::find(m_Plugins.begin(), m_Plugins.end(), plugin);
+  auto it = std::ranges::find(m_Plugins, plugin);
   if (it != m_Plugins.end()) {
     m_Plugins.erase(it);
   }

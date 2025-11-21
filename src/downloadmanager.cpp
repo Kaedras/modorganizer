@@ -868,8 +868,7 @@ void DownloadManager::refreshAlphabeticalTranslation()
     m_AlphabeticalTranslation.push_back(pos);
   }
 
-  std::sort(m_AlphabeticalTranslation.begin(), m_AlphabeticalTranslation.end(),
-            LessThanWrapper(this));
+  std::ranges::sort(m_AlphabeticalTranslation, LessThanWrapper(this));
 }
 
 void DownloadManager::restoreDownload(int index)
@@ -1054,10 +1053,9 @@ void DownloadManager::resumeDownloadInt(int index)
 
 DownloadManager::DownloadInfo* DownloadManager::downloadInfoByID(unsigned int id)
 {
-  auto iter = std::find_if(m_ActiveDownloads.begin(), m_ActiveDownloads.end(),
-                           [id](DownloadInfo* info) {
-                             return info->m_DownloadID == id;
-                           });
+  auto iter = std::ranges::find_if(m_ActiveDownloads, [id](DownloadInfo* info) {
+    return info->m_DownloadID == id;
+  });
   if (iter != m_ActiveDownloads.end()) {
     return *iter;
   } else {
@@ -1859,11 +1857,10 @@ void DownloadManager::nxmFilesAvailable(QString, int, QVariant userData,
     } else {
       SelectionDialog selection(tr("No file on Nexus matches the selected file by "
                                    "name. Please manually choose the correct one."));
-      std::sort(files.begin(), files.end(),
-                [](const QVariant& lhs, const QVariant& rhs) {
-                  return lhs.toMap()["uploaded_timestamp"].toInt() >
-                         rhs.toMap()["uploaded_timestamp"].toInt();
-                });
+      std::ranges::sort(files, [](const QVariant& lhs, const QVariant& rhs) {
+        return lhs.toMap()["uploaded_timestamp"].toInt() >
+               rhs.toMap()["uploaded_timestamp"].toInt();
+      });
       for (QVariant file : files) {
         QVariantMap fileInfo = file.toMap();
         if (fileInfo["category_id"].toInt() != NexusInterface::FileStatus::REMOVED &&
@@ -2059,8 +2056,8 @@ void DownloadManager::nxmDownloadURLsAvailable(QString gameName, int modID, int 
 
   const auto servers = m_OrganizerCore->settings().network().servers();
 
-  std::sort(resultList.begin(), resultList.end(),
-            boost::bind(&ServerByPreference, servers.getPreferred(), _1, _2));
+  std::ranges::sort(resultList,
+                    boost::bind(&ServerByPreference, servers.getPreferred(), _1, _2));
 
   info->userData["downloadMap"] = resultList;
 

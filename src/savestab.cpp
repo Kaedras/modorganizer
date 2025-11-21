@@ -189,10 +189,9 @@ void SavesTab::refreshSaveList()
     QDir savesDir = currentSavesDir();
     MOBase::log::debug("reading save games from {}", savesDir.absolutePath());
     m_SaveGames = m_core.managedGame()->listSaves(savesDir);
-    std::sort(m_SaveGames.begin(), m_SaveGames.end(),
-              [](auto const& lhs, auto const& rhs) {
-                return lhs->getCreationTime() > rhs->getCreationTime();
-              });
+    std::ranges::sort(m_SaveGames, [](auto const& lhs, auto const& rhs) {
+      return lhs->getCreationTime() > rhs->getCreationTime();
+    });
 
     ui.list->clear();
     for (auto& save : m_SaveGames) {

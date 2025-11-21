@@ -215,7 +215,7 @@ void FileTreeItem::sort(int column, Qt::SortOrder order, bool force)
     // log::debug("sorting is stale for {}, sorting now", debugName());
     m_sortingStale = false;
 
-    std::sort(m_children.begin(), m_children.end(), [&](auto&& a, auto&& b) {
+    std::ranges::sort(m_children, [&](auto&& a, auto&& b) {
       int r = 0;
 
       if (a->isDirectory() && !b->isDirectory()) {

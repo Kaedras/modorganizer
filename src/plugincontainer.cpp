@@ -412,10 +412,9 @@ QObject* PluginContainer::as_qobject(MOBase::IPlugin* plugin) const
 {
   // Find the correspond QObject - Can this be done safely with a cast?
   auto& objects = bf::at_key<QObject>(m_Plugins);
-  auto it =
-      std::find_if(std::begin(objects), std::end(objects), [plugin](QObject* obj) {
-        return qobject_cast<IPlugin*>(obj) == plugin;
-      });
+  auto it       = std::ranges::find_if(objects, [plugin](QObject* obj) {
+    return qobject_cast<IPlugin*>(obj) == plugin;
+  });
 
   if (it == std::end(objects)) {
     return nullptr;
@@ -953,8 +952,7 @@ void PluginContainer::unloadPlugin(MOBase::IPlugin* plugin, QObject* object)
 
     // We do not want to remove from QObject since we are iterating over them.
     if constexpr (!std::is_same<type, QObject*>{}) {
-      auto itp =
-          std::find(t.second.begin(), t.second.end(), qobject_cast<type>(object));
+      auto itp = std::ranges::find(t.second, qobject_cast<type>(object));
       if (itp != t.second.end()) {
         t.second.erase(itp);
       }
@@ -990,10 +988,9 @@ void PluginContainer::unloadPlugin(MOBase::IPlugin* plugin, QObject* object)
     proxy->unload(filepath(plugin));
   } else {
     // We need to find the loader.
-    auto it = std::find_if(m_PluginLoaders.begin(), m_PluginLoaders.end(),
-                           [object](auto* loader) {
-                             return loader->instance() == object;
-                           });
+    auto it = std::ranges::find_if(m_PluginLoaders, [object](auto* loader) {
+      return loader->instance() == object;
+    });
 
     if (it != m_PluginLoaders.end()) {
       if (!(*it)->unload()) {

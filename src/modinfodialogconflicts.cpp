@@ -496,7 +496,7 @@ std::vector<QAction*> ConflictsTab::createGotoActions(const ConflictItem* item)
     mods.push_back(realOrigin.getName());
   }
 
-  std::sort(mods.begin(), mods.end(), [](const auto& a, const auto& b) {
+  std::ranges::sort(mods, [](const auto& a, const auto& b) {
     return (QString::localeAwareCompare(a, b) < 0);
   });
 
@@ -669,11 +669,11 @@ bool GeneralConflictsTab::update()
           }
         }
       } else {
-        auto currId     = m_tab->origin()->getID();
-        auto currModAlt = std::find_if(alternatives.begin(), alternatives.end(),
-                                       [&currId](auto const& alt) {
-                                         return currId == alt.originID();
-                                       });
+        auto currId = m_tab->origin()->getID();
+        auto currModAlt =
+            std::ranges::find_if(alternatives, [&currId](auto const& alt) {
+              return currId == alt.originID();
+            });
 
         if (currModAlt == alternatives.end()) {
           log::error("Mod {} not found in the list of origins for file {}",
@@ -1037,10 +1037,10 @@ AdvancedConflictsTab::createItem(FileIndex index, int fileOrigin, bool archive,
 
       auto currOrgId = currOrigin->getID();
 
-      auto currModIter = std::find_if(alternatives.begin(), alternatives.end(),
-                                      [&currOrgId](auto const& alt) {
-                                        return currOrgId == alt.originID();
-                                      });
+      auto currModIter =
+          std::ranges::find_if(alternatives, [&currOrgId](auto const& alt) {
+            return currOrgId == alt.originID();
+          });
 
       if (currModIter == alternatives.end()) {
         log::error("Mod {} not found in the list of origins for file {}",

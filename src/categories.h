@@ -95,9 +95,13 @@ public:
           m_NexusCats(std::move(nexusCats)), m_HasChildren(false)
     {}
 
-    friend bool operator<(const Category& LHS, const Category& RHS)
+    bool operator==(const Category& other) const
     {
-      return LHS.sortValue() < RHS.sortValue();
+      return m_SortValue == other.m_SortValue;
+    }
+    std::strong_ordering operator<=>(const Category& other) const
+    {
+      return m_SortValue <=> other.m_SortValue;
     }
 
     int sortValue() const { return m_SortValue; }

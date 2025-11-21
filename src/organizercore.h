@@ -128,10 +128,9 @@ public:
      */
     const Content* findById(int id) const
     {
-      auto it = std::find_if(std::begin(m_Contents), std::end(m_Contents),
-                             [&id](auto const& content) {
-                               return content.id() == id;
-                             });
+      auto it = std::ranges::find_if(m_Contents, [&id](auto const& content) {
+        return content.id() == id;
+      });
       return it == std::end(m_Contents) ? nullptr : &(*it);
     }
 

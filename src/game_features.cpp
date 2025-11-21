@@ -159,12 +159,10 @@ GameFeatures::GameFeatures(OrganizerCore* core, PluginContainer* plugins)
   connect(plugins, &PluginContainer::pluginUnregistered,
           [this, updateFeatures](MOBase::IPlugin* plugin) {
             // remove features from the current plugin
-            for (auto& [_, features] : m_allFeatures) {
-              features.erase(std::remove_if(features.begin(), features.end(),
-                                            [plugin](const auto& feature) {
-                                              return feature.plugin() == plugin;
-                                            }),
-                             features.end());
+            for (auto& features : m_allFeatures | std::views::values) {
+              std::erase_if(features, [plugin](const auto& feature) {
+                return feature.plugin() == plugin;
+              });
             }
 
             // update current features
@@ -215,10 +213,10 @@ void GameFeatures::updateCurrentFeatures(std::type_index const& index)
     auto& currentCheckers = m_currentFeatures[ModDataCheckerIndex];
     std::vector<std::shared_ptr<ModDataChecker>> checkers;
     checkers.reserve(currentCheckers.size());
-    std::transform(currentCheckers.begin(), currentCheckers.end(),
-                   std::back_inserter(checkers), [](auto const& checker) {
-                     return std::dynamic_pointer_cast<ModDataChecker>(checker);
-                   });
+    std::ranges::transform(currentCheckers, std::back_inserter(checkers),
+                           [](auto const& checker) {
+                             return std::dynamic_pointer_cast<ModDataChecker>(checker);
+                           });
     modDataChecker().setCheckers(std::move(checkers));
     emit modDataCheckerUpdated(gameFeature<ModDataChecker>().get());
   }
@@ -228,10 +226,10 @@ void GameFeatures::updateCurrentFeatures(std::type_index const& index)
     auto& currentContents = m_currentFeatures[ModDataContentIndex];
     std::vector<std::shared_ptr<ModDataContent>> contents;
     contents.reserve(currentContents.size());
-    std::transform(currentContents.begin(), currentContents.end(),
-                   std::back_inserter(contents), [](auto const& checker) {
-                     return std::dynamic_pointer_cast<ModDataContent>(checker);
-                   });
+    std::ranges::transform(currentContents, std::back_inserter(contents),
+                           [](auto const& checker) {
+                             return std::dynamic_pointer_cast<ModDataContent>(checker);
+                           });
     modDataContent().setContents(std::move(contents));
     emit modDataContentUpdated(gameFeature<ModDataContent>().get());
   }
@@ -258,7 +256,7 @@ bool GameFeatures::registerGameFeature(MOBase::IPlugin* plugin,
 {
   auto& features = m_allFeatures[feature->typeInfo()];
 
-  if (std::find_if(features.begin(), features.end(), [&feature](const auto& data) {
+  if (std::ranges::find_if(features, [&feature](const auto& data) {
         return data.feature() == feature;
       }) != features.end()) {
     log::error("cannot register feature multiple time");
@@ -288,11 +286,10 @@ bool GameFeatures::registerGameFeature(MOBase::IPlugin* plugin,
 bool GameFeatures::unregisterGameFeature(std::shared_ptr<MOBase::GameFeature> feature)
 {
   bool removed = false;
-  for (auto& [_, features] : m_allFeatures) {
-    auto it =
-        std::find_if(features.begin(), features.end(), [&feature](const auto& data) {
-          return data.feature() == feature;
-        });
+  for (auto& features : m_allFeatures | std::views::values) {
+    auto it = std::ranges::find_if(features, [&feature](const auto& data) {
+      return data.feature() == feature;
+    });
 
     // the feature can only exist for one kind of features and cannot be duplicated
     if (it != features.end()) {
@@ -316,11 +313,9 @@ int GameFeatures::unregisterGameFeatures(MOBase::IPlugin* plugin,
 
   const auto initialSize = features.size();
 
-  features.erase(std::remove_if(features.begin(), features.end(),
-                                [plugin](const auto& feature) {
-                                  return feature.plugin() == plugin;
-                                }),
-                 features.end());
+  std::erase_if(features, [plugin](const auto& feature) {
+    return feature.plugin() == plugin;
+  });
 
   const int removed = features.size() - initialSize;
 

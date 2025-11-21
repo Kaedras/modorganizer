@@ -16,7 +16,7 @@ QList<QString> ModFlagIconDelegate::getIconsForFlags(std::vector<ModInfo::EFlag>
   QList<QString> result;
 
   // Don't do flags for overwrite
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_OVERWRITE) != flags.end())
+  if (std::ranges::find(flags, ModInfo::FLAG_OVERWRITE) != flags.end())
     return result;
 
   for (auto iter = flags.begin(); iter != flags.end(); ++iter) {

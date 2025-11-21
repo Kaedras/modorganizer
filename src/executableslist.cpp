@@ -235,8 +235,7 @@ bool ExecutablesList::titleExists(const QString& title) const
   auto test = [&](const Executable& exe) {
     return exe.title() == title;
   };
-  return std::find_if(m_Executables.begin(), m_Executables.end(), test) !=
-         m_Executables.end();
+  return std::ranges::find_if(m_Executables, test) != m_Executables.end();
 }
 
 void ExecutablesList::setExecutable(const Executable& exe)

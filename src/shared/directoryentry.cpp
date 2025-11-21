@@ -176,7 +176,7 @@ void DirectoryEntry::addFromAllBSAs(const QString& originName, const QString& di
 
       if (filenameLc.startsWith(pluginNameLc + " - ") ||
           filenameLc.startsWith(pluginNameLc + ".")) {
-        auto itor = std::find(loadOrder.begin(), loadOrder.end(), plugin);
+        auto itor = std::ranges::find(loadOrder, plugin);
         if (itor != loadOrder.end()) {
           order = std::distance(loadOrder.begin(), itor);
         }
@@ -818,10 +818,9 @@ void DirectoryEntry::removeDirectoryFromList(SubDirectories::iterator itor)
   const auto* entry = *itor;
 
   {
-    auto itor2 = std::find_if(m_SubDirectoriesLookup.begin(),
-                              m_SubDirectoriesLookup.end(), [&](auto&& d) {
-                                return (d.second == entry);
-                              });
+    auto itor2 = std::ranges::find_if(m_SubDirectoriesLookup, [&](auto&& d) {
+      return (d.second == entry);
+    });
 
     if (itor2 == m_SubDirectoriesLookup.end()) {
       log::error("entry {} not in sub directories map", entry->getName());
@@ -836,7 +835,7 @@ void DirectoryEntry::removeDirectoryFromList(SubDirectories::iterator itor)
 void DirectoryEntry::removeFileFromList(FileIndex index)
 {
   auto removeFrom = [&](auto& list) {
-    auto iter = std::find_if(list.begin(), list.end(), [&index](auto&& pair) {
+    auto iter = std::ranges::find_if(list, [&index](auto&& pair) {
       return (pair.second == index);
     });
 

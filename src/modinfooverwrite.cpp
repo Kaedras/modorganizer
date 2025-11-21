@@ -65,8 +65,7 @@ int ModInfoOverwrite::getHighlight() const
   int highlight =
       (isValid() ? HIGHLIGHT_IMPORTANT : HIGHLIGHT_INVALID) | HIGHLIGHT_CENTER;
   auto flags = getFlags();
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_PLUGIN_SELECTED) !=
-      flags.end())
+  if (std::ranges::find(flags, ModInfo::FLAG_PLUGIN_SELECTED) != flags.end())
     highlight |= HIGHLIGHT_PLUGIN;
   return highlight;
 }

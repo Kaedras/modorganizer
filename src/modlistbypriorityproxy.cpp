@@ -100,13 +100,13 @@ void ModListByPriorityProxy::buildTree()
 
   auto& ibp = m_profile->getAllIndexesByPriority();
   if (m_sortOrder == Qt::AscendingOrder) {
-    std::for_each(ibp.begin(), ibp.end(), fn);
+    std::ranges::for_each(ibp, fn);
     m_Root.children.insert(m_Root.children.begin(),
                            std::make_move_iterator(backups.begin()),
                            std::make_move_iterator(backups.end()));
     m_Root.children.push_back(std::move(overwrite));
   } else {
-    std::for_each(ibp.rbegin(), ibp.rend(), fn);
+    std::ranges::for_each(ibp, fn);
     m_Root.children.insert(m_Root.children.begin(), std::move(overwrite));
     m_Root.children.insert(m_Root.children.end(),
                            std::make_move_iterator(backups.begin()),

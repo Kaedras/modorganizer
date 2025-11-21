@@ -299,12 +299,10 @@ void ModListContextMenu::addSendToContextMenu()
     if (index.isValid()) {
       auto info  = ModInfo::getByIndex(index.toInt());
       auto flags = info->getConflictFlags();
-      if (std::find_first_of(flags.begin(), flags.end(), overwritten_flags.begin(),
-                             overwritten_flags.end()) != flags.end()) {
+      if (std::ranges::find_first_of(flags, overwritten_flags) != flags.end()) {
         overwritten = true;
       }
-      if (std::find_first_of(flags.begin(), flags.end(), overwrite_flags.begin(),
-                             overwrite_flags.end()) != flags.end()) {
+      if (std::ranges::find_first_of(flags, overwrite_flags) != flags.end()) {
         overwrite = true;
       }
     }
@@ -425,13 +423,12 @@ void ModListContextMenu::addBackupActions(ModInfo::Ptr mod)
     m_actions.removeMods(m_selected);
   });
   addSeparator();
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_INVALID) != flags.end()) {
+  if (std::ranges::find(flags, ModInfo::FLAG_INVALID) != flags.end()) {
     addAction(tr("Ignore missing data"), [=]() {
       m_actions.ignoreMissingData(m_selected);
     });
   }
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_ALTERNATE_GAME) !=
-      flags.end()) {
+  if (std::ranges::find(flags, ModInfo::FLAG_ALTERNATE_GAME) != flags.end()) {
     addAction(tr("Mark as converted/working"), [=]() {
       m_actions.markConverted(m_selected);
     });
@@ -518,8 +515,7 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
     m_actions.createBackup(m_index);
   });
 
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_HIDDEN_FILES) !=
-      flags.end()) {
+  if (std::ranges::find(flags, ModInfo::FLAG_HIDDEN_FILES) != flags.end()) {
     addAction(tr("Restore hidden files"), [=]() {
       m_actions.restoreHiddenFiles(m_selected);
     });
@@ -597,14 +593,13 @@ void ModListContextMenu::addRegularActions(ModInfo::Ptr mod)
 
   addSeparator();
 
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_INVALID) != flags.end()) {
+  if (std::ranges::find(flags, ModInfo::FLAG_INVALID) != flags.end()) {
     addAction(tr("Ignore missing data"), [=]() {
       m_actions.ignoreMissingData(m_selected);
     });
   }
 
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_ALTERNATE_GAME) !=
-      flags.end()) {
+  if (std::ranges::find(flags, ModInfo::FLAG_ALTERNATE_GAME) != flags.end()) {
     addAction(tr("Mark as converted/working"), [=]() {
       m_actions.markConverted(m_selected);
     });

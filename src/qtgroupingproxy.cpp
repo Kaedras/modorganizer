@@ -190,7 +190,7 @@ void QtGroupingProxy::buildTree()
 
     // second loop is necessary because qt containers can't be iterated from end to
     // front and removing by index from begin to end is ugly
-    std::sort(rmgroups.begin(), rmgroups.end(), [](int lhs, int rhs) {
+    std::ranges::sort(rmgroups, [](int lhs, int rhs) {
       return rhs < lhs;
     });
     for (auto iter = rmgroups.begin(); iter != rmgroups.end(); ++iter) {

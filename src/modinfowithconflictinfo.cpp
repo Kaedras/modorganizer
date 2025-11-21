@@ -152,8 +152,7 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
       hasVisibleFiles   = true;
       auto alternatives = file->getAlternatives();
       if ((alternatives.size() == 0) ||
-          std::find(dataIDs.begin(), dataIDs.end(), alternatives.back().originID()) !=
-              dataIDs.end()) {
+          std::ranges::find(dataIDs, alternatives.back().originID()) != dataIDs.end()) {
         // no alternatives -> no conflict
         providesAnything = true;
       } else {
@@ -189,8 +188,8 @@ ModInfoWithConflictInfo::Conflicts ModInfoWithConflictInfo::doConflictCheck() co
 
         // Sort out the alternatives
         for (const auto& altInfo : alternatives) {
-          if (!(std::find(dataIDs.begin(), dataIDs.end(),
-                          alternatives.back().originID()) != dataIDs.end()) &&
+          if (!(std::ranges::find(dataIDs, alternatives.back().originID()) !=
+                dataIDs.end()) &&
               (altInfo.originID() != origin.getID())) {
             FilesOrigin& altOrigin =
                 m_Core.directoryStructure()->getOriginByID(altInfo.originID());

@@ -164,7 +164,7 @@ public:
   {
     beginResetModel();
 
-    std::sort(m_esps.begin(), m_esps.end(), [](const auto& a, const auto& b) {
+    std::ranges::sort(m_esps, [](const auto& a, const auto& b) {
       return (naturalCompare(a.filename(), b.filename()) < 0);
     });
 

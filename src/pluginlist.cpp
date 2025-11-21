@@ -167,10 +167,9 @@ void PluginList::highlightPlugins(const std::vector<unsigned int>& modIndices,
           MOShared::FileEntryPtr file = directoryEntry.findFile(plugin);
           if (file && file->getOrigin() != origin.getID()) {
             const auto alternatives = file->getAlternatives();
-            if (std::find_if(alternatives.begin(), alternatives.end(),
-                             [&](const FileAlternative& element) {
-                               return element.originID() == origin.getID();
-                             }) == alternatives.end())
+            if (std::ranges::find_if(alternatives, [&](const FileAlternative& element) {
+                  return element.originID() == origin.getID();
+                }) == alternatives.end())
               continue;
           }
           std::map<QString, int>::iterator iter = m_ESPsByName.find(plugin);
@@ -305,11 +304,9 @@ void PluginList::refresh(const QString& profileName,
     }
   }
 
-  m_ESPs.erase(std::remove_if(m_ESPs.begin(), m_ESPs.end(),
-                              [](const ESPInfo& info) -> bool {
-                                return info.name.isEmpty();
-                              }),
-               m_ESPs.end());
+  std::erase_if(m_ESPs, [](const ESPInfo& info) -> bool {
+    return info.name.isEmpty();
+  });
 
   fixPriorities();
 
@@ -466,10 +463,10 @@ void PluginList::fixPriorities()
     espPrios.push_back(std::make_pair(prio, i));
   }
 
-  std::sort(espPrios.begin(), espPrios.end(),
-            [](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) {
-              return lhs.first < rhs.first;
-            });
+  std::ranges::sort(espPrios,
+                    [](const std::pair<int, int>& lhs, const std::pair<int, int>& rhs) {
+                      return lhs.first < rhs.first;
+                    });
 
   for (int i = 0; i < espPrios.size(); ++i) {
     m_ESPs[espPrios[i].second].priority = i;
@@ -564,7 +561,7 @@ void PluginList::shiftPluginsPriority(const QModelIndexList& indices, int offset
   for (auto& idx : indices) {
     allIndex.push_back(idx.row());
   }
-  std::sort(allIndex.begin(), allIndex.end(), [=](int lhs, int rhs) {
+  std::ranges::sort(allIndex, [=](int lhs, int rhs) {
     bool cmp = m_ESPs[lhs].priority < m_ESPs[rhs].priority;
     return offset > 0 ? !cmp : cmp;
   });
@@ -713,8 +710,7 @@ void PluginList::readLockedOrderFrom(const QString& fileName)
       return a.second == priority;
     };
     auto alreadyLocked = [&]() {
-      return std::find_if(m_LockedOrder.begin(), m_LockedOrder.end(), findLocked) !=
-             m_LockedOrder.end();
+      return std::ranges::find_if(m_LockedOrder, findLocked) != m_LockedOrder.end();
     };
 
     // See if we can just set the given priority
@@ -882,10 +878,10 @@ void PluginList::refreshLoadOrder()
   syncLoadOrder();
   // set priorities according to locked load order
   std::map<int, QString> lockedLoadOrder;
-  std::for_each(m_LockedOrder.begin(), m_LockedOrder.end(),
-                [&lockedLoadOrder](const std::pair<QString, int>& ele) {
-                  lockedLoadOrder[ele.second] = ele.first;
-                });
+  std::ranges::for_each(m_LockedOrder,
+                        [&lockedLoadOrder](const std::pair<QString, int>& ele) {
+                          lockedLoadOrder[ele.second] = ele.first;
+                        });
 
   int targetPrio       = 0;
   bool savePluginsList = false;
@@ -1930,7 +1926,7 @@ void PluginList::changePluginPriority(std::vector<int> rows, int newPriority)
   const std::vector<ESPInfo>& esp = m_ESPs;
 
   // sort the moving plugins by ascending priorities
-  std::sort(rows.begin(), rows.end(), [&esp](const int& LHS, const int& RHS) {
+  std::ranges::sort(rows, [&esp](const int& LHS, const int& RHS) {
     return esp[LHS].priority < esp[RHS].priority;
   });
 

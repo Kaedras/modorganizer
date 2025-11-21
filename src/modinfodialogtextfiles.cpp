@@ -61,7 +61,7 @@ public:
   {
     beginResetModel();
 
-    std::sort(m_files.begin(), m_files.end(), [](const auto& a, const auto& b) {
+    std::ranges::sort(m_files, [](const auto& a, const auto& b) {
       return (naturalCompare(a.text, b.text) < 0);
     });
 

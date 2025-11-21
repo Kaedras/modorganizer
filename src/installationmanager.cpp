@@ -754,10 +754,9 @@ InstallationResult InstallationManager::install(const QString& fileName,
 
   auto installers = m_PluginContainer->plugins<IPluginInstaller>();
 
-  std::sort(installers.begin(), installers.end(),
-            [](IPluginInstaller* lhs, IPluginInstaller* rhs) {
-              return lhs->priority() > rhs->priority();
-            });
+  std::ranges::sort(installers, [](IPluginInstaller* lhs, IPluginInstaller* rhs) {
+    return lhs->priority() > rhs->priority();
+  });
 
   InstallationResult installResult(IPluginInstaller::RESULT_NOTATTEMPTED);
 

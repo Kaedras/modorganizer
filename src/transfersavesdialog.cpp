@@ -214,7 +214,7 @@ void TransferSavesDialog::refreshSaves(SaveCollection& saveCollection,
   saveCollection.clear();
 
   auto saves = m_GamePlugin->listSaves(savedir);
-  std::sort(saves.begin(), saves.end(), [](auto const& lhs, auto const& rhs) {
+  std::ranges::sort(saves, [](auto const& lhs, auto const& rhs) {
     return lhs->getCreationTime() > rhs->getCreationTime();
   });
 

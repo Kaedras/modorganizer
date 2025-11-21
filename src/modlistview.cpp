@@ -499,7 +499,7 @@ ModListView::ModCounters ModListView::counters() const
   ModCounters c;
 
   auto hasFlag = [](std::vector<ModInfo::EFlag> flags, ModInfo::EFlag filter) {
-    return std::find(flags.begin(), flags.end(), filter) != flags.end();
+    return std::ranges::find(flags, filter) != flags.end();
   };
 
   for (unsigned int index = 0; index < ModInfo::getNumMods(); ++index) {

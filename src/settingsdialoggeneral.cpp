@@ -128,7 +128,7 @@ void GeneralSettingsTab::addLanguages()
     languages.push_back({QString("English"), QString("en_US")});
   }
 
-  std::sort(languages.begin(), languages.end());
+  std::ranges::sort(languages);
 
   for (const auto& lang : languages) {
     ui->languageBox->addItem(lang.first, lang.second);

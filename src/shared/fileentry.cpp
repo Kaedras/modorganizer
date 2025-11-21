@@ -40,10 +40,9 @@ void FileEntry::addOrigin(OriginID origin, QDateTime fileTime, QStringView archi
     // this mod has a loose file and the origin mod has an archived file,
     // this mod is now the origin and the previous origin is the first alternative
 
-    auto itor =
-        std::find_if(m_Alternatives.begin(), m_Alternatives.end(), [&](auto&& i) {
-          return i.originID() == m_Origin;
-        });
+    auto itor = std::ranges::find_if(m_Alternatives, [&](auto&& i) {
+      return i.originID() == m_Origin;
+    });
 
     if (itor == m_Alternatives.end()) {
       m_Alternatives.push_back({m_Origin, m_Archive});
@@ -126,14 +125,9 @@ bool FileEntry::removeOrigin(OriginID origin)
       return true;
     }
   } else {
-    auto newEnd =
-        std::remove_if(m_Alternatives.begin(), m_Alternatives.end(), [&](auto& i) {
-          return i.originID() == origin;
-        });
-
-    if (newEnd != m_Alternatives.end()) {
-      m_Alternatives.erase(newEnd, m_Alternatives.end());
-    }
+    std::erase_if(m_Alternatives, [&](auto& i) {
+      return i.originID() == origin;
+    });
   }
   return false;
 }
@@ -144,7 +138,7 @@ void FileEntry::sortOrigins()
 
   m_Alternatives.push_back({m_Origin, m_Archive});
 
-  std::sort(m_Alternatives.begin(), m_Alternatives.end(), [&](auto&& LHS, auto&& RHS) {
+  std::ranges::sort(m_Alternatives, [&](auto&& LHS, auto&& RHS) {
     if (!LHS.isFromArchive() && !RHS.isFromArchive()) {
       int l = m_Parent->getOriginByID(LHS.originID()).getPriority();
       if (l < 0) {

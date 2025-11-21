@@ -63,7 +63,7 @@ PluginsSettingsTab::PluginsSettingsTab(Settings& s, PluginContainer* pluginConta
     handledNames.insert(plugin->name());
   }
 
-  for (auto& [k, item] : topItems) {
+  for (auto& item : topItems | std::views::values) {
     if (item->childCount() == 0) {
       item->setHidden(true);
     }

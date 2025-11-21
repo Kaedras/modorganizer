@@ -478,10 +478,8 @@ void ModListViewActions::exportModListCSV() const
           continue;
         }
         std::vector<ModInfo::EFlag> flags = info->getFlags();
-        if ((std::find(flags.begin(), flags.end(), ModInfo::FLAG_OVERWRITE) ==
-             flags.end()) &&
-            (std::find(flags.begin(), flags.end(), ModInfo::FLAG_BACKUP) ==
-             flags.end())) {
+        if ((std::ranges::find(flags, ModInfo::FLAG_OVERWRITE) == flags.end()) &&
+            (std::ranges::find(flags, ModInfo::FLAG_BACKUP) == flags.end())) {
           if (mod_Priority->isChecked())
             builder.setRowField("#Mod_Priority",
                                 QString("%1").arg(iter.first, 4, 10, QChar('0')));
@@ -563,7 +561,7 @@ void ModListViewActions::displayModInformation(ModInfo::Ptr modInfo,
     return;
   }
   std::vector<ModInfo::EFlag> flags = modInfo->getFlags();
-  if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_OVERWRITE) != flags.end()) {
+  if (std::ranges::find(flags, ModInfo::FLAG_OVERWRITE) != flags.end()) {
     QDialog* dialog = m_parent->findChild<QDialog*>("__overwriteDialog");
     try {
       if (dialog == nullptr) {
@@ -669,7 +667,7 @@ void ModListViewActions::sendModsToSeparator(const QModelIndexList& indexes) con
 
   // in descending order, reverse the separator
   if (m_view->sortOrder() == Qt::DescendingOrder) {
-    std::reverse(separators.begin(), separators.end());
+    std::ranges::reverse(separators);
   }
 
   ListDialog dialog(m_parent);
@@ -736,10 +734,10 @@ void ModListViewActions::sendModsToFirstConflict(const QModelIndexList& indexes)
   }
 
   std::set<int> priorities;
-  std::transform(conflicts.begin(), conflicts.end(),
-                 std::inserter(priorities, priorities.end()), [=](auto index) {
-                   return m_core.currentProfile()->getModPriority(index);
-                 });
+  std::ranges::transform(conflicts, std::inserter(priorities, priorities.end()),
+                         [=](auto index) {
+                           return m_core.currentProfile()->getModPriority(index);
+                         });
 
   if (!priorities.empty()) {
     m_core.modList()->changeModsPriority(indexes, *priorities.begin());
@@ -760,10 +758,10 @@ void ModListViewActions::sendModsToLastConflict(const QModelIndexList& indexes) 
   }
 
   std::set<int> priorities;
-  std::transform(conflicts.begin(), conflicts.end(),
-                 std::inserter(priorities, priorities.end()), [=](auto index) {
-                   return m_core.currentProfile()->getModPriority(index);
-                 });
+  std::ranges::transform(conflicts, std::inserter(priorities, priorities.end()),
+                         [=](auto index) {
+                           return m_core.currentProfile()->getModPriority(index);
+                         });
 
   if (!priorities.empty()) {
     m_core.modList()->changeModsPriority(indexes, *priorities.rbegin());
@@ -1064,8 +1062,7 @@ void ModListViewActions::restoreHiddenFiles(const QModelIndexList& indices) cons
       const auto flags     = modInfo->getFlags();
 
       if (!modInfo->isRegular() ||
-          std::find(flags.begin(), flags.end(), ModInfo::FLAG_HIDDEN_FILES) ==
-              flags.end()) {
+          std::ranges::find(flags, ModInfo::FLAG_HIDDEN_FILES) == flags.end()) {
         continue;
       }
 
@@ -1089,8 +1086,7 @@ void ModListViewActions::restoreHiddenFiles(const QModelIndexList& indices) cons
             ModInfo::getByIndex(idx.data(ModList::IndexRole).toInt());
 
         const auto flags = modInfo->getFlags();
-        if (std::find(flags.begin(), flags.end(), ModInfo::FLAG_HIDDEN_FILES) !=
-            flags.end()) {
+        if (std::ranges::find(flags, ModInfo::FLAG_HIDDEN_FILES) != flags.end()) {
           const QString modDir = modInfo->absolutePath();
 
           auto partialResult = restoreHiddenFilesRecursive(renamer, modDir);

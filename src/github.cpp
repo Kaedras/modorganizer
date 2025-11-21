@@ -194,7 +194,7 @@ void GitHub::onTimeout(const Request& req)
 void GitHub::deleteReply(QNetworkReply* reply)
 {
   // remove from the list
-  auto itor = std::find(m_replies.begin(), m_replies.end(), reply);
+  auto itor = std::ranges::find(m_replies, reply);
   if (itor != m_replies.end()) {
     m_replies.erase(itor);
   }
