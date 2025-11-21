@@ -45,13 +45,8 @@ SyncOverwriteDialog::SyncOverwriteDialog(const QString& path,
   refresh(path);
 
   QHeaderView* headerView = ui->syncTree->header();
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
   headerView->setSectionResizeMode(0, QHeaderView::Stretch);
   headerView->setSectionResizeMode(1, QHeaderView::Interactive);
-#else
-  headerView->setResizeMode(0, QHeaderView::Stretch);
-  headerView->setResizeMode(1, QHeaderView::Interactive);
-#endif
 }
 
 SyncOverwriteDialog::~SyncOverwriteDialog()
