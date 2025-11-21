@@ -186,7 +186,7 @@ protected:
       // We can always override the current name:
       currentName = std::get<0>(p)[0];
 
-      // If the current path contains only one components:
+      // If the current path contains only one component:
       if (std::get<0>(p).size() == 1) {
 
         // If it is not a directory, then it is a file in directly under this tree:
@@ -195,7 +195,7 @@ protected:
               std::make_shared<ArchiveFileEntry>(parent, currentName, std::get<2>(p)));
           currentName = "";
         } else {
-          // Otherwize, it is the actual "file" corresponding to the directory we are
+          // Otherwise, it is the actual "file" corresponding to the directory we are
           // listing, so we can retrieve the index here:
           currentIndex = std::get<2>(p);
         }

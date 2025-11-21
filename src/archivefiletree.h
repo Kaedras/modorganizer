@@ -42,7 +42,7 @@ public:
    * @brief Update the given archive to reflect change in this tree.
    *
    * This method disables files that have been removed from the file
-   * tree and move the ones that have been moved.
+   * tree and moves the ones that have been moved.
    *
    * @param archive The archive to update. Must be the one used to
    *     create the tree.
