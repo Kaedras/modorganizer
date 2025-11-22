@@ -1696,7 +1696,6 @@ void DownloadManager::downloadProgress(qint64 bytesReceived, qint64 bytesTotal)
         // calculate the download speed
         const double speed = rolling_mean(info->m_DownloadAcc) /
                              (rolling_mean(info->m_DownloadTimeAcc) / 1000.0);
-        ;
 
         const qint64 remaining = (bytesTotal - bytesReceived) / speed * 1000;
 
