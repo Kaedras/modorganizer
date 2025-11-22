@@ -40,7 +40,7 @@ public:
     if (intRes == Acceptable) {
       bool ok = false;
       int id  = input.toInt(&ok);
-      if (m_UsedIDs.find(id) != m_UsedIDs.end()) {
+      if (m_UsedIDs.contains(id)) {
         return QValidator::Intermediate;
       }
     }
@@ -61,7 +61,7 @@ public:
     if (intRes == Acceptable) {
       bool ok = false;
       int id  = input.toInt(&ok);
-      if ((id == 0) || (m_UsedIDs.find(id) != m_UsedIDs.end())) {
+      if ((id == 0) || m_UsedIDs.contains(id)) {
         return QValidator::Acceptable;
       } else {
         return QValidator::Intermediate;

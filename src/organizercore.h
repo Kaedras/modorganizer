@@ -148,7 +148,7 @@ public:
     {
       for (const auto& content : m_Contents) {
         if ((includeFilter || !content.isOnlyForFilter()) &&
-            ids.find(content.id()) != ids.end()) {
+            ids.contains(content.id())) {
           fn(content);
         }
       }
@@ -171,7 +171,7 @@ public:
     {
       for (const auto& content : m_Contents) {
         if ((includeFilter || !content.isOnlyForFilter())) {
-          if (ids.find(content.id()) != ids.end()) {
+          if (ids.contains(content.id())) {
             fnIn(content);
           } else {
             fnOut(content);

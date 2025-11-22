@@ -507,7 +507,7 @@ unsigned int CategoryFactory::resolveNexusID(int nexusID) const
 {
   auto result = m_NexusMap.find(nexusID);
   if (result != m_NexusMap.end()) {
-    if (m_IDMap.count(result->second.categoryID())) {
+    if (m_IDMap.contains(result->second.categoryID())) {
       log::debug(tr("nexus category id {0} maps to internal {1}"), nexusID,
                  m_IDMap.at(result->second.categoryID()));
       return m_IDMap.at(result->second.categoryID());

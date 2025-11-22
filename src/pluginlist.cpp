@@ -839,7 +839,7 @@ QString PluginList::getIndexPriority(int index) const
 
 bool PluginList::isESPLocked(int index) const
 {
-  return m_LockedOrder.find(m_ESPs.at(index).name) != m_LockedOrder.end();
+  return m_LockedOrder.contains(m_ESPs.at(index).name);
 }
 
 void PluginList::lockESPIndex(int index, bool lock)

@@ -339,6 +339,5 @@ const std::set<int>& ModInfoWithConflictInfo::getContents() const
 bool ModInfoWithConflictInfo::hasContent(int content) const
 {
   auto& contents = m_Contents.value();
-  return std::find(std::begin(contents), std::end(contents), content) !=
-         std::end(contents);
+  return contents.contains(content);
 }

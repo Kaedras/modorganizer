@@ -862,7 +862,7 @@ void DirectoryEntry::removeFileFromList(FileIndex index)
 void DirectoryEntry::removeFilesFromList(const std::set<FileIndex>& indices)
 {
   for (auto iter = m_Files.begin(); iter != m_Files.end();) {
-    if (indices.find(iter->second) != indices.end()) {
+    if (indices.contains(iter->second)) {
       iter = m_Files.erase(iter);
     } else {
       ++iter;
@@ -870,7 +870,7 @@ void DirectoryEntry::removeFilesFromList(const std::set<FileIndex>& indices)
   }
 
   for (auto iter = m_FilesLookup.begin(); iter != m_FilesLookup.end();) {
-    if (indices.find(iter->second) != indices.end()) {
+    if (indices.contains(iter->second)) {
       iter = m_FilesLookup.erase(iter);
     } else {
       ++iter;
