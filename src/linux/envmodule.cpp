@@ -15,7 +15,7 @@ Module::Module(QString path, std::size_t fileSize)
     : m_path(std::move(path)), m_fileSize(fileSize)
 {
   m_version   = getVersion();
-  m_timestamp = QFileInfo(path).birthTime();
+  m_timestamp = QFileInfo(m_path).birthTime();
 }
 
 const QString& Module::path() const
