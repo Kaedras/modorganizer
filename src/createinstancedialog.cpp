@@ -60,15 +60,18 @@ private:
     try {
       // split on separators
       const QString s      = QDir::toNativeSeparators(target.absolutePath());
-      const QStringList cs = s.split("\\");
+      const QStringList cs = s.split(QDir::separator());
 
       if (cs.empty()) {
         return;
       }
 
       // root directory
+#ifdef __unix__
+      QDir d(QStringLiteral("/"));
+#else
       QDir d(cs[0]);
-
+#endif
       // for each directory after the root
       for (int i = 1; i < cs.size(); ++i) {
         d = d.filePath(cs[i]);
