@@ -30,6 +30,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "sanitychecks.h"
 #include "settings.h"
 #include "shared/appconfig.h"
+#include "shared/nativeString.h"
 #include "shared/util.h"
 #include "thread_utils.h"
 #include "tutorialmanager.h"
@@ -53,21 +54,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
                         "processorArchitecture='x86' "                                 \
                         "version='1.0.0.0' "                                           \
                         "type='win32' \"")
-
-namespace
-{
-#ifdef __unix__
-std::string ToNative(const QString& str)
-{
-  return str.toStdString();
-}
-#else
-std::wstring ToNative(const QString& str)
-{
-  return str.toStdWString();
-}
-#endif
-}  // namespace
 
 using namespace MOBase;
 using namespace MOShared;
@@ -381,7 +367,7 @@ void MOApplication::externalMessage(const QString& message)
   } else {
     cl::CommandLine cl;
 
-    if (auto r = cl.process(ToNative(message))) {
+    if (auto r = cl.process(ToNativeString(message))) {
       log::debug("while processing external message, command line wants to "
                  "exit; ignoring");
 
