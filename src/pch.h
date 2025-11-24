@@ -49,6 +49,31 @@
 #include <windowsx.h>
 #endif
 
+// linux
+#ifdef __linux__
+#include <pwd.h>
+#include <sys/file.h>
+#include <sys/types.h>
+#include <sys/utsname.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+// google breakpad
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+#include <breakpad/client/linux/handler/exception_handler.h>
+#include <breakpad/client/linux/minidump_writer/minidump_writer.h>
+
+// flatpak
+// undefine signals from qtmetamacros.h because it conflicts with glib
+#ifdef signals
+#undef signals
+#endif
+#include <flatpak/flatpak.h>
+
+#endif
+
 // boost
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
