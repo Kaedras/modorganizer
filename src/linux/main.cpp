@@ -180,13 +180,18 @@ int run(int argc, char* argv[])
       }
 
       // value should exist by now
-      string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
+      fs::path path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
       if (!path.empty()) {
         descriptor = google_breakpad::MinidumpDescriptor(path);
         eh.set_minidump_descriptor(descriptor);
 
         // move old crash dumps into the crash dump folder
-        system(std::string("mv *.dmp " + path + "/").c_str());
+        for (auto item : fs::directory_iterator(".")) {
+          if (item.path().extension() == ".dmp") {
+            fs::copy(item.path(), path / item.path().filename());
+            fs::remove(item.path());
+          }
+        }
       }
 
       // check if the command line wants to run something right now
