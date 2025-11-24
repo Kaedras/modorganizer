@@ -44,6 +44,7 @@ struct SecretValueDeleter
   }
 };
 using SecretValuePtr = std::unique_ptr<SecretValue, SecretValueDeleter>;
+
 struct SecretServiceDeleter
 {
   void operator()(SecretService* s) const
