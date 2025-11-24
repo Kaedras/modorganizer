@@ -55,7 +55,6 @@ const QString& cachedFileType(const QString& file, bool isOnFilesystem)
     return itor->second;
   }
 
-  QString s;
   QMimeDatabase db;
   QMimeDatabase::MatchMode mode;
   if (isOnFilesystem) {
@@ -64,7 +63,7 @@ const QString& cachedFileType(const QString& file, bool isOnFilesystem)
     mode = QMimeDatabase::MatchExtension;
   }
   QMimeType mimeType = db.mimeTypeForFile(info.fileName(), mode);
-  s                  = mimeType.comment();
+  QString s          = mimeType.comment();
 
   return map.emplace(ext, s).first->second;
 }
