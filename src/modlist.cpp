@@ -1075,7 +1075,7 @@ bool ModList::dropLocalFiles(const ModListDropInfo& dropInfo, int row,
     }
   }
 
-  if (sourceList.count()) {
+  if (!sourceList.empty()) {
     if (!shellMove(sourceList, targetList)) {
       log::debug("Failed to move file (error {})", ::GetLastError());
       return false;
