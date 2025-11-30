@@ -8,8 +8,8 @@
 #include <QDateTime>
 #include <QProgressDialog>
 #include <iomanip>
+#include <log.h>
 #include <memory>
-#include <spdlog/spdlog.h>
 #include <sstream>
 
 static constexpr char SHMID[] = "mod_organizer_instance";
@@ -32,21 +32,6 @@ std::string to_hex(void* bufferIn, size_t bufferSize)
   return temp.str();
 }
 
-spdlog::level::level_enum toSpdLogLevel(log::Levels level)
-{
-  switch (level) {
-  case log::Info:
-    return spdlog::level::info;
-  case log::Warning:
-    return spdlog::level::warn;
-  case log::Error:
-    return spdlog::level::err;
-  case log::Debug:
-  default:
-    return spdlog::level::debug;
-  }
-}
-
 OverlayfsConnector::OverlayfsConnector()
     : m_overlayfsManager(OverlayFsManager::getInstance(
           qApp->property("dataPath").toString() +
@@ -55,14 +40,13 @@ OverlayfsConnector::OverlayfsConnector()
 {
   const auto& s = Settings::instance();
 
-  const spdlog::level::level_enum logLevel = toSpdLogLevel(s.diagnostics().logLevel());
-
-  m_overlayfsManager.setLogLevel(logLevel);
+  log::Levels level = s.diagnostics().logLevel();
+  m_overlayfsManager.setLogLevel(static_cast<LogLevel>(level));
 
   log::debug("initializing overlayfs:\n"
              " . instance: {}\n"
              " . log: {}",
-             SHMID, spdlog::level::to_short_c_str(logLevel));
+             SHMID, log::levelToString(level));
 
   for (const auto& suffix : s.skipFileSuffixes()) {
     if (suffix.isEmpty()) {
@@ -137,7 +121,7 @@ void OverlayfsConnector::updateParams(MOBase::log::Levels logLevel,
   using namespace std::chrono;
 
   m_overlayfsManager.setDebugMode(false);
-  m_overlayfsManager.setLogLevel(toSpdLogLevel(logLevel));
+  m_overlayfsManager.setLogLevel(static_cast<LogLevel>(logLevel));
 
   m_overlayfsManager.clearSkipFileSuffixes();
   for (auto& suffix : skipFileSuffixes) {
