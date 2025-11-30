@@ -298,7 +298,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   // command is
   // STEAM_COMPAT_DATA_PATH=compatdata/<appid>
   // STEAM_COMPAT_CLIENT_INSTALL_PATH=<steam path>
-  // SteamAppId=<appid>
+  // SteamGameId=<appid>
   // path/to/proton run application.exe
 
   // the application is located at steamapps/common/<appliation>
