@@ -425,8 +425,9 @@ std::set<QSharedPointer<ModInfo>> ModInfo::filteredMods(QString gameName,
           return false;
         });
     std::set<QSharedPointer<ModInfo>> diff;
-    std::ranges::set_difference(updates, finalMods, std::inserter(diff, diff.end()));
-    for (const auto& skipped : diff) {
+    std::set_difference(updates.begin(), updates.end(), finalMods.begin(),
+                        finalMods.end(), std::inserter(diff, diff.end()));
+    for (auto skipped : diff) {
       skipped->setLastNexusUpdate(QDateTime::currentDateTimeUtc());
     }
   }
