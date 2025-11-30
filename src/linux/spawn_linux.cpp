@@ -322,7 +322,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
   setenv("STEAM_COMPAT_DATA_PATH", compatData.toLocal8Bit(), 1);
   setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
-  setenv("SteamAppId", sp.steamAppID.toLocal8Bit(), 1);
+  setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
 
   const QString params =
       "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
