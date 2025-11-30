@@ -3841,7 +3841,7 @@ void MainWindow::on_restoreButton_clicked()
 
       QMessageBox::critical(this, tr("Restore failed"),
                             tr("Failed to restore the backup. Errorcode: %1")
-                                .arg(ToQString(formatSystemMessage(e))));
+                                .arg(formatSystemMessageToQString(e)));
     }
     m_OrganizerCore.refreshESPList(true);
   }
@@ -3865,7 +3865,7 @@ void MainWindow::on_restoreModsButton_clicked()
       const auto e = GetLastError();
       QMessageBox::critical(this, tr("Restore failed"),
                             tr("Failed to restore the backup. Errorcode: %1")
-                                .arg(formatSystemMessage(e)));
+                                .arg(formatSystemMessageToQString(e)));
     }
     m_OrganizerCore.refresh(false);
   }
@@ -3959,7 +3959,7 @@ void MainWindow::dropLocalFile(const QUrl& url, const QString& outputDir, bool m
   }
   if (!success) {
     const auto e = GetLastError();
-    log::error("file operation failed: {}", formatSystemMessage(e));
+    log::error("file operation failed: {}", formatSystemMessageToQString(e));
   }
 }
 

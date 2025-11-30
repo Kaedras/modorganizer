@@ -34,6 +34,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "versioninfo.h"
 
 #include "shared/appconfig.h"
+#include <algorithm>
 #include <iplugingame.h>
 #include <log.h>
 #include <report.h>
