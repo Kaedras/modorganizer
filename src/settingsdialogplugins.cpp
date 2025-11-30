@@ -2,6 +2,7 @@
 #include "noeditdelegate.h"
 #include "ui_settingsdialog.h"
 #include <iplugin.h>
+#include <ranges>
 
 #include "disableproxyplugindialog.h"
 #include "organizercore.h"
