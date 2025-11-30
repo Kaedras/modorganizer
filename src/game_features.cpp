@@ -1,6 +1,7 @@
 #include "game_features.h"
 
 #include <algorithm>
+#include <ranges>
 
 #include <QTimer>
 
