@@ -7,15 +7,10 @@
 #include "organizercore.h"
 #include "shared/util.h"
 #include "thread_utils.h"
+#include <client/linux/handler/exception_handler.h>
 #include <log.h>
 #include <report.h>
 #include <sys/prctl.h>
-
-// fixes an error message in breakpad
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-#include <client/linux/handler/exception_handler.h>
 
 using namespace MOBase;
 using namespace std;

@@ -59,11 +59,8 @@
 #include <unistd.h>
 
 // google breakpad
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-#include <breakpad/client/linux/handler/exception_handler.h>
-#include <breakpad/client/linux/minidump_writer/minidump_writer.h>
+#include <client/linux/handler/exception_handler.h>
+#include <client/linux/minidump_writer/minidump_writer.h>
 
 // flatpak
 // undefine signals from qtmetamacros.h because it conflicts with glib
