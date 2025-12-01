@@ -76,7 +76,7 @@ target_link_libraries(organizer PRIVATE
 if (UNIX)
 	# todo: remove this workaround
 	find_package(Qt6 REQUIRED COMPONENTS Test)
-	target_link_libraries(organizer PRIVATE Qt::Test fmt)
+	target_link_libraries(organizer PRIVATE Qt::Test)
 endif()
 
 if (WIN32)
