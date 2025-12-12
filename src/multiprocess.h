@@ -18,6 +18,7 @@ public:
   // `allowMultiple`: if another process is running, run this one
   // disconnected from the shared memory
   explicit MOMultiProcess(bool allowMultiple, QObject* parent = 0);
+  ~MOMultiProcess() override;
 
   /**
    * @return true if this process's job is to forward data to the primary

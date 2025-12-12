@@ -9,6 +9,10 @@ using namespace std::chrono_literals;
 static const QString s_Key = QStringLiteral("mo-43d1a3ad-eeb0-4818-97c9-eda5216c29b5");
 static const int s_Timeout = 5000;
 
+// whether there is another ModOrganizer process running, used on linux to determine if
+// shared memory has not been removed
+bool isOnlyMoProcess();
+
 using MOBase::reportError;
 
 MOMultiProcess::MOMultiProcess(bool allowMultiple, QObject* parent)
@@ -18,7 +22,10 @@ MOMultiProcess::MOMultiProcess(bool allowMultiple, QObject* parent)
 
   if (!m_SharedMem.create(1)) {
     if (m_SharedMem.error() == QSharedMemory::AlreadyExists) {
-      if (!allowMultiple) {
+      if (isOnlyMoProcess()) {
+        m_SharedMem.attach();
+        m_OwnsSM = true;
+      } else if (!allowMultiple) {
         m_SharedMem.attach();
         m_Ephemeral = true;
       }
