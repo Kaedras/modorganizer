@@ -6,7 +6,7 @@
 
 using namespace std::chrono_literals;
 
-static const char s_Key[]  = "mo-43d1a3ad-eeb0-4818-97c9-eda5216c29b5";
+static const QString s_Key = QStringLiteral("mo-43d1a3ad-eeb0-4818-97c9-eda5216c29b5");
 static const int s_Timeout = 5000;
 
 using MOBase::reportError;
@@ -14,7 +14,7 @@ using MOBase::reportError;
 MOMultiProcess::MOMultiProcess(bool allowMultiple, QObject* parent)
     : QObject(parent), m_Ephemeral(false), m_OwnsSM(false)
 {
-  m_SharedMem.setKey(s_Key);
+  m_SharedMem.setNativeKey(QSharedMemory::platformSafeKey(s_Key));
 
   if (!m_SharedMem.create(1)) {
     if (m_SharedMem.error() == QSharedMemory::AlreadyExists) {
