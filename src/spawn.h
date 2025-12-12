@@ -54,6 +54,9 @@ struct SpawnParameters
   QString arguments;
   QDir currentDirectory;
   QString steamAppID;
+#ifdef __unix__
+  QString prefixDirectory;
+#endif
   bool hooked   = false;
   HANDLE stdOut = INVALID_HANDLE_VALUE;
   HANDLE stdErr = INVALID_HANDLE_VALUE;

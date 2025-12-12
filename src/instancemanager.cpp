@@ -140,6 +140,13 @@ bool Instance::readFromIni()
     m_baseDir = s.paths().base();
   }
 
+#ifdef __unix__
+  if (m_prefixDir.isEmpty()) {
+    m_prefixDir = s.game().prefix();
+    log::debug("got prefix dir from ini: {}", m_prefixDir);
+  }
+#endif
+
   // figuring out profile from ini if it's missing
   getProfile(s);
 
@@ -173,6 +180,11 @@ Instance::SetupResults Instance::setup(PluginContainer& plugins)
   // can change it in the settings and might have multiple versions of the game
   // installed
   m_plugin->setGamePath(m_gameDir);
+
+#ifdef __unix__
+  log::debug("setting plugin prefix dir to {}", m_prefixDir);
+  m_plugin->setPrefixPath(m_prefixDir);
+#endif
 
   return SetupResults::Okay;
 }

@@ -193,6 +193,9 @@ private:
   QString m_dir;
   bool m_portable;
   QString m_gameName, m_gameDir, m_gameVariant, m_baseDir;
+#ifdef __unix__
+  QString m_prefixDir;
+#endif
   MOBase::IPluginGame* m_plugin;
   QString m_profile;
 

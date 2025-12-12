@@ -304,10 +304,11 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   // the application is located at steamapps/common/<appliation>
   // compatdata is located at steamapps/compatdata/<appid>
 
-  QString compatData = findCompatDataByAppID(sp.steamAppID);
-  if (compatData.isEmpty()) {
+  if (sp.prefixDirectory.isEmpty()) {
+    log::error("prefixDirectory is empty");
     return COMPAT_DATA_NOT_FOUND;
   }
+  log::debug("Using compatdata dir {}", sp.prefixDirectory);
 
   QString proton = findProtonByAppID(sp.steamAppID);
   if (proton.isEmpty()) {
@@ -320,7 +321,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     }
   }
 
-  setenv("STEAM_COMPAT_DATA_PATH", compatData.toLocal8Bit(), 1);
+  setenv("STEAM_COMPAT_DATA_PATH", sp.prefixDirectory.toLocal8Bit(), 1);
   setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
   setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
 

@@ -70,3 +70,17 @@ void GlobalSettings::updateRegistryKey()
 {
   // no-op
 }
+
+QString GameSettings::prefix() const
+{
+  return get<QString>(m_Settings, u"General"_s, u"prefix_directory"_s, "");
+}
+
+void GameSettings::setPrefix(const QString& prefix)
+{
+  if (prefix.isEmpty()) {
+    remove(m_Settings, u"General"_s, u"prefix_directory"_s);
+  } else {
+    set(m_Settings, u"General"_s, u"prefix_directory"_s, prefix);
+  }
+}

@@ -692,9 +692,10 @@ std::optional<ProcessRunner::Results> ProcessRunner::runBinary()
   adjustForVirtualized(game, m_sp, settings);
 
 #ifdef __unix__
-  // appID is required to get the prefix location
+  // appID is required to get the correct proton version
   if (m_sp.binary.suffix() == "exe") {
-    m_sp.steamAppID = m_core.managedGame()->steamAPPId();
+    m_sp.steamAppID      = m_core.managedGame()->steamAPPId();
+    m_sp.prefixDirectory = m_core.settings().game().prefix();
   }
 #endif
 

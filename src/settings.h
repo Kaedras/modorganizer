@@ -80,6 +80,11 @@ public:
   std::optional<QString> selectedProfileName() const;
   void setSelectedProfileName(const QString& name);
 
+#ifdef __unix__
+  QString prefix() const;
+  void setPrefix(const QString& prefix);
+#endif
+
 private:
   QSettings& m_Settings;
   const MOBase::IPluginGame* m_GamePlugin;
