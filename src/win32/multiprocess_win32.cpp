@@ -1,6 +1,6 @@
 #include "multiprocess.h"
 
-inline bool isOnlyMoProcess()
+bool isOnlyMoProcess()
 {
   // no-op
   return false;
