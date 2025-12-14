@@ -114,6 +114,12 @@ public:
   //
   virtual CreateInstanceDialog::ProfileSettings profileSettings() const;
 
+#ifdef __unix__
+  // returns the wine prefix path
+  //
+  virtual QString selectedGamePrefix() const;
+#endif
+
 protected:
   Ui::CreateInstanceDialog* ui;
   CreateInstanceDialog& m_dlg;
@@ -625,6 +631,52 @@ private:
   //
   QString dirLine(const QString& caption, const QString& path) const;
 };
+
+#ifdef __unix__
+
+// prefix path page; displays a textbox where the user can enter a wine prefix directory
+//
+class PrefixPage : public Page
+{
+public:
+  PrefixPage(CreateInstanceDialog& dlg);
+
+  // whether a valid prefix has been entered
+  //
+  bool ready() const override;
+
+  // returns the prefix path
+  //
+  QString selectedGamePrefix() const override;
+
+protected:
+  // uses the selected game to try to detect the wine prefix (only working with steam)
+  //
+  void doActivated(bool firstTime) override;
+
+private:
+  // whether the user has modified the text, prevents auto generation when the
+  // selected game changes
+  bool m_modified;
+
+  // whether the prefix path is valid
+  bool m_okay;
+
+  // called when the user modifies the textbox, remember that it has changed and
+  // calls verify()
+  //
+  void onChanged();
+
+  // check if the entered name is valid, sets m_okay
+  //
+  void verify();
+
+  // opens a browse directory dialog and sets the given textbox
+  //
+  void browse(QLineEdit* e) const;
+};
+
+#endif
 
 }  // namespace cid
 

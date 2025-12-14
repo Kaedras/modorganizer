@@ -1273,6 +1273,9 @@ QString ConfirmationPage::makeReview() const
 
   lines.push_back(QObject::tr("Game: %1").arg(name));
   lines.push_back(QObject::tr("Game location: %1").arg(ci.gameLocation));
+#ifdef __unix__
+  lines.push_back(QObject::tr("Prefix location: %1").arg(ci.prefixPath));
+#endif
 
   return lines.join("\n");
 }

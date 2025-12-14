@@ -20,11 +20,13 @@ if (UNIX)
 			${LIBFLATPAK_LIBRARIES}
 	)
 	set(LIBRARY_DIR lib)
+	set(os_name linux)
 else()
 	find_package(usvfs CONFIG REQUIRED)
 	set(OS_SPECIFIC_INCLUDE_DIRS)
 	set(OS_SPECIFIC_PRIVATE_DEPS Shlwapi Bcrypt Version Dbghelp usvfs::usvfs)
 	set(LIBRARY_DIR dlls)
+	set(os_name win32)
 endif()
 
 find_package(mo2-uibase CONFIG REQUIRED)
@@ -47,6 +49,9 @@ set_target_properties(organizer PROPERTIES
 	WIN32_EXECUTABLE TRUE)
 
 target_include_directories(organizer PUBLIC ${CMAKE_SOURCE_DIR}/src ${OS_SPECIFIC_INCLUDE_DIRS})
+
+# required for os-specific ui files
+set_property(TARGET organizer APPEND PROPERTY AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/src/${os_name})
 
 # disable translations because we want to be able to install somewhere else if
 # required

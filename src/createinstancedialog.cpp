@@ -112,6 +112,9 @@ CreateInstanceDialog::CreateInstanceDialog(const PluginContainer& pc, Settings* 
   m_pages.push_back(std::make_unique<TypePage>(*this));
   m_pages.push_back(std::make_unique<GamePage>(*this));
   m_pages.push_back(std::make_unique<VariantsPage>(*this));
+#ifdef __unix__
+  m_pages.push_back(std::make_unique<PrefixPage>(*this));
+#endif
   m_pages.push_back(std::make_unique<NamePage>(*this));
   m_pages.push_back(std::make_unique<ProfilePage>(*this));
   m_pages.push_back(std::make_unique<PathsPage>(*this));
@@ -335,6 +338,10 @@ void CreateInstanceDialog::finish()
     s.game().setName(ci.game->gameName());
     s.game().setDirectory(ci.gameLocation);
 
+#ifdef __unix__
+    s.game().setPrefix(ci.prefixPath);
+#endif
+
     if (!ci.gameVariant.isEmpty()) {
       s.game().setEdition(ci.gameVariant);
     }
@@ -495,6 +502,9 @@ CreateInstanceDialog::CreationInfo CreateInstanceDialog::rawCreationInfo() const
   ci.instanceName    = getSelected(&cid::Page::selectedInstanceName);
   ci.profileSettings = getSelected(&cid::Page::profileSettings);
   ci.paths           = getSelected(&cid::Page::selectedPaths);
+#ifdef __unix__
+  ci.prefixPath = getSelected(&cid::Page::selectedGamePrefix);
+#endif
 
   if (ci.type == Portable) {
     ci.dataPath = QDir(InstanceManager::singleton().portablePath()).absolutePath();

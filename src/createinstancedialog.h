@@ -86,6 +86,9 @@ public:
     QString instanceName;
     QString dataPath;
     QString iniPath;
+#ifdef __unix__
+    QString prefixPath;
+#endif
     Paths paths;
     ProfileSettings profileSettings;
   };
