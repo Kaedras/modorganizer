@@ -11,6 +11,7 @@
 #include <log.h>
 #include <report.h>
 #include <sys/prctl.h>
+#include <sys/resource.h>
 
 using namespace MOBase;
 using namespace std;
@@ -80,6 +81,20 @@ int run(int argc, char* argv[])
   if (prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY) == -1) {
     const int e = errno;
     log::warn("Error in prctl(PR_SET_PTRACER), {}", strerror(e));
+  }
+
+  rlimit limit;
+  if (getrlimit(RLIMIT_CORE, &limit) == -1) {
+    const int e = errno;
+    log::error("getrlimit failed, {}", strerror(e));
+    return 1;
+  }
+  limit.rlim_cur = RLIM_INFINITY;
+
+  if (setrlimit(RLIMIT_CORE, &limit) == -1) {
+    const int e = errno;
+    log::error("setrlimit failed, {}", strerror(e));
+    return 1;
   }
 
   cl::CommandLine cl;
