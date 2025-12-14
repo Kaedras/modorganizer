@@ -52,6 +52,12 @@ public:
   //
   void exploreBaseDirectory();
 
+#ifdef __unix__
+  // explores the wine prefix directory of the selected instance
+  //
+  void explorePrefixDirectory() const;
+#endif
+
   // explores the game directory of the selected instance
   //
   void exploreGame();

@@ -148,6 +148,12 @@ public:
   //
   QString gameDirectory() const;
 
+#ifdef __unix__
+  // returns the wine prefix directory
+  //
+  QString prefixDirectory() const;
+#endif
+
   // returns the instance directory as given in the constructor
   //
   QString directory() const;

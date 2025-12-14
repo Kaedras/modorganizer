@@ -190,6 +190,11 @@ InstanceManagerDialog::InstanceManagerDialog(PluginContainer& pc, QWidget* paren
   connect(ui->exploreGame, &QPushButton::clicked, [&] {
     exploreGame();
   });
+#ifdef __unix__
+  connect(ui->explorePrefix, &QPushButton::clicked, [&] {
+    explorePrefixDirectory();
+  });
+#endif
 
   connect(ui->convertToGlobal, &QPushButton::clicked, [&] {
     convertToGlobal();
@@ -681,6 +686,9 @@ void InstanceManagerDialog::fillData(const Instance& ii)
   ui->baseDirectory->setText(ii.baseDirectory());
   ui->gameName->setText(ii.gameName());
   ui->gameDir->setText(ii.gameDirectory());
+#ifdef __unix__
+  ui->prefixDir->setText(ii.prefixDirectory());
+#endif
   setButtonsEnabled(true);
 
   const auto& m = InstanceManager::singleton();
@@ -716,6 +724,9 @@ void InstanceManagerDialog::clearData()
   ui->baseDirectory->clear();
   ui->gameName->clear();
   ui->gameDir->clear();
+#ifdef __unix__
+  ui->prefixDir->clear();
+#endif
 
   setButtonsEnabled(false);
 
@@ -729,6 +740,9 @@ void InstanceManagerDialog::setButtonsEnabled(bool b)
   ui->exploreLocation->setEnabled(b);
   ui->exploreBaseDirectory->setEnabled(b);
   ui->exploreGame->setEnabled(b);
+#ifdef __unix__
+  ui->explorePrefix->setEnabled(b);
+#endif
   ui->convertToPortable->setEnabled(b);
   ui->convertToGlobal->setEnabled(b);
   ui->deleteInstance->setEnabled(b);
