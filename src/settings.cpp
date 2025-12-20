@@ -32,6 +32,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 EndorsementState endorsementStateFromString(const QString& s)
 {
@@ -1980,12 +1981,39 @@ void NexusSettings::setCategoryMappings(bool b) const
   set(m_Settings, "Settings", "category_mappings", b);
 }
 
+QString getApplicationFilePath()
+{
+#ifdef __unix__
+  QString executable = qgetenv("APPIMAGE");
+  if (!executable.isEmpty()) {
+    return executable;
+  }
+#endif
+  return QCoreApplication::applicationFilePath();
+}
+
+QString getNxmHandlerPath()
+{
+#ifdef __unix__
+  const QString appImage = qgetenv("APPIMAGE");
+  if (!appImage.isEmpty()) {
+    const qsizetype lastSlash = appImage.lastIndexOf('/');
+    if (lastSlash == -1) {
+      log::warn("$APPIMAGE does not contain any slashes: {}", appImage);
+      return QCoreApplication::applicationDirPath() % "/"_L1 %
+             AppConfig::nxmHandlerExe();
+    }
+    return appImage.first(lastSlash) % "/nxmhandler-x86_64.AppImage"_L1;
+  }
+#endif
+  return QCoreApplication::applicationDirPath() % "/"_L1 % AppConfig::nxmHandlerExe();
+}
+
 void NexusSettings::registerAsNXMHandler(bool force)
 {
-  const auto nxmPath =
-      QCoreApplication::applicationDirPath() + "/" + AppConfig::nxmHandlerExe();
+  const auto nxmPath = getNxmHandlerPath();
 
-  const auto executable = QCoreApplication::applicationFilePath();
+  const auto executable = getApplicationFilePath();
 
   QString mode       = force ? "forcereg" : "reg";
   QString parameters = mode + " " + m_Parent.game().plugin()->gameShortName();
