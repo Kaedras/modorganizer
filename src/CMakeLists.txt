@@ -10,20 +10,18 @@ if (UNIX)
 	find_package(mo2-overlayfs CONFIG REQUIRED)
 	find_package(unofficial-breakpad CONFIG REQUIRED)
 	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
-	pkg_check_modules(LIBFLATPAK REQUIRED flatpak)
-	set(OS_SPECIFIC_INCLUDE_DIRS ${LIBSECRET_INCLUDE_DIRS} ${LIBFLATPAK_INCLUDE_DIRS})
+	pkg_check_modules(libsecret REQUIRED IMPORTED_TARGET libsecret-1)
+	pkg_check_modules(libflatpak REQUIRED IMPORTED_TARGET flatpak)
 	set(OS_SPECIFIC_PRIVATE_DEPS
 			mo2::overlayfs
 			unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
-			${LIBSECRET_LIBRARIES}
-			${LIBFLATPAK_LIBRARIES}
+			PkgConfig::libsecret
+			PkgConfig::libflatpak
 	)
 	set(LIBRARY_DIR lib)
 	set(os_name linux)
 else()
 	find_package(usvfs CONFIG REQUIRED)
-	set(OS_SPECIFIC_INCLUDE_DIRS)
 	set(OS_SPECIFIC_PRIVATE_DEPS Shlwapi Bcrypt Version Dbghelp usvfs::usvfs)
 	set(LIBRARY_DIR dlls)
 	set(os_name win32)
@@ -48,7 +46,7 @@ set_target_properties(organizer PROPERTIES
 	OUTPUT_NAME "ModOrganizer"
 	WIN32_EXECUTABLE TRUE)
 
-target_include_directories(organizer PUBLIC ${CMAKE_SOURCE_DIR}/src ${OS_SPECIFIC_INCLUDE_DIRS})
+target_include_directories(organizer PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 # required for os-specific ui files
 set_property(TARGET organizer APPEND PROPERTY AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/src/${os_name})
