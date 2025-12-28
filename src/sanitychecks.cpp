@@ -108,6 +108,9 @@ int checkPaths(IPluginGame& game, const Settings& s)
   n += checkProtected(game.gameDirectory(), "the game");
   n += checkMicrosoftStore(game.gameDirectory());
   n += checkProtected(QApplication::applicationDirPath(), "Mod Organizer");
+#ifdef __unix__
+  n += checkProtected(s.game().prefix(), "the wine prefix");
+#endif
 
   if (checkProtected(s.paths().base(), "the instance base directory")) {
     ++n;
