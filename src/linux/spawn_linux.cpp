@@ -6,7 +6,6 @@
 #include "settings.h"
 #include "shared/util.h"
 #include "stub.h"
-#include "usvfs-fuse/usvfsmanager.h"
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
@@ -15,6 +14,7 @@
 #include <report.h>
 #include <steamutility.h>
 #include <sys/wait.h>
+#include <usvfs-fuse/usvfsmanager.h>
 #include <utility.h>
 
 // undefine signals from qtmetamacros.h because it conflicts with glib
@@ -36,6 +36,7 @@ static constexpr int COMPAT_DATA_NOT_FOUND = 201;
 static constexpr int STEAM_NOT_FOUND       = 202;
 static constexpr int APPID_EMPTY           = 203;
 static constexpr int MOUNT_ERROR           = 204;
+static constexpr int UNKNOWN_ERROR         = 300;
 
 namespace spawn::dialogs
 {
@@ -263,17 +264,21 @@ void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
   if (sp.hooked) {
-    if (!UsvfsManager::instance()->mount()) {
-      return MOUNT_ERROR;
+    pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+        sp.binary.absoluteFilePath(), sp.arguments, sp.binary.absolutePath());
+    if (pid >= 0) {
+      processHandle = pidfd_open(pid, 0);
+      return 0;
     }
-  }
-
-  auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(), sp.binary.absolutePath(),
-                                 sp.arguments);
-
-  if (result.success()) {
-    processHandle = result.stealProcessHandle();
-    return 0;
+    // todo: add proper error codes
+    errno = UNKNOWN_ERROR;
+  } else {
+    auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(),
+                                   sp.binary.absolutePath(), sp.arguments);
+    if (result.success()) {
+      processHandle = result.stealProcessHandle();
+      return 0;
+    }
   }
 
   const int e = errno;
@@ -315,24 +320,41 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     return PROTON_NOT_FOUND;
   }
 
+  const QString params =
+      "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
+
   if (sp.hooked) {
-    if (!UsvfsManager::instance()->mount()) {
-      return MOUNT_ERROR;
+    QStringList env;
+    for (int i = 0; environ[i] != nullptr; ++i) {
+      env << environ[i];
+    }
+
+    env << "STEAM_COMPAT_DATA_PATH=" % sp.prefixDirectory;
+    env << "STEAM_COMPAT_CLIENT_INSTALL_PATH=" % steamPath;
+    env << "SteamGameId=" % sp.steamAppID;
+
+    pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+        proton, params, sp.binary.absolutePath(), std::move(env));
+
+    if (pid >= 0) {
+      pidFd = pidfd_open(pid, 0);
+      return 0;
+    }
+    // todo: add proper error codes
+    errno = UNKNOWN_ERROR;
+  } else {
+    setenv("STEAM_COMPAT_DATA_PATH", sp.prefixDirectory.toLocal8Bit(), 1);
+    setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
+    setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
+
+    auto result = shell::ExecuteIn(proton, sp.binary.absolutePath(), params);
+
+    if (result.success()) {
+      pidFd = result.stealProcessHandle();
+      return 0;
     }
   }
 
-  setenv("STEAM_COMPAT_DATA_PATH", sp.prefixDirectory.toLocal8Bit(), 1);
-  setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
-  setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
-
-  const QString params =
-      "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
-  auto result = shell::ExecuteIn(proton, sp.binary.absolutePath(), params);
-
-  if (result.success()) {
-    pidFd = result.stealProcessHandle();
-    return 0;
-  }
   const int e = errno;
   log::error("error running {}, {}", sp.binary.absoluteFilePath().toStdString(),
              strerror(e));
