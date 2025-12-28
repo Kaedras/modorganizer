@@ -3,7 +3,7 @@
 	<id>org.modorganizer2.ModOrganizer</id>
 	<metadata_license>FSFAP</metadata_license>
 	<project_license>GPL-3.0</project_license>
-	<name>Mod Organizer</name>
+	<name>ModOrganizer</name>
 	<summary>Tool for managing mod collections of arbitrary size</summary>
 	<description>
 		<p>
