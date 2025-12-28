@@ -150,8 +150,8 @@ void UsvfsConnector::updateMapping(const MappingType& mapping)
   const auto end  = std::chrono::high_resolution_clock::now();
   const auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-  log::debug("Overlayfs mappings updated, linked {} dirs and {} files in {}ms", dirs,
-             files, time.count());
+  log::debug("VFS mappings updated, linked {} dirs and {} files in {}ms", dirs, files,
+             time.count());
 }
 
 void UsvfsConnector::updateParams(MOBase::log::Levels logLevel,

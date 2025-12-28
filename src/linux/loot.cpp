@@ -251,7 +251,7 @@ bool Loot::start(QWidget* parent, bool didUpdateMasterList)
 
   log::debug("starting loot");
 
-  // overlayfs
+  // vfs
   m_core.prepareVFS();
 
   // spawning
@@ -267,7 +267,7 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
   const auto logLevel = m_core.settings().diagnostics().lootLogLevel();
 
   if (!UsvfsManager::instance()->mount()) {
-    emit log(log::Levels::Error, tr("failed to start loot: error mounting overlayfs"));
+    emit log(log::Levels::Error, tr("failed to start loot: error mounting usvfs"));
     return false;
   }
 
