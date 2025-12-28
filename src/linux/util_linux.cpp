@@ -1,8 +1,8 @@
 #include "linux/stub.h"
 #include "shared/util.h"
 
-#include <overlayfs/overlayfsmanager.h>
 #include <sys/prctl.h>
+#include <usvfs-fuse/usvfsmanager.h>
 #include <versioninfo.h>
 
 using namespace MOBase;
@@ -18,7 +18,7 @@ Version createVersionInfo()
 
 QString getUsvfsVersionString()
 {
-  return OverlayFsManager::ofsVersionString();
+  return UsvfsManager::usvfsVersionString();
 }
 
 void SetThisThreadName(const QString& s)

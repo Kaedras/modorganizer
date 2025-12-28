@@ -40,7 +40,7 @@
 #ifdef _WIN32
 #include <usvfs/usvfs.h>
 #else
-#include <overlayfs/overlayfsmanager.h>
+#include <usvfs-fuse/usvfsmanager.h>
 #endif
 
 #include <QApplication>

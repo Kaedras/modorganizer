@@ -39,7 +39,7 @@
 #ifdef _WIN32
 #include "win32/usvfsconnector.h"
 #else
-#include "linux/overlayfsconnector.h"
+#include "linux/usvfsconnector.h"
 #endif
 
 class ModListSortProxy;

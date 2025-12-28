@@ -7,16 +7,18 @@ endif()
 find_package(mo2-cmake CONFIG REQUIRED)
 
 if (UNIX)
-	find_package(mo2-overlayfs CONFIG REQUIRED)
+	find_package(ICU REQUIRED COMPONENTS data)
+	find_package(usvfs-fuse CONFIG REQUIRED)
 	find_package(unofficial-breakpad CONFIG REQUIRED)
 	find_package(PkgConfig REQUIRED)
 	pkg_check_modules(libsecret REQUIRED IMPORTED_TARGET libsecret-1)
 	pkg_check_modules(libflatpak REQUIRED IMPORTED_TARGET flatpak)
 	set(OS_SPECIFIC_PRIVATE_DEPS
-			mo2::overlayfs
+			usvfs-fuse
 			unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
 			PkgConfig::libsecret
 			PkgConfig::libflatpak
+			ICU::data
 	)
 	set(LIBRARY_DIR lib)
 	set(os_name linux)

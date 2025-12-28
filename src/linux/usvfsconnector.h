@@ -1,5 +1,5 @@
-#ifndef OVERLAYFSCONNECTOR_H
-#define OVERLAYFSCONNECTOR_H
+#ifndef USVFSCONNECTOR_H
+#define USVFSCONNECTOR_H
 
 #include "envdump.h"
 #include <QString>
@@ -7,19 +7,14 @@
 #include <executableinfo.h>
 #include <filemapping.h>
 #include <log.h>
-#include <overlayfs/overlayfsmanager.h>
 
-class OverlayfsConnector;
-class OverlayfsConnectorException;
+class UsvfsManager;
 
-using UsvfsConnector          = OverlayfsConnector;
-using UsvfsConnectorException = OverlayfsConnectorException;
-
-class OverlayfsConnectorException : public std::exception
+class UsvfsConnectorException : public std::exception
 {
 
 public:
-  OverlayfsConnectorException(const QString& text) : m_Message(text.toLocal8Bit()) {}
+  UsvfsConnectorException(const QString& text) : m_Message(text.toLocal8Bit()) {}
 
   const char* what() const noexcept override { return m_Message.constData(); }
 
@@ -27,14 +22,14 @@ private:
   QByteArray m_Message;
 };
 
-class OverlayfsConnector : public QObject
+class UsvfsConnector : public QObject
 {
 
   Q_OBJECT
 
 public:
-  OverlayfsConnector();
-  ~OverlayfsConnector() override;
+  UsvfsConnector();
+  ~UsvfsConnector() override;
 
   void updateMapping(const MappingType& mapping);
 
@@ -49,9 +44,9 @@ public:
   void setOverwritePath(const QString& path) const;
 
 private:
-  OverlayFsManager& m_overlayfsManager;
+  std::shared_ptr<UsvfsManager> m_usvfsManager;
 };
 
-std::vector<pid_t> getRunningOverlayfsProcesses();
+std::vector<pid_t> getRunningUSVFSProcesses();
 
-#endif  // OVERLAYFSCONNECTOR_H
+#endif  // USVFSCONNECTOR_H

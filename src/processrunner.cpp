@@ -8,17 +8,6 @@
 #include <log.h>
 #include <report.h>
 
-#ifdef __unix__
-#include "linux/overlayfsconnector.h"
-namespace
-{
-std::vector<HANDLE> getRunningUSVFSProcesses()
-{
-  return getRunningOverlayfsProcesses();
-}
-}  // namespace
-#endif
-
 using namespace MOBase;
 
 extern std::optional<ProcessRunner::Results> singleWait(HANDLE handle, DWORD pid);

@@ -5,6 +5,7 @@
 #include <log.h>
 #include <lootcli/lootcli.h>
 #include <report.h>
+#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 using namespace json;
@@ -265,7 +266,7 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
 {
   const auto logLevel = m_core.settings().diagnostics().lootLogLevel();
 
-  if (!OverlayFsManager::getInstance().mount()) {
+  if (!UsvfsManager::instance()->mount()) {
     emit log(log::Levels::Error, tr("failed to start loot: error mounting overlayfs"));
     return false;
   }
@@ -380,7 +381,7 @@ void Loot::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
     emit finished();
   });
 
-  OverlayFsManager::getInstance().umount();
+  UsvfsManager::instance()->unmount();
 
   if (exitStatus == QProcess::CrashExit) {
     if (m_cancel) {

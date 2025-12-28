@@ -80,7 +80,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <uibase/versioninfo.h>
 
 #ifdef __unix__
-#include <overlayfs/overlayfsmanager.h>
 inline QString formatSystemMessageToQString(int e)
 {
   return QString::fromLocal8Bit(strerror(e));

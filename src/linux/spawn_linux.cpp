@@ -3,10 +3,10 @@
 #include "env.h"
 #include "envos.h"
 #include "envsecurity.h"
-#include "overlayfs/overlayfsmanager.h"
 #include "settings.h"
 #include "shared/util.h"
 #include "stub.h"
+#include "usvfs-fuse/usvfsmanager.h"
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
@@ -263,7 +263,7 @@ void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
   if (sp.hooked) {
-    if (!OverlayFsManager::getInstance().mount()) {
+    if (!UsvfsManager::instance()->mount()) {
       return MOUNT_ERROR;
     }
   }
@@ -316,7 +316,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   }
 
   if (sp.hooked) {
-    if (!OverlayFsManager::getInstance().mount()) {
+    if (!UsvfsManager::instance()->mount()) {
       return MOUNT_ERROR;
     }
   }
@@ -547,14 +547,14 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
   case EACCES: {
     startBinaryAdmin(parent, sp);
     if (sp.hooked) {
-      OverlayFsManager::getInstance().umount();
+      UsvfsManager::instance()->unmount();
     }
     return INVALID_HANDLE_VALUE;
   }
 
   default: {
     if (sp.hooked) {
-      OverlayFsManager::getInstance().umount();
+      UsvfsManager::instance()->unmount();
     }
     dialogs::spawnFailed(parent, sp, e);
     return INVALID_HANDLE_VALUE;
