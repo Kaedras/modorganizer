@@ -18,7 +18,11 @@
     "lz4",
     "mo2-dds-header",
     "libbsarchpp",
-    "zlib"
+    "zlib",
+    {
+      "platform": "linux",
+      "name": "usvfs-fuse"
+    }
   ],
   "features": {
     "standalone": {
@@ -33,10 +37,6 @@
         {
           "platform": "windows",
           "name": "usvfs"
-        },
-        {
-          "platform": "linux",
-          "name": "usvfs-fuse"
         }
       ]
     }
