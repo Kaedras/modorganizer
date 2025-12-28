@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>org.modorganizer2.ModOrganizer</id>
+	<metadata_license>FSFAP</metadata_license>
+	<project_license>GPL-3.0</project_license>
+	<name>Mod Organizer</name>
+	<summary>Tool for managing mod collections of arbitrary size</summary>
+	<description>
+		<p>
+			Mod Organizer (MO) is a tool for managing mod collections of arbitrary size. It is specifically designed for people who like to experiment with mods and thus need an easy and reliable way to install and uninstall them. Mod Organizer 2 is a mod manager created by Tannin to support 64-bit games like Skyrim Special Edition and Fallout 4 in addition to all the 32-bit games MO1 already supported.
+		</p>
+	</description>
+	<launchable type="desktop-id">org.modorganizer2.ModOrganizer.desktop</launchable>
+	<url type="homepage">https://github.com/ModOrganizer2/modorganizer</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://staticdelivery.nexusmods.com/mods/1704/images/6194-0-1481782718.png</image>
+		</screenshot>
+	</screenshots>
+	<provides>
+		<id>org.modorganizer2.ModOrganizer.desktop</id>
+	</provides>
+</component>
