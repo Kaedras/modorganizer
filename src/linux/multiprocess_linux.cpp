@@ -19,10 +19,19 @@
 bool isOnlyMoProcess()
 {
   const std::vector<env::Process> processes = env::getRunningProcesses();
+  // appimages create 2 processes
+  int count           = 0;
+  const bool appImage = getenv("APPIMAGE") != nullptr;
   for (const auto& process : processes) {
     if (process.name() == QApplication::applicationName() &&
         std::cmp_not_equal(process.pid(), getpid())) {
-      return false;
+      if (!appImage) {
+        return false;
+      }
+      // return false if running as appimage and there is more than 1 other process
+      if (count++ > 1) {
+        return false;
+      }
     }
   }
 
