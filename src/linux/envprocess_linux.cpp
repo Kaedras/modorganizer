@@ -118,6 +118,7 @@ DWORD getProcessParentID(DWORD pid)
     return 0;
   }
   int items = fscanf(file, "%*u (%*[^)]%*[)] %*c %d", &ppid);
+  fclose(file);
   if (items != 1) {
     const int error = errno;
     log::warn("could not get ppid of pid {}: {}", pid, strerror(error));
