@@ -226,6 +226,7 @@ QMessageBox::StandardButton startSteamFailed(QWidget* parent, const QString& loc
       .button({QObject::tr("Cancel"), QMessageBox::Cancel})
       .exec();
 }
+
 bool confirmRestartAsAdmin(QWidget* parent, const SpawnParameters& sp)
 {
   STUB();
