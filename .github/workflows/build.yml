@@ -33,7 +33,7 @@ jobs:
         uses: Kaedras/build-with-mob-action@master
         with:
           qt-modules: qtpositioning qtwebchannel qtwebengine qtwebsockets
-          mo2-dependencies: ${{ runner.os == 'Windows' && 'usvfs' || 'overlayfs' }} uibase bsatk esptk archive lootcli
+          mo2-dependencies: ${{ runner.os == 'Windows' && 'usvfs' || 'usvfs-fuse' }} uibase bsatk esptk archive lootcli
 
       - name: Install ModOrganizer
         shell: pwsh
