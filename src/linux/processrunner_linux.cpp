@@ -57,8 +57,8 @@ ProcessRunner::Results waitForProcesses(const std::vector<HANDLE>& initialProces
   std::atomic<bool> interrupt(false);
 
   // wait for all child processes
-  auto* t = QThread::create(waitForProcessesThread, std::ref(results), -1, ls,
-                            std::ref(interrupt));
+  auto* t = QThread::create(waitForProcessesThread, std::ref(results),
+                            initialProcesses.front(), ls, std::ref(interrupt));
 
   QEventLoop events;
   QObject::connect(t, &QThread::finished, [&] {
