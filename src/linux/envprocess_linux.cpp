@@ -82,8 +82,49 @@ std::vector<Process> getRunningProcesses()
     try {
       // directory name may not be an integer, in which case it can be ignored
       pid_t pid = stoi(item.path().filename().string());
-      v.emplace_back(pid, getProcessParentID(static_cast<DWORD>(pid)),
-                     getProcessName(static_cast<DWORD>(pid)));
+
+      // common errors
+      // EACCES: the process probably belongs to another user
+      // ENOENT: the process has exited before this function has finished
+
+      auto procName = getProcessName(static_cast<uint32_t>(pid));
+
+      // ignore the process
+      if (procName.isEmpty()) {
+        const int e = errno;
+        if (e != EACCES && e != ENOENT) {
+          log::warn("error getting process name for pid {}, {}", pid, strerror(e));
+        }
+        continue;
+      }
+
+      char state;
+      pid_t ppid;
+
+      FILE* file = fopen(format("/proc/{}/stat", pid).c_str(), "r");
+      if (file == nullptr) {
+        const int e = errno;
+        if (e != EACCES && e != ENOENT) {
+          log::warn("error opening stats for pid {}, {}", pid, strerror(e));
+        }
+        continue;
+      }
+      int itemsRead = fscanf(file, "%*u (%*[^)]%*[)] %c %d", &state, &ppid);
+      fclose(file);
+      if (itemsRead != 2) {
+        if (errno != EACCES) {
+          log::warn("error reading stats for pid {}, {}", pid, strerror(errno));
+        }
+        continue;
+      }
+
+      // don't include zombies and dead processes
+      if (state == 'Z' || state == 'X') {
+        continue;
+      }
+
+      Process p(pid, ppid, std::move(procName));
+      v.push_back(p);
     } catch (const invalid_argument&) {
     }
   }
