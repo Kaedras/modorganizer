@@ -96,5 +96,10 @@ ProcessRunner::Results waitForProcess(HANDLE initialProcess, LPDWORD exitCode,
     *exitCode = info.si_code;
   }
 
+  // wait for unmount to complete
+  // todo: improve or remove this
+  log::debug("sleeping for 10ms");
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
   return r;
 }

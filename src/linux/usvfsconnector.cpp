@@ -165,7 +165,7 @@ void UsvfsConnector::updateParams(MOBase::log::Levels logLevel,
   using namespace std::chrono;
 
   m_usvfsManager->setDebugMode(false);
-  m_usvfsManager->setLogLevel(static_cast<LogLevel>(logLevel));
+  m_usvfsManager->setLogLevel(toUsvfsLogLevel(logLevel));
   m_usvfsManager->setProcessDelay(duration_cast<milliseconds>(spawnDelay));
 
   m_usvfsManager->usvfsClearExecutableBlacklist();
@@ -206,13 +206,14 @@ void UsvfsConnector::setOverwritePath(const QString& path) const
 
 std::vector<HANDLE> getRunningUSVFSProcesses()
 {
-  const auto& procs = UsvfsManager::instance()->usvfsGetVFSProcessList();
+  const auto& pids = UsvfsManager::instance()->usvfsGetVFSProcessList();
 
   std::vector<HANDLE> result;
 
-  for (const auto& proc : procs) {
-    if (proc->state() == QProcess::ProcessState::Running) {
-      result.push_back(proc->processId());
+  for (const auto& pid : pids) {
+    int status;
+    if (waitpid(pid, &status, WNOHANG) > 0) {
+      result.emplace_back(pidfd_open(pid, 0));
     }
   }
   return result;

@@ -265,7 +265,8 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
   if (sp.hooked) {
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
-        sp.binary.absoluteFilePath(), sp.arguments, sp.binary.absolutePath());
+        sp.binary.absoluteFilePath().toStdString(), sp.arguments.toStdString(),
+        sp.binary.absolutePath().toStdString());
     if (pid >= 0) {
       processHandle = pidfd_open(pid, 0);
       return 0;
@@ -324,17 +325,18 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
       "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
 
   if (sp.hooked) {
-    QStringList env;
+    vector<string> env;
     for (int i = 0; environ[i] != nullptr; ++i) {
-      env << environ[i];
+      env.push_back(environ[i]);
     }
 
-    env << "STEAM_COMPAT_DATA_PATH=" % sp.prefixDirectory;
-    env << "STEAM_COMPAT_CLIENT_INSTALL_PATH=" % steamPath;
-    env << "SteamGameId=" % sp.steamAppID;
+    env.push_back("STEAM_COMPAT_DATA_PATH=" + sp.prefixDirectory.toStdString());
+    env.push_back("STEAM_COMPAT_CLIENT_INSTALL_PATH=" + steamPath.toStdString());
+    env.push_back("SteamGameId=" + sp.steamAppID.toStdString());
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
-        proton, params, sp.binary.absolutePath(), std::move(env));
+        proton.toStdString(), params.toStdString(),
+        sp.binary.absolutePath().toStdString(), std::move(env));
 
     if (pid >= 0) {
       pidFd = pidfd_open(pid, 0);
@@ -343,6 +345,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     // todo: add proper error codes
     errno = UNKNOWN_ERROR;
   } else {
+    // todo: create function to pass env to
     setenv("STEAM_COMPAT_DATA_PATH", sp.prefixDirectory.toLocal8Bit(), 1);
     setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
     setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
