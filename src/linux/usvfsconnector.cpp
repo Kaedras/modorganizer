@@ -209,10 +209,11 @@ std::vector<HANDLE> getRunningUSVFSProcesses()
   const auto& procs = UsvfsManager::instance()->usvfsGetVFSProcessList();
 
   std::vector<HANDLE> result;
-  result.reserve(procs.size());
 
   for (const auto& proc : procs) {
-    result.push_back(proc->processId());
+    if (proc->state() == QProcess::ProcessState::Running) {
+      result.push_back(proc->processId());
+    }
   }
   return result;
 }
