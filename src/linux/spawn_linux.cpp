@@ -337,7 +337,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         proton.toStdString(), params.toStdString(),
-        sp.binary.absolutePath().toStdString(), std::move(env));
+        sp.binary.absolutePath().toStdString(), env);
 
     if (pid >= 0) {
       pidFd = pidfd_open(pid, 0);
