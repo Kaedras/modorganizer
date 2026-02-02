@@ -26,7 +26,11 @@ ModuleNotification::~ModuleNotification() {}
 
 std::optional<QString> getAssocString(const QFileInfo& file)
 {
-  return QStringLiteral("xdg-open %1").arg(file.absoluteFilePath());
+  auto xdgOpen = QStandardPaths::findExecutable(QStringLiteral("xdg-open"));
+  if (xdgOpen.isEmpty()) {
+    return {};
+  }
+  return xdgOpen % " "_L1 % file.absoluteFilePath();
 }
 
 QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
@@ -71,13 +75,13 @@ void set(const QString& n, const QString& v)
 
 Association getAssociation(const QFileInfo& targetInfo)
 {
-  const auto cmd = getAssocString(targetInfo);
+  auto cmd = getAssocString(targetInfo);
 
   log::debug("raw cmd is '{}'", *cmd);
 
-  return {QFileInfo(u"xdg-open"_s),
-          QStringLiteral("xdg-open %1").arg(targetInfo.absoluteFilePath()),
-          targetInfo.absoluteFilePath()};
+  auto xdgOpen = QStandardPaths::findExecutable(QStringLiteral("xdg-open"));
+
+  return {QFileInfo(xdgOpen), *cmd, targetInfo.absoluteFilePath()};
 }
 
 bool registryValueExists(const QString&, const QString&)
