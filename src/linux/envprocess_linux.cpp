@@ -26,9 +26,11 @@ HandlePtr Process::openHandleForWait() const
 //
 bool Process::canAccess() const
 {
-  HandlePtr h = pidfd_open((pid_t)m_pid, 0);
-  if (!h) {
-    return false;
+  const string filePath = format("/proc/{}/stat", m_pid);
+  if (access(filePath.c_str(), R_OK) == -1) {
+    if (errno == EACCES) {
+      return false;
+    }
   }
   return true;
 }
