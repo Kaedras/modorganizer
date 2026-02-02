@@ -41,8 +41,6 @@ public:
   void updateForcedLibraries(
       const QList<MOBase::ExecutableForcedLoadSetting>& forcedLibraries);
 
-  void setOverwritePath(const QString& path) const;
-
 private:
   std::shared_ptr<UsvfsManager> m_usvfsManager;
 };

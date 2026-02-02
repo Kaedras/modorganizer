@@ -138,11 +138,11 @@ void UsvfsConnector::updateMapping(const MappingType& mapping)
     if (map.isDirectory) {
       m_usvfsManager->usvfsVirtualLinkDirectoryStatic(
           map.source.toStdString(), map.destination.toStdString(),
-          (map.createTarget ? linkFlag::CREATE_TARGET : 0) | linkFlag::RECURSIVE);
+          map.createTarget ? linkFlag::CREATE_TARGET : 0);
       ++dirs;
     } else {
       m_usvfsManager->usvfsVirtualLinkFile(map.source.toStdString(),
-                                           map.destination.toStdString(), 0);
+                                           map.destination.toStdString());
       ++files;
     }
   }

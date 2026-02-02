@@ -2043,9 +2043,6 @@ std::vector<Mapping> OrganizerCore::fileMapping(const QString& profileName,
 
   for (const auto& mod : profile.getActiveMods()) {
     if (std::get<0>(mod).compare("overwrite", Qt::CaseInsensitive) == 0) {
-#ifdef __unix__
-      m_USVFS.setOverwritePath(std::get<1>(mod));
-#endif
       continue;
     }
 
