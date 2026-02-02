@@ -199,11 +199,6 @@ void UsvfsConnector::updateForcedLibraries(
   }
 }
 
-void UsvfsConnector::setOverwritePath(const QString& path) const
-{
-  m_usvfsManager->setUpperDir(path.toStdString());
-}
-
 std::vector<HANDLE> getRunningUSVFSProcesses()
 {
   const auto& pids = UsvfsManager::instance()->usvfsGetVFSProcessList();
