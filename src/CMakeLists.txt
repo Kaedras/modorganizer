@@ -12,12 +12,10 @@ if (UNIX)
 	find_package(unofficial-breakpad CONFIG REQUIRED)
 	find_package(PkgConfig REQUIRED)
 	pkg_check_modules(libsecret REQUIRED IMPORTED_TARGET libsecret-1)
-	pkg_check_modules(libflatpak REQUIRED IMPORTED_TARGET flatpak)
 	set(OS_SPECIFIC_PRIVATE_DEPS
 			usvfs-fuse
 			unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
 			PkgConfig::libsecret
-			PkgConfig::libflatpak
 			ICU::data
 	)
 	set(LIBRARY_DIR lib)

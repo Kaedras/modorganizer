@@ -62,13 +62,12 @@
 #include <client/linux/handler/exception_handler.h>
 #include <client/linux/minidump_writer/minidump_writer.h>
 
-// flatpak
+// libsecret
 // undefine signals from qtmetamacros.h because it conflicts with glib
 #ifdef signals
 #undef signals
 #endif
-#include <flatpak/flatpak.h>
-
+#include <libsecret/secret.h>
 #endif
 
 // boost

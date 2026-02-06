@@ -17,18 +17,10 @@
 #include <usvfs-fuse/usvfsmanager.h>
 #include <utility.h>
 
-// undefine signals from qtmetamacros.h because it conflicts with glib
-#ifdef signals
-#undef signals
-#endif
-#include <flatpak/flatpak.h>
-
 using namespace MOBase;
 using namespace MOShared;
 using namespace std;
 using namespace Qt::StringLiterals;
-
-static const QString steamFlatpak = u"com.valvesoftware.Steam"_s;
 
 // custom error codes
 static constexpr int PROTON_NOT_FOUND      = 200;
@@ -391,29 +383,18 @@ std::pair<QString, int> getSteamExecutable(QWidget* parent)
     return {steam, 0};
   }
 
-  // try flatpak
-  // get flatpak installation
-  GError* e                         = nullptr;
-  FlatpakInstallation* installation = flatpak_installation_new_user(nullptr, &e);
-  if (e != nullptr) {
-    g_error_free(e);
-    return {{}, dialogs::badSteamPath(parent)};
-  }
+  QString home =
+      QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
+  QStringList paths = {home % "/.steam/steam/steam.sh",
+                       home % "/.local/share/Steam/steam.sh",
+                       home % ".var/app/com.valvesoftware.Steam/data/Steam/steam.sh"};
 
-  // get installation reference to steam
-  FlatpakInstalledRef* flatpakInstalledRef = flatpak_installation_get_installed_ref(
-      installation, FLATPAK_REF_KIND_APP, "com.valvesoftware.Steam", nullptr, "stable",
-      nullptr, &e);
-  if (e != nullptr || flatpakInstalledRef == nullptr) {
-    // error or not found
-    if (e != nullptr) {
-      log::error("error getting steam flatpak location, {}", e->message);
-      g_error_free(e);
+  for (const auto& path : paths) {
+    if (QFileInfo::exists(path)) {
+      return {path, 0};
     }
-    return {{}, dialogs::badSteamPath(parent)};
   }
-
-  return {steamFlatpak, 0};
+  return {{}, dialogs::badSteamPath(parent)};
 }
 
 bool startSteam(QWidget* parent)
@@ -441,27 +422,6 @@ bool startSteam(QWidget* parent)
              " . username={}, password={}",
              binary.toStdString(), (username.isEmpty() ? "no" : "yes"),
              (password.isEmpty() ? "no" : "yes"));
-
-  if (binary == steamFlatpak) {
-    // run steam as flatpak
-    GError* e;
-    FlatpakInstallation* installation = flatpak_installation_new_user(nullptr, &e);
-    if (e != nullptr) {
-      log::error("error starting steam flatpak, {}", e->message);
-      g_error_free(e);
-      return false;
-    }
-
-    if (flatpak_installation_launch(installation, steamFlatpak.toStdString().c_str(),
-                                    nullptr, "stable", nullptr, nullptr, &e)) {
-      return true;
-    }
-    if (e) {
-      log::error("error starting steam flatpak, {}", e->message);
-      g_error_free(e);
-    }
-    return false;
-  }
 
   // todo: check if steam should really be detached
   QProcess p;
