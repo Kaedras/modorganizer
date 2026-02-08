@@ -5,12 +5,7 @@
 #include <iplugingame.h>
 #include <isavegameinfowidget.h>
 #include <localsavegames.h>
-
-#ifdef __unix__
 #include <registry.h>
-#else
-#include <Windows.h>
-#endif
 
 using namespace MOBase;
 
@@ -149,12 +144,10 @@ QDir SavesTab::currentSavesDir() const
     }
 
     QString iniPath = m_core.currentProfile()->absoluteIniFilePath(iniFiles[0]);
-
-    wchar_t path[MAX_PATH];
-    if (::GetPrivateProfileStringW(L"General", L"SLocalSavePath", L"", path, MAX_PATH,
-                                   iniPath.toStdWString().c_str())) {
-      savesDir.setPath(m_core.managedGame()->documentsDirectory().absoluteFilePath(
-          QString::fromWCharArray(path)));
+    auto value      = ReadRegistryValue("General", "SLocalSavePath", "", iniPath);
+    if (value) {
+      savesDir.setPath(
+          m_core.managedGame()->documentsDirectory().absoluteFilePath(*value));
     } else {
       savesDir = m_core.managedGame()->savesDirectory();
     }

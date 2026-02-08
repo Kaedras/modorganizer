@@ -30,6 +30,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <bsainvalidation.h>
 #include <dataarchives.h>
 #include <iplugingame.h>
+#include <qinipp.h>
 #include <questionboxmemory.h>
 #include <report.h>
 #include <safewritefile.h>
@@ -63,6 +64,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace MOBase;
 using namespace MOShared;
+using namespace Qt::StringLiterals;
 
 void Profile::touchFile(QString fileName)
 {
@@ -303,8 +305,8 @@ void Profile::createTweakedIniFile()
   mergeTweak(getProfileTweaks(), tweakedIni);
 
   bool error = false;
-  if (!MOBase::WriteRegistryValue(L"Archive", L"bInvalidateOlderFiles", L"1",
-                                  ToWString(tweakedIni).c_str())) {
+  if (!MOBase::WriteRegistryValue(u"Archive"_s, u"bInvalidateOlderFiles"_s, u"1"_s,
+                                  tweakedIni)) {
     error = true;
   }
 
@@ -758,48 +760,20 @@ std::vector<std::wstring> Profile::splitDZString(const wchar_t* buffer) const
 
 void Profile::mergeTweak(const QString& tweakName, const QString& tweakedIni) const
 {
-  static const int bufferSize = 32768;
-
-  std::wstring tweakNameW  = ToWString(tweakName);
-  std::wstring tweakedIniW = ToWString(tweakedIni);
-  QScopedArrayPointer<wchar_t> buffer(new wchar_t[bufferSize]);
-
-  // retrieve a list of sections
-  DWORD size =
-      ::GetPrivateProfileSectionNamesW(buffer.data(), bufferSize, tweakNameW.c_str());
-
-  if (size == bufferSize - 2) {
-    // unfortunately there is no good way to find the required size
-    // of the buffer
-    throw MyException(QString("Buffer too small. Please report this as a bug. "
-                              "For now you might want to split up %1")
-                          .arg(tweakName));
+  QFile tweakFile(tweakName);
+  if (!tweakFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    throw Exception(QString("Error opening %1.").arg(tweakName));
   }
+  qinipp::Ini ini;
+  QTextStream inStream(&tweakFile);
 
-  std::vector<std::wstring> sections = splitDZString(buffer.data());
+  ini.parse(inStream);
 
-  // now iterate over all sections and retrieve a list of keys in each
-  for (std::vector<std::wstring>::iterator iter = sections.begin();
-       iter != sections.end(); ++iter) {
-    // retrieve the names of all keys
-    size = ::GetPrivateProfileStringW(iter->c_str(), nullptr, nullptr, buffer.data(),
-                                      bufferSize, tweakNameW.c_str());
-    if (size == bufferSize - 2) {
-      throw MyException(QString("Buffer too small. Please report this as a bug. "
-                                "For now you might want to split up %1")
-                            .arg(tweakName));
-    }
-
-    std::vector<std::wstring> keys = splitDZString(buffer.data());
-
-    for (std::vector<std::wstring>::iterator keyIter = keys.begin();
-         keyIter != keys.end(); ++keyIter) {
-      // TODO this treats everything as strings but how could I differentiate the type?
-      ::GetPrivateProfileStringW(iter->c_str(), keyIter->c_str(), nullptr,
-                                 buffer.data(), bufferSize,
-                                 ToWString(tweakName).c_str());
-      MOBase::WriteRegistryValue(iter->c_str(), keyIter->c_str(), buffer.data(),
-                                 tweakedIniW.c_str());
+  for (const auto& [sectionName, section] : ini.sections) {
+    for (const auto& [key, value] : section) {
+      if (!WriteRegistryValue(sectionName, key, value, tweakedIni)) {
+        throw Exception(QString("Error writing to %1.").arg(tweakName));
+      }
     }
   }
 }

@@ -14,7 +14,7 @@
     {
       "kind": "git",
       "repository": "https://github.com/Kaedras/vcpkg-registry",
-      "baseline": "a4719a48c656122d41c28ef36662ba5ec503b821",
+      "baseline": "e3aeac0504b6e766fc91c0a8098119101775e545",
       "packages": ["mo2-*", "7zip", "usvfs", "usvfs-fuse", "libbsarchpp"]
     }
   ]
