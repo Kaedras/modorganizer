@@ -233,7 +233,9 @@ void SelfUpdater::openOutputFile(const QString& fileName)
       fileName;
   log::debug("downloading to {}", outputPath);
   m_UpdateFile.setFileName(outputPath);
-  m_UpdateFile.open(QIODevice::WriteOnly);
+  if (!m_UpdateFile.open(QIODevice::WriteOnly)) {
+    log::error("Error opening file {}, {}", outputPath, m_UpdateFile.errorString());
+  }
 }
 
 void SelfUpdater::download(const QString& downloadLink)

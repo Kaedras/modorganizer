@@ -1129,7 +1129,11 @@ void PluginContainer::loadPlugins()
       loadCheck.close();
     }
 
-    loadCheck.open(QIODevice::WriteOnly);
+    if (!loadCheck.open(QIODevice::WriteOnly)) {
+      log::error("Error opening file {}, {}", loadCheck.fileName(),
+                 loadCheck.errorString());
+      return;
+    }
   }
 
   QString pluginPath = qApp->applicationDirPath() + "/" + AppConfig::pluginPath();
@@ -1177,7 +1181,11 @@ void PluginContainer::loadPlugins()
     }
 
     log::warn("user skipped plugin '{}', remembering in loadcheck", skipPlugin);
-    loadCheck.open(QIODevice::WriteOnly);
+    if (!loadCheck.open(QIODevice::WriteOnly)) {
+      log::error("Error opening file {}, {}", loadCheck.fileName(),
+                 loadCheck.errorString());
+      return;
+    }
     loadCheck.write(skipPlugin.toUtf8());
     loadCheck.write("\n");
     loadCheck.flush();

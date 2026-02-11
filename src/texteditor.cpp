@@ -104,7 +104,10 @@ bool TextEditor::save()
   }
 
   QFile file(m_filename);
-  file.open(QIODevice::WriteOnly);
+  if (!file.open(QIODevice::WriteOnly)) {
+    log::error("Error opening file {}, {}", m_filename, file.errorString());
+    return false;
+  }
   file.resize(0);
 
   auto codec = QStringConverter::encodingForName(m_encoding.toUtf8());

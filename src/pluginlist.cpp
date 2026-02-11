@@ -656,7 +656,10 @@ void PluginList::readLockedOrderFrom(const QString& fileName)
     return;
   }
 
-  file.open(QIODevice::ReadOnly);
+  if (!file.open(QIODevice::ReadOnly)) {
+    log::error("Error opening file {}, {}", fileName, file.errorString());
+    return;
+  }
   int lineNumber = 0;
   while (!file.atEnd()) {
     QByteArray line = file.readLine();
