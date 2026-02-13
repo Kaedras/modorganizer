@@ -23,8 +23,16 @@ std::optional<ProcessRunner::Results> singleWait(HANDLE pidFd, DWORD pid)
 
   switch (result) {
   case 1: {
-    log::debug("process {} completed", pid);
-    return ProcessRunner::Completed;
+    siginfo_t info{};
+    int res = waitid(P_PID, pid, &info, WEXITED | WSTOPPED | WNOHANG | WNOWAIT);
+    if (res == 0) {
+      if (info.si_pid != 0) {
+        log::debug("process {} completed", pid);
+        return ProcessRunner::Completed;
+      }
+    } else {
+      log::error("waitid failed: {}", strerror(errno));
+    }
   }
 
   case 0: {
