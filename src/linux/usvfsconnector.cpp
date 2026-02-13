@@ -72,7 +72,7 @@ UsvfsConnector::UsvfsConnector() : m_usvfsManager(UsvfsManager::instance())
   const LogLevel logLevel = toUsvfsLogLevel(s.diagnostics().logLevel());
   const auto delay        = duration_cast<milliseconds>(s.diagnostics().spawnDelay());
 
-  m_usvfsManager->setUseMountNamespace(true);
+  // m_usvfsManager->setUseMountNamespace(true);
 
   const QString logFileName =
       qApp->property("dataPath").toString() % QStringLiteral("/logs/usvfs.log");
