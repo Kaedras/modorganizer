@@ -761,8 +761,13 @@ std::vector<std::wstring> Profile::splitDZString(const wchar_t* buffer) const
 void Profile::mergeTweak(const QString& tweakName, const QString& tweakedIni) const
 {
   QFile tweakFile(tweakName);
+  if (!tweakFile.exists()) {
+    return;
+  }
+
   if (!tweakFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    throw Exception(QString("Error opening %1.").arg(tweakName));
+    throw Exception(
+        QString("Error opening %1: %2.").arg(tweakName, tweakFile.errorString()));
   }
   qinipp::Ini ini;
   QTextStream inStream(&tweakFile);
