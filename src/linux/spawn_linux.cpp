@@ -319,9 +319,6 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
   if (sp.hooked) {
     vector<string> env;
-    for (int i = 0; environ[i] != nullptr; ++i) {
-      env.push_back(environ[i]);
-    }
 
     env.push_back("STEAM_COMPAT_DATA_PATH=" + sp.prefixDirectory.toStdString());
     env.push_back("STEAM_COMPAT_CLIENT_INSTALL_PATH=" + steamPath.toStdString());
