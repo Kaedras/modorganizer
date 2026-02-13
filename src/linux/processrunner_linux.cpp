@@ -9,6 +9,7 @@
 #include <report.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 using namespace std;
@@ -72,6 +73,12 @@ ProcessRunner::Results waitForProcesses(const std::vector<HANDLE>& initialProces
   }
 
   delete t;
+
+  if (results == ProcessRunner::Completed) {
+    if (getRunningUSVFSProcesses().empty()) {
+      UsvfsManager::instance()->unmount();
+    }
+  }
 
   return results;
 }

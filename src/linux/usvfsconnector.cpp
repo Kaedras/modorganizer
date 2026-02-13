@@ -212,9 +212,11 @@ std::vector<HANDLE> getRunningUSVFSProcesses()
   std::vector<HANDLE> result;
 
   for (const auto& pid : pids) {
-    int status;
-    if (waitpid(pid, &status, WNOHANG) > 0) {
-      result.emplace_back(pidfd_open(pid, 0));
+    siginfo_t info{};
+    if (waitid(P_PID, pid, &info, WEXITED | WSTOPPED | WNOHANG | WNOWAIT) == 0) {
+      if (info.si_pid == 0) {
+        result.emplace_back(pidfd_open(pid, 0));
+      }
     }
   }
   return result;
