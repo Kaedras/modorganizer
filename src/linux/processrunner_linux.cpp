@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 using namespace MOBase;
+using namespace std;
 
 std::optional<ProcessRunner::Results> singleWait(HANDLE pidFd, DWORD pid)
 {
@@ -18,36 +19,26 @@ std::optional<ProcessRunner::Results> singleWait(HANDLE pidFd, DWORD pid)
     return ProcessRunner::Error;
   }
 
-  pollfd pfd       = {pidFd, POLLIN, 0};
-  const int result = poll(&pfd, 1, 50);
+  // todo: find a better solution
+  // poll() supports timeouts, but is unreliable here
+  this_thread::sleep_for(50ms);
 
-  switch (result) {
-  case 1: {
-    siginfo_t info{};
-    int res = waitid(P_PID, pid, &info, WEXITED | WSTOPPED | WNOHANG | WNOWAIT);
-    if (res == 0) {
-      if (info.si_pid != 0) {
-        log::debug("process {} completed", pid);
-        return ProcessRunner::Completed;
-      }
-    } else {
-      log::error("waitid failed: {}", strerror(errno));
+  siginfo_t info{};
+  int result = waitid(P_PID, pid, &info, WEXITED | WSTOPPED | WNOHANG | WNOWAIT);
+
+  if (result == 0) {
+    if (info.si_pid != 0) {
+      log::debug("process {} completed", pid);
+      return ProcessRunner::Completed;
     }
-  }
 
-  case 0: {
     // still running
     return {};
   }
 
-  case -1:  // fall-through
-  default: {
-    // error
-    const int e = errno;
-    log::error("failed waiting for {}, {}", pid, formatSystemMessage(e));
-    return ProcessRunner::Error;
-  }
-  }
+  const int e = errno;
+  log::error("failed waiting for {}, {}", pid, formatSystemMessage(e));
+  return ProcessRunner::Error;
 }
 
 extern void waitForProcessesThread(ProcessRunner::Results& result, HANDLE job,
@@ -64,7 +55,6 @@ ProcessRunner::Results waitForProcesses(const std::vector<HANDLE>& initialProces
   auto results = ProcessRunner::Running;
   std::atomic<bool> interrupt(false);
 
-  // wait for all child processes
   auto* t = QThread::create(waitForProcessesThread, std::ref(results),
                             initialProcesses.front(), ls, std::ref(interrupt));
 
