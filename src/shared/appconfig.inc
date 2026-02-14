@@ -17,6 +17,7 @@ APPPARAM(QString, proxyDLLTarget, "steam_api.dll")
 APPPARAM(QString, proxyDLLOrig, "steam_api_orig.dll") // needs to be identical to the value used in proxydll-project
 #ifdef __unix__
 APPPARAM(QString, nxmHandlerExe, "nxmhandler")
+APPPARAM(QString, flatpakExtPath, "/app/extensions")
 #else
 APPPARAM(QString, proxyDLLSource, "proxy.dll")
 APPPARAM(QString, vfs32DLLName, "usvfs_x86.dll")

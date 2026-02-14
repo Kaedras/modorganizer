@@ -1136,38 +1136,48 @@ void PluginContainer::loadPlugins()
     }
   }
 
-  QString pluginPath = qApp->applicationDirPath() + "/" + AppConfig::pluginPath();
-  log::debug("looking for plugins in {}", QDir::toNativeSeparators(pluginPath));
-  QDirIterator iter(pluginPath, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+  auto loadPluginsFromDir = [&](const QString& pluginPath) {
+    log::debug("looking for plugins in {}", QDir::toNativeSeparators(pluginPath));
+    QDirIterator iter(pluginPath, QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
 
-  while (iter.hasNext()) {
-    iter.next();
+    while (iter.hasNext()) {
+      iter.next();
 
-    if (skipPlugin == iter.fileName()) {
-      log::debug("plugin \"{}\" skipped for this session", iter.fileName());
-      continue;
-    }
-
-    if (m_Organizer) {
-      if (m_Organizer->settings().plugins().blacklisted(iter.fileName())) {
-        log::debug("plugin \"{}\" blacklisted", iter.fileName());
+      if (skipPlugin == iter.fileName()) {
+        log::debug("plugin \"{}\" skipped for this session", iter.fileName());
         continue;
       }
-    }
 
-    if (loadCheck.isOpen()) {
-      loadCheck.write(iter.fileName().toUtf8());
-      loadCheck.write("\n");
-      loadCheck.flush();
-    }
+      if (m_Organizer) {
+        if (m_Organizer->settings().plugins().blacklisted(iter.fileName())) {
+          log::debug("plugin \"{}\" blacklisted", iter.fileName());
+          continue;
+        }
+      }
 
-    QString filepath = iter.filePath();
-    if (QLibrary::isLibrary(filepath)) {
-      loadQtPlugin(filepath);
-    } else if (auto p = isQtPluginFolder(filepath)) {
-      loadQtPlugin(*p);
+      if (loadCheck.isOpen()) {
+        loadCheck.write(iter.fileName().toUtf8());
+        loadCheck.write("\n");
+        loadCheck.flush();
+      }
+
+      QString filepath = iter.filePath();
+      if (QLibrary::isLibrary(filepath)) {
+        loadQtPlugin(filepath);
+      } else if (auto p = isQtPluginFolder(filepath)) {
+        loadQtPlugin(*p);
+      }
     }
+  };
+
+  QString pluginPath = qApp->applicationDirPath() + "/" + AppConfig::pluginPath();
+  loadPluginsFromDir(pluginPath);
+#ifdef __unix__
+  // load plugins from flatpak extensions
+  if (getenv("container")) {
+    loadPluginsFromDir(AppConfig::flatpakExtPath());
   }
+#endif
 
   if (skipPlugin.isEmpty()) {
     // remove the load check file on success
