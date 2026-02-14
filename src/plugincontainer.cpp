@@ -1175,7 +1175,7 @@ void PluginContainer::loadPlugins()
 #ifdef __unix__
   // load plugins from flatpak extensions
   if (getenv("container")) {
-    loadPluginsFromDir(AppConfig::flatpakExtPath());
+    loadPluginsFromDir(AppConfig::flatpakExtPath() + "/" + AppConfig::pluginPath());
   }
 #endif
 
