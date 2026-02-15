@@ -1,7 +1,8 @@
 [Desktop Entry]
 Name=ModOrganizer
+Comment=Tool for managing mod collections
 Exec=ModOrganizer
-Icon=ModOrganizer
+Icon=org.modorganizer2.ModOrganizer
 Type=Application
 Categories=Utility;
 Terminal=false
