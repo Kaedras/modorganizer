@@ -2,7 +2,7 @@
 Name=ModOrganizer
 Comment=Tool for managing mod collections
 Exec=ModOrganizer
-Icon=org.modorganizer2.ModOrganizer
+Icon=io.github.kaedras.ModOrganizer
 Type=Application
 Categories=Utility;
 Terminal=false
