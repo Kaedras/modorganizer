@@ -928,11 +928,6 @@ QString Profile::getModlistFileName() const
   return QDir::cleanPath(m_Directory.absoluteFilePath("modlist.txt"));
 }
 
-QString Profile::getPluginsFileName() const
-{
-  return QDir::cleanPath(m_Directory.absoluteFilePath("plugins.txt"));
-}
-
 QString Profile::getLoadOrderFileName() const
 {
   return QDir::cleanPath(m_Directory.absoluteFilePath("loadorder.txt"));
