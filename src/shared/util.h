@@ -62,6 +62,10 @@ inline FILETIME ToFILETIME(std::filesystem::file_time_type t)
   return ft;
 }
 
+#ifdef __unix__
+QString findFileNameCaseInsensitive(const QDir& dir, const QString& fileName);
+#endif
+
 }  // namespace MOShared
 
 enum class Exit

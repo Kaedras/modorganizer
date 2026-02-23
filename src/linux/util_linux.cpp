@@ -29,4 +29,15 @@ void SetThisThreadName(const QString& s)
   }
 }
 
+QString findFileNameCaseInsensitive(const QDir& dir, const QString& fileName)
+{
+  for (const auto& entry :
+       dir.entryList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
+    if (entry.compare(fileName, Qt::CaseInsensitive) == 0) {
+      return entry;
+    }
+  }
+  return fileName;
+}
+
 }  // namespace MOShared
