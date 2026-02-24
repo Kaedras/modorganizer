@@ -30,7 +30,7 @@ std::optional<QString> getAssocString(const QFileInfo& file)
   if (xdgOpen.isEmpty()) {
     return {};
   }
-  return xdgOpen % " "_L1 % file.absoluteFilePath();
+  return xdgOpen % " \""_L1 % file.absoluteFilePath() % "\""_L1;
 }
 
 QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
@@ -81,7 +81,7 @@ Association getAssociation(const QFileInfo& targetInfo)
 
   auto xdgOpen = QStandardPaths::findExecutable(QStringLiteral("xdg-open"));
 
-  return {QFileInfo(xdgOpen), *cmd, targetInfo.absoluteFilePath()};
+  return {QFileInfo(xdgOpen), *cmd, "\""_L1 % targetInfo.absoluteFilePath() % "\""_L1};
 }
 
 bool registryValueExists(const QString&, const QString&)
