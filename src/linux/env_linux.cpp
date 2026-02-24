@@ -39,17 +39,18 @@ QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
     return {};
   }
 
-  pid_t pid;
+  std::string pidStr;
   if (process == INVALID_HANDLE_VALUE) {
-    pid = getpid();
+    pidStr = "self";
   } else {
-    pid = pidfd_getpid(process);
+    pid_t pid = pidfd_getpid(process);
     if (pid == -1) {
       return {};
     }
+    pidStr = std::to_string(pid);
   }
 
-  std::filesystem::path exe("/proc/" + std::to_string(pid) + "/exe");
+  std::filesystem::path exe("/proc/" + pidStr + "/exe");
   return QString::fromStdString(read_symlink(exe));
 }
 
@@ -97,9 +98,7 @@ void deleteRegistryKeyIfEmpty(const QString&)
 
 QString thisProcessPath()
 {
-  pid_t pid = getpid();
-
-  std::filesystem::path exe("/proc/" + std::to_string(pid) + "/exe");
+  std::filesystem::path exe("/proc/self/exe");
   return QFileInfo(read_symlink(exe)).path();
 }
 
