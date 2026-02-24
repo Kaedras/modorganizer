@@ -259,7 +259,7 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
   if (sp.hooked) {
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         sp.binary.absoluteFilePath().toStdString(), sp.arguments.toStdString(),
-        sp.binary.absolutePath().toStdString());
+        sp.currentDirectory.absolutePath().toStdString());
     if (pid >= 0) {
       processHandle = pidfd_open(pid, 0);
       return 0;
