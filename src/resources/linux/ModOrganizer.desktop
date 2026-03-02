@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=ModOrganizer
 Comment=Tool for managing mod collections
-Exec=ModOrganizer
-Icon=io.github.kaedras.ModOrganizer
+Exec=ModOrganizer %u
+Icon=ModOrganizer
 Type=Application
 Categories=Utility;
 Terminal=false
