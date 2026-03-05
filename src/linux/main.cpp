@@ -10,6 +10,7 @@
 
 using namespace MOBase;
 using namespace std;
+using namespace Qt::StringLiterals;
 namespace fs = std::filesystem;
 
 namespace env
@@ -108,6 +109,8 @@ int run(int argc, char* argv[])
   TimeThis tt("main() multiprocess");
 
   MOApplication app(argc, argv);
+
+  app.setDesktopFileName(u"ModOrganizer"_s);
 
   // check if the command line wants to run something right now
   if (auto r = cl.runPostApplication(app)) {
