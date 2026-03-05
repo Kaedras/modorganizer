@@ -8,7 +8,7 @@ class OrganizerCore;
 
 class Loot : public QObject
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   struct Message
@@ -102,7 +102,6 @@ public slots:
 
 private:
   OrganizerCore& m_core;
-  // std::unique_ptr<QThread> m_thread;
   bool m_cancel;
   bool m_result;
   std::unique_ptr<QProcess> m_lootProcess;
