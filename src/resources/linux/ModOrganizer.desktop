@@ -4,5 +4,5 @@ Comment=Tool for managing mod collections
 Exec=ModOrganizer %u
 Icon=ModOrganizer
 Type=Application
-Categories=Game;GameTool
+Categories=Game
 Terminal=false
