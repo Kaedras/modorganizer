@@ -1995,15 +1995,9 @@ QString getApplicationFilePath()
 QString getNxmHandlerPath()
 {
 #ifdef __unix__
-  const QString appImage = qgetenv("APPIMAGE");
-  if (!appImage.isEmpty()) {
-    const qsizetype lastSlash = appImage.lastIndexOf('/');
-    if (lastSlash == -1) {
-      log::warn("$APPIMAGE does not contain any slashes: {}", appImage);
-      return QCoreApplication::applicationDirPath() % "/"_L1 %
-             AppConfig::nxmHandlerExe();
-    }
-    return appImage.first(lastSlash) % "/nxmhandler-x86_64.AppImage"_L1;
+  const QString appDir = qgetenv("APPDIR");
+  if (!appDir.isEmpty()) {
+    return appDir % "/usr/bin/nxmhandler"_L1;
   }
 #endif
   return QCoreApplication::applicationDirPath() % "/"_L1 % AppConfig::nxmHandlerExe();
