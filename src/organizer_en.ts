@@ -2829,7 +2829,7 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
     </message>
     <message>
         <location filename="linux/loot.cpp" line="270"/>
-        <source>failed to start loot: error mounting overlayfs</source>
+        <source>failed to start loot: error mounting usvfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6053,7 +6053,7 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="organizercore.cpp" line="2075"/>
+        <location filename="organizercore.cpp" line="2072"/>
         <source>The designated write target &quot;%1&quot; is not enabled.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6209,18 +6209,18 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugincontainer.cpp" line="1207"/>
+        <location filename="plugincontainer.cpp" line="1225"/>
         <source>Some plugins could not be loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugincontainer.cpp" line="1210"/>
-        <location filename="plugincontainer.cpp" line="1230"/>
+        <location filename="plugincontainer.cpp" line="1228"/>
+        <location filename="plugincontainer.cpp" line="1248"/>
         <source>Description missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="plugincontainer.cpp" line="1220"/>
+        <location filename="plugincontainer.cpp" line="1238"/>
         <source>The following plugins could not be loaded. The reason may be missing dependencies (i.e. python) or an outdated version:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6249,25 +6249,25 @@ Continue?</source>
     </message>
     <message>
         <location filename="pluginlist.cpp" line="101"/>
-        <location filename="pluginlist.cpp" line="1449"/>
+        <location filename="pluginlist.cpp" line="1452"/>
         <source>Form Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="pluginlist.cpp" line="103"/>
-        <location filename="pluginlist.cpp" line="1453"/>
+        <location filename="pluginlist.cpp" line="1456"/>
         <source>Header Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="pluginlist.cpp" line="105"/>
-        <location filename="pluginlist.cpp" line="1456"/>
+        <location filename="pluginlist.cpp" line="1459"/>
         <source>Author</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="pluginlist.cpp" line="107"/>
-        <location filename="pluginlist.cpp" line="1461"/>
+        <location filename="pluginlist.cpp" line="1464"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6328,107 +6328,107 @@ Continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1433"/>
+        <location filename="pluginlist.cpp" line="1436"/>
         <source>Origin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1437"/>
+        <location filename="pluginlist.cpp" line="1440"/>
         <source>This plugin can&apos;t be disabled or moved (enforced by the game).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1443"/>
+        <location filename="pluginlist.cpp" line="1446"/>
         <source>This plugin can&apos;t be disabled (enforced by the game).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1466"/>
+        <location filename="pluginlist.cpp" line="1469"/>
         <source>Missing Masters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1478"/>
+        <location filename="pluginlist.cpp" line="1481"/>
         <source>Enabled Masters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1489"/>
+        <location filename="pluginlist.cpp" line="1492"/>
         <source>Loads Archives</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1490"/>
+        <location filename="pluginlist.cpp" line="1493"/>
         <source>There are Archives connected to this plugin. Their assets will be added to your game, overwriting in case of conflicts following the plugin order. Loose files will always overwrite assets from Archives. (This flag only checks for Archives from the same mod as the plugin)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1498"/>
+        <location filename="pluginlist.cpp" line="1501"/>
         <source>Loads INI settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1501"/>
+        <location filename="pluginlist.cpp" line="1504"/>
         <source>There is an ini file connected to this plugin. Its settings will be added to your game settings, overwriting in case of conflicts.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1509"/>
+        <location filename="pluginlist.cpp" line="1512"/>
         <source>This %1 is flagged as a light plugin (ESL). It will adhere to the %1 load order but the records will be loaded in ESL space (FE/FF). You can have up to 4096 light plugins in addition to other plugin types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1515"/>
+        <location filename="pluginlist.cpp" line="1518"/>
         <source>This ESM is flagged as a medium plugin (ESH). It adheres to the ESM load order but loads records in ESH space (FD). You can have 256 medium plugins in addition to other plugin types.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1522"/>
+        <location filename="pluginlist.cpp" line="1525"/>
         <source>This plugin has the blueprint flag. This forces it to load after every other non-blueprint plugin. Blueprint plugins will adhere to standard load order rules with other blueprint plugins.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1530"/>
+        <location filename="pluginlist.cpp" line="1533"/>
         <source>WARNING: This plugin is both light and medium flagged. This could indicate that the file was saved improperly and may have mismatched record references. Use it at your own risk.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1536"/>
+        <location filename="pluginlist.cpp" line="1539"/>
         <source>This is a dummy plugin. It contains no records and is typically used to load a paired archive file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1543"/>
+        <location filename="pluginlist.cpp" line="1546"/>
         <source>Light plugins (ESL) are not supported by this game.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1545"/>
+        <location filename="pluginlist.cpp" line="1548"/>
         <source>This game does not currently permit custom plugin loading. There may be manual workarounds.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1577"/>
+        <location filename="pluginlist.cpp" line="1580"/>
         <source>Incompatible with %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1583"/>
+        <location filename="pluginlist.cpp" line="1586"/>
         <source>Depends on missing %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1591"/>
+        <location filename="pluginlist.cpp" line="1594"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1595"/>
+        <location filename="pluginlist.cpp" line="1598"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="1917"/>
+        <location filename="pluginlist.cpp" line="1920"/>
         <source>failed to restore load order for %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6681,71 +6681,71 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>Profile</name>
     <message>
-        <location filename="profile.cpp" line="87"/>
+        <location filename="profile.cpp" line="89"/>
         <source>invalid profile name: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="91"/>
+        <location filename="profile.cpp" line="93"/>
         <source>failed to create %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="280"/>
+        <location filename="profile.cpp" line="282"/>
         <source>failed to write mod list: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="291"/>
+        <location filename="profile.cpp" line="293"/>
         <source>failed to update tweaked ini file, wrong settings may be used: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="314"/>
+        <location filename="profile.cpp" line="316"/>
         <source>failed to create tweaked ini: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="339"/>
+        <location filename="profile.cpp" line="341"/>
         <source>failed to open %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="431"/>
+        <location filename="profile.cpp" line="433"/>
         <source>&quot;%1&quot; is missing or inaccessible</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="493"/>
-        <location filename="profile.cpp" line="531"/>
-        <location filename="profile.cpp" line="623"/>
-        <location filename="profile.cpp" line="681"/>
-        <location filename="profile.cpp" line="690"/>
+        <location filename="profile.cpp" line="495"/>
+        <location filename="profile.cpp" line="533"/>
+        <location filename="profile.cpp" line="625"/>
+        <location filename="profile.cpp" line="683"/>
+        <location filename="profile.cpp" line="692"/>
         <source>invalid mod index: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="576"/>
+        <location filename="profile.cpp" line="578"/>
         <source>A mod named &quot;overwrite&quot; was detected, disabled, and moved to the highest priority on the mod list. You may want to rename this mod and enable it again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="867"/>
+        <location filename="profile.cpp" line="846"/>
         <source>Delete profile-specific save games?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="868"/>
+        <location filename="profile.cpp" line="847"/>
         <source>Do you want to delete the profile-specific save games? (If you select &quot;No&quot;, the save games will show up again if you re-enable profile-specific save games)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="903"/>
+        <location filename="profile.cpp" line="882"/>
         <source>Missing profile-specific game INI files!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="904"/>
+        <location filename="profile.cpp" line="883"/>
         <source>Some of your profile-specific game INI files were missing.  They will now be copied from the vanilla game folder.  You might want to double-check your settings.
 
 Missing files:
@@ -6753,12 +6753,12 @@ Missing files:
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="923"/>
+        <location filename="profile.cpp" line="902"/>
         <source>Delete profile-specific game INI files?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="924"/>
+        <location filename="profile.cpp" line="903"/>
         <source>Do you want to delete the profile-specific game INI files? (If you select &quot;No&quot;, the INI files will be used again if you re-enable profile-specific game INI files.)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7271,8 +7271,8 @@ p, li { white-space: pre-wrap; }
         <location filename="createinstancedialogpages.cpp" line="675"/>
         <location filename="createinstancedialogpages.cpp" line="696"/>
         <location filename="createinstancedialogpages.cpp" line="723"/>
-        <location filename="linux/spawn_linux.cpp" line="204"/>
-        <location filename="linux/spawn_linux.cpp" line="226"/>
+        <location filename="linux/spawn_linux.cpp" line="196"/>
+        <location filename="linux/spawn_linux.cpp" line="218"/>
         <location filename="settingsdialognexus.cpp" line="270"/>
         <location filename="settingsdialognexus.cpp" line="277"/>
         <location filename="settingsdialogworkarounds.cpp" line="230"/>
@@ -7604,10 +7604,10 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="195"/>
-        <location filename="linux/spawn_linux.cpp" line="196"/>
-        <location filename="linux/spawn_linux.cpp" line="219"/>
-        <location filename="linux/spawn_linux.cpp" line="220"/>
+        <location filename="linux/spawn_linux.cpp" line="187"/>
+        <location filename="linux/spawn_linux.cpp" line="188"/>
+        <location filename="linux/spawn_linux.cpp" line="211"/>
+        <location filename="linux/spawn_linux.cpp" line="212"/>
         <location filename="win32/spawn_win32.cpp" line="157"/>
         <location filename="win32/spawn_win32.cpp" line="158"/>
         <location filename="win32/spawn_win32.cpp" line="183"/>
@@ -7616,14 +7616,14 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="198"/>
+        <location filename="linux/spawn_linux.cpp" line="190"/>
         <location filename="win32/spawn_win32.cpp" line="160"/>
         <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="202"/>
-        <location filename="linux/spawn_linux.cpp" line="224"/>
+        <location filename="linux/spawn_linux.cpp" line="194"/>
+        <location filename="linux/spawn_linux.cpp" line="216"/>
         <location filename="spawn.cpp" line="112"/>
         <location filename="win32/spawn_win32.cpp" line="164"/>
         <location filename="win32/spawn_win32.cpp" line="188"/>
@@ -7631,21 +7631,21 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="203"/>
-        <location filename="linux/spawn_linux.cpp" line="225"/>
+        <location filename="linux/spawn_linux.cpp" line="195"/>
+        <location filename="linux/spawn_linux.cpp" line="217"/>
         <location filename="win32/spawn_win32.cpp" line="165"/>
         <location filename="win32/spawn_win32.cpp" line="189"/>
         <source>The program may fail to launch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="474"/>
+        <location filename="linux/spawn_linux.cpp" line="435"/>
         <location filename="win32/spawn_win32.cpp" line="423"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="475"/>
+        <location filename="linux/spawn_linux.cpp" line="436"/>
         <location filename="win32/spawn_win32.cpp" line="424"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>
@@ -7866,12 +7866,12 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="791"/>
+        <location filename="pluginlist.cpp" line="794"/>
         <source>failed to access %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="pluginlist.cpp" line="813"/>
+        <location filename="pluginlist.cpp" line="816"/>
         <source>failed to set file time %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7893,7 +7893,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="profile.cpp" line="71"/>
+        <location filename="profile.cpp" line="73"/>
         <source>failed to create %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7915,12 +7915,12 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.cpp" line="2029"/>
+        <location filename="settings.cpp" line="2023"/>
         <source>Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.cpp" line="2030"/>
+        <location filename="settings.cpp" line="2024"/>
         <source>Failed to start the helper application: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8273,17 +8273,17 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="texteditor.cpp" line="468"/>
+        <location filename="texteditor.cpp" line="471"/>
         <source>&amp;Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="texteditor.cpp" line="475"/>
+        <location filename="texteditor.cpp" line="478"/>
         <source>&amp;Word wrap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="texteditor.cpp" line="479"/>
+        <location filename="texteditor.cpp" line="482"/>
         <source>&amp;Open in Explorer</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8482,17 +8482,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>SavesTab</name>
     <message>
-        <location filename="savestab.cpp" line="231"/>
+        <location filename="savestab.cpp" line="224"/>
         <source>%1 more</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="savestab.cpp" line="235"/>
+        <location filename="savestab.cpp" line="228"/>
         <source>Confirm</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="savestab.cpp" line="236"/>
+        <location filename="savestab.cpp" line="229"/>
         <source>Are you sure you want to remove the following %n save(s)?&lt;br&gt;&lt;ul&gt;%1&lt;/ul&gt;&lt;br&gt;Removed saves will be sent to the Recycle Bin.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -8500,12 +8500,12 @@ p, li { white-space: pre-wrap; }
         </translation>
     </message>
     <message>
-        <location filename="savestab.cpp" line="259"/>
+        <location filename="savestab.cpp" line="252"/>
         <source>Fix enabled mods...</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location filename="savestab.cpp" line="274"/>
+        <location filename="savestab.cpp" line="267"/>
         <source>Delete %n save(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -8513,7 +8513,7 @@ p, li { white-space: pre-wrap; }
         </translation>
     </message>
     <message>
-        <location filename="savestab.cpp" line="279"/>
+        <location filename="savestab.cpp" line="272"/>
         <source>Open in Explorer...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8559,22 +8559,22 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="selfupdater.cpp" line="309"/>
+        <location filename="selfupdater.cpp" line="311"/>
         <source>Download failed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="selfupdater.cpp" line="320"/>
+        <location filename="selfupdater.cpp" line="322"/>
         <source>Failed to install update: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="selfupdater.cpp" line="338"/>
+        <location filename="selfupdater.cpp" line="340"/>
         <source>Failed to start %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="selfupdater.cpp" line="346"/>
+        <location filename="selfupdater.cpp" line="348"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9680,7 +9680,7 @@ On Windows XP:
 <context>
     <name>UsvfsConnector</name>
     <message>
-        <location filename="linux/usvfsconnector.cpp" line="116"/>
+        <location filename="linux/usvfsconnector.cpp" line="122"/>
         <location filename="win32/usvfsconnector.cpp" line="201"/>
         <source>Preparing vfs</source>
         <translation type="unfinished"></translation>
