@@ -2,11 +2,6 @@
 #define USVFSCONNECTOR_H
 
 #include "envdump.h"
-#include <QString>
-#include <exception>
-#include <executableinfo.h>
-#include <filemapping.h>
-#include <log.h>
 
 class UsvfsManager;
 

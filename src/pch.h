@@ -53,6 +53,9 @@
 #ifdef __linux__
 #include <pwd.h>
 #include <sys/file.h>
+#include <sys/mman.h>
+#include <sys/prctl.h>
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
@@ -292,3 +295,28 @@
 #include <QtGui/QtGui>
 #include <QtPlugin>
 #include <QtTest/QtTest>
+
+// lootcli
+#include <lootcli/lootcli.h>
+
+// uibase
+#include <executableinfo.h>
+#include <filemapping.h>
+#include <iplugingame.h>
+#include <log.h>
+#include <report.h>
+#include <steamutility.h>
+#include <utility.h>
+#include <versioninfo.h>
+#ifdef __unix__
+#include <linux/compatibility.h>
+#include <linux/fdcloser.h>
+#endif
+
+// usvfs
+#ifdef _WIN32
+#include <usvfs/usvfs.h>
+#include <usvfs/usvfsparameters.h>
+#else
+#include <usvfs-fuse/usvfsmanager.h>
+#endif

@@ -1,9 +1,6 @@
 #include "envmodule.h"
 #include "env.h"
 
-#include <log.h>
-#include <utility.h>
-
 using namespace std;
 using namespace Qt::StringLiterals;
 

@@ -1,10 +1,6 @@
 #include "linux/stub.h"
 #include "shared/util.h"
 
-#include <sys/prctl.h>
-#include <usvfs-fuse/usvfsmanager.h>
-#include <versioninfo.h>
-
 using namespace MOBase;
 
 namespace MOShared

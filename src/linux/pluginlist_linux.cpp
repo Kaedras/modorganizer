@@ -1,7 +1,3 @@
-#include <QString>
-#include <linux/fdcloser.h>
-#include <sys/file.h>
-
 #include "../shared/os_error.h"
 
 bool isFileLocked(const QString& fileName) noexcept(false)

@@ -2803,42 +2803,42 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
 <context>
     <name>Loot</name>
     <message>
-        <location filename="linux/loot.cpp" line="45"/>
+        <location filename="linux/loot.cpp" line="41"/>
         <location filename="win32/loot.cpp" line="223"/>
         <source>Loot failed to run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="48"/>
+        <location filename="linux/loot.cpp" line="44"/>
         <location filename="win32/loot.cpp" line="226"/>
         <source>No errors were reported. The log below might have more information.
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="102"/>
+        <location filename="linux/loot.cpp" line="98"/>
         <location filename="win32/loot.cpp" line="280"/>
         <source>Errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="114"/>
+        <location filename="linux/loot.cpp" line="110"/>
         <location filename="win32/loot.cpp" line="292"/>
         <source>Warnings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="270"/>
+        <location filename="linux/loot.cpp" line="266"/>
         <source>failed to start loot: error mounting usvfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="296"/>
+        <location filename="linux/loot.cpp" line="292"/>
         <source>failed to start loot: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="398"/>
+        <location filename="linux/loot.cpp" line="394"/>
         <location filename="win32/loot.cpp" line="607"/>
         <source>Loot failed. Exit code was: 0x%1</source>
         <translation type="unfinished"></translation>
@@ -7271,8 +7271,8 @@ p, li { white-space: pre-wrap; }
         <location filename="createinstancedialogpages.cpp" line="675"/>
         <location filename="createinstancedialogpages.cpp" line="696"/>
         <location filename="createinstancedialogpages.cpp" line="723"/>
-        <location filename="linux/spawn_linux.cpp" line="196"/>
-        <location filename="linux/spawn_linux.cpp" line="218"/>
+        <location filename="linux/spawn_linux.cpp" line="186"/>
+        <location filename="linux/spawn_linux.cpp" line="208"/>
         <location filename="settingsdialognexus.cpp" line="270"/>
         <location filename="settingsdialognexus.cpp" line="277"/>
         <location filename="settingsdialogworkarounds.cpp" line="230"/>
@@ -7519,49 +7519,49 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="66"/>
+        <location filename="linux/loot.cpp" line="62"/>
         <location filename="win32/loot.cpp" line="244"/>
         <source>General messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="78"/>
+        <location filename="linux/loot.cpp" line="74"/>
         <location filename="win32/loot.cpp" line="256"/>
         <source>Plugins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="89"/>
+        <location filename="linux/loot.cpp" line="85"/>
         <location filename="win32/loot.cpp" line="267"/>
         <source>No messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="135"/>
+        <location filename="linux/loot.cpp" line="131"/>
         <location filename="win32/loot.cpp" line="315"/>
         <source>Incompatibilities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="150"/>
+        <location filename="linux/loot.cpp" line="146"/>
         <location filename="win32/loot.cpp" line="330"/>
         <source>Missing masters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="182"/>
+        <location filename="linux/loot.cpp" line="178"/>
         <location filename="win32/loot.cpp" line="362"/>
         <source>Verified clean by %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="202"/>
+        <location filename="linux/loot.cpp" line="198"/>
         <location filename="win32/loot.cpp" line="382"/>
         <source>%1 found %2 ITM record(s), %3 deleted reference(s) and %4 deleted navmesh(es).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="216"/>
+        <location filename="linux/loot.cpp" line="212"/>
         <location filename="loglist.cpp" line="390"/>
         <location filename="organizercore.cpp" line="390"/>
         <location filename="settingsdialogdiagnostics.cpp" line="39"/>
@@ -7573,7 +7573,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="221"/>
+        <location filename="linux/loot.cpp" line="217"/>
         <location filename="settingsdialogdiagnostics.cpp" line="38"/>
         <location filename="settingsdialogdiagnostics.cpp" line="64"/>
         <location filename="win32/loot.cpp" line="401"/>
@@ -7581,33 +7581,33 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="691"/>
+        <location filename="linux/loot.cpp" line="687"/>
         <location filename="win32/loot.cpp" line="916"/>
         <source>failed to run loot: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/main.cpp" line="135"/>
+        <location filename="linux/main.cpp" line="130"/>
         <location filename="win32/main.cpp" line="63"/>
         <source>Mod Organizer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/main.cpp" line="136"/>
+        <location filename="linux/main.cpp" line="131"/>
         <location filename="win32/main.cpp" line="64"/>
         <source>An instance of Mod Organizer is already running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/pluginlist_linux.cpp" line="14"/>
+        <location filename="linux/pluginlist_linux.cpp" line="10"/>
         <source>failed to access %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="187"/>
-        <location filename="linux/spawn_linux.cpp" line="188"/>
-        <location filename="linux/spawn_linux.cpp" line="211"/>
-        <location filename="linux/spawn_linux.cpp" line="212"/>
+        <location filename="linux/spawn_linux.cpp" line="177"/>
+        <location filename="linux/spawn_linux.cpp" line="178"/>
+        <location filename="linux/spawn_linux.cpp" line="201"/>
+        <location filename="linux/spawn_linux.cpp" line="202"/>
         <location filename="win32/spawn_win32.cpp" line="157"/>
         <location filename="win32/spawn_win32.cpp" line="158"/>
         <location filename="win32/spawn_win32.cpp" line="183"/>
@@ -7616,14 +7616,14 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="190"/>
+        <location filename="linux/spawn_linux.cpp" line="180"/>
         <location filename="win32/spawn_win32.cpp" line="160"/>
         <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="194"/>
-        <location filename="linux/spawn_linux.cpp" line="216"/>
+        <location filename="linux/spawn_linux.cpp" line="184"/>
+        <location filename="linux/spawn_linux.cpp" line="206"/>
         <location filename="spawn.cpp" line="112"/>
         <location filename="win32/spawn_win32.cpp" line="164"/>
         <location filename="win32/spawn_win32.cpp" line="188"/>
@@ -7631,21 +7631,21 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="195"/>
-        <location filename="linux/spawn_linux.cpp" line="217"/>
+        <location filename="linux/spawn_linux.cpp" line="185"/>
+        <location filename="linux/spawn_linux.cpp" line="207"/>
         <location filename="win32/spawn_win32.cpp" line="165"/>
         <location filename="win32/spawn_win32.cpp" line="189"/>
         <source>The program may fail to launch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="435"/>
+        <location filename="linux/spawn_linux.cpp" line="425"/>
         <location filename="win32/spawn_win32.cpp" line="423"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="436"/>
+        <location filename="linux/spawn_linux.cpp" line="426"/>
         <location filename="win32/spawn_win32.cpp" line="424"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>
@@ -9680,7 +9680,7 @@ On Windows XP:
 <context>
     <name>UsvfsConnector</name>
     <message>
-        <location filename="linux/usvfsconnector.cpp" line="122"/>
+        <location filename="linux/usvfsconnector.cpp" line="115"/>
         <location filename="win32/usvfsconnector.cpp" line="201"/>
         <source>Preparing vfs</source>
         <translation type="unfinished"></translation>

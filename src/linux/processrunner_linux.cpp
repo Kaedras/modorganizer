@@ -1,15 +1,6 @@
 #include "env.h"
-#include "envmodule.h"
-#include "instancemanager.h"
-#include "iuserinterface.h"
 #include "organizercore.h"
 #include "processrunner.h"
-#include <iplugingame.h>
-#include <log.h>
-#include <report.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 using namespace std;

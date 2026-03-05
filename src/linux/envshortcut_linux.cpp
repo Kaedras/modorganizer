@@ -1,9 +1,5 @@
 #include "env.h"
 #include "envshortcut.h"
-#include "executableslist.h"
-#include <QBuffer>
-#include <log.h>
-#include <utility.h>
 
 using namespace Qt::StringLiterals;
 

@@ -3,7 +3,6 @@
 #include "settings.h"
 #include "settingsutilities.h"
 #include "shared/appconfig.h"
-#include <utility.h>
 
 using namespace MOBase;
 using namespace Qt::StringLiterals;

@@ -1,11 +1,6 @@
 #include "../envsecurity.h"
 #include "../env.h"
 #include "stub.h"
-#include <linux/compatibility.h>
-#include <log.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <utility.h>
 
 namespace env
 {

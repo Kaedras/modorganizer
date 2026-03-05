@@ -1,7 +1,5 @@
 #include "instancemanager.h"
 
-#include <log.h>
-
 QString Instance::prefixDirectory() const
 {
   return m_prefixDir;

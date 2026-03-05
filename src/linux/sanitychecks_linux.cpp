@@ -1,9 +1,4 @@
 #include "env.h"
-#include "envmodule.h"
-#include "settings.h"
-
-#include <QStandardPaths>
-#include <utility.h>
 
 using namespace Qt::StringLiterals;
 

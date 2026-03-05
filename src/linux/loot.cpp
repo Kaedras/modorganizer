@@ -1,11 +1,7 @@
 #include "loot.h"
+#include "json.h"
 #include "lootdialog.h"
 #include "organizercore.h"
-#include <json.h>
-#include <log.h>
-#include <lootcli/lootcli.h>
-#include <report.h>
-#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 using namespace json;

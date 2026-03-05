@@ -7,11 +7,6 @@
 #include "organizercore.h"
 #include "shared/util.h"
 #include "thread_utils.h"
-#include <client/linux/handler/exception_handler.h>
-#include <log.h>
-#include <report.h>
-#include <sys/prctl.h>
-#include <sys/resource.h>
 
 using namespace MOBase;
 using namespace std;

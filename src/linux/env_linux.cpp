@@ -4,10 +4,6 @@
 #include "envprocess.h"
 #include "shared/util.h"
 #include "stub.h"
-#include <client/linux/handler/exception_handler.h>
-#include <client/linux/minidump_writer/minidump_writer.h>
-#include <linux/compatibility.h>
-#include <utility.h>
 
 using namespace Qt::StringLiterals;
 

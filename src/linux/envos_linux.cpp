@@ -1,7 +1,4 @@
 #include "../envos.h"
-#include <sys/utsname.h>
-
-#include <log.h>
 
 using namespace MOBase;
 using namespace Qt::StringLiterals;

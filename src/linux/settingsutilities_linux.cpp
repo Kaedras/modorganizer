@@ -1,12 +1,4 @@
 #include "settingsutilities.h"
-#include <memory>
-#include <utility.h>
-
-// undefine signals from qtmetamacros.h because it conflicts with glib
-#ifdef signals
-#undef signals
-#endif
-#include <libsecret/secret.h>
 
 using namespace MOBase;
 

@@ -6,16 +6,6 @@
 #include "settings.h"
 #include "shared/util.h"
 #include "stub.h"
-#include <QDirIterator>
-#include <QMessageBox>
-#include <QProcess>
-#include <QString>
-#include <log.h>
-#include <report.h>
-#include <steamutility.h>
-#include <sys/wait.h>
-#include <usvfs-fuse/usvfsmanager.h>
-#include <utility.h>
 
 using namespace MOBase;
 using namespace MOShared;

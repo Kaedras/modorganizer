@@ -2,8 +2,6 @@
 #include "loglist.h"
 #include "organizercore.h"
 #include "shared/util.h"
-#include <log.h>
-#include <report.h>
 
 namespace cl
 {
