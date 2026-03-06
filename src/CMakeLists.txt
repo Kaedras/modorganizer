@@ -142,12 +142,12 @@ if(WIN32)
 			DESTINATION ${_bin})
 endif()
 
-if (WIN32)
-	# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
-	if (NOT MO2_INSTALL_IS_BIN)
-		install(FILES $<TARGET_PDB_FILE:organizer> DESTINATION pdb)
-	endif()
+# do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
+if (NOT MO2_INSTALL_IS_BIN)
+	mo2_install_pdb(TARGET organizer)
+endif()
 
+if (WIN32)
 	mo2_deploy_qt(
 		DIRECTORY ${_bin}
 		BINARIES ModOrganizer.exe $<TARGET_FILE_NAME:mo2::uibase>)
