@@ -258,7 +258,7 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
     errno = UNKNOWN_ERROR;
   } else {
     auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(),
-                                   sp.binary.absolutePath(), sp.arguments);
+                                   sp.currentDirectory.absolutePath(), sp.arguments);
     if (result.success()) {
       processHandle = result.stealProcessHandle();
       return 0;
@@ -316,7 +316,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         proton.toStdString(), params.toStdString(),
-        sp.binary.absolutePath().toStdString(), env);
+        sp.currentDirectory.absolutePath().toStdString(), env);
 
     if (pid >= 0) {
       pidFd = pidfd_open(pid, 0);
@@ -330,7 +330,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
     setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
 
-    auto result = shell::ExecuteIn(proton, sp.binary.absolutePath(), params);
+    auto result = shell::ExecuteIn(proton, sp.currentDirectory.absolutePath(), params);
 
     if (result.success()) {
       pidFd = result.stealProcessHandle();
