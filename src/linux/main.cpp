@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 
 int run(int argc, char* argv[])
 {
-  MOShared::SetThisThreadName("main");
+  MOShared::SetThisThreadName(u"main"_s);
   google_breakpad::MinidumpDescriptor descriptor(".");
   google_breakpad::ExceptionHandler eh(descriptor, nullptr, dumpCallback, nullptr, true,
                                        -1);
@@ -106,7 +106,7 @@ int run(int argc, char* argv[])
   initLogging();
 
   // must be after logging
-  TimeThis tt("main() multiprocess");
+  TimeThis tt(u"main() multiprocess"_s);
 
   MOApplication app(argc, argv);
 
@@ -194,7 +194,7 @@ int run(int argc, char* argv[])
         eh.set_minidump_descriptor(descriptor);
 
         // move old crash dumps into the crash dump folder
-        for (auto item : fs::directory_iterator(".")) {
+        for (const auto& item : fs::directory_iterator(".")) {
           if (item.path().extension() == ".dmp") {
             fs::copy(item.path(), path / item.path().filename());
             fs::remove(item.path());
