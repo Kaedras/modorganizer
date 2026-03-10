@@ -259,7 +259,6 @@ namespace spawn
 extern bool isBatchFile(const QFileInfo& target);
 extern bool isExeFile(const QFileInfo& target);
 extern bool isJavaFile(const QFileInfo& target);
-extern QString makeSteamArguments(const QString& username, const QString& password);
 
 void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 {
@@ -370,6 +369,21 @@ void startBinaryAdmin(QWidget* parent, const SpawnParameters& sp)
 
   log::info("restarting MO as administrator");
   restartAsAdmin(parent);
+}
+
+QString makeSteamArguments(const QString& username, const QString& password)
+{
+  QString args;
+
+  if (username != "") {
+    args += "-login " + username;
+
+    if (password != "") {
+      args += " " + password;
+    }
+  }
+
+  return args;
 }
 
 bool startSteam(QWidget* parent)

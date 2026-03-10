@@ -169,8 +169,7 @@ QString makeContent(const SpawnParameters& sp, DWORD code)
 
 QMessageBox::StandardButton badSteamPath(QWidget* parent)
 {
-  const auto details = QStringLiteral(
-      "can't start steam because it was not found. Tried PATH and flatpak");
+  const auto details = QStringLiteral("can't start steam because it was not found.");
 
   log::error("{}", details);
 
@@ -225,7 +224,6 @@ namespace spawn
 // located in spawn.cpp
 extern bool isExeFile(const QFileInfo& target);
 extern bool isJavaFile(const QFileInfo& target);
-extern QString makeSteamArguments(const QString& username, const QString& password);
 
 void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 {
@@ -362,35 +360,113 @@ void startBinaryAdmin(QWidget* parent, const SpawnParameters& sp)
   restartAsAdmin(parent);
 }
 
-std::pair<QString, int> getSteamExecutable(QWidget* parent)
+QString getSteamDesktopFile(QWidget* parent)
 {
-  // try PATH
-  QString steam = QStandardPaths::findExecutable(u"steam"_s);
-  if (!steam.isEmpty()) {
-    return {steam, 0};
+  QStringList steam = QStandardPaths::locateAll(QStandardPaths::ApplicationsLocation,
+                                                u"steam.desktop"_s);
+
+  QStringList steamFlatpak = QStandardPaths::locateAll(
+      QStandardPaths::ApplicationsLocation, u"com.valvesoftware.Steam.desktop"_s);
+
+  int total = steam.size() + steamFlatpak.size();
+
+  if (total == 0) {
+    return {};
   }
 
-  QString home =
-      QStandardPaths::standardLocations(QStandardPaths::HomeLocation).first();
-  QStringList paths = {home % "/.steam/steam/steam.sh",
-                       home % "/.local/share/Steam/steam.sh",
-                       home % ".var/app/com.valvesoftware.Steam/data/Steam/steam.sh"};
+  if (total == 1) {
+    if (steam.isEmpty()) {
+      return steamFlatpak.first();
+    }
+    return steam.first();
+  }
 
-  for (const auto& path : paths) {
-    if (QFileInfo::exists(path)) {
-      return {path, 0};
+  log::debug("found {} steam desktop files, prompting user to select one", total);
+
+  // multiple desktop files have been found, let the user decide which one to use
+  // one possible reason is that steam is installed via package manager and flatpak
+  // simultaneously
+  QStringList paths;
+  for (const auto& path : steam) {
+    paths << "Steam (" % path % ")";
+  }
+  for (const auto& path : steamFlatpak) {
+    paths << "Steam Flatpak (" % path % ")";
+  }
+
+  QInputDialog dialog(parent);
+  dialog.setWindowTitle(QObject::tr("Select Steam installation"));
+  dialog.setLabelText(QObject::tr("Multiple Steam desktop files have been found, "
+                                  "please select which one you'd like to use"));
+  dialog.setOption(QInputDialog::UseListViewForComboBoxItems);
+  dialog.setComboBoxItems(paths);
+
+  int result = dialog.exec();
+  if (result == QDialog::Rejected) {
+    log::debug("user didn't select anything");
+    return {};
+  }
+
+  QString selection = dialog.textValue();
+  log::debug("user selection: {}", selection);
+  selection.remove(0, selection.indexOf('(') + 1);
+  selection.chop(1);
+
+  return selection;
+}
+
+QStringList makeSteamArguments(const QString& username, const QString& password)
+{
+  QStringList args;
+
+  if (username != "") {
+    args << "-login" << username;
+
+    if (password != "") {
+      args << password;
     }
   }
-  return {{}, dialogs::badSteamPath(parent)};
+
+  return args;
 }
 
 bool startSteam(QWidget* parent)
 {
-  QString binary = getSteamExecutable(parent).first;
-  if (binary.isEmpty()) {
+  QString desktopFile = getSteamDesktopFile(parent);
+  if (desktopFile.isEmpty()) {
     return dialogs::badSteamPath(parent) == QMessageBox::Yes;
   }
-  QString arguments;
+
+  // extract exec line
+  QFile file(desktopFile);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    log::error("error opening {}: {}", desktopFile, file.errorString());
+    return false;
+  }
+  QTextStream in(&file);
+  QString line;
+  while (in.readLineInto(&line)) {
+    if (!line.startsWith("Exec="_L1)) {
+      continue;
+    }
+    line.remove("Exec="_L1);
+    break;
+  }
+  if (line.isEmpty()) {
+    log::error("error parsing desktop file {}", desktopFile);
+    return false;
+  }
+
+  // clean up line
+  static QRegularExpression regex(uR"(%[fFuUick])"_s);
+  line.remove(regex);
+  line = line.trimmed();
+
+  QStringList arguments = QProcess::splitCommand(line);
+  if (arguments.isEmpty()) {
+    log::error("error parsing steam desktop file");
+    return false;
+  }
 
   // See if username and password supplied. If so, pass them into steam.
   QString username, password;
@@ -401,22 +477,21 @@ bool startSteam(QWidget* parent)
     if (password.length() > 0)
       MOBase::log::getDefault().addToBlacklist(password.toStdString(),
                                                "STEAM_PASSWORD");
-    arguments = makeSteamArguments(username, password);
+    arguments.append(makeSteamArguments(username, password));
   }
 
   log::debug("starting steam process:\n"
              " . program: '{}'\n"
              " . username={}, password={}",
-             binary.toStdString(), (username.isEmpty() ? "no" : "yes"),
+             desktopFile.toStdString(), (username.isEmpty() ? "no" : "yes"),
              (password.isEmpty() ? "no" : "yes"));
 
-  // todo: check if steam should really be detached
   QProcess p;
-  p.setProgram(binary);
-  p.setArguments(QProcess::splitCommand(arguments));
+  p.setProgram(arguments.takeFirst());
+  p.setArguments(arguments);
   if (!p.startDetached()) {
     const auto r =
-        dialogs::startSteamFailed(parent, binary, p.errorString(), p.error());
+        dialogs::startSteamFailed(parent, desktopFile, p.errorString(), p.error());
 
     return (r == QMessageBox::Yes);
   }
@@ -506,7 +581,46 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
   HANDLE handle = INVALID_HANDLE_VALUE;
   int e;
-  if (sp.binary.suffix() == "exe"_L1) {
+  if (sp.binary.suffix() == "desktop"_L1) {
+    QString path = sp.binary.absoluteFilePath();
+
+    // extract exec line
+    // see
+    // https://specifications.freedesktop.org/desktop-entry/latest/exec-variables.html
+    // todo: test this more extensively
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      log::error("error opening {}: {}", path, file.errorString());
+      return -1;
+    }
+    QTextStream in(&file);
+    QString line;
+    while (in.readLineInto(&line)) {
+      if (!line.startsWith("Exec="_L1)) {
+        continue;
+      }
+      line.remove("Exec="_L1);
+      break;
+    }
+    if (line.isEmpty()) {
+      log::error("error parsing desktop file {}", path);
+      return -1;
+    }
+
+    static QRegularExpression regex(uR"(%[fFuUdDnNickvm])"_s);
+    line.remove(regex);
+    line = line.trimmed();
+
+    auto firstSpace = line.indexOf(' ');
+
+    SpawnParameters p = sp;
+    p.binary          = QFileInfo(line.left(firstSpace));
+    p.arguments       = line.remove(0, firstSpace).trimmed() % " "_L1 % sp.arguments;
+
+    log::debug("arguments: {}", p.arguments);
+
+    e = spawn(p, handle);
+  } else if (sp.binary.suffix() == "exe"_L1) {
     e = spawnProton(sp, handle);
   } else {
     e = spawn(sp, handle);

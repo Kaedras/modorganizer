@@ -220,21 +220,6 @@ SteamStatus getSteamStatus()
   return ss;
 }
 
-QString makeSteamArguments(const QString& username, const QString& password)
-{
-  QString args;
-
-  if (username != "") {
-    args += "-login " + username;
-
-    if (password != "") {
-      args += " " + password;
-    }
-  }
-
-  return args;
-}
-
 bool checkSteam(QWidget* parent, const SpawnParameters& sp, const QDir& gameDirectory,
                 const QString& steamAppID, const Settings& settings)
 {

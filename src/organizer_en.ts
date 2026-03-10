@@ -7639,14 +7639,24 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="425"/>
-        <location filename="win32/spawn_win32.cpp" line="423"/>
+        <location filename="linux/spawn_linux.cpp" line="397"/>
+        <source>Select Steam installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="398"/>
+        <source>Multiple Steam desktop files have been found, please select which one you&apos;d like to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="linux/spawn_linux.cpp" line="496"/>
+        <location filename="win32/spawn_win32.cpp" line="437"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="426"/>
-        <location filename="win32/spawn_win32.cpp" line="424"/>
+        <location filename="linux/spawn_linux.cpp" line="497"/>
+        <location filename="win32/spawn_win32.cpp" line="438"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8386,12 +8396,12 @@ You can restart Mod Organizer as administrator and try launching the program aga
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/spawn_win32.cpp" line="593"/>
+        <location filename="win32/spawn_win32.cpp" line="607"/>
         <source>Select binary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="win32/spawn_win32.cpp" line="594"/>
+        <location filename="win32/spawn_win32.cpp" line="608"/>
         <source>Binary</source>
         <translation type="unfinished"></translation>
     </message>
