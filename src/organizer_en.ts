@@ -7271,8 +7271,8 @@ p, li { white-space: pre-wrap; }
         <location filename="createinstancedialogpages.cpp" line="675"/>
         <location filename="createinstancedialogpages.cpp" line="696"/>
         <location filename="createinstancedialogpages.cpp" line="723"/>
-        <location filename="linux/spawn_linux.cpp" line="186"/>
-        <location filename="linux/spawn_linux.cpp" line="208"/>
+        <location filename="linux/spawn_linux.cpp" line="185"/>
+        <location filename="linux/spawn_linux.cpp" line="207"/>
         <location filename="settingsdialognexus.cpp" line="270"/>
         <location filename="settingsdialognexus.cpp" line="277"/>
         <location filename="settingsdialogworkarounds.cpp" line="230"/>
@@ -7604,10 +7604,10 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="linux/spawn_linux.cpp" line="176"/>
         <location filename="linux/spawn_linux.cpp" line="177"/>
-        <location filename="linux/spawn_linux.cpp" line="178"/>
+        <location filename="linux/spawn_linux.cpp" line="200"/>
         <location filename="linux/spawn_linux.cpp" line="201"/>
-        <location filename="linux/spawn_linux.cpp" line="202"/>
         <location filename="win32/spawn_win32.cpp" line="157"/>
         <location filename="win32/spawn_win32.cpp" line="158"/>
         <location filename="win32/spawn_win32.cpp" line="183"/>
@@ -7616,14 +7616,14 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="180"/>
+        <location filename="linux/spawn_linux.cpp" line="179"/>
         <location filename="win32/spawn_win32.cpp" line="160"/>
         <source>The path to the Steam executable cannot be found. You might try reinstalling Steam.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="184"/>
-        <location filename="linux/spawn_linux.cpp" line="206"/>
+        <location filename="linux/spawn_linux.cpp" line="183"/>
+        <location filename="linux/spawn_linux.cpp" line="205"/>
         <location filename="spawn.cpp" line="112"/>
         <location filename="win32/spawn_win32.cpp" line="164"/>
         <location filename="win32/spawn_win32.cpp" line="188"/>
@@ -7631,31 +7631,31 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="185"/>
-        <location filename="linux/spawn_linux.cpp" line="207"/>
+        <location filename="linux/spawn_linux.cpp" line="184"/>
+        <location filename="linux/spawn_linux.cpp" line="206"/>
         <location filename="win32/spawn_win32.cpp" line="165"/>
         <location filename="win32/spawn_win32.cpp" line="189"/>
         <source>The program may fail to launch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="397"/>
+        <location filename="linux/spawn_linux.cpp" line="403"/>
         <source>Select Steam installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="398"/>
+        <location filename="linux/spawn_linux.cpp" line="404"/>
         <source>Multiple Steam desktop files have been found, please select which one you&apos;d like to use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="496"/>
+        <location filename="linux/spawn_linux.cpp" line="505"/>
         <location filename="win32/spawn_win32.cpp" line="437"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="497"/>
+        <location filename="linux/spawn_linux.cpp" line="506"/>
         <location filename="win32/spawn_win32.cpp" line="438"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>

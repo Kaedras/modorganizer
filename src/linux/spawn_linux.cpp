@@ -286,6 +286,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   // STEAM_COMPAT_DATA_PATH=compatdata/<appid>
   // STEAM_COMPAT_CLIENT_INSTALL_PATH=<steam path>
   // SteamGameId=<appid>
+  // LD_PRELOAD=<steam path>/ubuntu12_(32|64)/gameoverlayrenderer.so
   // path/to/proton run application.exe
 
   // the application is located at steamapps/common/<appliation>
@@ -305,12 +306,17 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   const QString params =
       "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
 
+  const string steamPathStr = steamPath.toStdString();
+  const string ldPreload    = format(
+      "{}/ubuntu12_32/gameoverlayrenderer.so:{}/ubuntu12_64/gameoverlayrenderer.so",
+      steamPathStr, steamPathStr);
   if (sp.hooked) {
     vector<string> env;
 
     env.push_back("STEAM_COMPAT_DATA_PATH=" + sp.prefixDirectory.toStdString());
-    env.push_back("STEAM_COMPAT_CLIENT_INSTALL_PATH=" + steamPath.toStdString());
+    env.push_back("STEAM_COMPAT_CLIENT_INSTALL_PATH=" + steamPathStr);
     env.push_back("SteamGameId=" + sp.steamAppID.toStdString());
+    env.push_back("LD_PRELOAD=" + ldPreload);
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         proton.toStdString(), params.toStdString(),
@@ -325,8 +331,9 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   } else {
     // todo: create function to pass env to
     setenv("STEAM_COMPAT_DATA_PATH", sp.prefixDirectory.toLocal8Bit(), 1);
-    setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPath.toLocal8Bit(), 1);
+    setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPathStr.c_str(), 1);
     setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
+    setenv("LD_PRELOAD", ldPreload.c_str(), 1);
 
     auto result = shell::ExecuteIn(proton, sp.currentDirectory.absolutePath(), params);
 
