@@ -33,7 +33,7 @@ bool Process::canAccess() const
 
 std::vector<Module> getLoadedModules()
 {
-  std::vector<Module> v;
+  vector<Module> v;
 
   QFile maps(u"/proc/self/maps"_s);
   if (!maps.open(QIODevice::ReadOnly)) {

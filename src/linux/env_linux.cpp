@@ -6,6 +6,8 @@
 #include "stub.h"
 
 using namespace Qt::StringLiterals;
+using namespace std;
+namespace fs = std::filesystem;
 
 namespace env
 {
@@ -35,7 +37,7 @@ QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
     return {};
   }
 
-  std::string pidStr;
+  string pidStr;
   if (process == INVALID_HANDLE_VALUE) {
     pidStr = "self";
   } else {
@@ -43,17 +45,17 @@ QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
     if (pid == -1) {
       return {};
     }
-    pidStr = std::to_string(pid);
+    pidStr = to_string(pid);
   }
 
-  std::filesystem::path exe("/proc/" + pidStr + "/exe");
+  fs::path exe("/proc/" + pidStr + "/exe");
   return QString::fromStdString(read_symlink(exe));
 }
 
 std::unique_ptr<ModuleNotification>
 Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
 {
-  return std::make_unique<ModuleNotification>(o, f);
+  return make_unique<ModuleNotification>(o, f);
 }
 
 QString get(const QString& name)
@@ -94,7 +96,7 @@ void deleteRegistryKeyIfEmpty(const QString&)
 
 QString thisProcessPath()
 {
-  std::filesystem::path exe("/proc/self/exe");
+  fs::path exe("/proc/self/exe");
   return QFileInfo(read_symlink(exe)).path();
 }
 
@@ -126,7 +128,7 @@ int tempFile(const QString& dir)
   QString path = dir % "/"_L1 % prefix % ext;
 
   for (int i = 0; i < MaxTries; ++i) {
-    std::clog << "trying file '" << path.toStdString() << "'\n";
+    clog << "trying file '" << path.toStdString() << "'\n";
 
     if (!QFile::exists(path)) {
       int fd = open(path.toStdString().c_str(), O_WRONLY | O_CREAT | O_EXCL,
@@ -134,18 +136,18 @@ int tempFile(const QString& dir)
       if (fd == INVALID_HANDLE_VALUE) {
         const auto e = GetLastError();
         // probably no write access
-        std::cerr << "failed to create dump file, " << formatSystemMessage(e) << "\n";
+        cerr << "failed to create dump file, " << formatSystemMessage(e) << "\n";
 
         return INVALID_HANDLE_VALUE;
       }
-      std::cout << "using file '" << path.toStdString() << "'\n";
+      cout << "using file '" << path.toStdString() << "'\n";
       return fd;
     }
     // try again with "-i"
     path = dir % "/"_L1 % prefix % "-"_L1 % QString::number(i + 1) % ext;
   }
 
-  std::cerr << "can't create dump file, ran out of filenames\n";
+  cerr << "can't create dump file, ran out of filenames\n";
   return {};
 }
 
@@ -170,7 +172,7 @@ HandlePtr dumpFile(const QString& dir)
     return HandlePtr(fd);
   }
 
-  std::clog << "cannot write dump file in current directory\n";
+  clog << "cannot write dump file in current directory\n";
 
   // try the temp directory
   const auto temp = tempDir();
@@ -187,11 +189,11 @@ HandlePtr dumpFile(const QString& dir)
 
 bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
 {
-  std::string dumpPath;
+  string dumpPath;
 
   HandlePtr file = dumpFile(dir);
   if (!file) {
-    std::cerr << "nowhere to write the dump file\n";
+    cerr << "nowhere to write the dump file\n";
     return false;
   }
 
@@ -201,7 +203,7 @@ bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
   bool result = WriteMinidump(file.get(), process, &blob, sizeof(blob));
   if (!result) {
     const int e = errno;
-    std::cerr << "Error creating minidump, " << strerror(e) << "\n";
+    cerr << "Error creating minidump, " << strerror(e) << "\n";
   }
 
   return result;
@@ -212,7 +214,7 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
   pid_t target = pidfd_getpid(process);
   if (target == -1) {
     const int e = errno;
-    std::cerr << "Error getting pid from pidfd, " << strerror(e) << "\n";
+    cerr << "Error getting pid from pidfd, " << strerror(e) << "\n";
     return false;
   }
 
@@ -221,14 +223,14 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
 
 bool coredumpOther(CoreDumpTypes type)
 {
-  std::cout << "creating minidump for a running process\n";
+  cout << "creating minidump for a running process\n";
   const pid_t pid = findOtherPid();
   if (pid == 0) {
-    std::cerr << "no other process found\n";
+    cerr << "no other process found\n";
     return false;
   }
 
-  std::cout << "found other process with pid " << pid << "\n";
+  cout << "found other process with pid " << pid << "\n";
 
   return createMiniDumpForPid(nullptr, pid, type);
 }

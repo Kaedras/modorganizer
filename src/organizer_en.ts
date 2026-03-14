@@ -7639,23 +7639,23 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="403"/>
+        <location filename="linux/spawn_linux.cpp" line="405"/>
         <source>Select Steam installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="404"/>
+        <location filename="linux/spawn_linux.cpp" line="406"/>
         <source>Multiple Steam desktop files have been found, please select which one you&apos;d like to use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="505"/>
+        <location filename="linux/spawn_linux.cpp" line="507"/>
         <location filename="win32/spawn_win32.cpp" line="437"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/spawn_linux.cpp" line="506"/>
+        <location filename="linux/spawn_linux.cpp" line="508"/>
         <location filename="win32/spawn_win32.cpp" line="438"/>
         <source>Please press OK once you&apos;re logged into steam.</source>
         <translation type="unfinished"></translation>
