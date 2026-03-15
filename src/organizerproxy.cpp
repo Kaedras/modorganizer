@@ -32,10 +32,10 @@ OrganizerProxy::OrganizerProxy(OrganizerCore* organizer,
       m_DownloadManagerProxy(
           std::make_unique<DownloadManagerProxy>(this, organizer->downloadManager())),
       m_ModListProxy(std::make_unique<ModListProxy>(this, organizer->modList())),
-      m_ExecutablesListProxy(
-          std::make_unique<ExecutablesListProxy>(organizer->executablesList())),
       m_PluginListProxy(
           std::make_unique<PluginListProxy>(this, organizer->pluginList())),
+      m_ExecutablesListProxy(
+          std::make_unique<ExecutablesListProxy>(organizer->executablesList())),
       m_GameFeaturesProxy(
           std::make_unique<GameFeaturesProxy>(this, pluginContainer->gameFeatures()))
 {}
