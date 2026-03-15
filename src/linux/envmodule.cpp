@@ -78,9 +78,10 @@ QString Module::toString() const
 
 QString Module::getVersion() const
 {
-  if (m_path.contains(".so."_L1)) {
-    auto pos = m_path.indexOf(".so."_L1);
-    return m_path.sliced(pos);
+  static constexpr QLatin1StringView searchString = ".so."_L1;
+  const qsizetype pos                             = m_path.indexOf(searchString);
+  if (pos != -1) {
+    return m_path.sliced(pos + searchString.size());
   }
   return {};
 }
