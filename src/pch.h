@@ -235,6 +235,7 @@
 #include <QSplashScreen>
 #include <QSplitter>
 #include <QSslSocket>
+#include <QStack>
 #include <QStandardItemModel>
 #include <QStandardPaths>
 #include <QStatusBar>
@@ -287,14 +288,10 @@
 #include <Qt>
 #include <QtAlgorithms>
 #include <QtConcurrent/QtConcurrentRun>
-#include <QtCore/QAbstractItemModel>
-#include <QtCore/QObject>
-#include <QtCore/QStack>
 #include <QtDebug>
 #include <QtGlobal>
-#include <QtGui/QtGui>
+#include <QtGui>
 #include <QtPlugin>
-#include <QtTest/QtTest>
 
 // lootcli
 #include <lootcli/lootcli.h>
