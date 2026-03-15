@@ -7,7 +7,6 @@ endif()
 find_package(mo2-cmake CONFIG REQUIRED)
 
 if (UNIX)
-	find_package(ICU REQUIRED COMPONENTS data)
 	find_package(usvfs-fuse CONFIG REQUIRED)
 	find_package(unofficial-breakpad CONFIG REQUIRED)
 	find_package(PkgConfig REQUIRED)
@@ -75,12 +74,6 @@ target_link_libraries(organizer PRIVATE
 	Qt6::WebEngineWidgets Qt6::WebSockets
 	${OS_SPECIFIC_PRIVATE_DEPS}
 )
-
-if (UNIX)
-	# todo: remove this workaround
-	find_package(Qt6 REQUIRED COMPONENTS Test)
-	target_link_libraries(organizer PRIVATE Qt::Test)
-endif()
 
 if (WIN32)
 	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls.manifest.qt6"
