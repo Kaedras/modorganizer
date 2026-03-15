@@ -152,6 +152,7 @@ mo2_add_filter(NAME src/application GROUPS
 	multiprocess
 	sanitychecks
 	selfupdater
+	systemtraymanager
 	updatedialog
 )
 
@@ -316,7 +317,9 @@ mo2_add_filter(NAME src/profiles GROUPS
 
 mo2_add_filter(NAME src/proxies GROUPS
 	downloadmanagerproxy
+	executableslistproxy
 	gamefeaturesproxy
+	instancemanagerproxy
 	modlistproxy
 	organizerproxy
 	pluginlistproxy

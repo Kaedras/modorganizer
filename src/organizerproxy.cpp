@@ -1,8 +1,11 @@
 #include "organizerproxy.h"
 
 #include "downloadmanagerproxy.h"
+#include "executableslistproxy.h"
 #include "gamefeaturesproxy.h"
 #include "glob_matching.h"
+#include "instancemanager.h"
+#include "instancemanagerproxy.h"
 #include "modlistproxy.h"
 #include "organizercore.h"
 #include "plugincontainer.h"
@@ -15,6 +18,8 @@
 #include <QApplication>
 #include <QObject>
 
+#include <memory>
+
 using namespace MOBase;
 using namespace MOShared;
 
@@ -22,9 +27,13 @@ OrganizerProxy::OrganizerProxy(OrganizerCore* organizer,
                                PluginContainer* pluginContainer,
                                MOBase::IPlugin* plugin)
     : m_Proxied(organizer), m_PluginContainer(pluginContainer), m_Plugin(plugin),
+      m_InstanceManagerProxy(
+          std::make_unique<InstanceManagerProxy>(&InstanceManager::singleton())),
       m_DownloadManagerProxy(
           std::make_unique<DownloadManagerProxy>(this, organizer->downloadManager())),
       m_ModListProxy(std::make_unique<ModListProxy>(this, organizer->modList())),
+      m_ExecutablesListProxy(
+          std::make_unique<ExecutablesListProxy>(organizer->executablesList())),
       m_PluginListProxy(
           std::make_unique<PluginListProxy>(this, organizer->pluginList())),
       m_GameFeaturesProxy(
@@ -82,6 +91,11 @@ void OrganizerProxy::disconnectSignals()
 IModRepositoryBridge* OrganizerProxy::createNexusBridge() const
 {
   return new NexusBridge(m_PluginContainer, m_Plugin->name());
+}
+
+QString OrganizerProxy::instanceName() const
+{
+  return InstanceManager::singleton().currentInstance()->displayName();
 }
 
 QString OrganizerProxy::profileName() const
@@ -342,6 +356,11 @@ std::shared_ptr<const MOBase::IFileTree> OrganizerProxy::virtualFileTree() const
   return m_Proxied->m_VirtualFileTree.value();
 }
 
+MOBase::IInstanceManager* OrganizerProxy::instanceManager() const
+{
+  return m_InstanceManagerProxy.get();
+}
+
 MOBase::IDownloadManager* OrganizerProxy::downloadManager() const
 {
   return m_DownloadManagerProxy.get();
@@ -357,14 +376,30 @@ MOBase::IModList* OrganizerProxy::modList() const
   return m_ModListProxy.get();
 }
 
+MOBase::IExecutablesList* OrganizerProxy::executablesList() const
+{
+  return m_ExecutablesListProxy.get();
+}
+
 MOBase::IGameFeatures* OrganizerProxy::gameFeatures() const
 {
   return m_GameFeaturesProxy.get();
 }
 
-MOBase::IProfile* OrganizerProxy::profile() const
+std::shared_ptr<MOBase::IProfile> OrganizerProxy::profile() const
 {
   return m_Proxied->currentProfile();
+}
+
+QStringList OrganizerProxy::profileNames() const
+{
+  return m_Proxied->profileNames();
+}
+
+std::shared_ptr<const MOBase::IProfile>
+OrganizerProxy::getProfile(const QString& name) const
+{
+  return m_Proxied->getProfile(name);
 }
 
 MOBase::IPluginGame const* OrganizerProxy::managedGame() const

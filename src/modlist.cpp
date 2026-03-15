@@ -449,6 +449,10 @@ QVariant ModList::data(const QModelIndex& modelIndex, int role) const
       return text;
     } else if (column == COL_CATEGORY) {
       const std::set<int>& categories = modInfo->getCategories();
+      if (categories.empty()) {
+        return QString();
+      }
+
       std::wostringstream categoryString;
       categoryString << ToWString(tr("Categories: <br>"));
       CategoryFactory& categoryFactory = CategoryFactory::instance();
@@ -829,7 +833,7 @@ QStringList ModList::allMods() const
 
 QStringList ModList::allModsByProfilePriority(MOBase::IProfile* profile) const
 {
-  Profile* mo2Profile = profile == nullptr ? m_Organizer->currentProfile()
+  Profile* mo2Profile = profile == nullptr ? m_Organizer->currentProfile().get()
                                            : static_cast<Profile*>(profile);
 
   QStringList res;

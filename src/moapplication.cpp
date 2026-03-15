@@ -404,7 +404,7 @@ void MOApplication::externalMessage(const QString& message)
   }
 }
 
-std::unique_ptr<Instance> MOApplication::getCurrentInstance(bool forceSelect)
+std::shared_ptr<Instance> MOApplication::getCurrentInstance(bool forceSelect)
 {
   auto& m              = InstanceManager::singleton();
   auto currentInstance = m.currentInstance();

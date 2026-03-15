@@ -68,6 +68,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "shared/appconfig.h"
 #include "spawn.h"
 #include "statusbar.h"
+#include "systemtraymanager.h"
 #include <bsainvalidation.h>
 #include <dataarchives.h>
 #include <safewritefile.h>
@@ -253,7 +254,8 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
       m_PluginContainer(pluginContainer),
       m_ArchiveListWriter(std::bind(&MainWindow::saveArchiveList, this)),
       m_LinkToolbar(nullptr), m_LinkDesktop(nullptr), m_LinkStartMenu(nullptr),
-      m_NumberOfProblems(0), m_ProblemsCheckRequired(false)
+      m_SystemTrayManager(nullptr), m_NumberOfProblems(0),
+      m_ProblemsCheckRequired(false)
 {
   // disables incredibly slow menu fade in effect that looks and feels like crap.
   // this was only happening to users with the windows
@@ -279,6 +281,8 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
   ui->setupUi(this);
   languageChange(settings.interface().language());
   ui->statusBar->setup(ui, settings);
+
+  m_SystemTrayManager = new SystemTrayManager(this, ui->logDock);
 
   {
     auto& ni = NexusInterface::instance();
@@ -492,6 +496,12 @@ MainWindow::MainWindow(Settings& settings, OrganizerCore& organizerCore,
   m_Tutorial.expose("espList", m_OrganizerCore.pluginList());
 
   m_OrganizerCore.setUserInterface(this);
+  m_OrganizerCore.onFinishedRun([=](const QString, unsigned int) {
+    if (isHidden()) {
+      m_SystemTrayManager->restoreFromSystemTray();
+    }
+  });
+
   connect(m_OrganizerCore.modList(), &ModList::showMessage, [=](auto&& message) {
     showMessage(message);
   });
@@ -1704,6 +1714,10 @@ void MainWindow::startExeAction()
     action->setEnabled(true);
   });
 
+  if (itor->minimizeToSystemTray()) {
+    m_SystemTrayManager->minimizeToSystemTray();
+  }
+
   m_OrganizerCore.processRunner()
       .setFromExecutable(*itor)
       .setWaitForCompletion(ProcessRunner::TriggerRefresh)
@@ -1795,14 +1809,14 @@ void MainWindow::on_profileBox_currentIndexChanged(int index)
 
   auto saveGames = m_OrganizerCore.gameFeatures().gameFeature<LocalSavegames>();
   if (saveGames != nullptr) {
-    if (saveGames->prepareProfile(m_OrganizerCore.currentProfile())) {
+    if (saveGames->prepareProfile(m_OrganizerCore.currentProfile().get())) {
       m_SavesTab->refreshSaveList();
     }
   }
 
   auto invalidation = m_OrganizerCore.gameFeatures().gameFeature<BSAInvalidation>();
   if (invalidation != nullptr) {
-    if (invalidation->prepareProfile(m_OrganizerCore.currentProfile())) {
+    if (invalidation->prepareProfile(m_OrganizerCore.currentProfile().get())) {
       QTimer::singleShot(5, [this] {
         m_OrganizerCore.refresh();
       });
@@ -2041,7 +2055,8 @@ void MainWindow::checkBSAList()
       ui->bsaList->blockSignals(false);
     });
 
-    QStringList defaultArchives = archives->archives(m_OrganizerCore.currentProfile());
+    QStringList defaultArchives =
+        archives->archives(m_OrganizerCore.currentProfile().get());
 
     bool warning = false;
 
@@ -2278,6 +2293,10 @@ void MainWindow::on_startButton_clicked()
     ui->startButton->setEnabled(true);
   });
 
+  if (selectedExecutable->minimizeToSystemTray()) {
+    m_SystemTrayManager->minimizeToSystemTray();
+  }
+
   m_OrganizerCore.processRunner()
       .setFromExecutable(*selectedExecutable)
       .setWaitForCompletion(ProcessRunner::TriggerRefresh)
@@ -2389,14 +2408,14 @@ void MainWindow::on_actionAdd_Profile_triggered()
 
   auto saveGames = m_OrganizerCore.gameFeatures().gameFeature<LocalSavegames>();
   if (saveGames != nullptr) {
-    if (saveGames->prepareProfile(m_OrganizerCore.currentProfile())) {
+    if (saveGames->prepareProfile(m_OrganizerCore.currentProfile().get())) {
       m_SavesTab->refreshSaveList();
     }
   }
 
   auto invalidation = m_OrganizerCore.gameFeatures().gameFeature<BSAInvalidation>();
   if (invalidation != nullptr) {
-    if (invalidation->prepareProfile(m_OrganizerCore.currentProfile())) {
+    if (invalidation->prepareProfile(m_OrganizerCore.currentProfile().get())) {
       QTimer::singleShot(5, [this] {
         m_OrganizerCore.refresh();
       });

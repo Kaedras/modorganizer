@@ -32,7 +32,7 @@ jobs:
         id: build-modorganizer
         uses: Kaedras/build-with-mob-action@master
         with:
-          qt-modules: qtpositioning qtwebchannel qtwebengine qtwebsockets
+          qt-modules: qtpositioning qtwebchannel qtwebengine qtwebsockets qtnetworkauth
           mo2-dependencies: ${{ runner.os == 'Windows' && 'usvfs' || 'usvfs-fuse' }} uibase bsatk esptk archive lootcli
 
       - name: Install ModOrganizer

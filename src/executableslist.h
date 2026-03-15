@@ -28,6 +28,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFileInfo>
 #include <QMetaType>
 
+#include <uibase/iexecutable.h>
+
 namespace MOBase
 {
 class IPluginGame;
@@ -38,14 +40,15 @@ class Settings;
 /*!
  * @brief Information about an executable
  **/
-class Executable
+class Executable : public MOBase::IExecutable
 {
 public:
   enum Flag
   {
-    ShowInToolbar      = 0x02,
-    UseApplicationIcon = 0x04,
-    Hide               = 0x08
+    ShowInToolbar        = 0x02,
+    UseApplicationIcon   = 0x04,
+    Hide                 = 0x08,
+    MinimizeToSystemTray = 0x16
   };
 
   Q_DECLARE_FLAGS(Flags, Flag);
@@ -57,11 +60,11 @@ public:
    */
   Executable(const MOBase::ExecutableInfo& info, Flags flags);
 
-  const QString& title() const;
-  const QFileInfo& binaryInfo() const;
-  const QString& arguments() const;
-  const QString& steamAppID() const;
-  const QString& workingDirectory() const;
+  const QString& title() const override;
+  const QFileInfo& binaryInfo() const override;
+  const QString& arguments() const override;
+  const QString& steamAppID() const override;
+  const QString& workingDirectory() const override;
   Flags flags() const;
 
   Executable& title(const QString& s);
@@ -74,6 +77,7 @@ public:
   bool isShownOnToolbar() const;
   void setShownOnToolbar(bool state);
   bool usesOwnIcon() const;
+  bool minimizeToSystemTray() const;
   bool hide() const;
 
   void mergeFrom(const Executable& other);

@@ -82,6 +82,9 @@ void ExecutablesList::load(const MOBase::IPluginGame* game, const Settings& s)
     if (map["ownicon"].toBool())
       flags |= Executable::UseApplicationIcon;
 
+    if (map["minimizeToSystemTray"].toBool())
+      flags |= Executable::MinimizeToSystemTray;
+
     if (map["hide"].toBool())
       flags |= Executable::Hide;
 
@@ -114,14 +117,15 @@ void ExecutablesList::store(Settings& s)
   for (const auto& item : *this) {
     std::map<QString, QVariant> map;
 
-    map["title"]            = item.title();
-    map["toolbar"]          = item.isShownOnToolbar();
-    map["ownicon"]          = item.usesOwnIcon();
-    map["hide"]             = item.hide();
-    map["binary"]           = item.binaryInfo().filePath();
-    map["arguments"]        = item.arguments();
-    map["workingDirectory"] = item.workingDirectory();
-    map["steamAppID"]       = item.steamAppID();
+    map["title"]                = item.title();
+    map["toolbar"]              = item.isShownOnToolbar();
+    map["ownicon"]              = item.usesOwnIcon();
+    map["hide"]                 = item.hide();
+    map["binary"]               = item.binaryInfo().filePath();
+    map["arguments"]            = item.arguments();
+    map["workingDirectory"]     = item.workingDirectory();
+    map["steamAppID"]           = item.steamAppID();
+    map["minimizeToSystemTray"] = item.minimizeToSystemTray();
 
     v.push_back(std::move(map));
   }
@@ -359,6 +363,10 @@ void ExecutablesList::dump() const
       flags.push_back("hide");
     }
 
+    if (e.flags() & Executable::MinimizeToSystemTray) {
+      flags.push_back("minimizeToSystemTray");
+    }
+
     log::debug(" . executable '{}'\n"
                "    binary: {}\n"
                "    arguments: {}\n"
@@ -461,6 +469,11 @@ void Executable::setShownOnToolbar(bool state)
 bool Executable::usesOwnIcon() const
 {
   return m_flags.testFlag(UseApplicationIcon);
+}
+
+bool Executable::minimizeToSystemTray() const
+{
+  return m_flags.testFlag(MinimizeToSystemTray);
 }
 
 bool Executable::hide() const
