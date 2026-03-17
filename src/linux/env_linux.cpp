@@ -3,7 +3,6 @@
 #include "envmodule.h"
 #include "envprocess.h"
 #include "shared/util.h"
-#include "stub.h"
 
 using namespace Qt::StringLiterals;
 using namespace std;

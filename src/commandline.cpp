@@ -11,8 +11,6 @@
 #include <report.h>
 
 #ifdef __unix__
-#include "linux/stub.h"
-
 using command_line_parser = boost::program_options::command_line_parser;
 
 std::vector<nativeString> split_main(const nativeString& line)

@@ -1,9 +1,7 @@
 #include "filetree.h"
-#include "stub.h"
 
-bool FileTree::showShellMenu(QPoint pos)
+bool FileTree::showShellMenu(QPoint)
 {
-  STUB();
-  (void)pos;
+  // no-op
   return false;
 }

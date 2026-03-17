@@ -5,7 +5,6 @@
 #include "envsecurity.h"
 #include "settings.h"
 #include "shared/util.h"
-#include "stub.h"
 
 using namespace MOBase;
 using namespace MOShared;
@@ -208,14 +207,6 @@ QMessageBox::StandardButton startSteamFailed(QWidget* parent, const QString& loc
       .exec();
 }
 
-bool confirmRestartAsAdmin(QWidget* parent, const SpawnParameters& sp)
-{
-  STUB();
-  (void)parent;
-  (void)sp;
-  return false;
-}
-
 }  // namespace spawn::dialogs
 
 namespace spawn
@@ -349,22 +340,10 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   return e;
 }
 
-bool restartAsAdmin(QWidget* parent)
+bool restartAsAdmin(QWidget*)
 {
-  STUB();
-  (void)parent;
+  // no-op
   return false;
-}
-
-void startBinaryAdmin(QWidget* parent, const SpawnParameters& sp)
-{
-  if (!dialogs::confirmRestartAsAdmin(parent, sp)) {
-    log::debug("user declined");
-    return;
-  }
-
-  log::info("restarting MO as administrator");
-  restartAsAdmin(parent);
 }
 
 QString getSteamDesktopFile(QWidget* parent)
@@ -639,7 +618,6 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
   }
 
   case EACCES: {
-    startBinaryAdmin(parent, sp);
     if (sp.hooked) {
       UsvfsManager::instance()->unmount();
     }
