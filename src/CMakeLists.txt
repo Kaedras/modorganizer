@@ -41,7 +41,13 @@ set_target_properties(organizer PROPERTIES
 	OUTPUT_NAME "ModOrganizer"
 	WIN32_EXECUTABLE TRUE)
 
+configure_file(version.h.in version.h)
+configure_file(version.rc.in version.rc)
+
 target_include_directories(organizer PUBLIC ${CMAKE_SOURCE_DIR}/src)
+
+# required for files configured using `configure_file`
+target_include_directories(organizer PRIVATE ${CMAKE_BINARY_DIR}/src)
 
 # required for os-specific ui files
 set_property(TARGET organizer APPEND PROPERTY AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/src/${os_name})

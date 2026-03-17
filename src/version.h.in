@@ -1,0 +1,38 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+#define ORGANIZER_VERSION_MAJOR @organizer_VERSION_MAJOR@
+#define ORGANIZER_VERSION_MINOR @organizer_VERSION_MINOR@
+#define ORGANIZER_VERSION_PATCH @organizer_VERSION_PATCH@
+#define ORGANIZER_VERSION_SUFFIX "@organizer_VERSION_SUFFIX@"
+
+#define ORGANIZER_VERSION "@organizer_VERSION@-@organizer_VERSION_SUFFIX@"
+
+#ifdef __unix__
+
+// from https://doingstuff.dev/posts/elf-shared-library-version/
+// embed version info inside elf note header
+// can be read using `readelf -Wn`
+
+#include <elf.h>
+
+#define NOTE_SECTION ".note.organizer.version"
+
+struct version_note {
+    Elf64_Word	namesz;
+    Elf64_Word	descsz;
+    Elf64_Word	type;
+    char    desc[sizeof(ORGANIZER_VERSION)];
+};
+
+__attribute__((used, section(NOTE_SECTION), aligned(4)))
+static constexpr version_note version = {
+    .namesz = 0,
+    .descsz = sizeof(ORGANIZER_VERSION),
+    .type = NT_VERSION,
+    .desc = ORGANIZER_VERSION
+};
+
+#endif
+
+#endif //VERSION_H

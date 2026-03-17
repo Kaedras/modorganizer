@@ -1,5 +1,5 @@
-#include "linux/stub.h"
 #include "shared/util.h"
+#include "version.h"
 
 using namespace MOBase;
 
@@ -8,8 +8,7 @@ namespace MOShared
 
 Version createVersionInfo()
 {
-  STUB();
-  return {3, 0, 0, VersionInfo::RELEASE_ALPHA};
+  return Version::parse(ORGANIZER_VERSION);
 }
 
 QString getUsvfsVersionString()
