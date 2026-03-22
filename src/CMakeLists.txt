@@ -11,7 +11,6 @@ if (UNIX)
 			usvfs-fuse
 			unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
 			PkgConfig::libsecret
-			ICU::data
 	)
 	set(LIBRARY_DIR lib)
 	set(os_name linux)
@@ -27,7 +26,6 @@ find_package(mo2-archive CONFIG REQUIRED)
 find_package(mo2-lootcli-header CONFIG REQUIRED)
 find_package(mo2-bsatk CONFIG REQUIRED)
 find_package(mo2-esptk CONFIG REQUIRED)
-find_package(mo2-dds-header CONFIG REQUIRED)
 find_package(libbsarchpp CONFIG REQUIRED)
 
 find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets)

@@ -15,12 +15,8 @@
       "name": "breakpad",
       "platform": "linux"
     },
-    {
-      "name": "icu",
-      "platform": "linux"
-    },
     "lz4",
-    "mo2-dds-header",
+    "mo2-dxgiformat-header",
     "mo2-lootcli-header",
     "libbsarchpp",
     "zlib"
