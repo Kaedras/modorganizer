@@ -68,10 +68,13 @@ UsvfsConnector::UsvfsConnector() : m_usvfsManager(UsvfsManager::instance())
   // m_usvfsManager->setUseMountNamespace(true);
 
   const QString logFileName =
-      qApp->property("dataPath").toString() % QStringLiteral("/logs/usvfs.log");
+      qApp->property("dataPath").toString() %
+      QStringLiteral("/logs/usvfs-%1.log")
+          .arg(QDateTime::currentDateTimeUtc().toString(u"yyyy-MM-dd_hh-mm-ss"_s));
+  m_usvfsManager->setLogFile(logFileName.toStdString());
+  log::debug("usvfs log messages are written to {}", logFileName);
 
   m_usvfsManager->setLogLevel(logLevel);
-  m_usvfsManager->setLogFile(logFileName.toStdString());
   m_usvfsManager->setProcessDelay(delay);
 
   log::debug("initializing usvfs:\n"
