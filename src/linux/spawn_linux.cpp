@@ -659,13 +659,16 @@ QString findJavaInstallation(const QString&)
 FileExecutionContext getFileExecutionContext(QWidget*, const QFileInfo& target)
 {
   if (isJavaFile(target)) {
-    return {QFileInfo(u"java"_s),
-            QStringLiteral(R"(-jar "%1")")
-                .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
-            FileExecutionTypes::Executable};
+    QString java = findJavaInstallation(target.absoluteFilePath());
+    if (!java.isEmpty()) {
+      return {QFileInfo(java),
+              QStringLiteral(R"(-jar "%1")")
+                  .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
+              FileExecutionTypes::Executable};
+    }
   }
 
-  if (isExeFile(target)) {
+  else if (isExeFile(target)) {
     return {target, "", FileExecutionTypes::Executable};
   }
 
