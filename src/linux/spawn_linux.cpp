@@ -297,17 +297,16 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   const QString params =
       "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
 
-  const string steamPathStr = steamPath.toStdString();
-  const string ldPreload    = format(
-      "{}/ubuntu12_32/gameoverlayrenderer.so:{}/ubuntu12_64/gameoverlayrenderer.so",
-      steamPathStr, steamPathStr);
   if (sp.hooked) {
+    const string steamPathStr = steamPath.toStdString();
     vector<string> env;
 
     env.push_back("STEAM_COMPAT_DATA_PATH=" + sp.prefixDirectory.toStdString());
     env.push_back("STEAM_COMPAT_CLIENT_INSTALL_PATH=" + steamPathStr);
     env.push_back("SteamGameId=" + sp.steamAppID.toStdString());
-    env.push_back("LD_PRELOAD=" + ldPreload);
+    env.push_back("LD_PRELOAD=" + steamPathStr +
+                  "/ubuntu12_32/gameoverlayrenderer.so:" + steamPathStr +
+                  "/ubuntu12_64/gameoverlayrenderer.so");
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         proton.toStdString(), params.toStdString(),
@@ -320,13 +319,15 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     // todo: add proper error codes
     errno = UNKNOWN_ERROR;
   } else {
-    // todo: create function to pass env to
-    setenv("STEAM_COMPAT_DATA_PATH", sp.prefixDirectory.toLocal8Bit(), 1);
-    setenv("STEAM_COMPAT_CLIENT_INSTALL_PATH", steamPathStr.c_str(), 1);
-    setenv("SteamGameId", sp.steamAppID.toLocal8Bit(), 1);
-    setenv("LD_PRELOAD", ldPreload.c_str(), 1);
+    QStringList env;
+    env << "STEAM_COMPAT_DATA_PATH="_L1 % sp.prefixDirectory;
+    env << "STEAM_COMPAT_CLIENT_INSTALL_PATH="_L1 % steamPath;
+    env << "SteamGameId="_L1 % sp.steamAppID;
+    env << "LD_PRELOAD="_L1 % steamPath % "/ubuntu12_32/gameoverlayrenderer.so:" %
+               steamPath % "/ubuntu12_64/gameoverlayrenderer.so";
 
-    auto result = shell::ExecuteIn(proton, sp.currentDirectory.absolutePath(), params);
+    auto result =
+        shell::Execute(proton, sp.currentDirectory.absolutePath(), params, env);
 
     if (result.success()) {
       pidFd = result.stealProcessHandle();
