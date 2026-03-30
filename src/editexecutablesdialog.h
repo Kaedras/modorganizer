@@ -176,6 +176,9 @@ private slots:
   void on_browseBinary_clicked();
   void on_browseWorkingDirectory_clicked();
   void on_configureLibraries_clicked();
+#ifdef __unix__
+  void on_browsePrefixDirectory_clicked();
+#endif
 
   void on_buttons_clicked(QAbstractButton* b);
 

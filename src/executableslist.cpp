@@ -99,6 +99,11 @@ void ExecutablesList::load(const MOBase::IPluginGame* game, const Settings& s)
                       .arguments(map["arguments"].toString())
                       .steamAppID(map["steamAppID"].toString())
                       .workingDirectory(map["workingDirectory"].toString())
+#ifdef __unix__
+                      .prefixDirectory(map["prefixDirectory"].toString())
+                      .enableSteamAPI(map["enableSteamAPI"].toBool())
+                      .enableSteamOverlay(map["enableSteamOverlay"].toBool())
+#endif
                       .flags(flags));
   }
 
@@ -126,6 +131,11 @@ void ExecutablesList::store(Settings& s)
     map["workingDirectory"]     = item.workingDirectory();
     map["steamAppID"]           = item.steamAppID();
     map["minimizeToSystemTray"] = item.minimizeToSystemTray();
+#ifdef __unix__
+    map["prefixDirectory"]    = item.prefixDirectory();
+    map["enableSteamAPI"]     = item.enableSteamAPI();
+    map["enableSteamOverlay"] = item.enableSteamOverlay();
+#endif
 
     v.push_back(std::move(map));
   }
@@ -346,45 +356,7 @@ void ExecutablesList::upgradeFromCustom(MOBase::IPluginGame const* game)
   }
 }
 
-void ExecutablesList::dump() const
-{
-  for (const auto& e : m_Executables) {
-    QStringList flags;
-
-    if (e.flags() & Executable::ShowInToolbar) {
-      flags.push_back("toolbar");
-    }
-
-    if (e.flags() & Executable::UseApplicationIcon) {
-      flags.push_back("icon");
-    }
-
-    if (e.flags() & Executable::Hide) {
-      flags.push_back("hide");
-    }
-
-    if (e.flags() & Executable::MinimizeToSystemTray) {
-      flags.push_back("minimizeToSystemTray");
-    }
-
-    log::debug(" . executable '{}'\n"
-               "    binary: {}\n"
-               "    arguments: {}\n"
-               "    steam ID: {}\n"
-               "    directory: {}\n"
-               "    flags: {} ({})",
-               e.title(), e.binaryInfo().filePath(), e.arguments(), e.steamAppID(),
-               e.workingDirectory(), flags.join("|"), e.flags());
-  }
-}
-
 Executable::Executable(QString title) : m_title(title) {}
-
-Executable::Executable(const MOBase::ExecutableInfo& info, Flags flags)
-    : m_title(info.title()), m_binaryInfo(info.binary()),
-      m_arguments(info.arguments().join(" ")), m_steamAppID(info.steamAppID()),
-      m_workingDirectory(info.workingDirectory().path()), m_flags(flags)
-{}
 
 const QString& Executable::title() const
 {
@@ -492,4 +464,9 @@ void Executable::mergeFrom(const Executable& other)
   m_steamAppID       = other.steamAppID();
   m_workingDirectory = other.workingDirectory();
   m_flags            = other.flags();
+#ifdef __unix__
+  m_prefixDirectory    = other.prefixDirectory();
+  m_enableSteamAPI     = other.enableSteamAPI();
+  m_enableSteamOverlay = other.enableSteamOverlay();
+#endif
 }

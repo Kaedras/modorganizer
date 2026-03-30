@@ -66,6 +66,11 @@ public:
   const QString& steamAppID() const override;
   const QString& workingDirectory() const override;
   Flags flags() const;
+#ifdef __unix__
+  const QString& prefixDirectory() const override;
+  bool enableSteamAPI() const override;
+  bool enableSteamOverlay() const override;
+#endif
 
   Executable& title(const QString& s);
   Executable& binaryInfo(const QFileInfo& fi);
@@ -73,6 +78,11 @@ public:
   Executable& steamAppID(const QString& s);
   Executable& workingDirectory(const QString& s);
   Executable& flags(Flags f);
+#ifdef __unix__
+  Executable& prefixDirectory(const QString& s);
+  Executable& enableSteamAPI(bool b);
+  Executable& enableSteamOverlay(bool b);
+#endif
 
   bool isShownOnToolbar() const;
   void setShownOnToolbar(bool state);
@@ -89,6 +99,11 @@ private:
   QString m_steamAppID;
   QString m_workingDirectory;
   Flags m_flags;
+#ifdef __unix__
+  QString m_prefixDirectory;
+  bool m_enableSteamAPI     = false;
+  bool m_enableSteamOverlay = false;
+#endif
 };
 
 /*!

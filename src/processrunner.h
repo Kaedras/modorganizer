@@ -86,7 +86,11 @@ public:
   ProcessRunner& setWaitForCompletion(WaitFlags flags          = NoFlags,
                                       UILocker::Reasons reason = UILocker::LockUI);
   ProcessRunner& setHooked(bool b);
-
+#ifdef __unix__
+  ProcessRunner& setPrefixDir(const QDir& directory);
+  ProcessRunner& setSteamAPI(bool b);
+  ProcessRunner& setSteamOverlay(bool b);
+#endif
   // - if the target is an executable file, runs it hooked
   // - if the target is a file:
   //     - if forceHook is false, calls ShellExecute() on it

@@ -456,6 +456,12 @@ ProcessRunner& ProcessRunner::setFromExecutable(const Executable& exe)
   setCustomOverwrite(customOverwrite);
   setForcedLibraries(forcedLibraries);
 
+#ifdef __unix__
+  setPrefixDir(exe.prefixDirectory());
+  setSteamAPI(exe.enableSteamAPI());
+  setSteamOverlay(exe.enableSteamOverlay());
+#endif
+
   return *this;
 }
 

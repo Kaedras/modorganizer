@@ -55,7 +55,9 @@ struct SpawnParameters
   QDir currentDirectory;
   QString steamAppID;
 #ifdef __unix__
-  QString prefixDirectory;
+  QDir prefixDirectory;
+  bool enableSteamAPI     = false;
+  bool enableSteamOverlay = false;
 #endif
   bool hooked   = false;
   HANDLE stdOut = INVALID_HANDLE_VALUE;

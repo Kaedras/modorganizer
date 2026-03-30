@@ -5,6 +5,24 @@
 using namespace MOBase;
 using namespace std;
 
+ProcessRunner& ProcessRunner::setPrefixDir(const QDir& directory)
+{
+  m_sp.prefixDirectory = directory;
+  return *this;
+}
+
+ProcessRunner& ProcessRunner::setSteamAPI(bool b)
+{
+  m_sp.enableSteamAPI = b;
+  return *this;
+}
+
+ProcessRunner& ProcessRunner::setSteamOverlay(bool b)
+{
+  m_sp.enableSteamOverlay = b;
+  return *this;
+}
+
 std::optional<ProcessRunner::Results> singleWait(HANDLE pidFd, DWORD pid)
 {
   if (pidFd == -1) {
