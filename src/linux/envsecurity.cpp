@@ -1,11 +1,17 @@
 #include "../envsecurity.h"
 #include "../env.h"
-#include "stub.h"
+
+namespace
+{
+constexpr int SECURITY_PROVIDER_LSM = 1;
+}
+
+using namespace MOBase;
+using namespace Qt::StringLiterals;
+using namespace std;
 
 namespace env
 {
-
-using namespace MOBase;
 
 SecurityProduct::SecurityProduct(QUuid guid, QString name, int provider, bool active,
                                  bool upToDate)
@@ -40,32 +46,59 @@ bool SecurityProduct::upToDate() const
 
 QString SecurityProduct::toString() const
 {
-  STUB();
-  return {};
+  QString s;
+
+  if (m_name.isEmpty()) {
+    s += u"(no name)"_s;
+  } else {
+    s += m_name;
+  }
+
+  return s;
 }
 
 QString SecurityProduct::providerToString() const
 {
-  STUB();
-  return {};
+  QStringList ps;
+  if (m_provider == SECURITY_PROVIDER_LSM) {
+    ps.push_back(u"lsm"_s);
+  }
+
+  return ps.join(u"|"_s);
 }
 
 std::vector<SecurityProduct> getSecurityProductsFromWMI()
 {
-  STUB();
+  // no-op
   return {};
 }
 
 std::optional<SecurityProduct> getWindowsFirewall()
 {
-  STUB();
+  // no-op
   return {};
 }
 
 std::vector<SecurityProduct> getSecurityProducts()
 {
-  STUB();
-  return {};
+  vector<SecurityProduct> v;
+
+  QFile lsm(u"/sys/kernel/security/lsm"_s);
+  if (!lsm.open(QIODeviceBase::ReadOnly)) {
+    log::warn("Error opening /sys/kernel/security/lsm, {}", lsm.errorString());
+    return v;
+  }
+
+  QTextStream stream(&lsm);
+  QString moduleString = stream.readAll();
+  QStringList modules  = moduleString.split(',');
+  v.reserve(modules.size());
+
+  for (const auto& module : modules) {
+    v.emplace_back(QUuid(), module, SECURITY_PROVIDER_LSM, true, true);
+  }
+
+  return v;
 }
 
 class failed
@@ -90,10 +123,9 @@ QString getUsername(int owner)
   return QString::fromLocal8Bit(p->pw_name);
 }
 
-FileRights makeFileRights(int m)
+FileRights makeFileRights(int)
 {
-  (void)m;
-  STUB();
+  // no-op
   return {};
 }
 
