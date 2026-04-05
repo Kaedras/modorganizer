@@ -12,6 +12,8 @@
 
 #include <algorithm>
 
+using namespace MOBase;
+
 Executable::Executable(const MOBase::ExecutableInfo& info, Flags flags)
     : m_title(info.title()), m_binaryInfo(info.binary()),
       m_arguments(info.arguments().join(" ")), m_steamAppID(info.steamAppID()),
