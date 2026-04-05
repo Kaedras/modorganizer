@@ -1,7 +1,6 @@
 #include "commandline.h"
 #include "env.h"
 #include "instancemanager.h"
-#include "linux/stub.h"
 #include "loglist.h"
 #include "messagedialog.h"
 #include "multiprocess.h"
