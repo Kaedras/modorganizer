@@ -1,9 +1,6 @@
 #include "executableslist.h"
 
-#include "settings.h"
 #include <log.h>
-
-#include <QFileInfo>
 
 using namespace MOBase;
 

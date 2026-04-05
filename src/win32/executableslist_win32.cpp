@@ -1,16 +1,6 @@
 #include "executableslist.h"
 
-#include "iplugingame.h"
-#include "settings.h"
-#include "utility.h"
 #include <log.h>
-
-#include <QCoreApplication>
-#include <QDebug>
-#include <QDir>
-#include <QFileInfo>
-
-#include <algorithm>
 
 using namespace MOBase;
 
