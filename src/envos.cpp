@@ -1,0 +1,27 @@
+#include "envos.h"
+
+#include <QSysInfo>
+
+using namespace Qt::StringLiterals;
+
+namespace env
+{
+
+OsInfo::OsInfo()
+    : m_elevated(isElevated()), m_compatibilityMode(compatibilityMode()),
+      m_string(toString())
+{}
+
+QString OsInfo::toString() const
+{
+  QString elevated = u"?"_s;
+  if (m_elevated.has_value()) {
+    elevated = *m_elevated ? u"yes"_s : u"no"_s;
+  }
+
+  return QSysInfo::prettyProductName() % ", version "_L1 % QSysInfo::kernelVersion() %
+         ", architecture "_L1 % QSysInfo::currentCpuArchitecture() % ", elevated: "_L1 %
+         elevated;
+}
+
+}  // namespace env

@@ -94,7 +94,7 @@ std::vector<Process> Environment::runningProcesses() const
 const OsInfo& Environment::getOSInfo() const
 {
   if (!m_os) {
-    m_os = CreateInfo();
+    m_os = std::make_unique<OsInfo>();
   }
 
   return *m_os;

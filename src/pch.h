@@ -249,6 +249,7 @@
 #include <QStyleOptionSlider>
 #include <QStyledItemDelegate>
 #include <QSyntaxHighlighter>
+#include <QSysInfo>
 #include <QTabWidget>
 #include <QTableWidget>
 #include <QTemporaryFile>
