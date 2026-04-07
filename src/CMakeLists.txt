@@ -150,11 +150,15 @@ endif()
 mo2_add_filter(NAME src/application GROUPS
 	iuserinterface
 	commandline
-	main
+	${os_name}/commandline_${os_name}
+	${os_name}/main
 	moapplication
+	${os_name}/moapplication_${os_name}
 	moshortcut
 	multiprocess
+	${os_name}/multiprocess_${os_name}
 	sanitychecks
+	${os_name}/sanitychecks_${os_name}
 	selfupdater
 	systemtraymanager
 	updatedialog
@@ -183,6 +187,7 @@ mo2_add_filter(NAME src/core GROUPS
 	plugincontainer
 	apiuseraccount
 	processrunner
+	${os_name}/processrunner_${os_name}
 	qdirfiletree
 	virtualfiletree
 	uilocker
@@ -216,30 +221,41 @@ mo2_add_filter(NAME src/downloads GROUPS
 
 mo2_add_filter(NAME src/env GROUPS
 	env
+	${os_name}/env_${os_name}
 	envdump
 	envfs
 	envmetrics
 	envmodule
+	${os_name}/envmodule
 	envsecurity
-	envshell
+	${os_name}/envsecurity
+	${os_name}/envshell
 	envshortcut
-	envwindows
+	${os_name}/envshortcut_${os_name}
+	envos
+	${os_name}/envos_${os_name}
 )
 
 mo2_add_filter(NAME src/executables GROUPS
 	executableslist
+	${os_name}/executableslist_${os_name}
 	editexecutablesdialog
+	${os_name}/editexecutablesdialog_${os_name}
 )
 
 mo2_add_filter(NAME src/instances GROUPS
 	createinstancedialog
+	${os_name}/createinstancedialog
 	createinstancedialogpages
 	instancemanager
+	${os_name}/instancemanager_${os_name}
 	instancemanagerdialog
+	${os_name}/instancemanagerdialog_${os_name}
 )
 
 mo2_add_filter(NAME src/loot GROUPS
 	loot
+	${os_name}/loot
 	lootdialog
 )
 
@@ -248,6 +264,7 @@ mo2_add_filter(NAME src/mainwindow GROUPS
 	downloadstab
 	iconfetcher
 	filetree
+	${os_name}/filetree_${os_name}
 	filetreeitem
 	filetreemodel
 	mainwindow
@@ -303,6 +320,7 @@ mo2_add_filter(NAME src/modlist/view GROUPS
 
 mo2_add_filter(NAME src/plugins GROUPS
 	pluginlist
+	${os_name}/pluginlist_${os_name}
 	pluginlistsortproxy
 	pluginlistview
 	pluginlistcontextmenu
@@ -315,6 +333,7 @@ mo2_add_filter(NAME src/previews GROUPS
 
 mo2_add_filter(NAME src/profiles GROUPS
 	profile
+	${os_name}/profile_${os_name}
 	profileinputdialog
 	profilesdialog
 )
@@ -342,7 +361,9 @@ mo2_add_filter(NAME src/register GROUPS
 
 mo2_add_filter(NAME src/settings GROUPS
 	settings
+	${os_name}/settings_${os_name}
 	settingsutilities
+	${os_name}/settingsutilities_${os_name}
 )
 
 mo2_add_filter(NAME src/settingsdialog GROUPS
@@ -365,9 +386,13 @@ mo2_add_filter(NAME src/utilities GROUPS
 	persistentcookiejar
 	serverinfo
 	spawn
+	${os_name}/spawn_${os_name}
 	shared/util
-	usvfsconnector
-	shared/windows_error
+	shared/${os_name}/util_${os_name}
+	shared/nativeString
+	${os_name}/usvfsconnector
+	shared/os_error
+	shared/${os_name}/os_error
 	thread_utils
 	json
 	glob_matching
