@@ -54,6 +54,11 @@ set_property(TARGET organizer APPEND PROPERTY AUTOUIC_SEARCH_PATHS ${CMAKE_SOURC
 # required
 mo2_configure_target(organizer WARNINGS 4 TRANSLATIONS OFF)
 
+if(WIN32)
+	# add configured version.rc to sources
+	target_sources(organizer PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+endif()
+
 if(UNIX)
 	set_target_properties(organizer PROPERTIES INSTALL_RPATH ".:./lib/")
 endif()
