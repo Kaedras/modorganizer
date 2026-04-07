@@ -12,30 +12,53 @@ using namespace MOBase;
 
 bool OsInfo::getCompatibilityMode() const
 {
-  using RtlGetNtVersionNumbersType = void(NTAPI)(DWORD*, DWORD*, DWORD*);
+  // information was found here: https://stackoverflow.com/a/3445031
+  // values can be found in the Application Compatibility Toolkit
 
-  auto* RtlGetNtVersionNumbers =
-      reinterpret_cast<RtlGetNtVersionNumbersType*> GetProcAddress(
-          GetModuleHandleA("ntdll.dll"), "RtlGetNtVersionNumbers");
+  // non-exhaustive list of compatibility mode values:
+  //    WIN95
+  //    WIN98
+  //    NT4SP5
+  //    WIN2000
+  //    WINXPSP2
+  //    WINXPSP3
+  //    VISTARTM
+  //    VISTASP1
+  //    VISTASP2
+  //    WIN7RTM
+  //    WINSRV03SP1
+  //    WINSRV08SP1
+  //    WIN8RTM
 
-  if (!RtlGetNtVersionNumbers) {
-    log::error("RtlGetNtVersionNumbers() not found in ntdll.dll");
+  DWORD dataLength;
+  std::wstring applicationFilePath = QApplication::applicationFilePath().toStdWString();
+  auto key = LR"(Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers)";
+
+  // get required buffer size
+  auto result = RegGetValueW(HKEY_CURRENT_USER, key, applicationFilePath.c_str(),
+                             RRF_RT_REG_SZ, nullptr, nullptr, &dataLength);
+  if (result != ERROR_SUCCESS) {
+    // ERROR_FILE_NOT_FOUND means that no compatibility options are set
+    if (result != ERROR_FILE_NOT_FOUND) {
+      log::error("Error getting compatibility mode from registry, {}",
+                 windowsErrorString(result));
+    }
     return false;
   }
 
-  OSVERSIONINFO osInfo       = {0};
-  osInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&osInfo);
+  // get data
+  std::vector<char> data(dataLength);
+  result = RegGetValueW(HKEY_CURRENT_USER, key, applicationFilePath.c_str(),
+                        RRF_RT_REG_SZ, nullptr, data.data(), &dataLength);
+  if (result != ERROR_SUCCESS) {
+    log::error("Error getting compatibility mode from registry, {}",
+               windowsErrorString(result));
+    return false;
+  }
 
-  DWORD dwMajorVersion;
-  DWORD dwMinorVersion;
-  DWORD dwBuildNumber;
-
-  RtlGetNtVersionNumbers(&dwMajorVersion, &dwMinorVersion, &dwBuildNumber);
-
-  dwBuildNumber &= 0x0000FFFF;
-
-  if (osInfo.dwBuildNumber != dwBuildNumber) {
+  // all values are on a single line, separated by spaces
+  std::wstring str{data.data(), data.data() + dataLength};
+  if (str.contains(L" WIN") || str.contains(L" VISTA") || str.contains(L" NT")) {
     return true;
   }
   return false;
