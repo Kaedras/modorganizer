@@ -10,11 +10,13 @@ namespace env
 
 using namespace MOBase;
 
-bool OsInfo::compatibilityMode() const
+bool OsInfo::getCompatibilityMode() const
 {
-  TRtlGetNtVersionNumbers RtlGetNtVersionNumbers =
-      (TRtlGetNtVersionNumbers)GetProcAddress(GetModuleHandleA("ntdll.dll"),
-                                              "RtlGetNtVersionNumbers");
+  using RtlGetNtVersionNumbersType = void(NTAPI)(DWORD*, DWORD*, DWORD*);
+
+  auto* RtlGetNtVersionNumbers =
+      reinterpret_cast<RtlGetNtVersionNumbersType*> GetProcAddress(
+          GetModuleHandleA("ntdll.dll"), "RtlGetNtVersionNumbers");
 
   if (!RtlGetNtVersionNumbers) {
     log::error("RtlGetNtVersionNumbers() not found in ntdll.dll");

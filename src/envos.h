@@ -30,6 +30,14 @@ private:
   std::optional<bool> m_elevated;
   bool m_compatibilityMode;
   QString m_string;
+
+  // gets whether the process is elevated
+  //
+  std::optional<bool> getElevated() const;
+
+  // tries to guess whether this process is running in compatibility mode
+  //
+  bool getCompatibilityMode() const;
 };
 
 }  // namespace env

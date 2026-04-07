@@ -6,13 +6,13 @@ using namespace Qt::StringLiterals;
 namespace env
 {
 
-bool OsInfo::compatibilityMode() const
+bool OsInfo::getCompatibilityMode() const
 {
   // no-op
   return false;
 }
 
-std::optional<bool> OsInfo::isElevated() const
+std::optional<bool> OsInfo::getElevated() const
 {
   return getuid() == 0;
 }

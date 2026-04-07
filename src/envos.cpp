@@ -12,6 +12,16 @@ OsInfo::OsInfo()
       m_string(toString())
 {}
 
+bool OsInfo::compatibilityMode() const
+{
+  return m_compatibilityMode;
+}
+
+std::optional<bool> OsInfo::isElevated() const
+{
+  return m_elevated;
+}
+
 QString OsInfo::toString() const
 {
   QString elevated = u"?"_s;
