@@ -8,7 +8,7 @@ namespace env
 {
 
 OsInfo::OsInfo()
-    : m_elevated(isElevated()), m_compatibilityMode(compatibilityMode()),
+    : m_elevated(getElevated()), m_compatibilityMode(compatibilityMode()),
       m_string(toString())
 {}
 
