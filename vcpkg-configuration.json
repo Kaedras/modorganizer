@@ -1,13 +1,13 @@
 {
   "default-registry": {
     "kind": "git",
-    "baseline": "b472291f295551b7127359ea38fdd2ca092f6f1b",
+    "baseline": "b21ff8f3cadbd8e0b175b49be2dd9202f1f208f4",
     "repository": "https://github.com/Microsoft/vcpkg"
   },
   "registries": [
     {
       "kind": "git",
-      "baseline": "b472291f295551b7127359ea38fdd2ca092f6f1b",
+      "baseline": "b21ff8f3cadbd8e0b175b49be2dd9202f1f208f4",
       "repository": "https://github.com/Microsoft/vcpkg",
       "packages": [
         "boost*",
@@ -16,7 +16,7 @@
     },
     {
       "kind": "git",
-      "baseline": "912f76114486c46c15a47424201837a4692076b5",
+      "baseline": "d19d69476e437ba2345bcdfb846b3491649cf334",
       "repository": "https://github.com/Kaedras/vcpkg-registry",
       "packages": [
         "mo2-*",
