@@ -127,7 +127,7 @@ EditExecutablesDialog::EditExecutablesDialog(OrganizerCore& oc, int sel,
     saveOrder();
   });
 #ifdef __unix__
-  connect(ui->prefixDir, &QLineEdit::textChanged, [&] {
+  connect(ui->prefixDirectory, &QLineEdit::textChanged, [&] {
     save();
   });
   connect(ui->enableSteamAPI, &QCheckBox::toggled, [&] {
@@ -401,8 +401,8 @@ void EditExecutablesDialog::clearEdits()
   ui->hide->setChecked(false);
 
 #ifdef __unix__
-  ui->prefixDir->clear();
-  ui->prefixDir->setEnabled(false);
+  ui->prefixDirectory->clear();
+  ui->prefixDirectory->setEnabled(false);
   ui->enableSteamAPI->setEnabled(false);
   ui->enableSteamAPI->setChecked(false);
   ui->enableSteamOverlay->setEnabled(false);
@@ -426,7 +426,7 @@ void EditExecutablesDialog::setEdits(const Executable& e)
   ui->hide->setChecked(e.hide());
 
 #ifdef __unix__
-  ui->prefixDir->setText(e.prefixDirectory());
+  ui->prefixDirectory->setText(e.prefixDirectory());
   ui->enableSteamAPI->setChecked(e.enableSteamAPI());
   ui->enableSteamOverlay->setChecked(e.enableSteamOverlay());
 #endif
@@ -477,8 +477,8 @@ void EditExecutablesDialog::setEdits(const Executable& e)
   ui->minimizeToSystemTray->setEnabled(true);
   ui->hide->setEnabled(true);
 #ifdef __unix__
-  ui->prefixDir->setEnabled(true);
-  ui->browsePrefixDir->setEnabled(true);
+  ui->prefixDirectory->setEnabled(true);
+  ui->browsePrefixDirectory->setEnabled(true);
   ui->enableSteamAPI->setEnabled(true);
   ui->enableSteamOverlay->setEnabled(true);
 #endif
@@ -554,7 +554,7 @@ void EditExecutablesDialog::save()
   }
 
 #ifdef __unix__
-  e->prefixDirectory(ui->prefixDir->text());
+  e->prefixDirectory(ui->prefixDirectory->text());
   e->enableSteamAPI(ui->enableSteamAPI->isChecked());
   e->enableSteamOverlay(ui->enableSteamOverlay->isChecked());
 #endif

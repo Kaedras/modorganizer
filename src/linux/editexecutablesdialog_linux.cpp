@@ -7,13 +7,14 @@ using namespace MOBase;
 
 void EditExecutablesDialog::on_browsePrefixDirectory_clicked()
 {
-  QString dirName = FileDialogMemory::getExistingDirectory(
-      "editPrefixDirectory", this, tr("Select a directory"), ui->prefixDir->text());
+  QString dirName = FileDialogMemory::getExistingDirectory("editPrefixDirectory", this,
+                                                           tr("Select a directory"),
+                                                           ui->prefixDirectory->text());
 
   if (dirName.isNull()) {
     // cancelled
     return;
   }
 
-  ui->prefixDir->setText(dirName);
+  ui->prefixDirectory->setText(dirName);
 }
