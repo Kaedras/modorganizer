@@ -234,8 +234,8 @@ bool eventLogNotRunning(QWidget* parent, const env::Service& s,
   const auto mainText = QObject::tr("The Event Log service is not running");
   const auto content  = QObject::tr(
       "The Windows Event Log service is not running. This can prevent USVFS from "
-       "running properly and your mods may not be recognized by the program being "
-       "launched.");
+      "running properly and your mods may not be recognized by the program being "
+      "launched.");
 
   const auto r =
       MOBase::TaskDialog(parent, title)

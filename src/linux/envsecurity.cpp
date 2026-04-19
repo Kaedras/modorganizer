@@ -138,17 +138,17 @@ FileSecurity getFileSecurity(const QString& path)
   if (info.ownerId() == getuid()) {
     fs.rights.normalRights = info.permission(QFile::Permission::ReadUser) &&
                              info.permission(QFile::Permission::WriteUser);
-    fs.rights.hasExecute = info.permission(QFile::Permission::ExeUser);
+    fs.rights.hasExecute   = info.permission(QFile::Permission::ExeUser);
   }
   // if the calling process is in group
   else if (info.groupId() == getgid()) {
     fs.rights.normalRights = info.permission(QFile::Permission::ReadGroup) &&
                              info.permission(QFile::Permission::WriteGroup);
-    fs.rights.hasExecute = info.permission(QFile::Permission::ExeGroup);
+    fs.rights.hasExecute   = info.permission(QFile::Permission::ExeGroup);
   } else {
     fs.rights.normalRights = info.permission(QFile::Permission::ReadOther) &&
                              info.permission(QFile::Permission::WriteOther);
-    fs.rights.hasExecute = info.permission(QFile::Permission::ExeOther);
+    fs.rights.hasExecute   = info.permission(QFile::Permission::ExeOther);
   }
 
   return fs;
