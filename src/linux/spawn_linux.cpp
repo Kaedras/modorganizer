@@ -235,6 +235,7 @@ void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
+  logSpawning(sp, sp.binary.absoluteFilePath() % " "_L1 % sp.arguments);
   if (sp.hooked) {
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         sp.binary.absoluteFilePath().toStdString(), sp.arguments.toStdString(),
@@ -312,6 +313,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
                       "/ubuntu12_64/gameoverlayrenderer.so");
       }
     }
+    logSpawning(sp, proton % " "_L1 % params);
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         proton.toStdString(), params.toStdString(),
@@ -611,8 +613,6 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
     SpawnParameters p = sp;
     p.binary          = QFileInfo(line.left(firstSpace));
     p.arguments       = line.remove(0, firstSpace).trimmed() % " "_L1 % sp.arguments;
-
-    log::debug("arguments: {}", p.arguments);
 
     e = spawn(p, handle);
   } else if (sp.binary.suffix() == "exe"_L1) {
