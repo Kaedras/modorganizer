@@ -131,3 +131,47 @@ ProcessRunner::Results waitForProcess(HANDLE initialProcess, LPDWORD exitCode,
 
   return r;
 }
+
+void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
+                          const Settings& settings)
+{
+  const QString modsPath = settings.paths().mods();
+
+  // Check if this a request with either an executable or a working directory
+  // under our mods folder then will start the process in a virtualized
+  // "environment" with the appropriate paths fixed:
+  // (i.e. mods\FNIS\path\exe => game\data\path\exe)
+  QString cwdPath         = sp.currentDirectory.absolutePath();
+  QString trailedModsPath = modsPath;
+  if (!trailedModsPath.endsWith('/')) {
+    trailedModsPath = trailedModsPath + '/';
+  }
+  bool virtualizedCwd = cwdPath.startsWith(trailedModsPath, Qt::CaseInsensitive);
+  QString binPath     = sp.binary.absoluteFilePath();
+  bool virtualizedBin = binPath.startsWith(trailedModsPath, Qt::CaseInsensitive);
+  if (virtualizedCwd || virtualizedBin) {
+    if (virtualizedCwd) {
+      int cwdOffset       = cwdPath.indexOf('/', trailedModsPath.length());
+      QString adjustedCwd = cwdPath.mid(cwdOffset, -1);
+      cwdPath             = game->dataDirectory().absolutePath();
+      if (cwdOffset >= 0)
+        cwdPath += adjustedCwd;
+    }
+
+    if (virtualizedBin) {
+      int binOffset       = binPath.indexOf('/', trailedModsPath.length());
+      QString adjustedBin = binPath.mid(binOffset, -1);
+      binPath             = game->dataDirectory().absolutePath();
+      if (binOffset >= 0)
+        binPath += adjustedBin;
+    }
+
+    QString cmdline = QString("launch \"%1\" \"%2\" %3")
+                          .arg(QDir::toNativeSeparators(cwdPath),
+                               QDir::toNativeSeparators(binPath), sp.arguments);
+
+    sp.binary    = QFileInfo(QCoreApplication::applicationFilePath());
+    sp.arguments = cmdline;
+    sp.currentDirectory.setPath(QCoreApplication::applicationDirPath());
+  }
+}
