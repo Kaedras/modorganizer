@@ -6,7 +6,7 @@ set(MO2_CMAKE_DEPRECATED_UIBASE_INCLUDE ON)
 # Remove tutorials until Qt is fixed
 set(MO2_SKIP_TUTORIALS_INSTALL ON)
 
-project(organizer VERSION 3.0.0)
+project(organizer VERSION 2.7.0)
 set(organizer_VERSION_SUFFIX alpha.1)
 
 # if MO2_INSTALL_IS_BIN is set, this means that we should install directly into the
