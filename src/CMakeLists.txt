@@ -107,13 +107,7 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 	DESTINATION ${_bin}/resources)
 
 # install ModOrganizer.exe itself
-if(WIN32)
-	install(FILES $<TARGET_FILE:organizer> DESTINATION ${_bin})
-else()
-	# install TARGETS is required for INSTALL_RPATH to take effect
-	# this also installs with correct permissions
-	install(TARGETS organizer DESTINATION ${_bin})
-endif()
+install(TARGETS organizer DESTINATION ${_bin})
 
 # install dependencies DLLs
 install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
