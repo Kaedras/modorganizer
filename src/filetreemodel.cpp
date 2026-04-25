@@ -702,15 +702,14 @@ bool FileTreeModel::addNewDirectories(FileTreeItem& parentItem,
     } else {
       if (!shouldShowFolder(*d, nullptr)) {
         // this is a new directory, but it doesn't contain anything interesting
-        trace(log::debug("new dir {}, empty and pruned",
-                         QString::fromStdWString(d->getName())));
+        trace(log::debug("new dir {}, empty and pruned", d->getName()));
 
         // act as if this directory doesn't exist at all
         continue;
       }
 
       // this is a new directory
-      trace(log::debug("new dir {}", QString::fromStdWString(d->getName())));
+      trace(log::debug("new dir {}", d->getName()));
 
       toAdd.push_back(createDirectoryItem(parentItem, parentPath, *d));
       added = true;
@@ -834,7 +833,7 @@ bool FileTreeModel::addNewFiles(FileTreeItem& parentItem,
 
       if (shouldShowFile(*file)) {
         // this is a new file
-        trace(log::debug("new file {}", QString::fromStdWString(file->getName())));
+        trace(log::debug("new file {}", file->getName()));
 
         toAdd.push_back(createFileItem(parentItem, parentPath, *file));
         added = true;
@@ -842,8 +841,7 @@ bool FileTreeModel::addNewFiles(FileTreeItem& parentItem,
         range.includeCurrent();
       } else {
         // this is a new file, but it shouldn't be shown
-        trace(log::debug("new file {}, not shown",
-                         QString::fromStdWString(file->getName())));
+        trace(log::debug("new file {}, not shown", file->getName()));
         return true;
       }
     }
