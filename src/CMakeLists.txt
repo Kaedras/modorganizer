@@ -265,6 +265,7 @@ mo2_add_filter(NAME src/mainwindow GROUPS
 	filetree
 	${os_name}/filetree_${os_name}
 	filetreeitem
+	${os_name}filetreeitem_${os_name}
 	filetreemodel
 	mainwindow
 	savestab
