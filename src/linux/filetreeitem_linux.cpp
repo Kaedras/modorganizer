@@ -125,8 +125,8 @@ void FileTreeItem::getFileType() const
     m_fileType.set(directoryFileType());
     return;
   }
-
-  const auto& t = cachedFileType(resolvePath(m_realPath), !isFromArchive());
+  const QString path = resolvePath(m_realPath);
+  const QString& t   = cachedFileType(path, !isFromArchive());
   if (t.isEmpty()) {
     m_fileType.fail();
   } else {
