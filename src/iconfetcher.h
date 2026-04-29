@@ -57,12 +57,15 @@ private:
 
   bool hasOwnIcon(const QString& path) const;
 
-  QPixmap getPixmapIcon(QFileIconProvider::IconType t) const;
-  QPixmap getPixmapIcon(const QString& t) const;
+  template <class T>
+  QPixmap getPixmapIcon(T&& t) const
+  {
+    return m_provider.icon(t).pixmap({m_iconSize, m_iconSize});
+  }
 
   void threadFun();
 
-  void checkCache(Cache& cache);
+  void checkCache(Cache& cache, bool isFile = false);
   void queue(Cache& cache, QString path) const;
 
   QVariant fileIcon(const QString& path) const;

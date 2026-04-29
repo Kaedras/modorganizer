@@ -89,11 +89,7 @@ bool IconFetcher::hasOwnIcon(const QString& path) const
          path.endsWith(ico, Qt::CaseInsensitive);
 }
 
-QPixmap IconFetcher::getPixmapIcon(QFileIconProvider::IconType t) const
-{
-  return m_provider.icon(t).pixmap({m_iconSize, m_iconSize});
-}
-
+template <>
 QPixmap IconFetcher::getPixmapIcon(const QString& t) const
 {
   QMimeDatabase db;
@@ -113,11 +109,11 @@ void IconFetcher::threadFun()
     }
 
     checkCache(m_mimeTypeCache);
-    checkCache(m_fileCache);
+    checkCache(m_fileCache, true);
   }
 }
 
-void IconFetcher::checkCache(Cache& cache)
+void IconFetcher::checkCache(Cache& cache, bool isFile)
 {
   std::set<QString> queue;
 
@@ -133,7 +129,11 @@ void IconFetcher::checkCache(Cache& cache)
 
   std::map<QString, QPixmap> map;
   for (auto&& type : queue) {
-    map.emplace(std::move(type), getPixmapIcon(type));
+    if (isFile) {
+      map.emplace(std::move(type), getPixmapIcon(QFileInfo(type)));
+    } else {
+      map.emplace(std::move(type), getPixmapIcon(type));
+    }
   }
 
   {
