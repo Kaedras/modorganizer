@@ -7,9 +7,6 @@
 namespace env
 {
 
-extern Process getProcessTreeFromProcess(HANDLE h);
-extern void findChildProcesses(Process& parent, std::vector<Process>& processes);
-
 using namespace MOBase;
 
 HandlePtr Process::openHandleForWait() const
@@ -144,6 +141,37 @@ std::vector<Process> getRunningProcesses()
   return v;
 }
 
+void findChildren(Process& parent, const std::vector<Process>& processes)
+{
+  for (auto&& p : processes) {
+    if (p.ppid() == parent.pid()) {
+      Process child = p;
+      findChildren(child, processes);
+
+      parent.addChild(child);
+    }
+  }
+}
+
+Process getProcessTreeFromProcess(HANDLE h)
+{
+  Process root;
+
+  const auto parentPID = ::GetProcessId(h);
+  const auto v         = getRunningProcesses();
+
+  for (auto&& p : v) {
+    if (p.pid() == parentPID) {
+      Process child = p;
+      findChildren(child, v);
+      root.addChild(child);
+      break;
+    }
+  }
+
+  return root;
+}
+
 std::vector<DWORD> processesInJob(HANDLE h)
 {
   const int MaxTries = 5;
@@ -194,6 +222,26 @@ std::vector<DWORD> processesInJob(HANDLE h)
              lastCount, lastAssigned);
 
   return {};
+}
+
+void findChildProcesses(Process& parent, std::vector<Process>& processes)
+{
+  // find all processes that are direct children of `parent`
+  auto itor = processes.begin();
+
+  while (itor != processes.end()) {
+    if (itor->ppid() == parent.pid()) {
+      parent.addChild(*itor);
+      itor = processes.erase(itor);
+    } else {
+      ++itor;
+    }
+  }
+
+  // find all processes that are direct children of `parent`'s children
+  for (auto&& c : parent.children()) {
+    findChildProcesses(c, processes);
+  }
 }
 
 Process getProcessTreeFromJob(HANDLE h)

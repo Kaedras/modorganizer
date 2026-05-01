@@ -9,8 +9,6 @@ namespace env
 
 using namespace MOBase;
 
-extern Process getProcessTreeFromProcess(HANDLE h);
-
 HandlePtr Process::openHandleForWait() const
 {
   HandlePtr h = pidfd_open((pid_t)m_pid, PIDFD_NONBLOCK);
@@ -68,6 +66,36 @@ std::vector<Module> getLoadedModules()
   return v;
 }
 
+// check if the provided process is either dead or a zombie
+// also gets the ppid because both are read from /proc/pid/stat
+bool processIsDeadOrZombie(pid_t pid, pid_t& ppid)
+{
+  char state;
+
+  FILE* file = fopen(format("/proc/{}/stat", pid).c_str(), "r");
+  if (file == nullptr) {
+    const int e = errno;
+    if (e != EACCES && e != ENOENT) {
+      log::warn("error opening stats for pid {}, {}", pid, strerror(e));
+    }
+    return true;
+  }
+  int itemsRead = fscanf(file, "%*u (%*[^)]%*[)] %c %d", &state, &ppid);
+  fclose(file);
+  if (itemsRead != 2) {
+    if (errno != EACCES) {
+      log::warn("error reading stats for pid {}, {}", pid, strerror(errno));
+    }
+    return true;
+  }
+
+  if (state == 'Z' || state == 'X') {
+    return true;
+  }
+
+  return false;
+}
+
 std::vector<Process> getRunningProcesses()
 {
   vector<Process> v;
@@ -96,28 +124,8 @@ std::vector<Process> getRunningProcesses()
           continue;
         }
 
-        char state;
         pid_t ppid;
-
-        FILE* file = fopen(format("/proc/{}/stat", pid).c_str(), "r");
-        if (file == nullptr) {
-          const int e = errno;
-          if (e != EACCES && e != ENOENT) {
-            log::warn("error opening stats for pid {}, {}", pid, strerror(e));
-          }
-          continue;
-        }
-        int itemsRead = fscanf(file, "%*u (%*[^)]%*[)] %c %d", &state, &ppid);
-        fclose(file);
-        if (itemsRead != 2) {
-          if (errno != EACCES) {
-            log::warn("error reading stats for pid {}, {}", pid, strerror(errno));
-          }
-          continue;
-        }
-
-        // don't include zombies and dead processes
-        if (state == 'Z' || state == 'X') {
+        if (processIsDeadOrZombie(pid, ppid)) {
           continue;
         }
 
@@ -133,9 +141,45 @@ std::vector<Process> getRunningProcesses()
   return v;
 }
 
+void getChildren(Process& p)
+{
+  // according to proc_tid_children(5) this approach may be unreliable, so further
+  // testing is needed
+  fs::path taskDir = "/proc/" + to_string(p.pid()) + "/task";
+  try {
+    for (const auto& tid : fs::directory_iterator(taskDir)) {
+      ifstream file(tid.path() / "children");
+      pid_t pid;
+      file >> pid;
+      while (!file.eof()) {
+        pid_t ppid;
+        if (processIsDeadOrZombie(pid, ppid)) {
+          continue;
+        }
+
+        Process child{static_cast<DWORD>(pid), static_cast<DWORD>(ppid),
+                      getProcessName(static_cast<DWORD>(pid))};
+        getChildren(child);
+        p.addChild(child);
+        file >> pid;
+      }
+    }
+  } catch (const fs::filesystem_error& ex) {
+    log::error("error while iterating over '{}', {}", taskDir.string(), ex.what());
+  }
+}
+
 Process getProcessTree(HANDLE h)
 {
-  return getProcessTreeFromProcess(h);
+  Process root;
+  DWORD pid = GetProcessId(h);
+  pid_t ppid;
+  if (!processIsDeadOrZombie(pid, ppid)) {
+    Process child{pid, static_cast<DWORD>(ppid), getProcessName(pid)};
+    getChildren(child);
+    root.addChild(child);
+  }
+  return root;
 }
 
 QString getProcessName(HANDLE process)
