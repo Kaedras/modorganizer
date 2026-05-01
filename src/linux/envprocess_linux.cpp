@@ -138,6 +138,11 @@ Process getProcessTree(HANDLE h)
   return getProcessTreeFromProcess(h);
 }
 
+QString getProcessName(HANDLE process)
+{
+  return getProcessName(GetProcessId(process));
+}
+
 QString getProcessName(DWORD pid)
 {
   error_code ec;
