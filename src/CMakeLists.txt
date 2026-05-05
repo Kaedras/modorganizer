@@ -67,7 +67,7 @@ if(WIN32)
 	target_sources(organizer PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
 endif()
 
-if(UNIX)
+if(UNIX AND DEFINED VCPKG_TARGET_TRIPLET)
 	set_target_properties(organizer PROPERTIES INSTALL_RPATH ".:./lib/")
 endif()
 
