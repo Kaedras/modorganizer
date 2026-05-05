@@ -3,13 +3,21 @@ cmake_minimum_required(VERSION 3.16)
 find_package(mo2-cmake CONFIG REQUIRED)
 
 if (UNIX)
-	find_package(usvfs-fuse CONFIG REQUIRED)
-	find_package(unofficial-breakpad CONFIG REQUIRED)
 	find_package(PkgConfig REQUIRED)
+	find_package(usvfs-fuse CONFIG REQUIRED)
+	if (DEFINED VCPKG_TARGET_TRIPLET)
+		find_package(unofficial-breakpad CONFIG REQUIRED)
+		set(breakpad_targets unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client)
+	else()
+		message(STATUS "Using system installation of breakpad")
+		pkg_check_modules(breakpad REQUIRED IMPORTED_TARGET breakpad)
+		pkg_check_modules(breakpad-client REQUIRED IMPORTED_TARGET breakpad-client)
+		set(breakpad_targets PkgConfig::breakpad PkgConfig::breakpad-client)
+	endif()
 	pkg_check_modules(libsecret REQUIRED IMPORTED_TARGET libsecret-1)
 	set(OS_SPECIFIC_PRIVATE_DEPS
 			usvfs-fuse
-			unofficial::breakpad::libbreakpad unofficial::breakpad::libbreakpad_client
+			${breakpad_targets}
 			PkgConfig::libsecret
 	)
 	set(LIBRARY_DIR lib)
