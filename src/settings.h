@@ -21,6 +21,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #define SETTINGS_H
 
 #include "envdump.h"
+#include <QSettings>
+#include <QVersionNumber>
 #include <lootcli/lootcli.h>
 #include <questionboxmemory.h>
 #include <uibase/filterwidget.h>
@@ -38,6 +40,10 @@ class ExpanderWidget;
 }  // namespace MOBase
 
 class QSplitter;
+class QMainWindow;
+class QHeaderView;
+class QComboBox;
+class QTreeView;
 
 class ServerList;
 class Settings;

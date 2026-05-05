@@ -21,6 +21,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "copyeventfilter.h"
 #include "env.h"
 #include "organizercore.h"
+#include <QActionGroup>
+#include <QApplication>
+#include <QClipboard>
+#include <QGuiApplication>
+#include <QHeaderView>
+#include <QMenu>
+#include <QMessageBox>
 
 #ifdef __unix__
 static constexpr const char* userEnvVariable = "USER";

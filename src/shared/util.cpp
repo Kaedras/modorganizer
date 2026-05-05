@@ -21,6 +21,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "../env.h"
 #include "../mainwindow.h"
 #include "os_error.h"
+#include <QApplication>
 #include <uibase/log.h>
 
 using namespace MOBase;

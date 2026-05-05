@@ -7,6 +7,8 @@
 #include "organizercore.h"
 #include "shared/appconfig.h"
 #include "shared/util.h"
+#include <QApplication>
+#include <boost/program_options.hpp>
 #include <log.h>
 #include <report.h>
 

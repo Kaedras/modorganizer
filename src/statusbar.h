@@ -8,6 +8,7 @@ struct APIStats;
 class APIUserAccount;
 class Settings;
 class OrganizerCore;
+class QLabel;
 
 namespace Ui
 {

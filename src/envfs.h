@@ -4,6 +4,7 @@
 #include "thread_utils.h"
 #include <QDateTime>
 #include <QString>
+#include <condition_variable>
 #include <thread>
 
 namespace env

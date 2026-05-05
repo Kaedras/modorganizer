@@ -6,7 +6,6 @@ using namespace Qt::StringLiterals;
 
 namespace env
 {
-using namespace MOBase;
 
 Module::Module(QString path, std::size_t fileSize)
     : m_path(std::move(path)), m_fileSize(fileSize)

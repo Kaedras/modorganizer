@@ -1,5 +1,8 @@
 #include "shared/util.h"
 #include "version.h"
+#include <QDir>
+#include <sys/prctl.h>
+#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 

@@ -27,6 +27,7 @@
 #include "modlistversiondelegate.h"
 #include "modlistviewactions.h"
 #include "organizercore.h"
+#include <QInputDialog>
 
 using namespace MOBase;
 using namespace MOShared;

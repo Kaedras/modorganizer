@@ -2,6 +2,7 @@
 #define MODORGANIZER_COMMANDLINE_INCLUDED
 #include "moshortcut.h"
 #include "shared/nativeString.h"
+#include <boost/program_options.hpp>
 #include <memory>
 #include <vector>
 

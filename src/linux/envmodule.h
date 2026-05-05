@@ -1,6 +1,9 @@
 #ifndef ENV_MODULE_H
 #define ENV_MODULE_H
 
+#include <QDateTime>
+#include <QString>
+
 namespace env
 {
 // represents one module

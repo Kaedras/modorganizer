@@ -20,9 +20,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef CATEGORIES_H
 #define CATEGORIES_H
 
+#include <QObject>
 #include <QString>
 #include <functional>
 #include <map>
+#include <set>
 #include <vector>
 
 class CategoriesDialog;

@@ -1,5 +1,7 @@
 #include "shared/fileentry.h"
+#include <QAbstractItemModel>
 
+class QTreeView;
 class PluginContainer;
 
 class ConflictItem

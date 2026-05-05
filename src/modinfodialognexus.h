@@ -2,6 +2,7 @@
 #define MODINFODIALOGNEXUS_H
 
 #include "modinfodialogtab.h"
+#include <QWebEnginePage>
 
 class NexusTabWebpage : public QWebEnginePage
 {

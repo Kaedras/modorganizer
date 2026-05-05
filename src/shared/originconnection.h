@@ -3,6 +3,9 @@
 
 #include "fileregisterfwd.h"
 
+#include <map>
+#include <mutex>
+
 namespace MOShared
 {
 

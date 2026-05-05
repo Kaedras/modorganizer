@@ -6,6 +6,7 @@
 #include "settingsdialognexus.h"
 #include "shared/appconfig.h"
 #include "ui_createinstancedialog.h"
+#include <QFileDialog>
 #include <iplugingame.h>
 #include <report.h>
 #include <utility.h>

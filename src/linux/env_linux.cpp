@@ -4,6 +4,12 @@
 #include "envprocess.h"
 #include "shared/util.h"
 
+#include <QStandardPaths>
+#include <client/linux/handler/exception_handler.h>
+#include <client/linux/minidump_writer/minidump_writer.h>
+#include <iostream>
+#include <utility.h>
+
 using namespace Qt::StringLiterals;
 using namespace std;
 namespace fs = std::filesystem;

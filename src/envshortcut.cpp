@@ -3,6 +3,7 @@
 #include "executableslist.h"
 #include "filesystemutilities.h"
 #include "instancemanager.h"
+#include <QApplication>
 #include <log.h>
 #include <utility.h>
 

@@ -2,6 +2,9 @@
 #include "activatemodsdialog.h"
 #include "organizercore.h"
 #include "ui_mainwindow.h"
+#include <QMessageBox>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <iplugingame.h>
 #include <isavegameinfowidget.h>
 #include <localsavegames.h>

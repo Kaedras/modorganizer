@@ -42,11 +42,13 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QFutureWatcher>
 #include <QInputDialog>
 #include <QLibrary>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
+#include <QTemporaryFile>
 #include <QTextDocument>
 #include <QtConcurrent/QtConcurrentRun>
 

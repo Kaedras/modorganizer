@@ -30,6 +30,7 @@ class Instance;
 class PluginContainer;
 class OrganizerCore;
 class NexusInterface;
+class QSplashScreen;
 
 namespace MOBase
 {

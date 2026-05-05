@@ -38,6 +38,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPushButton>
 #include <QThread>
 #include <QUrlQuery>
+#include <boost/uuid.hpp>
 
 using namespace MOBase;
 using namespace std::chrono_literals;

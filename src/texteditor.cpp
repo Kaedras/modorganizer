@@ -1,6 +1,13 @@
 #include "texteditor.h"
 #include "utility.h"
+#include <QLineEdit>
+#include <QPainter>
+#include <QScopedValueRollback>
 #include <QSplitter>
+#include <QStyle>
+#include <QStyleOption>
+#include <QToolButton>
+#include <QVBoxLayout>
 #include <log.h>
 
 using namespace MOBase;

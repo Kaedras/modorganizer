@@ -3,6 +3,8 @@
 #include "colortable.h"
 #include "shared/appconfig.h"
 #include "ui_settingsdialog.h"
+#include <QDirIterator>
+#include <QMessageBox>
 #include <questionboxmemory.h>
 #include <utility.h>
 

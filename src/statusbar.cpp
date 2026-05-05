@@ -4,6 +4,7 @@
 #include "organizercore.h"
 #include "settings.h"
 #include "ui_mainwindow.h"
+#include <QLabel>
 
 StatusBar::StatusBar(QWidget* parent)
     : QStatusBar(parent), ui(nullptr), m_normal(new QLabel),

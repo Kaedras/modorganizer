@@ -2,6 +2,9 @@
 #define MO_REGISTER_FILESORIGIN_INCLUDED
 
 #include "fileregisterfwd.h"
+#include <boost/smart_ptr/weak_ptr.hpp>
+#include <mutex>
+#include <set>
 
 namespace MOShared
 {

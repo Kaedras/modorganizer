@@ -26,6 +26,17 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "serverinfo.h"
 #include "settingsutilities.h"
 #include "shared/appconfig.h"
+#include <QApplication>
+#include <QComboBox>
+#include <QDockWidget>
+#include <QHeaderView>
+#include <QMessageBox>
+#include <QScreen>
+#include <QSplitter>
+#include <QTimer>
+#include <QToolBar>
+#include <QTreeView>
+#include <QWindow>
 #include <expanderwidget.h>
 #include <iplugingame.h>
 #include <utility.h>

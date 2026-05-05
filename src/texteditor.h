@@ -2,8 +2,11 @@
 #define MO_TEXTEDITOR_H
 
 #include <QPlainTextEdit>
+#include <QSyntaxHighlighter>
+#include <QTextEdit>
 
 class TextEditor;
+class QLineEdit;
 
 class TextEditorToolbar : public QFrame
 {

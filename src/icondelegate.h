@@ -24,6 +24,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QAbstractProxyModel>
 #include <QStyledItemDelegate>
 
+class QTreeView;
+
 class IconDelegate : public QStyledItemDelegate
 {
   Q_OBJECT;

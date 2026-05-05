@@ -38,6 +38,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFile>
 #include <QPainter>
 #include <QProxyStyle>
+#include <QSplashScreen>
 #include <QSslSocket>
 #include <QStringList>
 #include <QStyleFactory>

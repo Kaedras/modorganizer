@@ -1,5 +1,6 @@
 #include "modinfodialogconflictsmodels.h"
 #include "modinfodialog.h"
+#include <QTreeView>
 #include <utility.h>
 
 using MOBase::naturalCompare;

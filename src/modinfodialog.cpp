@@ -31,6 +31,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "shared/directoryentry.h"
 #include "shared/filesorigin.h"
 #include "ui_modinfodialog.h"
+#include <QScopedValueRollback>
 #include <filesystem>
 
 using namespace MOBase;

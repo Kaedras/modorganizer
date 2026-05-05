@@ -1,5 +1,9 @@
 #include "env.h"
 #include "envshortcut.h"
+#include <QIcon>
+#include <QStandardPaths>
+#include <log.h>
+#include <utility.h>
 
 using namespace Qt::StringLiterals;
 

@@ -4,6 +4,8 @@
 #include "serverinfo.h"
 #include "ui_nexusmanualkey.h"
 #include "ui_settingsdialog.h"
+#include <QClipboard>
+#include <QFileDialog>
 #include <utility.h>
 
 using namespace MOBase;

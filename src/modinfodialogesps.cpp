@@ -2,6 +2,8 @@
 #include "modinfodialog.h"
 #include "settings.h"
 #include "ui_modinfodialog.h"
+#include <QInputDialog>
+#include <QListView>
 #include <log.h>
 #include <report.h>
 

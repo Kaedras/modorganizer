@@ -2,6 +2,9 @@
 #define MODORGANIZER_SAVESTAB_INCLUDED
 
 #include "savegameinfo.h"
+#include <QDir>
+#include <QFileSystemWatcher>
+#include <QTimer>
 #include <filterwidget.h>
 
 namespace Ui
@@ -17,6 +20,8 @@ class ISaveGameInfoWidget;
 
 class MainWindow;
 class OrganizerCore;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 class SavesTab : public QObject
 {

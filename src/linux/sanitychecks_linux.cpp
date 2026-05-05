@@ -1,5 +1,8 @@
 #include "env.h"
 
+#include <QStandardPaths>
+#include <utility.h>
+
 using namespace Qt::StringLiterals;
 
 namespace sanity

@@ -2,6 +2,8 @@
 #include "modconflicticondelegate.h"
 #include "modflagicondelegate.h"
 #include "settings.h"
+#include <QColorDialog>
+#include <QPainter>
 
 class ColorItem;
 ColorItem* colorItemForRow(QTableWidget* table, int row);

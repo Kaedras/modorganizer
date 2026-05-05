@@ -6,6 +6,8 @@
 #include "settings.h"
 #include "settingsdialog.h"
 
+class QTreeWidgetItem;
+
 class PluginsSettingsTab : public SettingsTab
 {
 public:

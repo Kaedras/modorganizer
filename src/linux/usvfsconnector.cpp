@@ -2,6 +2,9 @@
 #include "organizercore.h"
 #include "settings.h"
 #include "shared/util.h"
+#include <QApplication>
+#include <sys/wait.h>
+#include <usvfs-fuse/usvfsmanager.h>
 
 static constexpr char SHMID[] = "mod_organizer_instance";
 using namespace MOBase;

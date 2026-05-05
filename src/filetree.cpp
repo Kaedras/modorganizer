@@ -6,6 +6,13 @@
 #include "shared/directoryentry.h"
 #include "shared/fileentry.h"
 #include "shared/filesorigin.h"
+#include <QApplication>
+#include <QFileDialog>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QMenu>
+#include <QMessageBox>
+#include <QTreeView>
 #include <log.h>
 #include <widgetutility.h>
 

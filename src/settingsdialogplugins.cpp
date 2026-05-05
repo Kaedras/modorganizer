@@ -1,12 +1,13 @@
 #include "settingsdialogplugins.h"
-#include "noeditdelegate.h"
-#include "ui_settingsdialog.h"
-#include <iplugin.h>
-#include <ranges>
-
 #include "disableproxyplugindialog.h"
+#include "noeditdelegate.h"
 #include "organizercore.h"
 #include "plugincontainer.h"
+#include "ui_settingsdialog.h"
+#include <QMessageBox>
+#include <QTreeWidgetItem>
+#include <iplugin.h>
+#include <ranges>
 
 using namespace MOBase;
 

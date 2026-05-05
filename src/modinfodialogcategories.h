@@ -1,5 +1,6 @@
 #include "modinfodialogtab.h"
 
+class QTreeWidgetItem;
 class CategoryFactory;
 
 class CategoriesTab : public ModInfoDialogTab

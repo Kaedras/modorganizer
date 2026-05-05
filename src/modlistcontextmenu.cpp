@@ -6,6 +6,9 @@
 #include "modlistview.h"
 #include "modlistviewactions.h"
 #include "organizercore.h"
+#include <QPushButton>
+#include <QRadioButton>
+#include <QWidgetAction>
 
 using namespace MOBase;
 

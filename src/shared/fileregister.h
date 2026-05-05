@@ -3,7 +3,9 @@
 
 #include "fileregisterfwd.h"
 #include <boost/shared_ptr.hpp>
+#include <deque>
 #include <mutex>
+#include <set>
 
 namespace MOShared
 {

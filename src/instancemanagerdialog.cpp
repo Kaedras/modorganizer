@@ -8,6 +8,8 @@
 #include "shared/appconfig.h"
 #include "shared/util.h"
 #include "ui_instancemanagerdialog.h"
+#include <QListWidget>
+#include <QStandardItemModel>
 #include <iplugingame.h>
 #include <report.h>
 #include <utility.h>

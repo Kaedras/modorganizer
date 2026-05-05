@@ -11,6 +11,7 @@ class InstanceManagerDialog;
 
 class Instance;
 class PluginContainer;
+class QStandardItemModel;
 
 // a dialog to manage existing instances
 //

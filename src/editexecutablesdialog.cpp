@@ -25,6 +25,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "spawn.h"
 #include "ui_editexecutablesdialog.h"
 
+#include <QCompleter>
+#include <QMenu>
 #include <QMessageBox>
 #include <algorithm>
 #include <utility.h>

@@ -3,6 +3,8 @@
 #include "modinfo.h"
 #include "modinfodialogfwd.h"
 #include "shared/util.h"
+#include <QMimeDatabase>
+#include <QMimeType>
 #include <log.h>
 #include <utility.h>
 

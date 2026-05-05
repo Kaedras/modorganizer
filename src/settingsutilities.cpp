@@ -1,5 +1,8 @@
 #include "settingsutilities.h"
 #include "expanderwidget.h"
+#include <QDockWidget>
+#include <QHeaderView>
+#include <QMainWindow>
 #include <utility.h>
 
 using namespace MOBase;

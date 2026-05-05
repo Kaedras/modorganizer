@@ -2,6 +2,8 @@
 #define MO_REGISTER_FILEENTRY_INCLUDED
 
 #include "fileregisterfwd.h"
+#include <QDateTime>
+#include <mutex>
 
 namespace MOShared
 {

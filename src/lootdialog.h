@@ -1,6 +1,8 @@
 #ifndef MODORGANIZER_LOOTDIALOG_H
 #define MODORGANIZER_LOOTDIALOG_H
 
+#include <QDialog>
+#include <QWebEnginePage>
 #include <expanderwidget.h>
 #include <log.h>
 #include <lootcli/lootcli.h>

@@ -24,8 +24,11 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "originconnection.h"
 #include "os_error.h"
 #include "util.h"
+#include <QFile>
+#include <QRegularExpression>
 #include <filesystem>
 #include <log.h>
+#include <stack>
 #include <utility.h>
 
 using namespace Qt::StringLiterals;

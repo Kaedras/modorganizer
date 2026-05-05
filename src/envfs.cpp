@@ -1,7 +1,9 @@
 #include "envfs.h"
 #include "env.h"
 #include "shared/util.h"
+#include <QDirIterator>
 #include <log.h>
+#include <stack>
 #include <utility.h>
 
 using namespace MOBase;

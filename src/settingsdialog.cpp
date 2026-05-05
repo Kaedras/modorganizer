@@ -27,6 +27,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "settingsdialogtheme.h"
 #include "settingsdialogworkarounds.h"
 #include "ui_settingsdialog.h"
+#include <QMessageBox>
 
 using namespace MOBase;
 

@@ -2,6 +2,7 @@
 #define ENV_SECURITY_H
 
 #include <QString>
+#include <QStringList>
 #include <QUuid>
 
 namespace env

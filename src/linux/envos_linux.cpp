@@ -1,7 +1,6 @@
 #include "../envos.h"
 
-using namespace MOBase;
-using namespace Qt::StringLiterals;
+#include <unistd.h>
 
 namespace env
 {

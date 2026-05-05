@@ -4,6 +4,8 @@
 #include "filetreeitem.h"
 #include "iconfetcher.h"
 #include "shared/fileregisterfwd.h"
+#include <QAbstractItemModel>
+#include <QTimer>
 #include <unordered_set>
 
 class OrganizerCore;

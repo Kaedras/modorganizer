@@ -1,6 +1,7 @@
 #include "modcontenticondelegate.h"
 
 #include "modlistview.h"
+#include <QToolTip>
 
 ModContentIconDelegate::ModContentIconDelegate(ModListView* view, int column,
                                                int compactSize)

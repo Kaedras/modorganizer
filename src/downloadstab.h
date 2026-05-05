@@ -1,14 +1,17 @@
 #ifndef MODORGANIZER_DOWNLOADTAB_INCLUDED
 #define MODORGANIZER_DOWNLOADTAB_INCLUDED
 
+#include <QObject>
 #include <filterwidget.h>
 
+class QCheckBox;
 namespace Ui
 {
 class MainWindow;
 }
 class OrganizerCore;
 class DownloadListView;
+class QPushButton;
 
 class DownloadsTab : public QObject
 {

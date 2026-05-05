@@ -1,5 +1,9 @@
 #include "../envsecurity.h"
 #include "../env.h"
+#include <linux/compatibility.h>
+#include <log.h>
+#include <pwd.h>
+#include <utility.h>
 
 namespace
 {

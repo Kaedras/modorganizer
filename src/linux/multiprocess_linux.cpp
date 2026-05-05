@@ -1,5 +1,8 @@
 #include "envprocess.h"
 #include "multiprocess.h"
+#include <QApplication>
+#include <log.h>
+#include <sys/mman.h>
 
 // From https://doc.qt.io/qt-6/native-ipc-keys.html#ownership:
 // On Unix systems, the Qt classes that created the object will be responsible for

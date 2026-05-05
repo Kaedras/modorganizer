@@ -2,6 +2,10 @@
 #include "json.h"
 #include "lootdialog.h"
 #include "organizercore.h"
+#include <QApplication>
+#include <QJsonArray>
+#include <report.h>
+#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 using namespace json;

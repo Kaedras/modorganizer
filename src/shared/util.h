@@ -20,6 +20,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <QMenu>
 #include <filesystem>
 #include <string>
 
@@ -30,6 +31,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <uibase/log.h>
 #include <uibase/versioning.h>
 
+class QDir;
 class Executable;
 
 namespace MOShared

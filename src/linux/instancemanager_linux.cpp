@@ -1,4 +1,6 @@
 #include "instancemanager.h"
+#include <QApplication>
+#include <log.h>
 
 QString Instance::prefixDirectory() const
 {

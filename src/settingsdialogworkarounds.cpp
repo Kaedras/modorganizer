@@ -2,6 +2,7 @@
 #include "settings.h"
 #include "spawn.h"
 #include "ui_settingsdialog.h"
+#include <QInputDialog>
 #include <iplugingame.h>
 #include <log.h>
 #include <report.h>

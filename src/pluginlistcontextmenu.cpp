@@ -1,5 +1,6 @@
 #include "pluginlistcontextmenu.h"
 
+#include <QInputDialog>
 #include <report.h>
 #include <utility.h>
 

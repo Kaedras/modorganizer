@@ -5,6 +5,8 @@
 #include <QAbstractItemView>
 #include <QColor>
 
+class QTreeView;
+
 namespace MOShared
 {
 

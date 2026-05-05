@@ -1,6 +1,8 @@
 #include "env.h"
 #include "organizercore.h"
 #include "processrunner.h"
+#include <sys/wait.h>
+#include <usvfs-fuse/usvfsmanager.h>
 
 using namespace MOBase;
 using namespace std;

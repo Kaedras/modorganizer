@@ -3,6 +3,7 @@
 
 #include "modinfodialogtab.h"
 
+class QListView;
 class ESPItem;
 class ESPListModel;
 

@@ -19,6 +19,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "messagedialog.h"
 #include "ui_messagedialog.h"
+#include <QMainWindow>
 #include <QResizeEvent>
 #include <QTimer>
 #include <log.h>

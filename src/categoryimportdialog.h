@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+class QAbstractButton;
 namespace Ui
 {
 class CategoryImportDialog;

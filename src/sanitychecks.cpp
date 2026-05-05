@@ -2,6 +2,8 @@
 #include "env.h"
 #include "envmodule.h"
 #include "settings.h"
+#include <QApplication>
+#include <QCoreApplication>
 #include <iplugingame.h>
 #include <log.h>
 #include <utility.h>

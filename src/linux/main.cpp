@@ -7,6 +7,11 @@
 #include "organizercore.h"
 #include "shared/util.h"
 #include "thread_utils.h"
+#include <QMessageBox>
+#include <client/linux/handler/exception_handler.h>
+#include <client/linux/minidump_writer/minidump_writer.h>
+#include <report.h>
+#include <sys/prctl.h>
 
 using namespace MOBase;
 using namespace std;

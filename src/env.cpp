@@ -8,7 +8,10 @@
 #include "envshortcut.h"
 #include "settings.h"
 #include "shared/util.h"
+#include <QCoreApplication>
+#include <QStorageInfo>
 #include <fcntl.h>
+#include <iostream>
 #include <log.h>
 #include <utility.h>
 

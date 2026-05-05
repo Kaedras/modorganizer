@@ -2,6 +2,8 @@
 #include "shared/util.h"
 #include "thread_utils.h"
 
+#include <QMimeDatabase>
+
 namespace
 {
 int getIconSize()

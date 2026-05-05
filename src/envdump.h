@@ -1,6 +1,9 @@
 #ifndef MODORGANIZER_ENVDUMP_INCLUDED
 #define MODORGANIZER_ENVDUMP_INCLUDED
 
+#include <QString>
+#include <string>
+
 namespace env
 {
 

@@ -4,6 +4,7 @@
 #include "organizercore.h"
 #include "settings.h"
 #include "ui_modinfodialog.h"
+#include <QScopedValueRollback>
 #include <log.h>
 #include <utility.h>
 #include <versioninfo.h>

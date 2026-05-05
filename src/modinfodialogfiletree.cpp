@@ -3,6 +3,7 @@
 #include "modinfodialog.h"
 #include "organizercore.h"
 #include "ui_modinfodialog.h"
+#include <QMenu>
 #include <log.h>
 #include <report.h>
 #include <utility.h>

@@ -3,6 +3,7 @@
 #include "shared/filesorigin.h"
 #include "texteditor.h"
 #include "ui_modinfodialog.h"
+#include <QColorDialog>
 
 ModInfoDialogTab::ModInfoDialogTab(ModInfoDialogTabContext cx)
     : ui(cx.ui), m_parent(cx.parent), m_core(cx.core), m_plugin(cx.plugin),

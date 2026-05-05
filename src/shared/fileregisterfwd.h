@@ -1,6 +1,12 @@
 #ifndef MO_REGISTER_FILEREGISTERFWD_INCLUDED
 #define MO_REGISTER_FILEREGISTERFWD_INCLUDED
 
+#include <QHash>
+#include <QString>
+#include <boost/shared_ptr.hpp>
+#include <chrono>
+#include <climits>
+
 class DirectoryRefreshProgress;
 
 namespace MOShared

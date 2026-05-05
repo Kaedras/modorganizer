@@ -14,6 +14,8 @@ class OrganizerCore;
 class MainWindow;
 class ModListViewActions;
 class PluginListSortProxy;
+class QLCDNumber;
+class QLineEdit;
 
 class PluginListView : public QTreeView
 {

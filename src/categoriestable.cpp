@@ -18,6 +18,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "categoriestable.h"
+#include <QIODevice>
+#include <QMimeData>
 
 CategoriesTable::CategoriesTable(QWidget* parent) : QTableWidget(parent) {}
 

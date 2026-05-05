@@ -1,7 +1,13 @@
 #ifndef SETTINGSUTILITIES_H
 #define SETTINGSUTILITIES_H
 
+#include <QSettings>
 #include <log.h>
+
+class QAbstractButton;
+class QDockWidget;
+class QHeaderView;
+class QMainWindow;
 
 namespace MOBase
 {

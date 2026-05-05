@@ -30,6 +30,11 @@
 #include "shared/directoryentry.h"
 #include "shared/fileregister.h"
 #include "shared/filesorigin.h"
+#include <QBuffer>
+#include <QButtonGroup>
+#include <QColorDialog>
+#include <QDirIterator>
+#include <QRadioButton>
 
 using namespace MOBase;
 using namespace MOShared;

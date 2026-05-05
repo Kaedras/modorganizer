@@ -4,6 +4,8 @@
 #include "modlist.h"
 #include "shared/appconfig.h"
 #include "ui_settingsdialog.h"
+#include <QDirIterator>
+#include <QStyleFactory>
 #include <questionboxmemory.h>
 #include <utility.h>
 

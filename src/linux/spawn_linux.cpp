@@ -5,6 +5,15 @@
 #include "envsecurity.h"
 #include "settings.h"
 #include "shared/util.h"
+#include <QDirIterator>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QProcess>
+#include <report.h>
+#include <steamutility.h>
+#include <sys/wait.h>
+#include <usvfs-fuse/usvfsmanager.h>
+#include <utility.h>
 
 using namespace MOBase;
 using namespace MOShared;

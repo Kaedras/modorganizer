@@ -1,6 +1,7 @@
 #ifndef ENV_ENV_H
 #define ENV_ENV_H
 
+#include <QFileInfo>
 #include <QString>
 #include <set>
 #include <vector>

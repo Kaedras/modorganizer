@@ -1,5 +1,9 @@
 #include "envprocess.h"
 
+#include <QFile>
+#include <QFileInfo>
+#include <log.h>
+
 using namespace std;
 using namespace Qt::StringLiterals;
 namespace fs = std::filesystem;

@@ -1,6 +1,13 @@
 #include "createinstancedialogpages.h"
 #include "ui_createinstancedialog.h"
 
+#include <QDir>
+#include <QFile>
+#include <QFileDialog>
+#include <iplugingame.h>
+#include <log.h>
+#include <steamutility.h>
+
 namespace cid
 {
 

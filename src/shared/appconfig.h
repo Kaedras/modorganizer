@@ -20,7 +20,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef APPCONFIG_H
 #define APPCONFIG_H
 
-#include <string>
+#include <QString>
 
 namespace AppConfig
 {

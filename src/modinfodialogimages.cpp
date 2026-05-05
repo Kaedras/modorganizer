@@ -2,6 +2,8 @@
 #include "settings.h"
 #include "ui_modinfodialog.h"
 #include "utility.h"
+#include <QImageReader>
+#include <QToolTip>
 #include <log.h>
 
 using namespace MOBase;

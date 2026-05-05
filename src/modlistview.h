@@ -27,6 +27,8 @@ class Profile;
 class ModListByPriorityProxy;
 class ModListViewActions;
 class PluginListView;
+class QComboBox;
+class QPushButton;
 
 class ModListView : public QTreeView
 {

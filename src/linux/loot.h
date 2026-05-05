@@ -1,6 +1,12 @@
 #ifndef MODORGANIZER_LOOT_H
 #define MODORGANIZER_LOOT_H
 
+#include <QMetaType>
+#include <QObject>
+#include <QProcess>
+#include <log.h>
+#include <lootcli/lootcli.h>
+
 Q_DECLARE_METATYPE(lootcli::Progress);
 Q_DECLARE_METATYPE(MOBase::log::Levels);
 

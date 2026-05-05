@@ -1,6 +1,8 @@
 #include "settingsdialogpaths.h"
 #include "shared/appconfig.h"
 #include "ui_settingsdialog.h"
+#include <QFileDialog>
+#include <QMessageBox>
 #include <iplugingame.h>
 
 PathsSettingsTab::PathsSettingsTab(Settings& s, SettingsDialog& d)

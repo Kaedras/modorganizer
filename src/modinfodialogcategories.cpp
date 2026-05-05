@@ -2,6 +2,7 @@
 #include "categories.h"
 #include "modinfo.h"
 #include "ui_modinfodialog.h"
+#include <QTreeWidgetItem>
 
 CategoriesTab::CategoriesTab(ModInfoDialogTabContext cx)
     : ModInfoDialogTab(std::move(cx))

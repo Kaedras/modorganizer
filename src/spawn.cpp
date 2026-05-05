@@ -41,6 +41,9 @@ using namespace Qt::StringLiterals;
 
 #ifdef __unix__
 #include "linux/compatibility.h"
+#ifndef FALSE
+#define FALSE false
+#endif
 static const auto steamName        = "steam"_L1;
 static const auto steamServiceName = "steamwebhelper"_L1;
 #else

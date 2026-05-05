@@ -8,6 +8,7 @@
 #include "shared/filesorigin.h"
 #include "ui_modinfodialog.h"
 #include "utility.h"
+#include <QMenu>
 
 using namespace MOShared;
 using namespace MOBase;

@@ -13,6 +13,7 @@ class OrganizerCore;
 class PluginContainer;
 class FileTreeModel;
 class FileTreeItem;
+class QTreeView;
 
 class FileTree : public QObject
 {

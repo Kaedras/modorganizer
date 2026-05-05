@@ -3,6 +3,7 @@
 #include <QLocalSocket>
 #include <log.h>
 #include <report.h>
+#include <thread>
 
 using namespace std::chrono_literals;
 

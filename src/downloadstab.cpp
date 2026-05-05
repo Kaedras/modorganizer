@@ -3,6 +3,8 @@
 #include "downloadlistview.h"
 #include "organizercore.h"
 #include "ui_mainwindow.h"
+#include <QMessageBox>
+#include <QPushButton>
 
 DownloadsTab::DownloadsTab(OrganizerCore& core, Ui::MainWindow* mwui)
     : m_core(core),
