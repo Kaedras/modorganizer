@@ -33,11 +33,11 @@ private:
 
   // gets whether the process is elevated
   //
-  std::optional<bool> getElevated() const;
+  static std::optional<bool> getElevated();
 
   // tries to guess whether this process is running in compatibility mode
   //
-  bool getCompatibilityMode() const;
+  static bool getCompatibilityMode();
 };
 
 }  // namespace env

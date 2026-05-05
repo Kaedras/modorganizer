@@ -10,7 +10,7 @@ namespace env
 
 using namespace MOBase;
 
-bool OsInfo::getCompatibilityMode() const
+bool OsInfo::getCompatibilityMode()
 {
   // information was found here: https://stackoverflow.com/a/3445031
   // values can be found in the Application Compatibility Toolkit
@@ -64,7 +64,7 @@ bool OsInfo::getCompatibilityMode() const
   return false;
 }
 
-std::optional<bool> OsInfo::getElevated() const
+std::optional<bool> OsInfo::getElevated()
 {
   HandlePtr token;
 
