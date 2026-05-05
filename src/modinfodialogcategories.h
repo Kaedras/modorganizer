@@ -1,3 +1,6 @@
+#ifndef MODINFODIALOGCATEGORIES_H
+#define MODINFODIALOGCATEGORIES_H
+
 #include "modinfodialogtab.h"
 
 class QTreeWidgetItem;
@@ -25,3 +28,5 @@ private:
   void onCategoryChanged(QTreeWidgetItem* item, int col);
   void onPrimaryChanged(int index);
 };
+
+#endif  // MODINFODIALOGCATEGORIES_H
