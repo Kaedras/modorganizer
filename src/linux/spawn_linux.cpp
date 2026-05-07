@@ -147,7 +147,8 @@ QString makeDetails(const SpawnParameters& sp, DWORD code, const QString& more =
       " . cwd: '{}'{}\n"
       " . hooked: {}\n"
       " . MO elevated: {}",
-      code, strerror(static_cast<int>(code)), (more.isEmpty() ? more : ", " + more),
+      code, strerrorname_np(static_cast<int>(code)),
+      (more.isEmpty() ? more : ", " + more),
       formatSystemMessage(static_cast<int>(code)),
       QDir::toNativeSeparators(sp.binary.absoluteFilePath()).toStdString(), owner,
       rights, sp.arguments,
