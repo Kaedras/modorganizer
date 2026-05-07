@@ -522,7 +522,7 @@ std::optional<QString> checkSteamFiles(const QDir& dir)
   }
 
   // check linux files
-  // the library can be in an arbitrary location, so a recursive search may be required
+  // the library can be in an arbitrary location, so a recursive search may be required.
   // examples:
   // - unity games: <gamename>_Data/Plugins/libsteam_api.so
   //                <gamename>_Data/Plugins/x86_64/libsteam_api.so
@@ -531,15 +531,20 @@ std::optional<QString> checkSteamFiles(const QDir& dir)
   // - bastion: lib64/libsteam_api.so
   // - bitburner: resources/app/lib/libsteam_api.so
   // - war thunder: linux64/libsteam_api.so
+  // - starbound: linux/libsteam_api.so
 
   // best case performance (file in .): 990 ns
   // worst case performance (file non-existing): 36,247 ns
 
   // list of known paths
   static const QStringList steamFilesLinux = {
-      u"libsteam_api.so"_s,         u"bin/libsteam_api.so"_s,
-      u"lib/libsteam_api.so"_s,     u"lib64/libsteam_api.so"_s,
-      u"linux64/libsteam_api.so"_s, u"resources/app/lib/libsteam_api.so"_s,
+      u"libsteam_api.so"_s,
+      u"bin/libsteam_api.so"_s,
+      u"lib/libsteam_api.so"_s,
+      u"lib64/libsteam_api.so"_s,
+      u"linux64/libsteam_api.so"_s,
+      u"linux/libsteam_api.so"_s,
+      u"resources/app/lib/libsteam_api.so"_s,
   };
   static const QStringList steamFilesLinuxUnity = {
       u"Plugins/libsteam_api.so"_s,
