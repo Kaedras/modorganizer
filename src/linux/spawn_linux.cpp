@@ -36,10 +36,8 @@ extern void helperFailed(QWidget* parent, DWORD code, const QString& why,
                          const QString& binary, const QString& cwd,
                          const QString& args);
 
-std::string makeRightsDetails(const QFileInfo& info)
+QString makeRightsDetails(const QFileInfo& info)
 {
-  string s;
-
   auto permissions = info.permissions();
 
   int user   = 0;
@@ -47,115 +45,102 @@ std::string makeRightsDetails(const QFileInfo& info)
   int others = 0;
 
   if (permissions.testFlag(QFileDevice::ReadOwner)) {
-    s += "r";
     user += 4;
-  } else {
-    s += "-";
   }
   if (permissions.testFlag(QFileDevice::WriteOwner)) {
-    s += "w";
     user += 2;
-  } else {
-    s += "-";
   }
   if (permissions.testFlag(QFileDevice::ExeOwner)) {
-    s += "x";
     user += 1;
-  } else {
-    s += "-";
   }
 
   if (permissions.testFlag(QFileDevice::ReadGroup)) {
-    s += "r";
     group += 4;
-  } else {
-    s += "-";
   }
   if (permissions.testFlag(QFileDevice::WriteGroup)) {
-    s += "w";
     group += 2;
-  } else {
-    s += "-";
   }
   if (permissions.testFlag(QFileDevice::ExeGroup)) {
-    s += "x";
     group += 1;
-  } else {
-    s += "-";
   }
 
   if (permissions.testFlag(QFileDevice::ReadOther)) {
-    s += "r";
     others += 4;
-  } else {
-    s += "-";
   }
   if (permissions.testFlag(QFileDevice::WriteOther)) {
-    s += "w";
     others += 2;
-  } else {
-    s += "-";
   }
   if (permissions.testFlag(QFileDevice::ExeOther)) {
-    s += "x";
     others += 1;
-  } else {
-    s += "-";
   }
 
-  // append octal representation
-  s += format(" ({}{}{})", user, group, others);
-
-  return s;
+  return (permissions.testFlag(QFileDevice::ReadOwner) ? QChar('r') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::WriteOwner) ? QChar('w') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::ExeOwner) ? QChar('x') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::ReadGroup) ? QChar('r') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::WriteGroup) ? QChar('w') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::ExeGroup) ? QChar('x') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::ReadOther) ? QChar('r') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::WriteOther) ? QChar('w') : QChar('-')) %
+         (permissions.testFlag(QFileDevice::ExeOther) ? QChar('x') : QChar('-')) %
+         QStringLiteral(" (%1%2%3)").arg(user, group, others);
 }
 
 QString makeDetails(const SpawnParameters& sp, DWORD code, const QString& more = {})
 {
-  std::string owner, rights;
+  QString owner, rights;
 
   if (sp.binary.isFile()) {
-    const auto fs = env::getFileSecurity(sp.binary.absoluteFilePath());
+    auto fs = env::getFileSecurity(sp.binary.absoluteFilePath());
 
     if (fs.error.isEmpty()) {
-      owner  = fs.owner.toStdString();
+      owner  = fs.owner;
       rights = makeRightsDetails(sp.binary);
     } else {
-      owner  = fs.error.toStdString();
-      rights = fs.error.toStdString();
+      owner  = fs.error;
+      rights = fs.error;
     }
   } else {
-    owner  = "(file not found)";
-    rights = "(file not found)";
+    owner  = u"(file not found)"_s;
+    rights = u"(file not found)"_s;
   }
 
   const bool cwdExists =
       (sp.currentDirectory.isEmpty() ? true : sp.currentDirectory.exists());
 
-  std::string elevated;
+  QString elevated;
   if (auto b = env::Environment().getOSInfo().isElevated()) {
-    elevated = (*b ? "yes" : "no");
+    elevated = (*b ? u"yes"_s : u"no"_s);
   } else {
-    elevated = "(not available)";
+    elevated = u"(not available)"_s;
   }
 
-  auto s = std::format(
-      "Error {} {}{}: {}\n"
-      " . binary: '{}'\n"
-      " . owner: {}\n"
-      " . rights: {}\n"
-      " . arguments: '{}'\n"
-      " . cwd: '{}'{}\n"
-      " . hooked: {}\n"
-      " . MO elevated: {}",
-      code, strerrorname_np(static_cast<int>(code)),
-      (more.isEmpty() ? more : ", " + more),
-      formatSystemMessage(static_cast<int>(code)),
-      QDir::toNativeSeparators(sp.binary.absoluteFilePath()).toStdString(), owner,
-      rights, sp.arguments,
-      QDir::toNativeSeparators(sp.currentDirectory.absolutePath()).toStdString(),
-      (cwdExists ? "" : " (not found)"), (sp.hooked ? "yes" : "no"), elevated);
-
-  return QString::fromStdString(s);
+  return "Error "_L1 % QString::number(code) % ' ' %
+         strerrorname_np(static_cast<int>(code)) %
+         (more.isEmpty() ? more : ", "_L1 % more) % ": "_L1 %
+         strerror(static_cast<int>(code)) %
+         "\n"
+         " . binary: '"_L1 %
+         sp.binary.absoluteFilePath() %
+         "'\n"
+         " . owner: "_L1 %
+         owner %
+         "\n"
+         " . rights: "_L1 %
+         rights %
+         "\n"
+         " . arguments: "_L1 %
+         sp.arguments %
+         "\n"
+         " . cwd: '"_L1 %
+         sp.currentDirectory.absolutePath() % '\'' %
+         (cwdExists ? u""_s : u" (not found)"_s) %
+         "\n"
+         " . hooked: "_L1 %
+         (sp.hooked ? "yes"_L1 : "no"_L1) %
+         "\n"
+         " . MO elevated: "_L1 %
+         elevated;
 }
 
 QString makeContent(const SpawnParameters& sp, DWORD code)
@@ -198,11 +183,10 @@ QMessageBox::StandardButton badSteamPath(QWidget* parent)
 QMessageBox::StandardButton startSteamFailed(QWidget* parent, const QString& location,
                                              const QString& error, int e)
 {
-  auto details = QString("a steam install was found in %1").arg(location);
-
   SpawnParameters sp;
   sp.binary = QFileInfo(location);
-  details += makeDetails(sp, e, error);
+  QString details =
+      "a steam install was found in "_L1 % location % makeDetails(sp, e, error);
 
   log::error("{}", details);
 
@@ -245,7 +229,7 @@ void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
-  logSpawning(sp, sp.binary.absoluteFilePath() % " "_L1 % sp.arguments);
+  logSpawning(sp, sp.binary.absoluteFilePath() % ' ' % sp.arguments);
   if (sp.hooked) {
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         sp.binary.absoluteFilePath().toStdString(), sp.arguments.toStdString(),
@@ -323,7 +307,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
                       "/ubuntu12_64/gameoverlayrenderer.so");
       }
     }
-    logSpawning(sp, proton % " "_L1 % params);
+    logSpawning(sp, proton % ' ' % params);
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
         proton.toStdString(), params.toStdString(),
@@ -342,8 +326,9 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     if (sp.enableSteamAPI) {
       env << "SteamGameId="_L1 % sp.steamAppID;
       if (sp.enableSteamOverlay) {
-        env << "LD_PRELOAD="_L1 % steamPath % "/ubuntu12_32/gameoverlayrenderer.so:" %
-                   steamPath % "/ubuntu12_64/gameoverlayrenderer.so";
+        env << "LD_PRELOAD="_L1 % steamPath %
+                   "/ubuntu12_32/gameoverlayrenderer.so:"_L1 % steamPath %
+                   "/ubuntu12_64/gameoverlayrenderer.so"_L1;
       }
     }
     auto result =
@@ -395,10 +380,10 @@ QString getSteamDesktopFile(QWidget* parent)
   // simultaneously
   QStringList paths;
   for (const auto& path : steam) {
-    paths << "Steam (" % path % ")";
+    paths << "Steam ("_L1 % path % ')';
   }
   for (const auto& path : steamFlatpak) {
-    paths << "Steam Flatpak (" % path % ")";
+    paths << "Steam Flatpak ("_L1 % path % ')';
   }
 
   QInputDialog dialog(parent);
@@ -426,10 +411,10 @@ QStringList makeSteamArguments(const QString& username, const QString& password)
 {
   QStringList args;
 
-  if (username != "") {
-    args << "-login" << username;
+  if (!username.isEmpty()) {
+    args << u"-login"_s << username;
 
-    if (password != "") {
+    if (!password.isEmpty()) {
       args << password;
     }
   }
@@ -556,7 +541,7 @@ std::optional<QString> checkSteamFiles(const QDir& dir)
 
   // try some generic paths
   for (const auto& file : steamFilesLinux) {
-    QString filePath = absDir % "/"_L1 % file;
+    QString filePath = absDir % '/' % file;
     if (QFileInfo::exists(filePath)) {
       return filePath;
     }
@@ -568,7 +553,7 @@ std::optional<QString> checkSteamFiles(const QDir& dir)
     auto entry = it.next();
     if (entry.endsWith("_Data"_L1)) {
       for (const auto& file : steamFilesLinuxUnity) {
-        const QString filePath = entry % "/"_L1 % file;
+        const QString filePath = entry % '/' % file;
         if (QFileInfo::exists(filePath)) {
           return filePath;
         }
@@ -627,7 +612,7 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 
     SpawnParameters p = sp;
     p.binary          = QFileInfo(line.left(firstSpace));
-    p.arguments       = line.remove(0, firstSpace).trimmed() % " "_L1 % sp.arguments;
+    p.arguments       = line.remove(0, firstSpace).trimmed() % ' ' % sp.arguments;
 
     e = spawn(p, handle);
   } else if (sp.binary.suffix() == "exe"_L1) {
@@ -667,13 +652,12 @@ QString findJavaInstallation(const QString&)
   }
 
   // try JAVA_HOME
-  char* javaHome = getenv("JAVA_HOME");
-  if (javaHome != nullptr) {
-    QString tmp = QString::fromUtf8(javaHome);
-    if (!tmp.endsWith('/')) {
-      tmp += '/';
+  QString javaHome = qEnvironmentVariable("JAVA_HOME");
+  if (!javaHome.isEmpty()) {
+    if (!javaHome.endsWith('/')) {
+      javaHome = javaHome % '/';
     }
-    return tmp % u"bin/java"_s;
+    return javaHome % "bin/java"_L1;
   }
 
   // not found
@@ -686,14 +670,13 @@ FileExecutionContext getFileExecutionContext(QWidget*, const QFileInfo& target)
     QString java = findJavaInstallation(target.absoluteFilePath());
     if (!java.isEmpty()) {
       return {QFileInfo(java),
-              QStringLiteral(R"(-jar "%1")")
-                  .arg(QDir::toNativeSeparators(target.absoluteFilePath())),
+              QStringLiteral(R"(-jar "%1")").arg(target.absoluteFilePath()),
               FileExecutionTypes::Executable};
     }
   }
 
   else if (isExeFile(target)) {
-    return {target, "", FileExecutionTypes::Executable};
+    return {target, {}, FileExecutionTypes::Executable};
   }
 
   return {{}, {}, FileExecutionTypes::Other};
