@@ -68,7 +68,7 @@ if(WIN32)
 endif()
 
 if(UNIX AND DEFINED VCPKG_TARGET_TRIPLET)
-	set_target_properties(organizer PROPERTIES INSTALL_RPATH ".:./lib/")
+	set_target_properties(organizer PROPERTIES INSTALL_RPATH "$ORIGIN;$ORIGIN/lib")
 endif()
 
 # we add translations "manually" to handle MO2_INSTALL_IS_BIN
