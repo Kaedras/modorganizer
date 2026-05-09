@@ -117,6 +117,12 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 # install ModOrganizer.exe itself
 install(TARGETS organizer DESTINATION ${_bin})
 
+if (UNIX)
+	# install desktop file and icon
+	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/linux/ModOrganizer.desktop" DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+	install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/linux/ModOrganizer.svg" DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+endif()
+
 if(DEFINED VCPKG_TARGET_TRIPLET)
 	# install dependencies DLLs
 	install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
