@@ -117,29 +117,35 @@ install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/resources/markdown.html"
 # install ModOrganizer.exe itself
 install(TARGETS organizer DESTINATION ${_bin})
 
-# install dependencies DLLs
-install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
-install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/${LIBRARY_DIR})
+if(DEFINED VCPKG_TARGET_TRIPLET)
+	# install dependencies DLLs
+	install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
+	install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/${LIBRARY_DIR})
 
-# this may copy over the ones from uibase/usvfs
-# - when building with mob, this should not matter as the files should be identical
-# - when building standalone, this should help having matching USVFS DLL between the
-#   build and the installation
-# - this may cause issue with uibase in standalone mode if the installed version does
-#   not match the one used for the build, but there would be other issue anyway (e.g.
-#   different uibase.dll between modorganizer and plugins)
-#
-install(FILES
-	$<TARGET_FILE:mo2::uibase>
-DESTINATION ${_bin})
-
-if(WIN32)
+	# this may copy over the ones from uibase/usvfs
+	# - when building with mob, this should not matter as the files should be identical
+	# - when building standalone, this should help having matching USVFS DLL between the
+	#   build and the installation
+	# - this may cause issue with uibase in standalone mode if the installed version does
+	#   not match the one used for the build, but there would be other issue anyway (e.g.
+	#   different uibase.dll between modorganizer and plugins)
+	#
 	install(FILES
-			$<TARGET_FILE:usvfs_x64::usvfs_dll>
-			$<TARGET_FILE:usvfs_x86::usvfs_dll>
-			$<TARGET_FILE:usvfs_x64::usvfs_proxy>
-			$<TARGET_FILE:usvfs_x86::usvfs_proxy>
+			$<TARGET_FILE:mo2::uibase>
 			DESTINATION ${_bin})
+
+	if(WIN32)
+		install(FILES
+				$<TARGET_FILE:usvfs_x64::usvfs_dll>
+				$<TARGET_FILE:usvfs_x86::usvfs_dll>
+				$<TARGET_FILE:usvfs_x64::usvfs_proxy>
+				$<TARGET_FILE:usvfs_x86::usvfs_proxy>
+				DESTINATION ${_bin})
+	else()
+		install(FILES
+				$<TARGET_FILE:usvfs-fuse>
+				DESTINATION ${_bin})
+	endif()
 endif()
 
 # do not install PDB if CMAKE_INSTALL_PREFIX is "bin"
