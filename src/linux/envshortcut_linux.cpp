@@ -15,7 +15,7 @@ QString iconPath(int resolution)
   QString res = QString::number(resolution);
   return QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)
              .first() %
-         "/icons/hicolor/"_L1 % res % "x"_L1 % res % "/apps/"_L1;
+         "/icons/hicolor/"_L1 % res % 'x' % res % "/apps/"_L1;
 }
 
 }  // namespace

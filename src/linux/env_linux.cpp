@@ -33,7 +33,7 @@ std::optional<QString> getAssocString(const QFileInfo& file)
   if (xdgOpen.isEmpty()) {
     return {};
   }
-  return xdgOpen % " \""_L1 % file.absoluteFilePath() % "\""_L1;
+  return xdgOpen % " \""_L1 % file.absoluteFilePath() % '\"';
 }
 
 QString processPath(HANDLE process = INVALID_HANDLE_VALUE)
@@ -85,7 +85,7 @@ Association getAssociation(const QFileInfo& targetInfo)
 
   auto xdgOpen = QStandardPaths::findExecutable(QStringLiteral("xdg-open"));
 
-  return {QFileInfo(xdgOpen), *cmd, "\""_L1 % targetInfo.absoluteFilePath() % "\""_L1};
+  return {QFileInfo(xdgOpen), *cmd, '\"' % targetInfo.absoluteFilePath() % '\"'};
 }
 
 bool registryValueExists(const QString&, const QString&)
@@ -109,7 +109,7 @@ QString safeVersion()
 {
   try {
     // this can throw
-    return MOShared::createVersionInfo().string() % "-"_L1;
+    return MOShared::createVersionInfo().string() % '-';
   } catch (...) {
     return {};
   }
@@ -130,7 +130,7 @@ int tempFile(const QString& dir)
   const QString ext = u".dmp"_s;
 
   // first path to try, without counter in it
-  QString path = dir % "/"_L1 % prefix % ext;
+  QString path = dir % '/' % prefix % ext;
 
   for (int i = 0; i < MaxTries; ++i) {
     clog << "trying file '" << path.toStdString() << "'\n";
@@ -149,7 +149,7 @@ int tempFile(const QString& dir)
       return fd;
     }
     // try again with "-i"
-    path = dir % "/"_L1 % prefix % "-"_L1 % QString::number(i + 1) % ext;
+    path = dir % '/' % prefix % '-' % QString::number(i + 1) % ext;
   }
 
   cerr << "can't create dump file, ran out of filenames\n";

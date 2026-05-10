@@ -1,9 +1,7 @@
 #include "../envsecurity.h"
 #include "../env.h"
-#include <linux/compatibility.h>
 #include <log.h>
 #include <pwd.h>
-#include <utility.h>
 
 namespace
 {
@@ -53,9 +51,9 @@ QString SecurityProduct::toString() const
   QString s;
 
   if (m_name.isEmpty()) {
-    s += u"(no name)"_s;
+    s = s % u"(no name)"_s;
   } else {
-    s += m_name;
+    s = s % m_name;
   }
 
   return s;
@@ -68,7 +66,7 @@ QString SecurityProduct::providerToString() const
     ps.push_back(u"lsm"_s);
   }
 
-  return ps.join(u"|"_s);
+  return ps.join('|');
 }
 
 std::vector<SecurityProduct> getSecurityProductsFromWMI()
@@ -105,19 +103,6 @@ std::vector<SecurityProduct> getSecurityProducts()
   return v;
 }
 
-class failed
-{
-public:
-  failed(DWORD e, QString what)
-      : m_what(what + ", " + QString::fromStdString(formatSystemMessage(e)))
-  {}
-
-  QString what() const { return m_what; }
-
-private:
-  QString m_what;
-};
-
 QString getUsername(int owner)
 {
   passwd* p = getpwuid(owner);
@@ -137,7 +122,7 @@ FileSecurity getFileSecurity(const QString& path)
 {
   QFileInfo info(path);
   FileSecurity fs;
-  fs.owner = info.ownerId() == getuid() ? "(this user)" : info.owner();
+  fs.owner = info.ownerId() == getuid() ? u"(this user)"_s : info.owner();
   // if the calling process is owner
   if (info.ownerId() == getuid()) {
     fs.rights.normalRights = info.permission(QFile::Permission::ReadUser) &&

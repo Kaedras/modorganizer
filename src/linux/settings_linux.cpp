@@ -10,8 +10,8 @@ using namespace Qt::StringLiterals;
 
 void NexusSettings::dump() const
 {
-  const QString iniPath = InstanceManager::singleton().globalInstancesRootPath() %
-                          "/"_L1 % AppConfig::nxmHandlerIni();
+  const QString iniPath = InstanceManager::singleton().globalInstancesRootPath() % '/' %
+                          AppConfig::nxmHandlerIni();
 
   if (!QFileInfo::exists(iniPath)) {
     log::debug("nxm ini not found at {}", iniPath);
@@ -73,7 +73,7 @@ void GlobalSettings::updateRegistryKey()
 
 QString GameSettings::prefix() const
 {
-  return get<QString>(m_Settings, u"General"_s, u"prefix_directory"_s, "");
+  return get<QString>(m_Settings, u"General"_s, u"prefix_directory"_s, {});
 }
 
 void GameSettings::setPrefix(const QString& prefix)

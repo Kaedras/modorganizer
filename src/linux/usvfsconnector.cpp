@@ -174,7 +174,7 @@ void UsvfsConnector::updateParams(MOBase::log::Levels logLevel,
   m_usvfsManager->setProcessDelay(duration_cast<milliseconds>(spawnDelay));
 
   m_usvfsManager->usvfsClearExecutableBlacklist();
-  for (const auto& exec : executableBlacklist.split(";")) {
+  for (const auto& exec : executableBlacklist.split(';')) {
     m_usvfsManager->usvfsBlacklistExecutable(exec.toStdString());
   }
 

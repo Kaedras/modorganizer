@@ -132,7 +132,7 @@ void adjustForVirtualized(const IPluginGame* game, spawn::SpawnParameters& sp,
   QString cwdPath         = sp.currentDirectory.absolutePath();
   QString trailedModsPath = modsPath;
   if (!trailedModsPath.endsWith('/')) {
-    trailedModsPath = trailedModsPath + '/';
+    trailedModsPath = trailedModsPath % '/';
   }
   bool virtualizedCwd = cwdPath.startsWith(trailedModsPath, Qt::CaseInsensitive);
   QString binPath     = sp.binary.absoluteFilePath();

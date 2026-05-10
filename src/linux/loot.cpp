@@ -42,17 +42,18 @@ QString Loot::Report::toMarkdown() const
   QString s;
 
   if (!okay) {
-    s += "## "_L1 % tr("Loot failed to run") % "\n"_L1;
+    s = s % "## "_L1 % tr("Loot failed to run") % '\n';
 
     if (errors.empty() && warnings.empty()) {
-      s += tr("No errors were reported. The log below might have more information.\n");
+      s = s %
+          tr("No errors were reported. The log below might have more information.\n");
     }
   }
 
-  s += errorsMarkdown();
+  s = s % errorsMarkdown();
 
   if (okay) {
-    s += "\n"_L1 % successMarkdown();
+    s = s % '\n' % successMarkdown();
   }
 
   return s;
@@ -63,33 +64,33 @@ QString Loot::Report::successMarkdown() const
   QString s;
 
   if (!messages.empty()) {
-    s += "### "_L1 % QObject::tr("General messages") % "\n"_L1;
+    s = s % "### "_L1 % QObject::tr("General messages") % '\n';
 
     for (auto&& m : messages) {
-      s += " - "_L1 % m.toMarkdown() % "\n"_L1;
+      s = s % " - "_L1 % m.toMarkdown() % '\n';
     }
   }
 
   if (!plugins.empty()) {
     if (!s.isEmpty()) {
-      s += "\n"_L1;
+      s = s % '\n';
     }
 
-    s += "### "_L1 % QObject::tr("Plugins") % "\n"_L1;
+    s = s % "### "_L1 % QObject::tr("Plugins") % '\n';
 
     for (auto&& p : plugins) {
       const auto ps = p.toMarkdown();
       if (!ps.isEmpty()) {
-        s += ps % "\n"_L1;
+        s = s % ps % "\n"_L1;
       }
     }
   }
 
   if (s.isEmpty()) {
-    s += "**"_L1 % QObject::tr("No messages.") % "**\n"_L1;
+    s = s % "**"_L1 % QObject::tr("No messages.") % "**\n"_L1;
   }
 
-  s += stats.toMarkdown();
+  s = s % stats.toMarkdown();
 
   return s;
 }
@@ -99,22 +100,22 @@ QString Loot::Report::errorsMarkdown() const
   QString s;
 
   if (!errors.empty()) {
-    s += "### "_L1 % tr("Errors") % ":\n"_L1;
+    s = s % "### "_L1 % tr("Errors") % ":\n"_L1;
 
     for (auto&& e : errors) {
-      s += " - "_L1 % e % "\n"_L1;
+      s = s % " - "_L1 % e % '\n';
     }
   }
 
   if (!warnings.empty()) {
     if (!s.isEmpty()) {
-      s += "\n"_L1;
+      s = s % "\n"_L1;
     }
 
-    s += "### "_L1 % tr("Warnings") % ":\n"_L1;
+    s = s % "### "_L1 % tr("Warnings") % ":\n"_L1;
 
     for (auto&& w : warnings) {
-      s += " - "_L1 % w % "\n"_L1;
+      s = s % " - "_L1 % w % '\n';
     }
   }
 
@@ -132,45 +133,45 @@ QString Loot::Plugin::toMarkdown() const
   QString s;
 
   if (!incompatibilities.empty()) {
-    s += " - **"_L1 % QObject::tr("Incompatibilities") % ": "_L1;
+    s = s % " - **"_L1 % QObject::tr("Incompatibilities") % ": "_L1;
 
     QString fs;
     for (auto&& f : incompatibilities) {
       if (!fs.isEmpty()) {
-        fs += ", "_L1;
+        fs = fs % ", "_L1;
       }
 
-      fs += f.displayName.isEmpty() ? f.name : f.displayName;
+      fs = fs % (f.displayName.isEmpty() ? f.name : f.displayName);
     }
 
-    s += fs % "**\n"_L1;
+    s = s % fs % "**\n"_L1;
   }
 
   if (!missingMasters.empty()) {
-    s += " - **"_L1 % QObject::tr("Missing masters") % ": "_L1;
+    s = s % " - **"_L1 % QObject::tr("Missing masters") % ": "_L1;
 
     QString ms;
     for (auto&& m : missingMasters) {
       if (!ms.isEmpty()) {
-        ms += ", "_L1;
+        ms = ms % ", "_L1;
       }
 
-      ms += m;
+      ms = ms % m;
     }
 
-    s += ms % "**\n"_L1;
+    s = s % ms % "**\n"_L1;
   }
 
   for (auto&& m : messages) {
-    s += " - "_L1 % m.toMarkdown() % "\n"_L1;
+    s = s % " - "_L1 % m.toMarkdown() % '\n';
   }
 
   for (auto&& d : dirty) {
-    s += " - "_L1 % d.toMarkdown(false) % "\n"_L1;
+    s = s % " - "_L1 % d.toMarkdown(false) % '\n';
   }
 
   if (!s.isEmpty()) {
-    s = "#### "_L1 % name % "\n"_L1 % s;
+    s = "#### "_L1 % name % '\n' % s;
   }
 
   return s;
@@ -186,7 +187,7 @@ QString Loot::Dirty::toString(bool isClean) const
   QString s = cleaningString();
 
   if (!info.isEmpty()) {
-    s += " "_L1 % info;
+    s = s % ' ' % info;
   }
 
   return s;
@@ -213,12 +214,12 @@ QString Loot::Message::toMarkdown() const
 
   switch (type) {
   case log::Error: {
-    s += "**"_L1 % QObject::tr("Error") % "**: "_L1;
+    s = s % "**"_L1 % QObject::tr("Error") % "**: "_L1;
     break;
   }
 
   case log::Warning: {
-    s += "**"_L1 % QObject::tr("Warning") % "**: "_L1;
+    s = s % "**"_L1 % QObject::tr("Warning") % "**: "_L1;
     break;
   }
 
@@ -227,7 +228,7 @@ QString Loot::Message::toMarkdown() const
   }
   }
 
-  s += text;
+  s = s % text;
 
   return s;
 }

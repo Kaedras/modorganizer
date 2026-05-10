@@ -9,7 +9,7 @@ QString Instance::prefixDirectory() const
 
 QString InstanceManager::portablePath() const
 {
-  QString appImage = qgetenv("APPIMAGE");
+  QString appImage = qEnvironmentVariable("APPIMAGE");
   if (!appImage.isEmpty()) {
     const auto lastSlash = appImage.lastIndexOf('/');
     if (lastSlash == -1) {

@@ -3,10 +3,11 @@
 #include <log.h>
 
 using namespace MOBase;
+using namespace Qt::StringLiterals;
 
 Executable::Executable(const MOBase::ExecutableInfo& info, Flags flags)
     : m_title(info.title()), m_binaryInfo(info.binary()),
-      m_arguments(info.arguments().join(" ")), m_steamAppID(info.steamAppID()),
+      m_arguments(info.arguments().join(' ')), m_steamAppID(info.steamAppID()),
       m_workingDirectory(info.workingDirectory().path()), m_flags(flags),
       m_prefixDirectory(info.prefixDirectory().path()),
       m_enableSteamAPI(info.enableSteamAPI()),
@@ -52,19 +53,19 @@ void ExecutablesList::dump() const
     QStringList flags;
 
     if (e.flags() & Executable::ShowInToolbar) {
-      flags.push_back("toolbar");
+      flags.push_back(u"toolbar"_s);
     }
 
     if (e.flags() & Executable::UseApplicationIcon) {
-      flags.push_back("icon");
+      flags.push_back(u"icon"_s);
     }
 
     if (e.flags() & Executable::Hide) {
-      flags.push_back("hide");
+      flags.push_back(u"hide"_s);
     }
 
     if (e.flags() & Executable::MinimizeToSystemTray) {
-      flags.push_back("minimizeToSystemTray");
+      flags.push_back(u"minimizeToSystemTray"_s);
     }
 
     log::debug(" . executable '{}'\n"
@@ -78,6 +79,6 @@ void ExecutablesList::dump() const
                "    flags: {} ({})",
                e.title(), e.binaryInfo().filePath(), e.arguments(), e.steamAppID(),
                e.workingDirectory(), e.prefixDirectory(), e.enableSteamAPI(),
-               e.enableSteamOverlay(), flags.join("|"), e.flags());
+               e.enableSteamOverlay(), flags.join('|'), e.flags());
   }
 }
