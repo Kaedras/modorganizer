@@ -1,5 +1,39 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/hxenwxmpaob5xung?svg=true)](https://ci.appveyor.com/project/ModOrganizer2/modorganizer-736bd)
 
+# Status of this fork, including other modules
+
+## Linux
+
+### Known Issues
+
+- Running the tutorial can cause a segfault
+
+#### Low priority
+
+- Fallout 4/SkyrimSE/SkyrimVR icons are not extracted properly
+- Desktop theme is not applied correctly when running as AppImage
+- When MO is locked, the stated reason may be `bash` or `python` instead of the expected executable
+- After installing a fomod the tmp dir is not removed
+- Deactivating a mod causes a warning: `Plugin not found: <plugin name>`
+- `GameGamebryo::identifyGamePath()` does not work for newly installed games
+  - caused by `libraryfolders.vdf` not getting updated until restarting steam
+
+### Work in progress
+
+#### Features
+
+- Non-steam games
+
+#### Plugins
+
+- basic_games
+- installer_fomod_csharp
+- installer_omod
+
+## Windows
+
+- It compiles, no further testing has been done yet
+
 # Mod Organizer
 
 Mod Organizer (MO) is a tool for managing mod collections of arbitrary size. It is specifically designed for people who like to experiment with mods and thus need an easy and reliable way to install and uninstall them.
