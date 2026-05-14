@@ -136,21 +136,20 @@ if(DEFINED VCPKG_TARGET_TRIPLET)
 	#   not match the one used for the build, but there would be other issue anyway (e.g.
 	#   different uibase.dll between modorganizer and plugins)
 	#
-	install(FILES
-			$<TARGET_FILE:mo2::uibase>
-			DESTINATION ${_bin})
-
 	if(WIN32)
 		install(FILES
-				$<TARGET_FILE:usvfs_x64::usvfs_dll>
-				$<TARGET_FILE:usvfs_x86::usvfs_dll>
-				$<TARGET_FILE:usvfs_x64::usvfs_proxy>
-				$<TARGET_FILE:usvfs_x86::usvfs_proxy>
-				DESTINATION ${_bin})
+			$<TARGET_FILE:mo2::uibase>
+			$<TARGET_FILE:usvfs_x64::usvfs_dll>
+			$<TARGET_FILE:usvfs_x86::usvfs_dll>
+			$<TARGET_FILE:usvfs_x64::usvfs_proxy>
+			$<TARGET_FILE:usvfs_x86::usvfs_proxy>
+		DESTINATION ${_bin})
 	else()
 		install(FILES
-				$<TARGET_FILE:usvfs-fuse>
-				DESTINATION ${_bin})
+			$<TARGET_FILE:mo2::uibase>
+			$<TARGET_FILE:usvfs-fuse>
+			$<TARGET_FILE:mo2::archive>
+		DESTINATION ${_bin}/lib)
 	endif()
 endif()
 
