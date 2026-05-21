@@ -56,6 +56,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/scoped_ptr.hpp>
 
 #include "archivefiletree.h"
+#include "shared/nativeString.h"
 
 using namespace MOBase;
 using namespace MOShared;
@@ -135,9 +136,9 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
 
   // Callback for errors:
   QString errorMessage;
-  auto errorCallback = [&errorMessage, this](QString const& message) {
+  auto errorCallback = [&errorMessage, this](nativeString const& message) {
     m_ArchiveHandler->cancel();
-    errorMessage = message;
+    errorMessage = ToQString(message);
   };
 
   // The future that will hold the result:
@@ -145,9 +146,8 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
 
   if (silent) {
     future = QtConcurrent::run([&]() -> bool {
-      return m_ArchiveHandler->extract(
-          QFileInfo(extractPath).filesystemAbsoluteFilePath(), nullptr, nullptr,
-          errorCallback);
+      return m_ArchiveHandler->extract(ToNativeString(extractPath), nullptr, nullptr,
+                                       errorCallback);
     });
     future.waitForFinished();
   } else {
@@ -207,7 +207,7 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
           if (changeType == Archive::FileChangeType::EXTRACTION_START) {
             {
               std::scoped_lock guard(mutex);
-              currentFileName = ToQString(file);
+              currentFileName = ToQString(file.native());
             }
             emit progressUpdate();
           }
@@ -218,7 +218,7 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
     connect(&futureWatcher, &QFutureWatcher<bool>::finished, &loop, &QEventLoop::wakeUp,
             Qt::QueuedConnection);
     futureWatcher.setFuture(QtConcurrent::run([&]() -> bool {
-      return m_ArchiveHandler->extract(extractPath.toStdWString(), progressCallback,
+      return m_ArchiveHandler->extract(ToNativeString(extractPath), progressCallback,
                                        showFilenames ? fileChangeCallback : nullptr,
                                        errorCallback);
     }));
@@ -729,7 +729,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
   // open the archive and construct the directory tree the installers work on
 
   bool archiveOpen =
-      m_ArchiveHandler->open(fileName.toStdWString(), [this]() -> QString {
+      m_ArchiveHandler->open(ToNativeString(fileName), [this]() -> nativeString {
         m_Password.clear();
 
         // Note: If we are not in the Qt event thread, we cannot use queryPassword()
@@ -742,7 +742,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
         } else {
           queryPassword();
         }
-        return m_Password;
+        return ToNativeString(m_Password);
       });
   if (!archiveOpen) {
     log::debug("integrated archiver can't open {}: {} ({})", fileName,
