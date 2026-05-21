@@ -7,15 +7,6 @@
   "registries": [
     {
       "kind": "git",
-      "baseline": "256acc64012b23a13041d8705805e1f23b43a024",
-      "repository": "https://github.com/Microsoft/vcpkg",
-      "packages": [
-        "boost*",
-        "boost-*"
-      ]
-    },
-    {
-      "kind": "git",
       "baseline": "8b979c11f53db99038c9b75722c7a234691a6118",
       "repository": "https://github.com/Kaedras/vcpkg-registry",
       "packages": [
