@@ -2467,12 +2467,12 @@ Right now the only case I know of where this needs to be overwritten is for the 
 <context>
     <name>InstallationManager</name>
     <message>
-        <location filename="installationmanager.cpp" line="127"/>
+        <location filename="installationmanager.cpp" line="128"/>
         <source>Password required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installationmanager.cpp" line="128"/>
+        <location filename="installationmanager.cpp" line="129"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2888,36 +2888,36 @@ This is likely due to a corrupted or incompatible download or unrecognized archi
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="48"/>
+        <location filename="linux/loot.cpp" line="49"/>
         <location filename="win32/loot.cpp" line="226"/>
         <source>No errors were reported. The log below might have more information.
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="102"/>
+        <location filename="linux/loot.cpp" line="103"/>
         <location filename="win32/loot.cpp" line="280"/>
         <source>Errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="114"/>
+        <location filename="linux/loot.cpp" line="115"/>
         <location filename="win32/loot.cpp" line="292"/>
         <source>Warnings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="270"/>
+        <location filename="linux/loot.cpp" line="271"/>
         <source>failed to start loot: error mounting usvfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="296"/>
+        <location filename="linux/loot.cpp" line="297"/>
         <source>failed to start loot: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="398"/>
+        <location filename="linux/loot.cpp" line="399"/>
         <location filename="win32/loot.cpp" line="607"/>
         <source>Loot failed. Exit code was: 0x%1</source>
         <translation type="unfinished"></translation>
@@ -7588,7 +7588,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="installationmanager.cpp" line="74"/>
+        <location filename="installationmanager.cpp" line="75"/>
         <source>invalid 7-zip32.dll: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7623,49 +7623,49 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="66"/>
+        <location filename="linux/loot.cpp" line="67"/>
         <location filename="win32/loot.cpp" line="244"/>
         <source>General messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="78"/>
+        <location filename="linux/loot.cpp" line="79"/>
         <location filename="win32/loot.cpp" line="256"/>
         <source>Plugins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="89"/>
+        <location filename="linux/loot.cpp" line="90"/>
         <location filename="win32/loot.cpp" line="267"/>
         <source>No messages.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="135"/>
+        <location filename="linux/loot.cpp" line="136"/>
         <location filename="win32/loot.cpp" line="315"/>
         <source>Incompatibilities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="150"/>
+        <location filename="linux/loot.cpp" line="151"/>
         <location filename="win32/loot.cpp" line="330"/>
         <source>Missing masters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="182"/>
+        <location filename="linux/loot.cpp" line="183"/>
         <location filename="win32/loot.cpp" line="362"/>
         <source>Verified clean by %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="202"/>
+        <location filename="linux/loot.cpp" line="203"/>
         <location filename="win32/loot.cpp" line="382"/>
         <source>%1 found %2 ITM record(s), %3 deleted reference(s) and %4 deleted navmesh(es).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="216"/>
+        <location filename="linux/loot.cpp" line="217"/>
         <location filename="loglist.cpp" line="397"/>
         <location filename="organizercore.cpp" line="391"/>
         <location filename="settingsdialogdiagnostics.cpp" line="39"/>
@@ -7677,7 +7677,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="221"/>
+        <location filename="linux/loot.cpp" line="222"/>
         <location filename="settingsdialogdiagnostics.cpp" line="38"/>
         <location filename="settingsdialogdiagnostics.cpp" line="64"/>
         <location filename="win32/loot.cpp" line="401"/>
@@ -7685,7 +7685,7 @@ Destination:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="linux/loot.cpp" line="691"/>
+        <location filename="linux/loot.cpp" line="692"/>
         <location filename="win32/loot.cpp" line="916"/>
         <source>failed to run loot: %1</source>
         <translation type="unfinished"></translation>
