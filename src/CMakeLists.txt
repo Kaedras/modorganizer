@@ -125,9 +125,13 @@ endif()
 
 if(DEFINED VCPKG_TARGET_TRIPLET)
 	# install dependencies DLLs
-	install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
-	install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/${LIBRARY_DIR})
-
+	get_target_property(target_type libbsarchpp TYPE)
+	if(target_type STREQUAL "SHARED_LIBRARY")
+		install(FILES $<TARGET_FILE:libbsarchpp> DESTINATION ${_bin}/${LIBRARY_DIR})
+	endif()
+	if(WIN32)
+		install(FILES $<TARGET_FILE:7zip::7zip> DESTINATION ${_bin}/${LIBRARY_DIR})
+	endif()
 	# this may copy over the ones from uibase/usvfs
 	# - when building with mob, this should not matter as the files should be identical
 	# - when building standalone, this should help having matching USVFS DLL between the
