@@ -135,9 +135,9 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
 
   // Callback for errors:
   QString errorMessage;
-  auto errorCallback = [&errorMessage, this](std::wstring const& message) {
+  auto errorCallback = [&errorMessage, this](QString const& message) {
     m_ArchiveHandler->cancel();
-    errorMessage = QString::fromStdWString(message);
+    errorMessage = message;
   };
 
   // The future that will hold the result:
@@ -729,8 +729,8 @@ InstallationResult InstallationManager::install(const QString& fileName,
   // open the archive and construct the directory tree the installers work on
 
   bool archiveOpen =
-      m_ArchiveHandler->open(fileName.toStdWString(), [this]() -> std::wstring {
-        m_Password = QString();
+      m_ArchiveHandler->open(fileName.toStdWString(), [this]() -> QString {
+        m_Password.clear();
 
         // Note: If we are not in the Qt event thread, we cannot use queryPassword()
         // directly, so we emit passwordRequested() that is connected to
@@ -742,7 +742,7 @@ InstallationResult InstallationManager::install(const QString& fileName,
         } else {
           queryPassword();
         }
-        return m_Password.toStdWString();
+        return m_Password;
       });
   if (!archiveOpen) {
     log::debug("integrated archiver can't open {}: {} ({})", fileName,
