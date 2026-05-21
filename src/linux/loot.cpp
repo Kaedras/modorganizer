@@ -81,7 +81,7 @@ QString Loot::Report::successMarkdown() const
     for (auto&& p : plugins) {
       const auto ps = p.toMarkdown();
       if (!ps.isEmpty()) {
-        s = s % ps % "\n"_L1;
+        s = s % ps % '\n';
       }
     }
   }
