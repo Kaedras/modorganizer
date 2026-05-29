@@ -284,7 +284,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   }
   log::debug("Using compatdata dir {}", sp.prefixDirectory.absolutePath());
 
-  QString proton = getProtonFromPrefixPath(sp.prefixDirectory);
+  QString proton = protonByPrefixPath(sp.prefixDirectory);
   if (proton.isEmpty()) {
     return PROTON_NOT_FOUND;
   }
