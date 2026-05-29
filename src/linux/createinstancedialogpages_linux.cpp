@@ -6,7 +6,6 @@
 #include <QFileDialog>
 #include <iplugingame.h>
 #include <log.h>
-#include <steamutility.h>
 
 namespace cid
 {
@@ -38,11 +37,13 @@ void PrefixPage::doActivated(bool firstTime)
   }
 
   if (firstTime) {
-    QString prefixDir = findCompatDataByAppID(g->steamAPPId());
-    if (prefixDir.isEmpty() || !QFile::exists(prefixDir)) {
-      log::warn("Error determining wine prefix from steam app ID");
-    } else {
-      ui->prefixDir->setText(prefixDir);
+    if (!g->steamAPPId().isEmpty()) {
+      QDir prefixDir = g->gameDirectory();
+      if (!prefixDir.cd("../../compatdata/"_L1 % g->steamAPPId())) {
+        log::warn("Error determining wine prefix from steam app ID");
+      } else {
+        ui->prefixDir->setText(prefixDir.canonicalPath());
+      }
     }
   }
 
