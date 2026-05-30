@@ -292,26 +292,24 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   const QString params =
       "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
 
+  QStringList env;
+  env << "STEAM_COMPAT_DATA_PATH="_L1 % sp.prefixDirectory.absolutePath();
+  env << "STEAM_COMPAT_CLIENT_INSTALL_PATH="_L1 % steamPath;
+  if (sp.enableSteamAPI) {
+    env << "SteamGameId="_L1 % sp.steamAppID;
+    if (sp.enableSteamOverlay) {
+      env << "LD_PRELOAD="_L1 % steamPath % "/ubuntu12_32/gameoverlayrenderer.so:"_L1 %
+                 steamPath % "/ubuntu12_64/gameoverlayrenderer.so"_L1;
+    }
+  }
+
   if (sp.hooked) {
     const string steamPathStr = steamPath.toStdString();
-    vector<string> env;
 
-    env.push_back("STEAM_COMPAT_DATA_PATH=" +
-                  sp.prefixDirectory.absolutePath().toStdString());
-    env.push_back("STEAM_COMPAT_CLIENT_INSTALL_PATH=" + steamPathStr);
-    if (sp.enableSteamAPI) {
-      env.push_back("SteamGameId=" + sp.steamAppID.toStdString());
-      if (sp.enableSteamOverlay) {
-        env.push_back("LD_PRELOAD=" + steamPathStr +
-                      "/ubuntu12_32/gameoverlayrenderer.so:" + steamPathStr +
-                      "/ubuntu12_64/gameoverlayrenderer.so");
-      }
-    }
     logSpawning(sp, proton % ' ' % params);
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
-        proton.toStdString(), params.toStdString(),
-        sp.currentDirectory.absolutePath().toStdString(), env);
+        proton, params, sp.currentDirectory.absolutePath(), env);
 
     if (pid >= 0) {
       pidFd = pidfd_open(pid, 0);
@@ -320,17 +318,6 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     // todo: add proper error codes
     errno = UNKNOWN_ERROR;
   } else {
-    QStringList env;
-    env << "STEAM_COMPAT_DATA_PATH="_L1 % sp.prefixDirectory.absolutePath();
-    env << "STEAM_COMPAT_CLIENT_INSTALL_PATH="_L1 % steamPath;
-    if (sp.enableSteamAPI) {
-      env << "SteamGameId="_L1 % sp.steamAppID;
-      if (sp.enableSteamOverlay) {
-        env << "LD_PRELOAD="_L1 % steamPath %
-                   "/ubuntu12_32/gameoverlayrenderer.so:"_L1 % steamPath %
-                   "/ubuntu12_64/gameoverlayrenderer.so"_L1;
-      }
-    }
     auto result =
         shell::Execute(proton, sp.currentDirectory.absolutePath(), params, env);
 
