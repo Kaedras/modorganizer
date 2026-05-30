@@ -26,6 +26,7 @@ static constexpr int COMPAT_DATA_NOT_FOUND = 201;
 static constexpr int STEAM_NOT_FOUND       = 202;
 static constexpr int APPID_EMPTY           = 203;
 static constexpr int MOUNT_ERROR           = 204;
+static constexpr int RUNTIME_NOT_FOUND     = 205;
 static constexpr int UNKNOWN_ERROR         = 300;
 
 namespace spawn::dialogs
@@ -156,6 +157,8 @@ QString makeContent(const SpawnParameters& sp, DWORD code)
     return u"appid is empty"_s;
   case MOUNT_ERROR:
     return u"mount error"_s;
+  case RUNTIME_NOT_FOUND:
+    return u"steam linux runtime not found"_s;
   default:
     return {strerror(static_cast<int>(code))};
   }
@@ -270,16 +273,6 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     return APPID_EMPTY;
   }
 
-  // command is
-  // STEAM_COMPAT_DATA_PATH=compatdata/<appid>
-  // STEAM_COMPAT_CLIENT_INSTALL_PATH=<steam path>
-  // SteamGameId=<appid>
-  // LD_PRELOAD=<steam path>/ubuntu12_(32|64)/gameoverlayrenderer.so
-  // path/to/proton run application.exe
-
-  // the application is located at steamapps/common/<appliation>
-  // compatdata is located at steamapps/compatdata/<appid>
-
   if (sp.prefixDirectory.isEmpty()) {
     log::error("prefixDirectory is empty");
     return COMPAT_DATA_NOT_FOUND;
@@ -291,27 +284,51 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     return PROTON_NOT_FOUND;
   }
 
-  const QString params =
-      "run \""_L1 % sp.binary.absoluteFilePath() % "\" "_L1 % sp.arguments;
+  // TODO: select correct runtime based on proton version
+  QString runtime = findSteamGame(u"SteamLinuxRuntime_sniper"_s, u"_v2-entry-point"_s);
+  if (runtime.isEmpty()) {
+    return RUNTIME_NOT_FOUND;
+  }
+
+  // command is based on the documentation of umu-launcher
+  // https://github.com/Open-Wine-Components/umu-launcher#what-does-it-do
+
+  QString reaper = steamPath % "/ubuntu12_32/reaper"_L1;
+  QString params =
+      QStringLiteral("SteamLaunch AppId=%1 -- \"%2/ubuntu12_32/steam-launch-wrapper\" "
+                     "-- \"%3/_v2-entry-point\" --verb=waitforexitandrun -- \"%4\" "
+                     "waitforexitandrun \"%5\" %6")
+          .arg(sp.steamAppID, steamPath, runtime, proton, sp.binary.absoluteFilePath(),
+               sp.arguments);
 
   QStringList env;
   env << "STEAM_COMPAT_DATA_PATH="_L1 % sp.prefixDirectory.absolutePath();
   env << "STEAM_COMPAT_CLIENT_INSTALL_PATH="_L1 % steamPath;
   if (sp.enableSteamAPI) {
+    env << "STEAM_COMPAT_APP_ID="_L1 % sp.steamAppID;
     env << "SteamGameId="_L1 % sp.steamAppID;
-    if (sp.enableSteamOverlay) {
-      env << "LD_PRELOAD="_L1 % steamPath % "/ubuntu12_32/gameoverlayrenderer.so:"_L1 %
-                 steamPath % "/ubuntu12_64/gameoverlayrenderer.so"_L1;
-    }
+    env << "SteamAppId="_L1 % sp.steamAppID;
   }
+  if (sp.enableSteamOverlay) {
+    env << "LD_PRELOAD="_L1 % steamPath % "/ubuntu12_32/gameoverlayrenderer.so:"_L1 %
+               steamPath % "/ubuntu12_64/gameoverlayrenderer.so"_L1;
+  }
+  const QString shaderPath = QDir::cleanPath(sp.prefixDirectory.absolutePath() %
+                                             "/../../shadercache/"_L1 % sp.steamAppID);
+  env << "STEAM_COMPAT_SHADER_PATH="_L1 % shaderPath;
+  env << "STEAM_COMPAT_MEDIA_PATH="_L1 % shaderPath % "/fozmediav1"_L1;
+  env << "STEAM_COMPAT_TRANSCODED_MEDIA_PATH="_L1 % shaderPath;
+  env << "STEAM_FOSSILIZE_DUMP_PATH="_L1 % shaderPath %
+             "/fozpipelinesv6/steamapprun_pipeline_cache"_L1;
+  env << "DXVK_STATE_CACHE_PATH="_L1 % shaderPath % "/DXVK_state_cache"_L1;
 
   if (sp.hooked) {
     const string steamPathStr = steamPath.toStdString();
 
-    logSpawning(sp, proton % ' ' % params);
+    logSpawning(sp, reaper % ' ' % params);
 
     pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
-        proton, params, sp.currentDirectory.absolutePath(), env);
+        reaper, params, sp.currentDirectory.absolutePath(), env);
 
     if (pid >= 0) {
       pidFd = pidfd_open(pid, 0);
@@ -321,7 +338,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     errno = UNKNOWN_ERROR;
   } else {
     auto result =
-        shell::Execute(proton, sp.currentDirectory.absolutePath(), params, env);
+        shell::Execute(reaper, sp.currentDirectory.absolutePath(), params, env);
 
     if (result.success()) {
       pidFd = result.stealProcessHandle();
