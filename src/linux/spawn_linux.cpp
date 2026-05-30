@@ -216,13 +216,15 @@ void logSpawning(const SpawnParameters& sp, const QString& realCmd)
              " . exe: '{}'\n"
              " . args: '{}'\n"
              " . cwd: '{}'\n"
+             " . prefix path: '{}'\n"
              " . steam id: '{}'\n"
              " . hooked: {}\n"
              " . stdout: {}\n"
              " . stderr: {}\n"
              " . real cmd: '{}'",
              sp.binary.absoluteFilePath(), sp.arguments,
-             sp.currentDirectory.absolutePath(), sp.steamAppID, sp.hooked,
+             sp.currentDirectory.absolutePath(), sp.prefixDirectory.absolutePath(),
+             sp.steamAppID, sp.hooked,
              (sp.stdOut == INVALID_HANDLE_VALUE ? "no" : "yes"),
              (sp.stdErr == INVALID_HANDLE_VALUE ? "no" : "yes"), realCmd);
 }
