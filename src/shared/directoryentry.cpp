@@ -193,9 +193,10 @@ void DirectoryEntry::addFromBSA(const QString& originName, const QString& direct
                                 const QString& archivePath, int priority, int order,
                                 DirectoryStats& stats)
 {
-  FilesOrigin& origin    = createOrigin(originName, directory, priority, stats);
+  FilesOrigin& origin = createOrigin(originName, directory, priority, stats);
   QFileInfo archiveInfo(archivePath);
-  const auto archiveName = archiveInfo.fileName();
+  const auto archiveName              = archiveInfo.fileName();
+  std::filesystem::path archiveFsPath = archiveInfo.filesystemAbsoluteFilePath();
 
   if (containsArchive(archiveName)) {
     return;
@@ -207,7 +208,7 @@ void DirectoryEntry::addFromBSA(const QString& originName, const QString& direct
   try {
     // read() can return an error, but it can also throw if the file is not a
     // valid bsa
-    res = archive.read(archiveInfo, false);
+    res = archive.read(archiveFsPath, false);
   } catch (std::exception& e) {
     log::error("invalid bsa '{}', error {}", archivePath, e.what());
     return;
@@ -218,17 +219,11 @@ void DirectoryEntry::addFromBSA(const QString& originName, const QString& direct
     return;
   }
 
-  std::error_code ec;
-  const auto lwt = std::filesystem::last_write_time(archiveInfo, ec);
-  QDateTime ft;
+  QDateTime ft = archiveInfo.lastModified();
 
-  if (ec) {
-    log::warn("failed to get last modified date for '{}', {}", archivePath,
-              ec.message());
-  } else {
-    ft = archiveInfo.lastModified();
+  if (!ft.isValid()) {
+    log::warn("failed to get last modified date for '{}'", archivePath);
   }
-
   addFiles(origin, archive.getRoot(), ft, archiveName, order, stats);
 
   m_Populated = true;

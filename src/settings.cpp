@@ -427,8 +427,8 @@ void Settings::registerDownloadHandlers(bool force)
 
 void Settings::registerAsMODLHandler(bool force, bool includeNxm)
 {
-  const auto nxmPath = QCoreApplication::applicationDirPath() + "/" +
-                       QString::fromStdWString(AppConfig::nxmHandlerExe());
+  const auto nxmPath =
+      QCoreApplication::applicationDirPath() + "/" + AppConfig::nxmHandlerExe();
 
   const auto executable = QCoreApplication::applicationFilePath();
 
@@ -2554,7 +2554,6 @@ bool GlobalSettings::hasNexusApiKey()
 {
   return !getSecret("APIKEY").isEmpty();
 }
-
 
 bool GlobalSettings::nexusOAuthTokens(NexusOAuthTokens& tokens)
 {
