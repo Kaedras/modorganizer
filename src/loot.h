@@ -1,7 +1,160 @@
-#pragma once
+#ifndef MODORGANIZER_LOOT_H
+#define MODORGANIZER_LOOT_H
 
-#ifdef _WIN32
-#include "win32/loot.h"
+#include <QMetaType>
+#include <QObject>
+#include <QProcess>
+#include <log.h>
+#include <lootcli/lootcli.h>
+
+Q_DECLARE_METATYPE(lootcli::Progress);
+Q_DECLARE_METATYPE(MOBase::log::Levels);
+
+class OrganizerCore;
+
+class Loot : public QObject
+{
+  Q_OBJECT
+
+public:
+  struct Message
+  {
+    MOBase::log::Levels type;
+    QString text;
+
+    QString toMarkdown() const;
+  };
+
+  struct File
+  {
+    QString name;
+    QString displayName;
+  };
+
+  struct Dirty
+  {
+    qint64 crc               = 0;
+    qint64 itm               = 0;
+    qint64 deletedReferences = 0;
+    qint64 deletedNavmesh    = 0;
+    QString cleaningUtility;
+    QString info;
+
+    QString toString(bool isClean) const;
+    QString toMarkdown(bool isClean) const;
+    QString cleaningString() const;
+  };
+
+  struct Plugin
+  {
+    QString name;
+    std::vector<File> incompatibilities;
+    std::vector<Message> messages;
+    std::vector<Dirty> dirty, clean;
+    std::vector<QString> missingMasters;
+    bool loadsArchive  = false;
+    bool isMaster      = false;
+    bool isLightMaster = false;
+
+    QString toMarkdown() const;
+  };
+
+  struct Stats
+  {
+    qint64 time = 0;
+    QString lootcliVersion;
+    QString lootVersion;
+
+    QString toMarkdown() const;
+  };
+
+  struct Report
+  {
+    bool okay = false;
+    std::vector<QString> errors, warnings;
+    std::vector<Message> messages;
+    std::vector<Plugin> plugins;
+    Stats stats;
+
+    QString toMarkdown() const;
+
+  private:
+    QString successMarkdown() const;
+    QString errorsMarkdown() const;
+  };
+
+  Loot(OrganizerCore& core);
+  ~Loot() override;
+
+  bool start(QWidget* parent, bool didUpdateMasterList);
+  void cancel();
+  bool result() const;
+
+  const QString& reportPath() const;
+  const QString& sortedPluginListPath() const;
+  const Report& report() const;
+  const QString getSortedPluginListMarkdown() const;
+  const std::vector<QString>& errors() const;
+  const std::vector<QString>& warnings() const;
+
+signals:
+  void output(const QString& s);
+  void progress(const lootcli::Progress p);
+  void log(MOBase::log::Levels level, const QString& s) const;
+  void finished();
+
+public slots:
+  void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
+  void onReadyReadStandardOutput();
+  void onReadyReadStandardError() const;
+
+private:
+  OrganizerCore& m_core;
+#ifdef __unix__
+  std::unique_ptr<QProcess> m_lootProcess;
 #else
-#include "linux/loot.h"
+  std::unique_ptr<QThread> m_thread;
+  env::HandlePtr m_lootProcess;
+  std::unique_ptr<AsyncPipe> m_pipe;
+  std::string m_outputBuffer;
 #endif
+  bool m_cancel;
+  bool m_result;
+  std::vector<QString> m_errors, m_warnings;
+  Report m_report;
+
+#ifdef __unix__
+  bool spawnLootcli(QWidget* parent, bool didUpdateMasterList);
+#else
+  bool spawnLootcli(QWidget* parent, bool didUpdateMasterList,
+                    env::HandlePtr stdoutHandle);
+#endif
+
+#ifdef __unix__
+  void processStdout(const QString& lootOut);
+  void processStderr(const QString& lootOut) const;
+#else
+  void Loot::processStdout(const std::string& lootOut);
+#endif
+  void processMessage(const lootcli::Message& m);
+
+  Report createReport() const;
+  void processReport(Report& r) const;
+  void deleteReportFile();
+
+  void deleteSortedLoadOrder();
+
+  Message reportMessage(const QJsonObject& message) const;
+  std::vector<Plugin> reportPlugins(const QJsonArray& plugins) const;
+  Loot::Plugin reportPlugin(const QJsonObject& plugin) const;
+  Loot::Stats reportStats(const QJsonObject& stats) const;
+
+  std::vector<Message> reportMessages(const QJsonArray& array) const;
+  std::vector<Loot::File> reportFiles(const QJsonArray& array) const;
+  std::vector<Loot::Dirty> reportDirty(const QJsonArray& array) const;
+  std::vector<QString> reportStringArray(const QJsonArray& array) const;
+};
+
+bool runLoot(QWidget* parent, OrganizerCore& core, bool didUpdateMasterList);
+
+#endif  // MODORGANIZER_LOOT_H
