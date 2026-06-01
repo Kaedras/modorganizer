@@ -262,6 +262,36 @@ const std::vector<QString>& Loot::warnings() const
   return m_warnings;
 }
 
+QStringList Loot::createLootCliParams(bool didUpdateMasterList) const
+{
+  const auto logLevel = m_core.settings().diagnostics().lootLogLevel();
+
+  QStringList parameters;
+  parameters << "--game" << m_core.managedGame()->lootGameName()
+
+             << "--gamePath"
+             << QString("\"%1\"").arg(
+                    m_core.managedGame()->gameDirectory().absolutePath())
+
+             << "--pluginListPath"
+             << QString("\"%1/loadorder.txt\"").arg(m_core.profilePath())
+
+             << "--logLevel"
+             << QString::fromStdString(lootcli::logLevelToString(logLevel))
+
+             << "--out" << QString("\"%1\"").arg(LootReportPath)
+
+             << "--pluginListOutputPath" << QString("\"%1\"").arg(SortedPluginListPath)
+
+             << "--language" << m_core.settings().interface().language();
+
+  if (didUpdateMasterList) {
+    parameters << "--skipUpdateMasterlist";
+  }
+
+  return parameters;
+}
+
 void Loot::processMessage(const lootcli::Message& m)
 {
   switch (m.type) {

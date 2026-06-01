@@ -123,6 +123,7 @@ private:
   std::vector<QString> m_errors, m_warnings;
   Report m_report;
 
+  QStringList createLootCliParams(bool didUpdateMasterList) const;
 #ifdef __unix__
   bool spawnLootcli(QWidget* parent, bool didUpdateMasterList);
 #else

@@ -44,25 +44,13 @@ bool Loot::start(QWidget* parent, bool didUpdateMasterList)
 
 bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList)
 {
-  const auto logLevel = m_core.settings().diagnostics().lootLogLevel();
-
   if (!UsvfsManager::instance()->mount()) {
     emit log(log::Levels::Error, tr("failed to start loot: error mounting usvfs"));
     return false;
   }
 
-  QStringList parameters;
+  QStringList parameters = createLootCliParams(didUpdateMasterList);
 
-  if (didUpdateMasterList) {
-    parameters << u"--skipUpdateMasterlist"_s;
-  }
-  parameters << u"--game"_s << m_core.managedGame()->lootGameName() << u"--gamePath"_s
-             << m_core.managedGame()->gameDirectory().absolutePath()
-             << u"--pluginListPath"_s
-             << QStringLiteral("%1/loadorder.txt").arg(m_core.profilePath())
-             << u"--logLevel"_s << QString::fromStdString(logLevelToString(logLevel))
-             << u"--out"_s << LootReportPath << u"--language"_s
-             << m_core.settings().interface().language();
   auto lootHandle = std::make_unique<QProcess>(parent);
   QString program = qApp->applicationDirPath() % "/loot/lootcli"_L1;
   lootHandle->setWorkingDirectory(qApp->applicationDirPath() % "/loot"_L1);
