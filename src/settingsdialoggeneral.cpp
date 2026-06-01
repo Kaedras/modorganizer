@@ -22,6 +22,13 @@ GeneralSettingsTab::GeneralSettingsTab(Settings& s, SettingsDialog& d)
   ui->showMetaBox->setChecked(settings().interface().metaDownloads());
   ui->hideDownloadInstallBox->setChecked(
       settings().interface().hideDownloadsAfterInstallation());
+  ui->showDownloadNotificationsBox->setChecked(
+      settings().interface().showDownloadNotifications());
+
+  // connect MODL button
+  QObject::connect(ui->associateModlButton, &QPushButton::clicked, [&] {
+    Settings::instance().registerAsMODLHandler(true);
+  });
 
   // updates
   ui->checkForUpdates->setChecked(settings().checkForUpdates());
@@ -66,6 +73,8 @@ void GeneralSettingsTab::update()
   settings().interface().setMetaDownloads(ui->showMetaBox->isChecked());
   settings().interface().setHideDownloadsAfterInstallation(
       ui->hideDownloadInstallBox->isChecked());
+  settings().interface().setShowDownloadNotifications(
+      ui->showDownloadNotificationsBox->isChecked());
 
   // updates
   settings().setCheckForUpdates(ui->checkForUpdates->isChecked());

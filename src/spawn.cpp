@@ -35,6 +35,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <uibase/report.h>
 #include <uibase/utility.h>
 
+class QMessageBox;
+
 using namespace MOBase;
 using namespace MOShared;
 using namespace Qt::StringLiterals;

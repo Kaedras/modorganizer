@@ -86,47 +86,47 @@ struct PluginTypeName;
 template <>
 struct PluginTypeName<MOBase::IPlugin>
 {
-  static QString value() { return QT_TR_NOOP("Plugin"); }
+  static QString value() { return PluginContainer::tr("Plugin"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginDiagnose>
 {
-  static QString value() { return QT_TR_NOOP("Diagnose"); }
+  static QString value() { return PluginContainer::tr("Diagnose"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginGame>
 {
-  static QString value() { return QT_TR_NOOP("Game"); }
+  static QString value() { return PluginContainer::tr("Game"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginInstaller>
 {
-  static QString value() { return QT_TR_NOOP("Installer"); }
+  static QString value() { return PluginContainer::tr("Installer"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginModPage>
 {
-  static QString value() { return QT_TR_NOOP("Mod Page"); }
+  static QString value() { return PluginContainer::tr("Mod Page"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginPreview>
 {
-  static QString value() { return QT_TR_NOOP("Preview"); }
+  static QString value() { return PluginContainer::tr("Preview"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginTool>
 {
-  static QString value() { return QT_TR_NOOP("Tool"); }
+  static QString value() { return PluginContainer::tr("Tool"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginProxy>
 {
-  static QString value() { return QT_TR_NOOP("Proxy"); }
+  static QString value() { return PluginContainer::tr("Proxy"); }
 };
 template <>
 struct PluginTypeName<MOBase::IPluginFileMapper>
 {
-  static QString value() { return QT_TR_NOOP("File Mapper"); }
+  static QString value() { return PluginContainer::tr("File Mapper"); }
 };
 
 QStringList PluginContainer::pluginInterfaces()
@@ -1079,13 +1079,14 @@ void PluginContainer::loadPlugins()
     loadCheck.setFileName(qApp->property("dataPath").toString() +
                           "/plugin_loadcheck.tmp");
 
-    if (loadCheck.exists() && loadCheck.open(QIODevice::ReadOnly)) {
+    if (loadCheck.exists() && loadCheck.open(QIODevice::ReadOnly | QIODevice::Text)) {
       // oh, there was a failed plugin load last time. Find out which plugin was loaded
       // last
-      QString fileName;
-      while (!loadCheck.atEnd()) {
-        fileName = QString::fromUtf8(loadCheck.readLine().constData()).trimmed();
-      }
+      const auto contents = loadCheck.readAll();
+      loadCheck.close();
+
+      const auto fileName =
+          QString::fromUtf8(contents).split('\n', Qt::SkipEmptyParts).last().trimmed();
 
       log::warn("loadcheck file found for plugin '{}'", fileName);
 
@@ -1125,8 +1126,6 @@ void PluginContainer::loadPlugins()
         log::warn("user wants to load plugin '{}' anyway", fileName);
         break;
       }
-
-      loadCheck.close();
     }
 
     if (!loadCheck.open(QIODevice::WriteOnly)) {

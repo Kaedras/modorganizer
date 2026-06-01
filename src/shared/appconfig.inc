@@ -24,7 +24,9 @@ APPPARAM(QString, vfs32DLLName, "usvfs_x86.dll")
 APPPARAM(QString, vfs64DLLName, "usvfs_x64.dll")
 APPPARAM(QString, nxmHandlerExe, "nxmhandler.exe")
 #endif
-APPPARAM(QString, nxmHandlerIni, "nxmhandler.ini")
+APPPARAM(QString, nxmHandlerIni, "downloadhandler.ini")
+APPPARAM(QString, mo2NexusGameId, "site")
+APPPARAM(int, mo2NexusModId, 6)
 APPPARAM(QString, portableLockFileName, "portable.txt")
 APPPARAM(QString, localSavePlaceholder, "__MOProfileSave__/")
 

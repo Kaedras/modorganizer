@@ -21,8 +21,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #define SETTINGS_H
 
 #include "envdump.h"
-#include <QSettings>
-#include <QVersionNumber>
+#include "nexusoauthtokens.h"
 #include <lootcli/lootcli.h>
 #include <questionboxmemory.h>
 #include <uibase/filterwidget.h>
@@ -663,6 +662,11 @@ public:
   bool hideDownloadsAfterInstallation() const;
   void setHideDownloadsAfterInstallation(bool b);
 
+  // whether to show notifications when downloads complete or fail
+  //
+  bool showDownloadNotifications() const;
+  void setShowDownloadNotifications(bool b);
+
   // whether the API counter should be hidden
   //
   bool hideAPICounter() const;
@@ -819,6 +823,20 @@ public:
   unsigned int motdHash() const;
   void setMotdHash(unsigned int hash);
 
+  // registers MO as the handler for download links
+  //
+  // if 'force' is true, the registration dialog will be shown even if the user
+  // said earlier not to
+  //
+  void registerDownloadHandlers(bool force);
+
+  // registers MO as the handler for modl links
+  //
+  // if 'force' is true, the registration dialog will be shown even if the user
+  // said earlier not to
+  //
+  void registerAsMODLHandler(bool force, bool includeNxm = false);
+
   // whether archives should be parsed to show conflicts and contents
   //
   bool archiveParsing() const;
@@ -970,6 +988,24 @@ public:
   // returns whether an API key is currently stored
   //
   static bool hasNexusApiKey();
+
+  // Retrieves the stored OAuth tokens. Returns false if the credential doesn't exist
+  // or can't be parsed.
+  //
+  static bool nexusOAuthTokens(NexusOAuthTokens& tokens);
+
+  // Persists the OAuth tokens inside the credentials store, replacing the previous
+  // entry. Returns false on errors.
+  //
+  static bool setNexusOAuthTokens(const NexusOAuthTokens& tokens);
+
+  // Removes the stored OAuth tokens; returns false on errors.
+  //
+  static bool clearNexusOAuthTokens();
+
+  // Returns whether OAuth tokens are currently stored.
+  //
+  static bool hasNexusOAuthTokens();
 
   // resets anything that the user can disable
   static void resetDialogs();

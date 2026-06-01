@@ -9,8 +9,9 @@
 using namespace MOBase;
 using namespace json;
 
-static QString LootReportPath  = QDir::temp().absoluteFilePath("lootreport.json");
-static const DWORD PipeTimeout = 500;
+static QString LootReportPath       = QDir::temp().absoluteFilePath("lootreport.json");
+static QString SortedPluginListPath = QDir::temp().absoluteFilePath("loadorder.txt");
+static const DWORD PipeTimeout      = 500;
 
 class AsyncPipe
 {
@@ -423,11 +424,13 @@ Loot::~Loot()
   }
 
   deleteReportFile();
+  deleteSortedLoadOrder();
 }
 
 bool Loot::start(QWidget* parent, bool didUpdateMasterList)
 {
   deleteReportFile();
+  deleteSortedLoadOrder();
 
   log::debug("starting loot");
 
@@ -476,6 +479,8 @@ bool Loot::spawnLootcli(QWidget* parent, bool didUpdateMasterList,
 
              << "--out" << QString("\"%1\"").arg(LootReportPath)
 
+             << "--pluginListOutputPath" << QString("\"%1\"").arg(SortedPluginListPath)
+
              << "--language" << m_core.settings().interface().language();
 
   if (didUpdateMasterList) {
@@ -514,9 +519,14 @@ bool Loot::result() const
   return m_result;
 }
 
-const QString& Loot::outPath() const
+const QString& Loot::reportPath() const
 {
   return LootReportPath;
+}
+
+const QString& Loot::sortedPluginListPath() const
+{
+  return SortedPluginListPath;
 }
 
 const Loot::Report& Loot::report() const
@@ -676,7 +686,7 @@ Loot::Report Loot::createReport() const
   r.warnings = m_warnings;
 
   if (m_result) {
-    processOutputFile(r);
+    processReport(r);
   }
 
   return r;
@@ -695,21 +705,34 @@ void Loot::deleteReportFile()
   }
 }
 
-void Loot::processOutputFile(Report& r) const
+void Loot::deleteSortedLoadOrder()
+{
+  if (QFile::exists(SortedPluginListPath)) {
+    log::debug("deleting temporary sorted plugin list '{}'", SortedPluginListPath);
+    const auto r = shell::Delete(QFileInfo(SortedPluginListPath));
+    if (!r) {
+      log::error("failed to remove temporary sorted plugin list '{}': {}",
+                 SortedPluginListPath, r.toString());
+    }
+  }
+}
+
+void Loot::processReport(Report& r) const
 {
   log::debug("parsing json output file at '{}'", LootReportPath);
 
-  QFile outFile(LootReportPath);
-  if (!outFile.open(QIODevice::ReadOnly)) {
+  QFile reportFile(LootReportPath);
+  if (!reportFile.open(QIODevice::ReadOnly)) {
     emit log(MOBase::log::Error, QString("failed to open file, %1 (error %2)")
-                                     .arg(outFile.errorString())
-                                     .arg(outFile.error()));
+                                     .arg(reportFile.errorString())
+                                     .arg(reportFile.error()));
 
     return;
   }
 
   QJsonParseError e;
-  const QJsonDocument doc = QJsonDocument::fromJson(outFile.readAll(), &e);
+  const QJsonDocument doc = QJsonDocument::fromJson(reportFile.readAll(), &e);
+  reportFile.close();
   if (doc.isNull()) {
     emit log(MOBase::log::Error,
              QString("invalid json, %1 (error %2)").arg(e.errorString()).arg(e.error));
@@ -743,6 +766,46 @@ std::vector<Loot::Plugin> Loot::reportPlugins(const QJsonArray& plugins) const
   }
 
   return v;
+}
+
+const QString Loot::getSortedPluginListMarkdown() const
+{
+  if (!m_result) {
+    return {};
+  }
+
+  log::debug("parsing sorted plugin list at '{}'", SortedPluginListPath);
+
+  QFile pluginListFile(SortedPluginListPath);
+  if (!pluginListFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    emit log(MOBase::log::Error, QString("failed to open file, %1 (error %2)")
+                                     .arg(pluginListFile.errorString())
+                                     .arg(pluginListFile.error()));
+    return {};
+  }
+
+  QString markdown = "### " + tr("Sorted plugins") + "\n<details><summary>" +
+                     tr("Show") + "</summary>\n\n";
+
+  const auto pluginList     = m_core.pluginList();
+  const QByteArray contents = pluginListFile.readAll();
+  pluginListFile.close();
+
+  for (const QString& line :
+       QString::fromUtf8(contents).split('\n', Qt::SkipEmptyParts)) {
+    if (line.at(0) == '#') {
+      continue;
+    }
+
+    const QString pluginName = line.trimmed();
+    const bool active        = pluginList->isEnabled(pluginName);
+    const QString prefix     = active ? " - [x] " : " - [ ] ";
+    markdown += prefix + pluginName + "\n";
+  }
+
+  markdown += "</details>\n";
+
+  return markdown;
 }
 
 Loot::Plugin Loot::reportPlugin(const QJsonObject& plugin) const

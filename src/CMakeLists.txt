@@ -36,7 +36,7 @@ find_package(mo2-bsatk CONFIG REQUIRED)
 find_package(mo2-esptk CONFIG REQUIRED)
 find_package(libbsarchpp CONFIG REQUIRED)
 
-find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets)
+find_package(Qt6 REQUIRED COMPONENTS WebEngineWidgets WebSockets NetworkAuth)
 find_package(Boost CONFIG REQUIRED COMPONENTS program_options thread interprocess signals2 uuid accumulators)
 find_package(7zip CONFIG REQUIRED)
 find_package(lz4 CONFIG REQUIRED)
@@ -84,7 +84,7 @@ target_link_libraries(organizer PRIVATE
 	mo2::uibase mo2::archive libbsarchpp
 	mo2::bsatk mo2::esptk mo2::lootcli-header
 	Boost::program_options Boost::signals2 Boost::uuid Boost::accumulators
-	Qt6::WebEngineWidgets Qt6::WebSockets
+	Qt6::WebEngineWidgets Qt6::WebSockets Qt6::NetworkAuth
 	${OS_SPECIFIC_PRIVATE_DEPS}
 )
 
@@ -203,6 +203,9 @@ mo2_add_filter(NAME src/core GROUPS
 	githubpp
 	installationmanager
 	nexusinterface
+	nexusoauthlogin
+	nexusoauthtokens
+	nexusoauthconfig
 	nxmaccessmanager
 	organizercore
 	game_features

@@ -235,12 +235,13 @@ void ModListViewActions::checkModsForUpdates() const
                                                       QString());
     NexusInterface::instance().requestTrackingInfo(m_receiver, QVariant(), QString());
   } else {
-    QString apiKey;
-    if (GlobalSettings::nexusApiKey(apiKey)) {
+    NexusOAuthTokens tokens;
+    if (GlobalSettings::nexusOAuthTokens(tokens) ||
+        GlobalSettings::nexusApiKey(tokens.apiKey)) {
       m_core.doAfterLogin([=]() {
         checkModsForUpdates();
       });
-      NexusInterface::instance().getAccessManager()->apiCheck(apiKey);
+      NexusInterface::instance().getAccessManager()->apiCheck(tokens);
     } else {
       log::warn("{}", tr("You are not currently authenticated with Nexus. Please do so "
                          "under Settings -> Nexus."));
@@ -315,12 +316,13 @@ void ModListViewActions::checkModsForUpdates(
   if (NexusInterface::instance().getAccessManager()->validated()) {
     ModInfo::manualUpdateCheck(m_receiver, IDs);
   } else {
-    QString apiKey;
-    if (GlobalSettings::nexusApiKey(apiKey)) {
+    NexusOAuthTokens tokens;
+    if (GlobalSettings::nexusOAuthTokens(tokens) ||
+        GlobalSettings::nexusApiKey(tokens.apiKey)) {
       m_core.doAfterLogin([=]() {
         checkModsForUpdates(IDs);
       });
-      NexusInterface::instance().getAccessManager()->apiCheck(apiKey);
+      NexusInterface::instance().getAccessManager()->apiCheck(tokens);
     } else
       log::warn("{}", tr("You are not currently authenticated with Nexus. Please do so "
                          "under Settings -> Nexus."));
@@ -818,11 +820,13 @@ void ModListViewActions::removeMods(const QModelIndexList& indices) const
               QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         // use mod names instead of indexes because those become invalid during the
         // removal
-        DownloadManager::startDisableDirWatcher();
-        for (QString name : modNames) {
-          m_core.modList()->removeRowForce(ModInfo::getIndex(name), QModelIndex());
+        {
+          DirWatcherManager::Guard dirWatcherGuard =
+              m_core.downloadManager()->dirWatcher().scopedGuard();
+          for (QString name : modNames) {
+            m_core.modList()->removeRowForce(ModInfo::getIndex(name), QModelIndex());
+          }
         }
-        DownloadManager::endDisableDirWatcher();
       }
     } else if (!indices.isEmpty()) {
       m_core.modList()->removeRow(indices[0].data(ModList::IndexRole).toInt(),

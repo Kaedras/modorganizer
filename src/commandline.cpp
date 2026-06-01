@@ -7,10 +7,10 @@
 #include "organizercore.h"
 #include "shared/appconfig.h"
 #include "shared/util.h"
-#include <QApplication>
-#include <boost/program_options.hpp>
 #include <log.h>
 #include <report.h>
+
+#include <boost/optional/optional_io.hpp>
 
 #ifdef __unix__
 using command_line_parser = boost::program_options::command_line_parser;
@@ -250,8 +250,12 @@ std::optional<int> CommandLine::runEarly()
 
 std::optional<int> CommandLine::runPostApplication(MOApplication& a)
 {
-  // handle -i with no arguments
-  if (m_vm.contains("instance") && m_vm["instance"].as<std::string>() == "") {
+  const auto instanceArg = m_vm.find("instance");
+  if (instanceArg != m_vm.end() &&
+      !instanceArg->second.as<boost::optional<std::string>>().has_value()) {
+
+    // handle -i with no arguments (distinct from -i "", which will launch the
+    // portable instance if it exists, hence the use of boost::optional)
     env::Console c;
 
     if (auto i = InstanceManager::singleton().currentInstance()) {
@@ -343,7 +347,9 @@ void CommandLine::createOptions()
 
               ("logs", "duplicates the logs to stdout")
 
-                  ("instance,i", po::value<std::string>()->implicit_value(""),
+                  ("instance,i",
+                   po::value<boost::optional<std::string>>()->implicit_value(
+                       boost::none),
                    "use the given instance (defaults to last used)")
 
                       ("profile,p", po::value<std::string>(),
@@ -431,8 +437,14 @@ std::optional<QString> CommandLine::instance() const
 
   if (m_shortcut.isValid() && m_shortcut.hasInstance()) {
     return m_shortcut.instanceName();
-  } else if (m_vm.contains("instance")) {
-    return QString::fromStdString(m_vm["instance"].as<std::string>());
+  } else {
+    const auto instanceArg = m_vm.find("instance");
+    if (instanceArg != m_vm.end()) {
+      const auto& instanceVal = instanceArg->second.as<boost::optional<std::string>>();
+      if (instanceVal.has_value()) {
+        return QString::fromStdString(instanceVal.value());
+      }
+    }
   }
 
   return {};
@@ -842,6 +854,19 @@ Command::Meta DownloadFileCommand::meta() const
   return {"download", "downloads a file", "URL", ""};
 }
 
+po::options_description DownloadFileCommand::getVisibleOptions() const
+{
+  po::options_description d;
+
+  d.add_options()("game,g", po::value<std::string>(), "managed game")(
+      "name,n", po::value<std::string>(), "(optional) the download name")(
+      "modname,m", po::value<std::string>(), "(optional) the mod name")(
+      "version,v", po::value<std::string>(), "(optional) the download / mod version")(
+      "source,s", po::value<std::string>(), "(optional) the download source");
+
+  return d;
+}
+
 po::options_description DownloadFileCommand::getInternalOptions() const
 {
   po::options_description d;
@@ -868,16 +893,39 @@ bool DownloadFileCommand::canForwardToPrimary() const
 std::optional<int> DownloadFileCommand::runPostOrganizer(OrganizerCore& core)
 {
   const QString url = QString::fromStdString(vm()["URL"].as<std::string>());
+  QString game("");
+  QString name, modName, version, source;
 
   if (!url.startsWith("https://")) {
     reportError(QObject::tr("Download URL must start with https://"));
     return 1;
   }
 
+  if (vm().count("game")) {
+    game = QString::fromStdString(vm()["game"].as<std::string>());
+  }
+
+  if (vm().count("name")) {
+    name = QString::fromStdString(vm()["name"].as<std::string>());
+  }
+
+  if (vm().count("modname")) {
+    modName = QString::fromStdString(vm()["modname"].as<std::string>());
+  }
+
+  if (vm().count("version")) {
+    version = QString::fromStdString(vm()["version"].as<std::string>());
+  }
+
+  if (vm().count("source")) {
+    source = QString::fromStdString(vm()["source"].as<std::string>());
+  }
+
   log::debug("starting direct download from command line: {}", url.toStdString());
   MessageDialog::showMessage(QObject::tr("Download started"), qApp->activeWindow(),
                              false);
-  core.downloadManager()->startDownloadURLs(QStringList() << url);
+  core.downloadManager()->startDownloadURLWithMeta(url, game, name, modName, version,
+                                                   source);
 
   return {};
 }

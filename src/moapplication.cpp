@@ -124,6 +124,10 @@ MOApplication::MOApplication(int& argc, char** argv) : QApplication(argc, argv)
   m_defaultStyle = "windowsvista";
   updateStyle(m_defaultStyle);
   addDllsToPath();
+
+  // When MO2 is launched by nxmhandler, CWD is set to `C:\Windows\System32`.
+  // QtWebEngineProcess crashes if CWD is not set to the application directory.
+  QDir::setCurrent(QCoreApplication::applicationDirPath());
 }
 
 OrganizerCore& MOApplication::core()
@@ -285,9 +289,10 @@ int MOApplication::run(MOMultiProcess& multiProcess)
   tt.start("MOApplication::doOneRun() finishing");
 
   // start an api check
-  QString apiKey;
-  if (GlobalSettings::nexusApiKey(apiKey)) {
-    m_nexus->getAccessManager()->apiCheck(apiKey);
+  NexusOAuthTokens tokens;
+  if (GlobalSettings::nexusOAuthTokens(tokens) ||
+      GlobalSettings::nexusApiKey(tokens.apiKey)) {
+    m_nexus->getAccessManager()->apiCheck(tokens);
   }
 
   // tutorials

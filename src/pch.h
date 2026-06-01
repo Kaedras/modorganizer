@@ -281,7 +281,6 @@
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 #include <QWebEngineView>
-#include <QWebSocket>
 #include <QWhatsThis>
 #include <QWhatsThisClickedEvent>
 #include <QWidget>

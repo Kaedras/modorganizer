@@ -28,7 +28,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QRegularExpression>
 #include <filesystem>
 #include <log.h>
-#include <stack>
 #include <utility.h>
 
 using namespace Qt::StringLiterals;
@@ -195,7 +194,8 @@ void DirectoryEntry::addFromBSA(const QString& originName, const QString& direct
                                 DirectoryStats& stats)
 {
   FilesOrigin& origin    = createOrigin(originName, directory, priority, stats);
-  const auto archiveName = QFileInfo(archivePath).fileName();
+  QFileInfo archiveInfo(archivePath);
+  const auto archiveName = archiveInfo.fileName();
 
   if (containsArchive(archiveName)) {
     return;
@@ -207,7 +207,7 @@ void DirectoryEntry::addFromBSA(const QString& originName, const QString& direct
   try {
     // read() can return an error, but it can also throw if the file is not a
     // valid bsa
-    res = archive.read(archivePath.toStdString().c_str(), false);
+    res = archive.read(archiveInfo, false);
   } catch (std::exception& e) {
     log::error("invalid bsa '{}', error {}", archivePath, e.what());
     return;
@@ -219,15 +219,14 @@ void DirectoryEntry::addFromBSA(const QString& originName, const QString& direct
   }
 
   std::error_code ec;
-  const auto lwt =
-      std::filesystem::last_write_time(archivePath.toStdString().c_str(), ec);
+  const auto lwt = std::filesystem::last_write_time(archiveInfo, ec);
   QDateTime ft;
 
   if (ec) {
     log::warn("failed to get last modified date for '{}', {}", archivePath,
               ec.message());
   } else {
-    ft = QFileInfo(archivePath).lastModified();
+    ft = archiveInfo.lastModified();
   }
 
   addFiles(origin, archive.getRoot(), ft, archiveName, order, stats);

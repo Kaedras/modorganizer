@@ -50,6 +50,7 @@
 #include <QMessageBox>
 #include <QNetworkInterface>
 #include <QProcess>
+#include <QSystemTrayIcon>
 #include <QTimer>
 #include <QUrl>
 #include <QWidget>
@@ -298,11 +299,13 @@ bool OrganizerCore::nexusApi(bool retry)
     // previous attempt, maybe even successful
     return false;
   } else {
-    QString apiKey;
-    if (GlobalSettings::nexusApiKey(apiKey)) {
+    NexusOAuthTokens tokens;
+    GlobalSettings::nexusOAuthTokens(tokens);
+    GlobalSettings::nexusApiKey(tokens.apiKey);
+    if (tokens.isValid() || !tokens.apiKey.isEmpty()) {
       // credentials stored or user entered them manually
-      log::debug("attempt to verify nexus api key");
-      accessManager->apiCheck(apiKey);
+      log::debug("attempt to verify nexus credentials");
+      accessManager->apiCheck(tokens);
       return true;
     } else {
       // no credentials stored and user didn't enter them
@@ -534,6 +537,14 @@ QString OrganizerCore::getGlobalCoreDumpPath()
   }
 
   return {};
+}
+
+void OrganizerCore::showNotification(const QString& message, const QString& title,
+                                     QSystemTrayIcon::MessageIcon icon)
+{
+  if (m_UserInterface) {
+    m_UserInterface->showNotification(message, title, icon);
+  }
 }
 
 void OrganizerCore::setCurrentProfile(const QString& profileName)
@@ -862,7 +873,8 @@ OrganizerCore::doInstall(const QString& archivePath, GuessedValue<QString> modNa
 
 ModInfo::Ptr OrganizerCore::installDownload(int index, int priority)
 {
-  ScopedDisableDirWatcher scopedDirwatcher(&m_DownloadManager);
+  DirWatcherManager::Guard dirWatcherGuard =
+      m_DownloadManager.dirWatcher().scopedGuard();
 
   try {
     QString fileName        = m_DownloadManager.getFilePath(index);
@@ -1461,12 +1473,12 @@ void OrganizerCore::loggedInAction(QWidget* parent, std::function<void()> f)
   if (NexusInterface::instance().getAccessManager()->validated()) {
     f();
   } else if (!m_Settings.network().offlineMode()) {
-    QString apiKey;
-    if (GlobalSettings::nexusApiKey(apiKey)) {
+    NexusOAuthTokens tokens;
+    if (GlobalSettings::nexusOAuthTokens(tokens)) {
       doAfterLogin([f] {
         f();
       });
-      NexusInterface::instance().getAccessManager()->apiCheck(apiKey);
+      NexusInterface::instance().getAccessManager()->apiCheck(tokens);
     } else {
       MessageDialog::showMessage(tr("You need to be logged in with Nexus"), parent);
     }
@@ -1550,11 +1562,15 @@ std::vector<QString> OrganizerCore::enabledArchives()
   std::vector<QString> result;
   if (settings().archiveParsing()) {
     QFile archiveFile(m_CurrentProfile->getArchivesFileName());
-    if (archiveFile.open(QIODevice::ReadOnly)) {
-      while (!archiveFile.atEnd()) {
-        result.push_back(QString::fromUtf8(archiveFile.readLine()).trimmed());
-      }
+    if (archiveFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      const QByteArray contents = archiveFile.readAll();
       archiveFile.close();
+      const QStringList lines =
+          QString::fromUtf8(contents).split('\n', Qt::SkipEmptyParts);
+      result.reserve(lines.size());
+      for (const QString& line : lines) {
+        result.emplace_back(line.trimmed());
+      }
     }
   }
   return result;

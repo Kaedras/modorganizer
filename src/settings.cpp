@@ -26,19 +26,10 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "serverinfo.h"
 #include "settingsutilities.h"
 #include "shared/appconfig.h"
-#include <QApplication>
-#include <QComboBox>
-#include <QDockWidget>
-#include <QHeaderView>
-#include <QMessageBox>
-#include <QScreen>
-#include <QSplitter>
-#include <QTimer>
-#include <QToolBar>
-#include <QTreeView>
-#include <QWindow>
+#include <QJsonDocument>
 #include <expanderwidget.h>
 #include <iplugingame.h>
+#include <optional>
 #include <utility.h>
 
 using namespace MOBase;
@@ -427,6 +418,44 @@ bool Settings::keepBackupOnInstall() const
 void Settings::setKeepBackupOnInstall(bool b)
 {
   set(m_Settings, "General", "backup_install", b);
+}
+
+void Settings::registerDownloadHandlers(bool force)
+{
+  registerAsMODLHandler(force, true);
+}
+
+void Settings::registerAsMODLHandler(bool force, bool includeNxm)
+{
+  const auto nxmPath = QCoreApplication::applicationDirPath() + "/" +
+                       QString::fromStdWString(AppConfig::nxmHandlerExe());
+
+  const auto executable = QCoreApplication::applicationFilePath();
+
+  QStringList parameters = {force ? "forcereg" : "reg", "modl"};
+  QStringList games      = {m_Game.plugin()->gameShortName()};
+  games.append(m_Game.plugin()->validShortNames());
+  parameters.append(games.join(","));
+  parameters.append({executable, "-n %name% -m %modname% -v %version% -s %source%"});
+
+  QProcess* modlNxmProcess = new QProcess(this);
+
+  connect(modlNxmProcess, &QProcess::finished,
+          [=](int exitCode, QProcess::ExitStatus exitStatus) {
+            if (exitStatus == QProcess::NormalExit) {
+              if (includeNxm) {
+                nexus().registerAsNXMHandler(force);
+              }
+            } else {
+              QMessageBox::critical(
+                  nullptr, QObject::tr("Failed"),
+                  QObject::tr("Failed to start the helper application: %1")
+                      .arg(modlNxmProcess->program()));
+            }
+            modlNxmProcess->deleteLater();
+          });
+
+  modlNxmProcess->start(nxmPath, parameters);
 }
 
 GameSettings& Settings::game()
@@ -2021,14 +2050,13 @@ void NexusSettings::registerAsNXMHandler(bool force)
   const auto executable = getApplicationFilePath();
 
   QString mode       = force ? "forcereg" : "reg";
-  QString parameters = mode + " " + m_Parent.game().plugin()->gameShortName();
+  QString parameters = mode + " nxm " + m_Parent.game().plugin()->gameShortName();
   for (const QString& altGame : m_Parent.game().plugin()->validShortNames()) {
     parameters += "," + altGame;
   }
   parameters += " \"" + executable + "\"";
 
   const auto r = shell::Execute(nxmPath, parameters);
-
   if (!r.success()) {
     QMessageBox::critical(
         nullptr, QObject::tr("Failed"),
@@ -2246,6 +2274,16 @@ bool InterfaceSettings::hideDownloadsAfterInstallation() const
 void InterfaceSettings::setHideDownloadsAfterInstallation(bool b)
 {
   set(m_Settings, "Settings", "autohide_downloads", b);
+}
+
+bool InterfaceSettings::showDownloadNotifications() const
+{
+  return get<bool>(m_Settings, "Settings", "download_notifications", false);
+}
+
+void InterfaceSettings::setShowDownloadNotifications(bool b)
+{
+  set(m_Settings, "Settings", "download_notifications", b);
 }
 
 bool InterfaceSettings::hideAPICounter() const
@@ -2466,9 +2504,29 @@ void GlobalSettings::setHideAssignCategoriesQuestion(bool b)
   settings().setValue("HideAssignCategoriesQuestion", b);
 }
 
+namespace
+{
+constexpr auto NexusLegacyCredentialKey = "APIKEY";
+constexpr auto NexusOAuthCredentialKey  = "NEXUS_OAUTH_TOKENS";
+
+std::optional<NexusOAuthTokens> parseStoredTokens(const QString& raw)
+{
+  if (raw.isEmpty()) {
+    return std::nullopt;
+  }
+
+  const auto doc = QJsonDocument::fromJson(raw.toUtf8());
+  if (doc.isNull() || !doc.isObject()) {
+    return std::nullopt;
+  }
+
+  return NexusOAuthTokens::fromJson(doc.object());
+}
+}  // namespace
+
 bool GlobalSettings::nexusApiKey(QString& apiKey)
 {
-  QString tempKey = getSecret("APIKEY");
+  QString tempKey = getSecret(NexusLegacyCredentialKey);
   if (tempKey.isEmpty())
     return false;
 
@@ -2478,7 +2536,7 @@ bool GlobalSettings::nexusApiKey(QString& apiKey)
 
 bool GlobalSettings::setNexusApiKey(const QString& apiKey)
 {
-  if (!setSecret("APIKEY", apiKey)) {
+  if (!setSecret(NexusLegacyCredentialKey, apiKey)) {
     const auto e = GetLastError();
     log::error("Storing API key failed: {}", formatSystemMessage(e));
     return false;
@@ -2495,6 +2553,42 @@ bool GlobalSettings::clearNexusApiKey()
 bool GlobalSettings::hasNexusApiKey()
 {
   return !getSecret("APIKEY").isEmpty();
+}
+
+
+bool GlobalSettings::nexusOAuthTokens(NexusOAuthTokens& tokens)
+{
+  const auto raw    = getSecret(NexusOAuthCredentialKey);
+  const auto parsed = parseStoredTokens(raw);
+  if (!parsed) {
+    return false;
+  } else {
+    tokens = *parsed;
+  }
+  return true;
+}
+
+bool GlobalSettings::setNexusOAuthTokens(const NexusOAuthTokens& tokens)
+{
+  const auto payload = QJsonDocument(tokens.toJson()).toJson(QJsonDocument::Compact);
+
+  if (!setSecret(NexusOAuthCredentialKey, payload)) {
+    const auto e = GetLastError();
+    log::error("Storing OAuth tokens failed: {}", formatSystemMessage(e));
+    return false;
+  }
+
+  return true;
+}
+
+bool GlobalSettings::clearNexusOAuthTokens()
+{
+  return setSecret(NexusOAuthCredentialKey, "");
+}
+
+bool GlobalSettings::hasNexusOAuthTokens()
+{
+  return !getSecret(NexusOAuthCredentialKey).isEmpty();
 }
 
 void GlobalSettings::resetDialogs()
