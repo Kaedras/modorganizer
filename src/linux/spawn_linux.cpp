@@ -29,6 +29,88 @@ static constexpr int MOUNT_ERROR           = 204;
 static constexpr int RUNTIME_NOT_FOUND     = 205;
 static constexpr int UNKNOWN_ERROR         = 300;
 
+namespace
+{
+const QRegularExpression requiredToolRegex(uR"-("required_tool_appid" "(\d+)")-"_s);
+const QRegularExpression toolCommandlineRegex(uR"-("commandline" "(\d+)")-"_s);
+const QRegularExpression libraryRegex(uR"-(^\t"\d+"\n\t\{\n([\s\S]*?)\n\t\}$)-"_s,
+                                      QRegularExpression::MultilineOption);
+const QRegularExpression
+    appsRegex(uR"-(^\t{2}"apps"\n\t{2}\{\n([\s\S]*?)\n\t{2}\}$)-"_s,
+              QRegularExpression::MultilineOption);
+const QRegularExpression pathRegex(uR"-(^\t*"path"\t*"(.*)"$)-"_s,
+                                   QRegularExpression::MultilineOption);
+const QRegularExpression installDirRegex(uR"-(^\t"installdir"\t*"(.*)"$)-"_s);
+
+struct Tool
+{
+  QString requiredToolAppID;
+  QString commandline;
+};
+
+Tool parseToolManifest(const QString& toolPath) noexcept(false)
+{
+  QString toolManifestPath = toolPath % "/toolmanifest.vdf"_L1;
+  QFile toolManifestFile(toolManifestPath);
+  if (!toolManifestFile.open(QIODevice::ReadOnly)) {
+    throw runtime_error(format("Error opening '{}', {}", toolManifestPath,
+                               toolManifestFile.errorString()));
+  }
+
+  Tool tool;
+
+  QString data           = toolManifestFile.readAll();
+  tool.commandline       = toolCommandlineRegex.match(data).captured();
+  tool.requiredToolAppID = requiredToolRegex.match(data).captured();
+
+  return tool;
+}
+
+QString getPathFromAppID(const QString& appID) noexcept(false)
+{
+  QString steamPath = findSteamCached();
+
+  QString libraryFoldersPath = steamPath % "/config/libraryfolders.vdf"_L1;
+  QFile libraryFoldersFile(libraryFoldersPath);
+  if (!libraryFoldersFile.open(QIODevice::ReadOnly)) {
+    throw runtime_error(format("Error opening '{}', {}", libraryFoldersPath,
+                               libraryFoldersFile.errorString()));
+  }
+  QString libraryFoldersData = libraryFoldersFile.readAll();
+  auto it                    = libraryRegex.globalMatch(libraryFoldersData);
+  // iterate over library entries
+  while (it.hasNext()) {
+    auto match       = it.next();
+    QString captured = match.captured();
+    QString apps     = appsRegex.match(captured).captured(1);
+
+    if (apps.contains('"' % appID % '"')) {
+      // current library contains the appid we are looking for
+      QString libPath = pathRegex.match(captured).captured(1);
+      // parse appmanifest_<APPID>.acf
+      QString appManifestPath =
+          libPath % "/steamapps/appmanifest_"_L1 % appID % ".acf"_L1;
+      QFile appManifest(appManifestPath);
+      if (!appManifest.open(QIODevice::ReadOnly)) {
+        throw runtime_error(format("Error opening '{}', {}", appManifestPath,
+                                   appManifest.errorString()));
+      }
+
+      QString appManifestData = appManifest.readAll();
+      QString installDir      = installDirRegex.match(appManifestData).captured(1);
+      if (installDir.isEmpty()) {
+        throw runtime_error("Error parsing " + appManifestPath.toStdString());
+      }
+
+      return libPath % "steamapps/common/"_L1 % installDir;
+    }
+  }
+
+  throw runtime_error("Error finding a location for appID " + appID.toStdString());
+}
+
+}  // namespace
+
 namespace spawn::dialogs
 {
 
@@ -284,9 +366,28 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     return PROTON_NOT_FOUND;
   }
 
-  // TODO: select correct runtime based on proton version
-  QString runtime = findSteamGame(u"SteamLinuxRuntime_sniper"_s, u"_v2-entry-point"_s);
-  if (runtime.isEmpty()) {
+  // create the tool command line
+  // this may be a bit convoluted but *SHOULD* not break due to updates and require
+  // little to no changes in the foreseeable future
+  QString toolCommandline;
+  try {
+    const QString verb = u"waitforexitandrun"_s;
+    QString protonDir  = proton.chopped(7);
+    Tool tool          = parseToolManifest(protonDir);
+    tool.commandline.replace(u"%verb%"_s, verb);
+    toolCommandline = protonDir % tool.commandline;
+    // if `require_tool_appid` is set, the tool needs to be wrapped in another tool,
+    // which in turn could require to be wrapped in another tool
+    while (!tool.requiredToolAppID.isEmpty()) {
+      QString requiredToolPath = getPathFromAppID(tool.requiredToolAppID);
+      tool                     = parseToolManifest(protonDir);
+
+      tool.commandline.replace(u"%verb%"_s, verb);
+      toolCommandline =
+          '"' % requiredToolPath % '"' % tool.commandline % toolCommandline;
+    }
+  } catch (const runtime_error& ex) {
+    log::error(ex.what());
     return RUNTIME_NOT_FOUND;
   }
 
@@ -295,10 +396,9 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
   QString reaper = steamPath % "/ubuntu12_32/reaper"_L1;
   QString params =
-      QStringLiteral("SteamLaunch AppId=%1 -- \"%2/ubuntu12_32/steam-launch-wrapper\" "
-                     "-- \"%3/_v2-entry-point\" --verb=waitforexitandrun -- \"%4\" "
-                     "waitforexitandrun \"%5\" %6")
-          .arg(sp.steamAppID, steamPath, runtime, proton, sp.binary.absoluteFilePath(),
+      QStringLiteral(
+          R"(SteamLaunch AppId=%1 -- "%2/ubuntu12_32/steam-launch-wrapper" -- %3 "%4" %5)")
+          .arg(sp.steamAppID, steamPath, toolCommandline, sp.binary.absoluteFilePath(),
                sp.arguments);
 
   QStringList env;
