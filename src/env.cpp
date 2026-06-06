@@ -233,14 +233,14 @@ QString path()
 QString appendToPath(const QString& s)
 {
   auto old = path();
-  set("PATH", old + ";" + s);
+  set("PATH", old + QDir::listSeparator() + s);
   return old;
 }
 
 QString prependToPath(const QString& s)
 {
   auto old = path();
-  set("PATH", s + ";" + old);
+  set("PATH", s + QDir::listSeparator() + old);
   return old;
 }
 
