@@ -36,6 +36,8 @@ using namespace MOBase;
 using namespace MOShared;
 using namespace Qt::StringLiterals;
 
+QString getNxmHandler();
+
 EndorsementState endorsementStateFromString(const QString& s)
 {
   if (s == "Endorsed") {
@@ -599,6 +601,47 @@ QSettings::Status Settings::sync() const
   } else {
     return s;
   }
+}
+
+void NexusSettings::dump() const
+{
+  const auto iniPath = InstanceManager::singleton().globalInstancesRootPath() + "/" +
+                       AppConfig::nxmHandlerIni();
+
+  if (!QFileInfo(iniPath).exists()) {
+    log::debug("nxm ini not found at {}", iniPath);
+    return;
+  }
+
+  QSettings s(iniPath, QSettings::IniFormat);
+  if (const auto st = s.status(); st != QSettings::NoError) {
+    log::debug("can't read nxm ini from {}", iniPath);
+    return;
+  }
+
+  log::debug("nxmhandler settings:");
+  log::debug(" . primary: {}", getNxmHandler());
+
+  const auto noregister = getOptional<bool>(s, "General", "noregister");
+
+  if (noregister) {
+    log::debug(" . noregister: {}", *noregister);
+  } else {
+    log::debug(" . noregister: (not found)");
+  }
+
+  ScopedReadArray sra(s, "handlers");
+
+  sra.for_each([&] {
+    const auto games      = sra.get<QVariant>("games");
+    const auto executable = sra.get<QVariant>("executable");
+    const auto arguments  = sra.get<QVariant>("arguments");
+
+    log::debug(" . handler:");
+    log::debug("    . games:      {}", games.toString());
+    log::debug("    . executable: {}", executable.toString());
+    log::debug("    . arguments:  {}", arguments.toString());
+  });
 }
 
 QSettings::Status Settings::iniStatus() const
