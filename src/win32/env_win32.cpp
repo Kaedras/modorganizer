@@ -16,8 +16,10 @@ namespace env
 
 using namespace MOBase;
 
-extern DWORD findOtherPid();
-extern std::pair<QString, QString> splitExeAndArguments(const QString& cmd);
+// functions are defined in `env.cpp`
+DWORD findOtherPid();
+std::pair<QString, QString> splitExeAndArguments(const QString& cmd);
+std::unique_ptr<QFile> dumpFile(const QString& dir);
 
 Console::Console() : m_hasConsole(false), m_in(nullptr), m_out(nullptr), m_err(nullptr)
 {
@@ -189,42 +191,6 @@ Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
   context->setCookie(cookie);
 
   return context;
-}
-
-QString get(const QString& name)
-{
-  std::size_t bufferSize = 4000;
-  auto buffer            = std::make_unique<wchar_t[]>(bufferSize);
-
-  DWORD realSize = ::GetEnvironmentVariableW(name.toStdWString().c_str(), buffer.get(),
-                                             static_cast<DWORD>(bufferSize));
-
-  if (realSize > bufferSize) {
-    bufferSize = realSize;
-    buffer     = std::make_unique<wchar_t[]>(bufferSize);
-
-    realSize = ::GetEnvironmentVariableW(name.toStdWString().c_str(), buffer.get(),
-                                         static_cast<DWORD>(bufferSize));
-  }
-
-  if (realSize == 0) {
-    const auto e = ::GetLastError();
-
-    // don't log if not found
-    if (e != ERROR_ENVVAR_NOT_FOUND) {
-      log::error("failed to get environment variable '{}', {}", name,
-                 formatSystemMessage(e));
-    }
-
-    return {};
-  }
-
-  return QString::fromWCharArray(buffer.get(), realSize);
-}
-
-void set(const QString& n, const QString& v)
-{
-  ::SetEnvironmentVariableW(n.toStdWString().c_str(), v.toStdWString().c_str());
 }
 
 Service::StartType getServiceStartType(SC_HANDLE s, const QString& name)
@@ -688,122 +654,11 @@ QString thisProcessPath()
   return processPath();
 }
 
-std::wstring tempDir()
-{
-  const DWORD bufferSize         = MAX_PATH + 1;
-  wchar_t buffer[bufferSize + 1] = {};
-
-  const auto written = GetTempPathW(bufferSize, buffer);
-  if (written == 0) {
-    const auto e = GetLastError();
-
-    std::wcerr << L"failed to get temp path, " << formatSystemMessage(e) << L"\n";
-
-    return {};
-  }
-
-  // `written` does not include the null terminator
-  return std::wstring(buffer, buffer + written);
-}
-
-std::wstring safeVersion()
-{
-  try {
-    // this can throw
-    return MOShared::createVersionInfo().string().toStdWString() + L"-";
-  } catch (...) {
-    return {};
-  }
-}
-
-HandlePtr tempFile(const std::wstring dir)
-{
-  // maximum tries of incrementing the counter
-  const int MaxTries = 100;
-
-  // UTC time and date will be in the filename
-  const auto now = std::time(0);
-  const auto tm  = std::gmtime(&now);
-
-  // "ModOrganizer-YYYYMMDDThhmmss.dmp", with a possible "-i" appended, where
-  // i can go until MaxTries
-  std::wostringstream oss;
-  oss << L"ModOrganizer-" << safeVersion() << std::setw(4) << (1900 + tm->tm_year)
-      << std::setw(2) << std::setfill(L'0') << (tm->tm_mon + 1) << std::setw(2)
-      << std::setfill(L'0') << tm->tm_mday << "T" << std::setw(2) << std::setfill(L'0')
-      << tm->tm_hour << std::setw(2) << std::setfill(L'0') << tm->tm_min << std::setw(2)
-      << std::setfill(L'0') << tm->tm_sec;
-
-  const std::wstring prefix = oss.str();
-  const std::wstring ext    = L".dmp";
-
-  // first path to try, without counter in it
-  std::wstring path = dir + L"\\" + prefix + ext;
-
-  for (int i = 0; i < MaxTries; ++i) {
-    std::wclog << L"trying file '" << path << L"'\n";
-
-    HandlePtr h(CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW,
-                            FILE_ATTRIBUTE_NORMAL, nullptr));
-
-    if (h.get() != INVALID_HANDLE_VALUE) {
-      // worked
-      return h;
-    }
-
-    const auto e = GetLastError();
-
-    if (e != ERROR_FILE_EXISTS) {
-      // probably no write access
-      std::wcerr << L"failed to create dump file, " << formatSystemMessage(e) << L"\n";
-
-      return {};
-    }
-
-    // try again with "-i"
-    path = dir + L"\\" + prefix + L"-" + std::to_wstring(i + 1) + ext;
-  }
-
-  std::wcerr << L"can't create dump file, ran out of filenames\n";
-  return {};
-}
-
-HandlePtr dumpFile(const wchar_t* dir)
-{
-  // try the given directory, if any
-  if (dir) {
-    HandlePtr h = tempFile(dir);
-    if (h.get() != INVALID_HANDLE_VALUE) {
-      return h;
-    }
-  }
-
-  // try the current directory
-  HandlePtr h = tempFile(L".");
-  if (h.get() != INVALID_HANDLE_VALUE) {
-    return h;
-  }
-
-  std::wclog << L"cannot write dump file in current directory\n";
-
-  // try the temp directory
-  const auto temp = tempDir();
-
-  if (!temp.empty()) {
-    h = tempFile(temp.c_str());
-    if (h.get() != INVALID_HANDLE_VALUE) {
-      return h;
-    }
-  }
-
-  return {};
-}
-
 bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
 {
   const DWORD pid = GetProcessId(process);
 
-  const HandlePtr file = dumpFile(dir.toStdWString().c_str());
+  std::unique_ptr<QFile> file = dumpFile(dir);
   if (!file) {
     std::wcerr << L"nowhere to write the dump file\n";
     return false;
@@ -824,7 +679,7 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
   }
 
   const auto ret =
-      MiniDumpWriteDump(process, pid, file.get(), flags, nullptr, nullptr, nullptr);
+      MiniDumpWriteDump(process, pid, file->handle(), flags, nullptr, nullptr, nullptr);
 
   if (!ret) {
     const auto e = GetLastError();

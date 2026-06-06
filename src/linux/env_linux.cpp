@@ -19,7 +19,9 @@ namespace env
 
 using namespace MOBase;
 
-extern DWORD findOtherPid();
+// functions are defined in `env.cpp`
+DWORD findOtherPid();
+std::unique_ptr<QFile> dumpFile(const QString& dir);
 
 Console::Console() : m_hasConsole(true), m_in(stdin), m_out(stdout), m_err(stderr) {}
 
@@ -63,20 +65,6 @@ Environment::onModuleLoaded(QObject* o, std::function<void(Module)> f)
   return make_unique<ModuleNotification>(o, f);
 }
 
-QString get(const QString& name)
-{
-  return qEnvironmentVariable(name.toStdString().c_str());
-}
-
-void set(const QString& n, const QString& v)
-{
-  if (v.isEmpty()) {
-    qunsetenv(n.toStdString().c_str());
-  } else {
-    qputenv(n.toStdString().c_str(), v.toLocal8Bit());
-  }
-}
-
 Association getAssociation(const QFileInfo& targetInfo)
 {
   auto cmd = getAssocString(targetInfo);
@@ -105,98 +93,11 @@ QString thisProcessPath()
   return QFileInfo(read_symlink(exe)).path();
 }
 
-QString safeVersion()
-{
-  try {
-    // this can throw
-    return MOShared::createVersionInfo().string() % '-';
-  } catch (...) {
-    return {};
-  }
-}
-
-int tempFile(const QString& dir)
-{
-  // maximum tries of incrementing the counter
-  const int MaxTries = 100;
-
-  // UTC time and date will be in the filename
-  const QDateTime time = QDateTime::currentDateTimeUtc();
-
-  // "ModOrganizer-YYYYMMDDThhmmss.dmp", with a possible "-i" appended, where
-  // i can go until MaxTries
-  const QString prefix =
-      "ModOrganizer-"_L1 % safeVersion() % time.toString(u"yyyyMMddThhmmss"_s);
-  const QString ext = u".dmp"_s;
-
-  // first path to try, without counter in it
-  QString path = dir % '/' % prefix % ext;
-
-  for (int i = 0; i < MaxTries; ++i) {
-    clog << "trying file '" << path.toStdString() << "'\n";
-
-    if (!QFile::exists(path)) {
-      int fd = open(path.toStdString().c_str(), O_WRONLY | O_CREAT | O_EXCL,
-                    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-      if (fd == INVALID_HANDLE_VALUE) {
-        const auto e = GetLastError();
-        // probably no write access
-        cerr << "failed to create dump file, " << formatSystemMessage(e) << "\n";
-
-        return INVALID_HANDLE_VALUE;
-      }
-      cout << "using file '" << path.toStdString() << "'\n";
-      return fd;
-    }
-    // try again with "-i"
-    path = dir % '/' % prefix % '-' % QString::number(i + 1) % ext;
-  }
-
-  cerr << "can't create dump file, ran out of filenames\n";
-  return {};
-}
-
-QString tempDir()
-{
-  return QStandardPaths::standardLocations(QStandardPaths::TempLocation).first();
-}
-
-HandlePtr dumpFile(const QString& dir)
-{
-  // try the given directory, if any
-  if (!dir.isEmpty()) {
-    int fd = tempFile(dir);
-    if (fd != INVALID_HANDLE_VALUE) {
-      return HandlePtr(fd);
-    }
-  }
-
-  // try the current directory
-  int fd = tempFile(u"."_s);
-  if (fd != INVALID_HANDLE_VALUE) {
-    return HandlePtr(fd);
-  }
-
-  clog << "cannot write dump file in current directory\n";
-
-  // try the temp directory
-  const auto temp = tempDir();
-
-  if (!temp.isEmpty()) {
-    fd = tempFile(temp);
-    if (fd != INVALID_HANDLE_VALUE) {
-      return HandlePtr(fd);
-    }
-  }
-
-  return {};
-}
-
 bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
 {
   string dumpPath;
 
-  HandlePtr file = dumpFile(dir);
+  std::unique_ptr<QFile> file = dumpFile(dir);
   if (!file) {
     cerr << "nowhere to write the dump file\n";
     return false;
@@ -205,7 +106,7 @@ bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
   using namespace google_breakpad;
 
   ExceptionHandler::CrashContext blob{{}, process};
-  bool result = WriteMinidump(file.get(), process, &blob, sizeof(blob));
+  bool result = WriteMinidump(file->handle(), process, &blob, sizeof(blob));
   if (!result) {
     const int e = errno;
     cerr << "Error creating minidump, " << strerror(e) << "\n";

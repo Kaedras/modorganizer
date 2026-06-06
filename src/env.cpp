@@ -249,6 +249,16 @@ void setPath(const QString& s)
   set("PATH", s);
 }
 
+QString get(const QString& name)
+{
+  return qEnvironmentVariable(name.toUtf8().constData());
+}
+
+void set(const QString& name, const QString& value)
+{
+  qputenv(name.toUtf8().constData(), value.toUtf8());
+}
+
 Service::Service(QString name) : Service(std::move(name), StartType::None, Status::None)
 {}
 
@@ -399,6 +409,86 @@ DWORD findOtherPid()
              << L"you can try running this again as administrator\n";
 
   return 0;
+}
+
+QString safeVersion()
+{
+  try {
+    // this can throw
+    return MOShared::createVersionInfo().string() % '-';
+  } catch (...) {
+    return {};
+  }
+}
+
+// unique_ptr is used because QFile has no move ctor
+std::unique_ptr<QFile> tempFile(const QString& dir)
+{
+  // maximum tries of incrementing the counter
+  constexpr int MaxTries = 100;
+
+  // UTC time and date will be in the filename
+  const QDateTime time = QDateTime::currentDateTimeUtc();
+
+  // "ModOrganizer-YYYYMMDDThhmmss.dmp", with a possible "-i" appended, where
+  // i can go until MaxTries
+  const QString prefix =
+      "ModOrganizer-"_L1 % safeVersion() % time.toString(u"yyyyMMddThhmmss"_s);
+  const QString ext = u".dmp"_s;
+
+  // first path to try, without counter in it
+  QString path = dir % '/' % prefix % ext;
+
+  for (int i = 0; i < MaxTries; ++i) {
+    std::wclog << L"trying file '" << path.toStdWString() << L"'\n";
+
+    if (!QFile::exists(path)) {
+      auto file = std::make_unique<QFile>(path);
+      if (!file->open(QIODeviceBase::WriteOnly)) {
+        std::wcerr << L"failed to create dump file, "
+                   << file->errorString().toStdWString() << L'\n';
+        return {};
+      }
+
+      return file;
+    }
+    // try again with "-i"
+    path = dir % '/' % prefix % '-' % QString::number(i + 1) % ext;
+  }
+
+  std::wcerr << L"can't create dump file, ran out of filenames\n";
+  return {};
+}
+
+std::unique_ptr<QFile> dumpFile(const QString& dir)
+{
+  // try the given directory, if any
+  if (!dir.isEmpty()) {
+    std::unique_ptr<QFile> file = tempFile(dir);
+    if (file) {
+      return file;
+    }
+  }
+
+  // try the current directory
+  std::unique_ptr<QFile> file = tempFile(u"."_s);
+  if (file) {
+    return file;
+  }
+
+  std::wclog << L"cannot write dump file in current directory\n";
+
+  // try the temp directory
+  const QString temp = QDir::tempPath();
+
+  if (!temp.isEmpty()) {
+    file = tempFile(temp);
+    if (file) {
+      return file;
+    }
+  }
+
+  return {};
 }
 
 CoreDumpTypes coreDumpTypeFromString(const std::string& s)
