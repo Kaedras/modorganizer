@@ -16,7 +16,7 @@ Q_DECLARE_METATYPE(lootcli::Progress);
 Q_DECLARE_METATYPE(MOBase::log::Levels);
 
 class OrganizerCore;
-#ifdef __WIN32
+#ifdef _WIN32
 class AsyncPipe;
 #endif
 
