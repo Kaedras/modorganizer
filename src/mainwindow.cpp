@@ -3001,9 +3001,8 @@ void MainWindow::actionEndorseMO()
                             tr("Do you want to endorse Mod Organizer on Nexus now?"),
                             QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
     NexusInterface::instance().requestToggleEndorsement(
-        AppConfig::mo2NexusGameId(),
-        AppConfig::mo2NexusModId(), m_OrganizerCore.getVersion().string(), true, this,
-        QVariant(), QString());
+        AppConfig::mo2NexusGameId(), AppConfig::mo2NexusModId(),
+        m_OrganizerCore.getVersion().string(), true, this, QVariant(), QString());
   }
 }
 
@@ -3016,9 +3015,8 @@ void MainWindow::actionWontEndorseMO()
              "your mind."),
           QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
     NexusInterface::instance().requestToggleEndorsement(
-        AppConfig::mo2NexusGameId(),
-        AppConfig::mo2NexusModId(), m_OrganizerCore.getVersion().string(), false, this,
-        QVariant(), QString());
+        AppConfig::mo2NexusGameId(), AppConfig::mo2NexusModId(),
+        m_OrganizerCore.getVersion().string(), false, this, QVariant(), QString());
   }
 }
 
@@ -3110,8 +3108,7 @@ void MainWindow::nxmEndorsementsAvailable(QVariant userData, QVariant resultData
     }
   }
   if (Settings::instance().nexus().endorsementIntegration()) {
-    auto iter =
-        sorted.equal_range(AppConfig::mo2NexusGameId());
+    auto iter = sorted.equal_range(AppConfig::mo2NexusGameId());
     for (auto result = iter.first; result != iter.second; ++result) {
       if (result->second.first == AppConfig::mo2NexusModId()) {
         m_OrganizerCore.settings().nexus().setEndorsementState(
