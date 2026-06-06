@@ -8,6 +8,8 @@
 #include "envshortcut.h"
 #include "settings.h"
 #include "shared/util.h"
+#include <cwchar>
+#include <io.h>
 #include <log.h>
 #include <utility.h>
 
@@ -664,6 +666,13 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
     return false;
   }
 
+  const auto h = reinterpret_cast<HANDLE>(_get_osfhandle(file->handle()));
+  if (h == INVALID_HANDLE_VALUE) {
+    const int e = errno;
+    std::wcerr << L"failed to get file handle, " << _wcserror(e) << L"\n";
+    return false;
+  }
+
   auto flags =
       _MINIDUMP_TYPE(MiniDumpNormal | MiniDumpWithHandleData |
                      MiniDumpWithUnloadedModules | MiniDumpWithProcessThreadData);
@@ -678,8 +687,7 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
     std::wclog << L"writing mini minidump\n";
   }
 
-  const auto ret =
-      MiniDumpWriteDump(process, pid, file->handle(), flags, nullptr, nullptr, nullptr);
+  const auto ret = MiniDumpWriteDump(process, pid, h, flags, nullptr, nullptr, nullptr);
 
   if (!ret) {
     const auto e = GetLastError();
