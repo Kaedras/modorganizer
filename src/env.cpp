@@ -5,28 +5,17 @@
 #include "envos.h"
 #include "envprocess.h"
 #include "envsecurity.h"
-#include "envshortcut.h"
 #include "settings.h"
 #include "shared/util.h"
 #include <QCoreApplication>
 #include <QStorageInfo>
-#include <fcntl.h>
 #include <iostream>
 #include <log.h>
-#include <utility.h>
 
 #ifdef __unix__
 static inline const QString defaultName = QStringLiteral("ModOrganizer");
-// write, create file, fail if file is not created
-static inline constexpr int fileFlags = O_WRONLY | O_CREAT | O_EXCL;
-// rw for user, group
-static inline constexpr int fileMode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 #else
 static inline const QString defaultName = QStringLiteral("ModOrganizer.exe");
-// write, create file, fail if file is not created
-static inline constexpr int fileFlags = _O_WRONLY | _O_CREAT | _O_EXCL;
-// rw
-static inline constexpr int fileMode = _S_IREAD | _S_IWRITE;
 #endif
 
 using namespace Qt::StringLiterals;
