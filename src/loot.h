@@ -134,17 +134,19 @@ private:
   QStringList createLootCliParams(bool didUpdateMasterList) const;
 #ifdef __unix__
   bool spawnLootcli(QWidget* parent, bool didUpdateMasterList);
-#else
-  bool spawnLootcli(QWidget* parent, bool didUpdateMasterList,
-                    env::HandlePtr stdoutHandle);
-#endif
 
-#ifdef __unix__
   void processStdout(const QString& lootOut);
   void processStderr(const QString& lootOut) const;
 #else
+  bool spawnLootcli(QWidget* parent, bool didUpdateMasterList,
+                    env::HandlePtr stdoutHandle);
+
+  void lootThread();
+  bool waitForCompletion();
+
   void processStdout(const std::string& lootOut);
 #endif
+
   void processMessage(const lootcli::Message& m);
 
   Report createReport() const;
