@@ -36,6 +36,10 @@ void PrefixPage::doActivated(bool firstTime)
     return;
   }
 
+  if (g->isNativeLinuxVersion()) {
+    next();
+  }
+
   if (firstTime) {
     if (!g->steamAPPId().isEmpty()) {
       QDir prefixDir = g->gameDirectory();
