@@ -3,14 +3,22 @@
 
 #include <QMetaType>
 #include <QObject>
-#include <QProcess>
 #include <log.h>
 #include <lootcli/lootcli.h>
+
+#ifdef __unix__
+#include <QProcess>
+#else
+#include "envprocess.h"
+#endif
 
 Q_DECLARE_METATYPE(lootcli::Progress);
 Q_DECLARE_METATYPE(MOBase::log::Levels);
 
 class OrganizerCore;
+#ifdef __WIN32
+class AsyncPipe;
+#endif
 
 class Loot : public QObject
 {
@@ -135,7 +143,7 @@ private:
   void processStdout(const QString& lootOut);
   void processStderr(const QString& lootOut) const;
 #else
-  void Loot::processStdout(const std::string& lootOut);
+  void processStdout(const std::string& lootOut);
 #endif
   void processMessage(const lootcli::Message& m);
 
