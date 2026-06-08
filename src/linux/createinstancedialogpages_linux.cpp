@@ -37,7 +37,12 @@ void PrefixPage::doActivated(bool firstTime)
   }
 
   if (g->isNativeLinuxVersion()) {
+    // skip this page
+    setSkip(true);
+    m_okay = true;
     next();
+
+    return;
   }
 
   if (firstTime) {
