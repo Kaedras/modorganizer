@@ -111,10 +111,12 @@ signals:
   void log(MOBase::log::Levels level, const QString& s) const;
   void finished();
 
+#ifdef __unix__
 public slots:
   void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
   void onReadyReadStandardOutput();
   void onReadyReadStandardError() const;
+#endif
 
 private:
   OrganizerCore& m_core;
