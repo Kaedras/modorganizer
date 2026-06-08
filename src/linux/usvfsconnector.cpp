@@ -140,15 +140,20 @@ void UsvfsConnector::updateMapping(const MappingType& mapping)
       QCoreApplication::processEvents();
     }
 
-    if (map.isDirectory) {
-      m_usvfsManager->usvfsVirtualLinkDirectoryStatic(
-          map.source.toStdString(), map.destination.toStdString(),
-          map.createTarget ? linkFlag::CREATE_TARGET : 0);
-      ++dirs;
-    } else {
-      m_usvfsManager->usvfsVirtualLinkFile(map.source.toStdString(),
-                                           map.destination.toStdString());
-      ++files;
+    try {
+      if (map.isDirectory) {
+        m_usvfsManager->usvfsVirtualLinkDirectoryStatic(
+            map.source.toStdString(), map.destination.toStdString(),
+            map.createTarget ? linkFlag::CREATE_TARGET : 0);
+        ++dirs;
+      } else {
+        m_usvfsManager->usvfsVirtualLinkFile(map.source.toStdString(),
+                                             map.destination.toStdString());
+        ++files;
+      }
+    } catch (const std::runtime_error& ex) {
+      m_usvfsManager->usvfsClearVirtualMappings();
+      throw UsvfsConnectorException(ex.what());
     }
   }
 
