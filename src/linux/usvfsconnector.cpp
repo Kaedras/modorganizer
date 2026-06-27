@@ -164,7 +164,7 @@ void UsvfsConnector::updateMapping(const MappingType& mapping)
              time.count());
 }
 
-void UsvfsConnector::updateParams(MOBase::log::Levels logLevel,
+void UsvfsConnector::updateParams(log::Levels logLevel,
                                   env::CoreDumpTypes /*coreDumpType*/,
                                   const QString& /*crashDumpsPath*/,
                                   std::chrono::seconds spawnDelay,
@@ -198,7 +198,7 @@ void UsvfsConnector::updateParams(MOBase::log::Levels logLevel,
 }
 
 void UsvfsConnector::updateForcedLibraries(
-    const QList<MOBase::ExecutableForcedLoadSetting>& forcedLibraries)
+    const QList<ExecutableForcedLoadSetting>& forcedLibraries)
 {
   m_usvfsManager->usvfsClearLibraryForceLoads();
   for (const auto& setting : forcedLibraries) {
