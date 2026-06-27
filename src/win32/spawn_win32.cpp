@@ -11,7 +11,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QtDebug>
-#include <Shellapi.h>
+#include <shellapi.h>
 #include <uibase/errorcodes.h>
 #include <uibase/log.h>
 #include <uibase/report.h>

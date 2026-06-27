@@ -47,7 +47,7 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtGlobal>     // for qUtf8Printable
 
 #ifdef _WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #include <assert.h>  // for assert

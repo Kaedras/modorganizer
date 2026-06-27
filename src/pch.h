@@ -34,16 +34,16 @@
 #ifdef _WIN32
 // keep this header separated to avoid ordering issue since this must be
 // included before DbgHelp.h
-#include <Windows.h>
+#include <windows.h>
 
 // windows
-#include <DbgHelp.h>
-#include <LMCons.h>
-#include <Psapi.h>
-#include <Shellapi.h>
-#include <Shlwapi.h>
+#include <dbghelp.h>
 #include <eh.h>
+#include <lmcons.h>
+#include <psapi.h>
+#include <shellapi.h>
 #include <shlobj.h>
+#include <shlwapi.h>
 #include <tchar.h>
 #include <wincred.h>
 #include <windowsx.h>

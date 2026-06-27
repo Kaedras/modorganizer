@@ -1,6 +1,6 @@
 #include <QString>
-#include <Windows.h>
 #include <utility.h>
+#include <windows.h>
 
 using namespace MOBase;
 
