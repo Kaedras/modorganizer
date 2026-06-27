@@ -10,22 +10,6 @@ static constexpr char SHMID[] = "mod_organizer_instance";
 using namespace MOBase;
 using namespace Qt::StringLiterals;
 
-std::string to_hex(void* bufferIn, size_t bufferSize)
-{
-  unsigned char* buffer = static_cast<unsigned char*>(bufferIn);
-  std::ostringstream temp;
-  temp << std::hex;
-  for (size_t i = 0; i < bufferSize; ++i) {
-    temp << std::setfill('0') << std::setw(2) << (unsigned int)buffer[i];
-    if ((i % 16) == 15) {
-      temp << "\n";
-    } else {
-      temp << " ";
-    }
-  }
-  return temp.str();
-}
-
 LogLevel toUsvfsLogLevel(log::Levels level)
 {
   switch (level) {
