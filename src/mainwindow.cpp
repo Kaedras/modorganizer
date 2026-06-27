@@ -194,7 +194,6 @@ inline QString formatSystemMessageToQString(int e)
 {
   return QString::fromLocal8Bit(strerror(e));
 }
-static constexpr const char* newLine = "\n";
 #else
 #include <shlobj.h>
 #include <usvfs/usvfs.h>
@@ -202,7 +201,6 @@ inline QString formatSystemMessageToQString(DWORD e)
 {
   return QString::fromStdWString(MOBase::formatSystemMessage(e));
 }
-static constexpr const char* newLine = "\r\n";
 #endif
 
 const QSize SmallToolbarSize(24, 24);

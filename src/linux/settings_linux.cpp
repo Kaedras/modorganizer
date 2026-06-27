@@ -1,8 +1,6 @@
 #include "env.h"
-#include "instancemanager.h"
 #include "settings.h"
 #include "settingsutilities.h"
-#include "shared/appconfig.h"
 #include <QProcess>
 
 using namespace MOBase;

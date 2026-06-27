@@ -33,7 +33,7 @@ std::vector<std::pair<QString, QString>> getSystemDirectories()
   std::vector<std::pair<QString, QString>> systemDirs;
 
   for (auto&& p : systemFolderIDs) {
-    const auto dir = MOBase::getOptionalKnownFolder(p.first);
+    const auto dir = getOptionalKnownFolder(p.first);
 
     if (!dir.isEmpty()) {
       auto path = QDir::toNativeSeparators(dir).toLower();

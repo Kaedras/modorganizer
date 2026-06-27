@@ -7,6 +7,7 @@
 #include <libsecret/secret.h>
 
 using namespace MOBase;
+using namespace std;
 
 extern QString secretName(const QString& key);
 
@@ -19,7 +20,7 @@ struct HashTableDeleter
     }
   }
 };
-using GHashTablePtr = std::unique_ptr<GHashTable, HashTableDeleter>;
+using GHashTablePtr = unique_ptr<GHashTable, HashTableDeleter>;
 
 struct GListDeleter
 {
@@ -30,7 +31,7 @@ struct GListDeleter
     }
   }
 };
-using GListPtr = std::unique_ptr<GList, GListDeleter>;
+using GListPtr = unique_ptr<GList, GListDeleter>;
 
 struct SecretValueDeleter
 {
@@ -41,7 +42,7 @@ struct SecretValueDeleter
     }
   }
 };
-using SecretValuePtr = std::unique_ptr<SecretValue, SecretValueDeleter>;
+using SecretValuePtr = unique_ptr<SecretValue, SecretValueDeleter>;
 
 struct SecretServiceDeleter
 {
@@ -52,7 +53,7 @@ struct SecretServiceDeleter
     }
   }
 };
-using SecretServicePtr = std::unique_ptr<SecretService, SecretServiceDeleter>;
+using SecretServicePtr = unique_ptr<SecretService, SecretServiceDeleter>;
 
 bool deleteSecret(const QString& key)
 {
@@ -67,11 +68,11 @@ bool deleteSecret(const QString& key)
                                             SECRET_SEARCH_UNLOCK, nullptr, &e));
 
   if (e) {
-    std::string message = e->message;
+    string message = e->message;
     g_error_free(e);
 
     log::error("failed to delete secret {}, {}", keyName, message);
-    throw std::runtime_error(message);
+    throw runtime_error(message);
   }
 
   // not an error if the key already doesn't exist, and don't log it because
@@ -86,17 +87,17 @@ bool deleteSecret(const QString& key)
     auto* item = static_cast<SecretItem*>(items.get()[0].data);
     secret_item_delete_sync(item, nullptr, &e);
     if (e) {
-      std::string message = e->message;
+      string message = e->message;
       g_error_free(e);
 
       log::error("failed to delete secret {}, {}", keyName, message);
-      throw std::runtime_error(message);
+      throw runtime_error(message);
     }
   } else {
-    std::string message =
-        std::format("failed to delete secret {}, found {} items", keyName, length);
+    string message =
+        format("failed to delete secret {}, found {} items", keyName, length);
     log::error(message);
-    throw std::runtime_error(message);
+    throw runtime_error(message);
   }
 
   log::debug("deleted secret {}", key);
@@ -112,21 +113,21 @@ bool addSecret(const QString& key, const QString& data)
   SecretServicePtr service(
       secret_service_get_sync(SECRET_SERVICE_OPEN_SESSION, nullptr, &e));
   if (e) {
-    std::string message = e->message;
+    string message = e->message;
     g_error_free(e);
 
     log::error("failed to connect to secret service, {}", message);
-    throw std::runtime_error(message);
+    throw runtime_error(message);
   }
 
   // try to unlock
   secret_service_unlock_sync(service.get(), nullptr, nullptr, nullptr, &e);
   if (e) {
-    std::string message = e->message;
+    string message = e->message;
     g_error_free(e);
 
     log::error("failed to unlock default collection, {}", message);
-    throw std::runtime_error(message);
+    throw runtime_error(message);
   }
 
   const QString keyName = secretName(key);
@@ -143,11 +144,11 @@ bool addSecret(const QString& key, const QString& data)
                                 keyBA.data(), secretValue.get(), nullptr, &e);
 
   if (e) {
-    std::string message = e->message;
+    string message = e->message;
     g_error_free(e);
 
     log::error("failed to add secret {}, {}", keyName, message);
-    throw std::runtime_error(message);
+    throw runtime_error(message);
   }
 
   log::debug("set secret {}", keyName);
@@ -169,13 +170,13 @@ QString getSecret(const QString& key) noexcept(false)
   if (e) {
     log::error("failed to retrieve secret {}: {}", keyName, e->message);
     g_error_free(e);
-    return "";
+    return {};
   }
 
   // secret not found
   if (!value) {
     log::debug("secret {} was not found", keyName);
-    return "";
+    return {};
   }
   const gchar* text = secret_value_get_text(value.get());
 

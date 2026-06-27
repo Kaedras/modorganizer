@@ -5,7 +5,7 @@
 using namespace MOBase;
 using namespace Qt::StringLiterals;
 
-Executable::Executable(const MOBase::ExecutableInfo& info, Flags flags)
+Executable::Executable(const ExecutableInfo& info, Flags flags)
     : m_title(info.title()), m_binaryInfo(info.binary()),
       m_arguments(info.arguments().join(' ')), m_steamAppID(info.steamAppID()),
       m_workingDirectory(info.workingDirectory().path()), m_flags(flags),

@@ -8,9 +8,6 @@ using namespace MOBase;
 using namespace json;
 using namespace Qt::StringLiterals;
 
-static const QString LootReportPath =
-    QDir::temp().absoluteFilePath(u"lootreport.json"_s);
-
 Loot::Loot(OrganizerCore& core) : m_core(core), m_cancel(false), m_result(false) {}
 
 Loot::~Loot()

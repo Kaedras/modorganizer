@@ -29,7 +29,7 @@ bool Shortcut::add(Locations loc)
 {
   // extract icon from the PE file
   if (m_icon.endsWith("exe"_L1, Qt::CaseInsensitive)) {
-    QIcon icon     = MOBase::iconForExecutable(m_icon);
+    QIcon icon     = iconForExecutable(m_icon);
     QPixmap pixmap = icon.pixmap(512);
     QImage image   = pixmap.toImage();
     m_icon         = iconPath(image.size().width()) % "mo2-"_L1 % m_name % ".png"_L1;
@@ -73,13 +73,11 @@ bool Shortcut::add(Locations loc)
   log::debug("shortcut file will be saved at '{}'", path);
 
   QString fileContent =
-      QStringLiteral("#!/usr/bin/env xdg-open\n\n"
-                     "[Desktop Entry]\n"
+      QStringLiteral("[Desktop Entry]\n"
                      "Name=%1\n"
                      "Exec=%2 %3\n"
                      "Icon=%4\n"
                      "Path=%5\n"
-                     "StartupNotify=true\n"
                      "Type=Application\n")
           .arg(m_name, m_target, m_arguments, m_icon, m_workingDirectory);
 
