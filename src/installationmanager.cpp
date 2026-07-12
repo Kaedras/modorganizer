@@ -244,16 +244,14 @@ bool InstallationManager::extractFiles(QString extractPath, QString title,
 
   // Check the result:
   if (!future.result()) {
-    if (m_ArchiveHandler->getLastError() == Archive::Error::ERROR_EXTRACT_CANCELLED) {
-      if (!errorMessage.isEmpty()) {
-        throw MyException(tr("Extraction failed: %1").arg(errorMessage));
-      } else {
+    if (errorMessage.isEmpty()) {
+      if (m_ArchiveHandler->getLastError() == Archive::Error::ERROR_EXTRACT_CANCELLED) {
         return false;
       }
-    } else {
       throw MyException(tr("Extraction failed: %1")
                             .arg(static_cast<int>(m_ArchiveHandler->getLastError())));
     }
+    throw MyException(tr("Extraction failed: %1").arg(errorMessage));
   }
 
   return true;
