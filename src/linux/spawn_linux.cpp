@@ -32,8 +32,8 @@ static constexpr int UNKNOWN_ERROR         = 300;
 
 namespace
 {
-const QRegularExpression requiredToolRegex(uR"-("required_tool_appid" "(\d+)")-"_s);
-const QRegularExpression toolCommandlineRegex(uR"-("commandline" "(\d+)")-"_s);
+const QRegularExpression requireToolRegex(uR"-("required_tool_appid" "(\d+)")-"_s);
+const QRegularExpression toolCommandlineRegex(uR"-("commandline" "(.*)")-"_s);
 const QRegularExpression libraryRegex(uR"-(^\t"\d+"\n\t\{\n([\s\S]*?)\n\t\}$)-"_s,
                                       QRegularExpression::MultilineOption);
 const QRegularExpression
@@ -45,8 +45,9 @@ const QRegularExpression installDirRegex(uR"-(^\t"installdir"\t*"(.*)"$)-"_s);
 
 struct Tool
 {
-  QString requiredToolAppID;
-  QString commandline;
+  QString requireToolAppID;
+  QString command;
+  QString args;
 };
 
 Tool parseToolManifest(const QString& toolPath) noexcept(false)
@@ -54,15 +55,18 @@ Tool parseToolManifest(const QString& toolPath) noexcept(false)
   QString toolManifestPath = toolPath % "/toolmanifest.vdf"_L1;
   QFile toolManifestFile(toolManifestPath);
   if (!toolManifestFile.open(QIODevice::ReadOnly)) {
-    throw runtime_error(format("Error opening '{}', {}", toolManifestPath,
-                               toolManifestFile.errorString()));
+    throw runtime_error(format("Error opening '{}', {}", toolManifestPath.toStdString(),
+                               toolManifestFile.errorString().toStdString()));
   }
 
   Tool tool;
 
-  QString data           = toolManifestFile.readAll();
-  tool.commandline       = toolCommandlineRegex.match(data).captured();
-  tool.requiredToolAppID = requiredToolRegex.match(data).captured();
+  QString data = toolManifestFile.readAll();
+  QStringList commandline =
+      QProcess::splitCommand(toolCommandlineRegex.match(data).captured(1));
+  tool.command          = commandline.takeFirst();
+  tool.args             = commandline.join(' ');
+  tool.requireToolAppID = requireToolRegex.match(data).captured(1);
 
   return tool;
 }
@@ -114,16 +118,16 @@ QStringList createToolCommand(const QString& toolPath)
 {
   const QString verb = u"waitforexitandrun"_s;
   Tool tool          = parseToolManifest(toolPath);
-  tool.commandline.replace(u"%verb%"_s, verb);
-  QStringList toolCommandline = {toolPath % tool.commandline};
+  tool.args.replace(u"%verb%"_s, verb);
+  QStringList toolCommandline = {'"' % toolPath % tool.command % "\" "_L1 % tool.args};
   // if `require_tool_appid` is set, the tool needs to be wrapped in another tool,
   // which in turn could require to be wrapped in another tool
-  while (!tool.requiredToolAppID.isEmpty()) {
-    QString requiredToolPath = getPathFromAppID(tool.requiredToolAppID);
+  while (!tool.requireToolAppID.isEmpty()) {
+    QString requiredToolPath = getPathFromAppID(tool.requireToolAppID);
     tool                     = parseToolManifest(toolPath);
 
-    tool.commandline.replace(u"%verb%"_s, verb);
-    toolCommandline = QProcess::splitCommand(tool.commandline) << toolCommandline;
+    tool.requireToolAppID.replace(u"%verb%"_s, verb);
+    toolCommandline = QProcess::splitCommand(tool.args) << toolCommandline;
     toolCommandline.emplaceFront(requiredToolPath);
   }
 
