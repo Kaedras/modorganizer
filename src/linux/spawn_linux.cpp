@@ -109,6 +109,26 @@ QString getPathFromAppID(const QString& appID) noexcept(false)
   throw runtime_error("Error finding a location for appID " + appID.toStdString());
 }
 
+QStringList createToolCommand(const QString& toolPath)
+{
+  const QString verb = u"waitforexitandrun"_s;
+  Tool tool          = parseToolManifest(toolPath);
+  tool.commandline.replace(u"%verb%"_s, verb);
+  QStringList toolCommandline = {toolPath % tool.commandline};
+  // if `require_tool_appid` is set, the tool needs to be wrapped in another tool,
+  // which in turn could require to be wrapped in another tool
+  while (!tool.requiredToolAppID.isEmpty()) {
+    QString requiredToolPath = getPathFromAppID(tool.requiredToolAppID);
+    tool                     = parseToolManifest(toolPath);
+
+    tool.commandline.replace(u"%verb%"_s, verb);
+    toolCommandline = QProcess::splitCommand(tool.commandline) << toolCommandline;
+    toolCommandline.emplaceFront(requiredToolPath);
+  }
+
+  return toolCommandline;
+}
+
 }  // namespace
 
 namespace spawn::dialogs
@@ -367,25 +387,10 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   }
 
   // create the tool command line
-  // this may be a bit convoluted but *SHOULD* not break due to updates and require
-  // little to no changes in the foreseeable future
-  QString toolCommandline;
+  QStringList toolCommandline;
   try {
-    const QString verb = u"waitforexitandrun"_s;
-    QString protonDir  = proton.chopped(7);
-    Tool tool          = parseToolManifest(protonDir);
-    tool.commandline.replace(u"%verb%"_s, verb);
-    toolCommandline = protonDir % tool.commandline;
-    // if `require_tool_appid` is set, the tool needs to be wrapped in another tool,
-    // which in turn could require to be wrapped in another tool
-    while (!tool.requiredToolAppID.isEmpty()) {
-      QString requiredToolPath = getPathFromAppID(tool.requiredToolAppID);
-      tool                     = parseToolManifest(protonDir);
-
-      tool.commandline.replace(u"%verb%"_s, verb);
-      toolCommandline =
-          '"' % requiredToolPath % '"' % tool.commandline % toolCommandline;
-    }
+    QString protonDir = proton.chopped(7);
+    toolCommandline   = createToolCommand(protonDir);
   } catch (const runtime_error& ex) {
     log::error(ex.what());
     return RUNTIME_NOT_FOUND;
@@ -398,8 +403,8 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   QString params =
       QStringLiteral(
           R"(SteamLaunch AppId=%1 -- "%2/ubuntu12_32/steam-launch-wrapper" -- %3 "%4" %5)")
-          .arg(sp.steamAppID, steamPath, toolCommandline, sp.binary.absoluteFilePath(),
-               sp.arguments);
+          .arg(sp.steamAppID, steamPath, toolCommandline.join(' '),
+               sp.binary.absoluteFilePath(), sp.arguments);
 
   QStringList env;
   env << "STEAM_COMPAT_DATA_PATH="_L1 % sp.prefixDirectory.absolutePath();
