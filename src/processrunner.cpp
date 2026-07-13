@@ -647,7 +647,7 @@ std::optional<ProcessRunner::Results> ProcessRunner::runBinary()
 
 #ifdef __unix__
   // appID is required to get the correct proton version
-  if (m_sp.binary.suffix() == "exe") {
+  if (m_sp.binary.suffix() == "exe" && !m_sp.compatToolLaunch) {
     m_sp.steamAppID      = m_core.managedGame()->steamAPPId();
     m_sp.prefixDirectory = m_core.settings().game().prefix();
   }

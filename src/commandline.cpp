@@ -715,7 +715,12 @@ po::options_description RunCommand::getVisibleOptions() const
                   po::value<bool>()->default_value(false)->zero_tokens(),
                   "the name is a configured executable name")(
       "arguments,a", po::value<std::string>(), "override arguments")(
-      "cwd,c", po::value<std::string>(), "override working directory");
+      "cwd,c", po::value<std::string>(), "override working directory")
+#ifdef __unix__
+      ("steamLaunch", po::value<std::string>()->default_value("proton"),
+       "use MO as steam compatibility tool, set to native for native games")
+#endif
+      ;
 
   return d;
 }
@@ -787,6 +792,13 @@ std::optional<int> RunCommand::runPostOrganizer(OrganizerCore& core)
     }
 
     p.setWaitForCompletion(ProcessRunner::ForCommandLine, UILocker::PreventExit);
+
+#ifdef __unix__
+    if (vm().contains("steamLaunch")) {
+      p.setProton(vm()["steamLaunch"].as<std::string>() == "proton");
+      p.setCompatToolLaunch(true);
+    }
+#endif
 
     const auto r = p.run();
     if (r == ProcessRunner::Error) {

@@ -502,6 +502,35 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
   return e;
 }
 
+int spawnAsCompatTool(const SpawnParameters& sp, HANDLE& pidFd)
+{
+  if (sp.hooked) {
+    logSpawning(sp, sp.arguments);
+
+    pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+        sp.binary.absolutePath(), sp.arguments, sp.currentDirectory.absolutePath());
+
+    if (pid >= 0) {
+      pidFd = pidfd_open(pid, 0);
+      return 0;
+    }
+    errno = UNKNOWN_ERROR;
+  } else {
+    auto result = shell::ExecuteIn(sp.binary.absolutePath(),
+                                   sp.currentDirectory.absolutePath(), sp.arguments);
+
+    if (result.success()) {
+      pidFd = result.stealProcessHandle();
+      return 0;
+    }
+  }
+
+  const int e = errno;
+  log::error("error running {}, {}", sp.binary.absoluteFilePath().toStdString(),
+             strerror(e));
+  return e;
+}
+
 bool restartAsAdmin(QWidget*)
 {
   // no-op
@@ -734,7 +763,9 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
   HANDLE handle = INVALID_HANDLE_VALUE;
   int e;
-  if (sp.binary.suffix() == "desktop"_L1) {
+  if (sp.compatToolLaunch) {
+    e = spawnAsCompatTool(sp, handle);
+  } else if (sp.binary.suffix() == "desktop"_L1) {
     QString path = sp.binary.absoluteFilePath();
 
     // extract exec line
