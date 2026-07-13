@@ -3,6 +3,7 @@
 #include "env.h"
 #include "envos.h"
 #include "envsecurity.h"
+#include "instancemanager.h"
 #include "settings.h"
 #include "shared/util.h"
 #include <QDirIterator>
@@ -337,23 +338,63 @@ void logSpawning(const SpawnParameters& sp, const QString& realCmd)
 DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
 {
   logSpawning(sp, sp.binary.absoluteFilePath() % ' ' % sp.arguments);
-  if (sp.hooked) {
-    pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
-        sp.binary.absoluteFilePath().toStdString(), sp.arguments.toStdString(),
-        sp.currentDirectory.absolutePath().toStdString());
-    if (pid >= 0) {
-      processHandle = pidfd_open(pid, 0);
-      return 0;
+  try {
+    // handle steam linux runtime
+    if (sp.steamAppID.isEmpty()) {
+      return APPID_EMPTY;
     }
-    // todo: add proper error codes
-    errno = UNKNOWN_ERROR;
-  } else {
-    auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(),
-                                   sp.currentDirectory.absolutePath(), sp.arguments);
-    if (result.success()) {
-      processHandle = result.stealProcessHandle();
-      return 0;
+
+    auto instance = InstanceManager::singleton().currentInstance();
+    if (!instance) {
+      log::error("instance is empty");
+      return UNKNOWN_ERROR;
     }
+    QString args;
+    QString binary;
+    QString runtimeName = getRequiredLinuxRuntime(
+        InstanceManager::singleton().currentInstance()->gameDirectory(), sp.steamAppID);
+
+    if (!runtimeName.isEmpty()) {
+      try {
+        QString runtimePath = findSteamGame(runtimeName, u"toolmanifest.vdf"_s);
+        if (runtimePath.isEmpty()) {
+          return RUNTIME_NOT_FOUND;
+        }
+        QStringList toolCommand = createToolCommand(runtimePath);
+        toolCommand << sp.binary.absoluteFilePath() << sp.arguments;
+        binary = toolCommand.takeFirst();
+        args   = toolCommand.join(' ');
+      } catch (const runtime_error& ex) {
+        log::error(ex.what());
+        return RUNTIME_NOT_FOUND;
+      }
+    } else {
+      binary = sp.binary.absoluteFilePath();
+      args   = sp.arguments;
+    }
+
+    logSpawning(sp, binary % ' ' % args);
+
+    if (sp.hooked) {
+      pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+          binary, args, sp.currentDirectory.absolutePath());
+      if (pid >= 0) {
+        processHandle = pidfd_open(pid, 0);
+        return 0;
+      }
+      // todo: add proper error codes
+      errno = UNKNOWN_ERROR;
+    } else {
+      auto result = shell::ExecuteIn(sp.binary.absoluteFilePath(),
+                                     sp.currentDirectory.absolutePath(), sp.arguments);
+      if (result.success()) {
+        processHandle = result.stealProcessHandle();
+        return 0;
+      }
+    }
+  } catch (const runtime_error& ex) {
+    log::error(ex.what());
+    return UNKNOWN_ERROR;
   }
 
   const int e = errno;
