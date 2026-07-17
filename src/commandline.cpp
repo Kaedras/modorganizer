@@ -12,17 +12,20 @@
 
 #include <boost/optional/optional_io.hpp>
 
+using namespace Qt::StringLiterals;
+
 #ifdef __unix__
 using command_line_parser = boost::program_options::command_line_parser;
-
+namespace
+{
 std::vector<nativeString> split_main(const nativeString& line)
 {
   return boost::program_options::split_unix(std::forward<const nativeString&>(line));
 }
 
-inline const char* GetCommandLineNative()
+QString GetCommandLineQString()
 {
-  QFile cmdline(QStringLiteral("/proc/self/cmdline"));
+  QFile cmdline(u"/proc/self/cmdline"_s);
   if (!cmdline.open(QIODeviceBase::ReadOnly)) {
     std::cerr << "error getting commandline: " << cmdline.errorString().toStdString()
               << std::endl;
@@ -30,39 +33,48 @@ inline const char* GetCommandLineNative()
   }
   const auto data = cmdline.readAll();
   auto args       = data.split('\0');
-  std::string str;
+
+  QStringList argStrings;
+  argStrings.reserve(args.size());
+
   for (const auto& arg : args) {
-    if (!arg.isEmpty()) {
-      // escape spaces
-      if (arg.contains(' ')) {
-        str += "\"" + arg.toStdString() + "\" ";
-      } else {
-        str += arg.toStdString() + " ";
-      }
+    if (arg.isEmpty()) {
+      continue;
     }
+    QString argQString = QString::fromLocal8Bit(arg.constData());
+    // escape spaces
+    argQString.replace(' ', uR"(\ )"_s);
+
+    argStrings << argQString;
   }
 
-  // remove trailing space
-  if (!str.empty()) {
-    str.pop_back();
-  }
-
-  std::cout << "cmdline: " << str << std::endl;
-  return str.c_str();
+  return argStrings.join(' ');
 }
+
+nativeString GetCommandLineNative()
+{
+  return GetCommandLineQString().toStdString();
+}
+}  // namespace
 #else
 using command_line_parser = boost::program_options::wcommand_line_parser;
-
+namespace
+{
 std::vector<nativeString> split_main(const nativeString& line)
 {
   return boost::program_options::split_winmain(std::forward<const nativeString&>(line));
 }
 
-inline const wchar_t* GetCommandLineNative()
+nativeString GetCommandLineNative()
 {
   return GetCommandLineW();
 }
 
+QString GetCommandLineQString()
+{
+  return QString::fromStdWString(std::wstring(GetCommandLineW()));
+}
+}  // namespace
 #endif
 
 namespace cl
@@ -252,7 +264,7 @@ bool CommandLine::forwardToPrimary(MOMultiProcess& multiProcess)
   } else if (m_nxmLink) {
     multiProcess.sendMessage(*m_nxmLink);
   } else if (m_command && m_command->canForwardToPrimary()) {
-    multiProcess.sendMessage(ToQString(GetCommandLineNative()));
+    multiProcess.sendMessage(GetCommandLineQString());
   } else {
     return false;
   }
@@ -701,8 +713,9 @@ nativeCString
 LaunchCommand::UntouchedCommandLineArguments(int parseArgCount,
                                              std::vector<nativeString>& parsedArgs)
 {
-  nativeCString cmd = GetCommandLineNative();
-  nativeCString arg = nullptr;  // to skip executable name
+  const nativeString cmdString = GetCommandLineNative();
+  nativeCString cmd            = cmdString.c_str();
+  nativeCString arg            = nullptr;  // to skip executable name
   for (; parseArgCount >= 0 && *cmd; ++cmd) {
     if (*cmd == '"') {
       int escaped = 0;
@@ -741,12 +754,7 @@ po::options_description RunCommand::getVisibleOptions() const
                   po::value<bool>()->default_value(false)->zero_tokens(),
                   "the name is a configured executable name")(
       "arguments,a", po::value<std::string>(), "override arguments")(
-      "cwd,c", po::value<std::string>(), "override working directory")
-#ifdef __unix__
-      ("steamLaunch", po::value<std::string>()->default_value("proton"),
-       "use MO as steam compatibility tool, set to native for native games")
-#endif
-      ;
+      "cwd,c", po::value<std::string>(), "override working directory");
 
   return d;
 }
@@ -756,7 +764,12 @@ po::options_description RunCommand::getInternalOptions() const
   po::options_description d;
 
   d.add_options()("NAME", po::value<std::string>()->required(),
-                  "program or executable name");
+                  "program or executable name")
+#ifdef __unix__
+      ("asCompatibilityTool", po::value<bool>()->default_value(false),
+       "launch as steam compatibility tool")
+#endif
+      ;
 
   return d;
 }
