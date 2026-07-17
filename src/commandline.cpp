@@ -22,7 +22,33 @@ std::vector<nativeString> split_main(const nativeString& line)
 
 inline const char* GetCommandLineNative()
 {
-  return qApp->arguments().join(' ').toStdString().c_str();
+  QFile cmdline(QStringLiteral("/proc/self/cmdline"));
+  if (!cmdline.open(QIODeviceBase::ReadOnly)) {
+    std::cerr << "error getting commandline: " << cmdline.errorString().toStdString()
+              << std::endl;
+    return "";
+  }
+  const auto data = cmdline.readAll();
+  auto args       = data.split('\0');
+  std::string str;
+  for (const auto& arg : args) {
+    if (!arg.isEmpty()) {
+      // escape spaces
+      if (arg.contains(' ')) {
+        str += "\"" + arg.toStdString() + "\" ";
+      } else {
+        str += arg.toStdString() + " ";
+      }
+    }
+  }
+
+  // remove trailing space
+  if (!str.empty()) {
+    str.pop_back();
+  }
+
+  std::cout << "cmdline: " << str << std::endl;
+  return str.c_str();
 }
 #else
 using command_line_parser = boost::program_options::wcommand_line_parser;
