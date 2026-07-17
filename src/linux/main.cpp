@@ -9,7 +9,6 @@
 #include "thread_utils.h"
 #include <QMessageBox>
 #include <client/linux/handler/exception_handler.h>
-#include <client/linux/minidump_writer/minidump_writer.h>
 #include <report.h>
 #include <sys/prctl.h>
 
@@ -20,22 +19,22 @@ namespace fs = std::filesystem;
 
 namespace env
 {
-extern HandlePtr dumpFile(const QString& dir);
+extern std::unique_ptr<QFile> dumpFile(const QString& dir);
 }  // namespace env
 
 static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void*,
                          bool succeeded)
 {
   if (succeeded) {
-    auto h = env::dumpFile(OrganizerCore::getGlobalCoreDumpPath());
-
-    // get filename from fd
+    // get filename
     error_code ec;
-    fs::path filename = fs::read_symlink("/proc/self/fd/" + to_string(h.get()), ec);
-    if (ec) {
-      cerr << "Error getting filename from fd, " << ec.message() << "\n";
+    auto h = env::dumpFile(OrganizerCore::getGlobalCoreDumpPath());
+    if (!h) {
+      cerr << "Error getting dump file path!\n";
       return succeeded;
     }
+    fs::path filename = h->filesystemFileName();
+    h->close();
 
     // rename file
     fs::rename(descriptor.path(), filename, ec);
@@ -44,7 +43,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, 
       return succeeded;
     }
 
-    // check if the crash dump path is set
+    // move file into crash dump directory if it is set
     string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
     if (!path.empty()) {
       fs::create_directory(path);
@@ -57,6 +56,8 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, 
   } else {
     cerr << "Error creating minidump\n";
   }
+
+  cout << "Minidump created\n";
   return succeeded;
 }
 
@@ -192,17 +193,14 @@ int run(int argc, char* argv[])
         }
       }
 
-      // value should exist by now
+      // move old crash dumps into the crash dump folder
+      // getGlobalCoreDumpPath() returns empty values before MOApplication::setup() is
+      // called
       fs::path path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
       if (!path.empty()) {
-        descriptor = google_breakpad::MinidumpDescriptor(path);
-        eh.set_minidump_descriptor(descriptor);
-
-        // move old crash dumps into the crash dump folder
         for (const auto& item : fs::directory_iterator(".")) {
           if (item.path().extension() == ".dmp") {
-            fs::copy(item.path(), path / item.path().filename());
-            fs::remove(item.path());
+            fs::rename(item.path(), path / item.path().filename());
           }
         }
       }
