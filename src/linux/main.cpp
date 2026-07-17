@@ -101,11 +101,14 @@ int run(int argc, char* argv[])
 
   cl::CommandLine cl;
 
-  QString str;
+  QStringList args;
   for (int i = 0; i < argc; i++) {
-    str.append(argv[i]).append(' ');
+    QString arg = QString::fromLocal8Bit(argv[i]);
+    // escape spaces
+    arg.replace(' ', uR"(\ )"_s);
+    args.append(std::move(arg));
   }
-  if (auto r = cl.process(ToNativeString(str))) {
+  if (auto r = cl.process(ToNativeString(args.join(' ')))) {
     return *r;
   }
 
