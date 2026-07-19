@@ -90,8 +90,6 @@ public:
   ProcessRunner& setPrefixDir(const QDir& directory);
   ProcessRunner& setSteamAPI(bool b);
   ProcessRunner& setSteamOverlay(bool b);
-  ProcessRunner& setCompatToolLaunch(bool b);
-  ProcessRunner& setProton(bool b);
 #endif
   // - if the target is an executable file, runs it hooked
   // - if the target is a file:

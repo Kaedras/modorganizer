@@ -58,8 +58,6 @@ struct SpawnParameters
   QDir prefixDirectory;
   bool enableSteamAPI     = false;
   bool enableSteamOverlay = false;
-  bool compatToolLaunch   = false;
-  bool proton             = false;
 #endif
   bool hooked   = false;
   HANDLE stdOut = INVALID_HANDLE_VALUE;

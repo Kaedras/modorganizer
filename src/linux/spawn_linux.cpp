@@ -114,10 +114,10 @@ QString getPathFromAppID(const QString& appID) noexcept(false)
   throw runtime_error("Error finding a location for appID " + appID.toStdString());
 }
 
-QStringList createToolCommand(const QString& toolPath)
+QStringList createToolCommand(const QString& toolPath,
+                              const QString& verb = u"waitforexitandrun"_s)
 {
-  const QString verb = u"waitforexitandrun"_s;
-  Tool tool          = parseToolManifest(toolPath);
+  Tool tool = parseToolManifest(toolPath);
   tool.args.replace(u"%verb%"_s, verb);
   QStringList toolCommandline = {'"' % toolPath % tool.command % "\" "_L1 % tool.args};
   // if `require_tool_appid` is set, the tool needs to be wrapped in another tool,
@@ -504,11 +504,40 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
 int spawnAsCompatTool(const SpawnParameters& sp, HANDLE& pidFd)
 {
-  if (sp.hooked) {
-    logSpawning(sp, sp.arguments);
+  SpawnParameters newSp(sp);
+  if (qEnvironmentVariableIntegerValue("IS_PROTON").value_or(0) == 1) {
+    // get proton location
+    // todo: make proton version configurable
+    const QString protonLocation = findSteamGame(u"Proton 11.0"_s, u"proton"_s);
+    if (protonLocation.isEmpty()) {
+      return PROTON_NOT_FOUND;
+    }
 
-    pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
-        sp.binary.absolutePath(), sp.arguments, sp.currentDirectory.absolutePath());
+    // create the tool command line
+    QStringList toolCommandline;
+    const QString verb = qEnvironmentVariable("VERB");
+    if (verb.isEmpty()) {
+      log::error("$VERB not found");
+      return UNKNOWN_ERROR;
+    }
+    try {
+      toolCommandline = createToolCommand(protonLocation, verb);
+    } catch (const runtime_error& ex) {
+      log::error(ex.what());
+      return RUNTIME_NOT_FOUND;
+    }
+
+    newSp.binary    = QFileInfo{toolCommandline.takeFirst()};
+    newSp.arguments = toolCommandline.join(' ') % ' ' % sp.binary.absoluteFilePath() %
+                      ' ' % sp.arguments;
+  }
+
+  logSpawning(newSp, newSp.arguments);
+
+  if (newSp.hooked) {
+    const pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+        newSp.binary.absolutePath(), newSp.arguments,
+        newSp.currentDirectory.absolutePath());
 
     if (pid >= 0) {
       pidFd = pidfd_open(pid, 0);
@@ -516,8 +545,9 @@ int spawnAsCompatTool(const SpawnParameters& sp, HANDLE& pidFd)
     }
     errno = UNKNOWN_ERROR;
   } else {
-    auto result = shell::ExecuteIn(sp.binary.absolutePath(),
-                                   sp.currentDirectory.absolutePath(), sp.arguments);
+    auto result =
+        shell::ExecuteIn(newSp.binary.absolutePath(),
+                         newSp.currentDirectory.absolutePath(), newSp.arguments);
 
     if (result.success()) {
       pidFd = result.stealProcessHandle();
@@ -763,7 +793,7 @@ HANDLE startBinary(QWidget* parent, const SpawnParameters& sp)
 {
   HANDLE handle = INVALID_HANDLE_VALUE;
   int e;
-  if (sp.compatToolLaunch) {
+  if (qEnvironmentVariableIntegerValue("SteamClientLaunch").value_or(0) == 1) {
     e = spawnAsCompatTool(sp, handle);
   } else if (sp.binary.suffix() == "desktop"_L1) {
     QString path = sp.binary.absoluteFilePath();

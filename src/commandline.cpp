@@ -764,12 +764,7 @@ po::options_description RunCommand::getInternalOptions() const
   po::options_description d;
 
   d.add_options()("NAME", po::value<std::string>()->required(),
-                  "program or executable name")
-#ifdef __unix__
-      ("asCompatibilityTool", po::value<bool>()->default_value(false),
-       "launch as steam compatibility tool")
-#endif
-      ;
+                  "program or executable name");
 
   return d;
 }
@@ -831,13 +826,6 @@ std::optional<int> RunCommand::runPostOrganizer(OrganizerCore& core)
     }
 
     p.setWaitForCompletion(ProcessRunner::ForCommandLine, UILocker::PreventExit);
-
-#ifdef __unix__
-    if (vm().contains("steamLaunch")) {
-      p.setProton(vm()["steamLaunch"].as<std::string>() == "proton");
-      p.setCompatToolLaunch(true);
-    }
-#endif
 
     const auto r = p.run();
     if (r == ProcessRunner::Error) {

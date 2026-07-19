@@ -25,18 +25,6 @@ ProcessRunner& ProcessRunner::setSteamOverlay(bool b)
   return *this;
 }
 
-ProcessRunner& ProcessRunner::setCompatToolLaunch(bool b)
-{
-  m_sp.compatToolLaunch = b;
-  return *this;
-}
-
-ProcessRunner& ProcessRunner::setProton(bool b)
-{
-  m_sp.proton = b;
-  return *this;
-}
-
 std::optional<ProcessRunner::Results> singleWait(HANDLE pidFd, DWORD pid)
 {
   if (pidFd == -1) {
