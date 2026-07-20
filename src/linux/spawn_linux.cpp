@@ -134,6 +134,14 @@ QStringList createToolCommand(const QString& toolPath,
   return toolCommandline;
 }
 
+bool isExecutableFile(const QFileInfo& target)
+{
+  const QMimeDatabase db;
+  const QMimeType targetType = db.mimeTypeForFile(target);
+
+  return targetType.inherits(u"application/x-executable"_s);
+}
+
 }  // namespace
 
 namespace spawn::dialogs
@@ -317,7 +325,6 @@ namespace spawn
 {
 
 // located in spawn.cpp
-extern bool isExeFile(const QFileInfo& target);
 extern bool isJavaFile(const QFileInfo& target);
 
 void logSpawning(const SpawnParameters& sp, const QString& realCmd)
@@ -892,7 +899,7 @@ FileExecutionContext getFileExecutionContext(QWidget*, const QFileInfo& target)
     }
   }
 
-  else if (isExeFile(target)) {
+  else if (isExecutableFile(target)) {
     return {target, {}, FileExecutionTypes::Executable};
   }
 
