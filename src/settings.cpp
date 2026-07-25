@@ -2092,19 +2092,26 @@ void NexusSettings::registerAsNXMHandler(bool force)
 
   const auto executable = getApplicationFilePath();
 
-  QString mode       = force ? "forcereg" : "reg";
-  QString parameters = mode + " nxm " + m_Parent.game().plugin()->gameShortName();
-  for (const QString& altGame : m_Parent.game().plugin()->validShortNames()) {
-    parameters += "," + altGame;
-  }
-  parameters += " \"" + executable + "\"";
+  QStringList parameters = {force ? "forcereg" : "reg", "nxm"};
+  QStringList games      = {m_Parent.game().plugin()->gameShortName()};
+  games.append(m_Parent.game().plugin()->validShortNames());
+  parameters.append(games.join(','));
+  parameters.append(executable);
 
-  const auto r = shell::Execute(nxmPath, parameters);
-  if (!r.success()) {
-    QMessageBox::critical(
-        nullptr, QObject::tr("Failed"),
-        QObject::tr("Failed to start the helper application: %1").arg(r.toString()));
-  }
+  QProcess* nxmProcess = new QProcess();
+
+  QObject::connect(nxmProcess, &QProcess::finished,
+                   [=](int exitCode, QProcess::ExitStatus exitStatus) {
+                     if (exitStatus != QProcess::NormalExit) {
+                       QMessageBox::critical(
+                           nullptr, QObject::tr("Failed"),
+                           QObject::tr("Failed to start the helper application: %1")
+                               .arg(nxmProcess->errorString()));
+                     }
+                     nxmProcess->deleteLater();
+                   });
+
+  nxmProcess->start(nxmPath, parameters);
 }
 
 std::vector<std::chrono::seconds> NexusSettings::validationTimeouts() const
