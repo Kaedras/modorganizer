@@ -22,13 +22,13 @@ Shortcut::Shortcut() : m_iconIndex(0) {}
 
 Shortcut::Shortcut(const Executable& exe) : Shortcut()
 {
-  const auto& i = *InstanceManager::singleton().currentInstance();
+  const auto i = InstanceManager::singleton().currentInstance();
 
   m_name   = MOBase::sanitizeFileName(exe.title());
   m_target = QFileInfo(qApp->applicationFilePath()).absoluteFilePath();
 
   m_arguments = QString("\"moshortcut://%1:%2\"")
-                    .arg(i.isPortable() ? "" : i.displayName())
+                    .arg(i->isPortable() ? "" : i->displayName())
                     .arg(exe.title());
 
   m_description = QString("Run %1 with ModOrganizer").arg(exe.title());
