@@ -646,11 +646,13 @@ std::optional<ProcessRunner::Results> ProcessRunner::runBinary()
   adjustForVirtualized(game, m_sp, settings);
 
 #ifdef __unix__
-  // appID is required to get the correct proton version
-  if (m_sp.binary.suffix() == "exe" &&
-      qEnvironmentVariableIntegerValue("SteamClientLaunch").value_or(0) == 0) {
-    m_sp.steamAppID      = m_core.managedGame()->steamAPPId();
-    m_sp.prefixDirectory = m_core.settings().game().prefix();
+  if (qEnvironmentVariableIntegerValue("SteamClientLaunch").value_or(0) == 0) {
+    if (m_sp.steamAppID.isEmpty()) {
+      m_sp.steamAppID = m_core.managedGame()->steamAPPId();
+    }
+    if (m_sp.binary.suffix() == "exe" && m_sp.steamAppID.isEmpty()) {
+      m_sp.prefixDirectory = m_core.settings().game().prefix();
+    }
   }
 #endif
 
