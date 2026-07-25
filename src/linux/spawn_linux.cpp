@@ -362,8 +362,8 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
     }
     QString args;
     QString binary;
-    QString runtimeName = getRequiredLinuxRuntime(
-        InstanceManager::singleton().currentInstance()->gameDirectory(), sp.steamAppID);
+    QString runtimeName =
+        getRequiredLinuxRuntime(instance->gameDirectory(), sp.steamAppID);
 
     if (!runtimeName.isEmpty()) {
       try {
