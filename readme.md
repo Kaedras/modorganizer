@@ -7,6 +7,7 @@
 ### Known Issues
 
 - Running the tutorial can cause a segfault
+- ModOrganizer does not exit properly after switching instances
 
 #### Low priority
 
@@ -23,7 +24,6 @@
 #### Features
 
 - Non-steam games
-- Support for native linux games, e.g. Stardew Valley, Baldur's Gate 3, X4
 
 #### Plugins
 
