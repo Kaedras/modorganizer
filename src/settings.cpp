@@ -36,6 +36,31 @@ using namespace MOBase;
 using namespace MOShared;
 using namespace Qt::StringLiterals;
 
+namespace
+{
+QString getApplicationFilePath()
+{
+#ifdef __unix__
+  QString executable = qgetenv("APPIMAGE");
+  if (!executable.isEmpty()) {
+    return executable;
+  }
+#endif
+  return QCoreApplication::applicationFilePath();
+}
+
+QString getNxmHandlerPath()
+{
+#ifdef __unix__
+  const QString appDir = qgetenv("APPDIR");
+  if (!appDir.isEmpty()) {
+    return appDir % "/usr/bin/nxmhandler"_L1;
+  }
+#endif
+  return QCoreApplication::applicationDirPath() % "/"_L1 % AppConfig::nxmHandlerExe();
+}
+}  // namespace
+
 QString getNxmHandler();
 
 EndorsementState endorsementStateFromString(const QString& s)
@@ -429,10 +454,9 @@ void Settings::registerDownloadHandlers(bool force)
 
 void Settings::registerAsMODLHandler(bool force, bool includeNxm)
 {
-  const auto nxmPath =
-      QCoreApplication::applicationDirPath() + "/" + AppConfig::nxmHandlerExe();
+  const auto nxmPath = getNxmHandlerPath();
 
-  const auto executable = QCoreApplication::applicationFilePath();
+  const auto executable = getApplicationFilePath();
 
   QStringList parameters = {force ? "forcereg" : "reg", "modl"};
   QStringList games      = {m_Game.plugin()->gameShortName()};
@@ -2062,28 +2086,6 @@ bool NexusSettings::categoryMappings() const
 void NexusSettings::setCategoryMappings(bool b) const
 {
   set(m_Settings, "Settings", "category_mappings", b);
-}
-
-QString getApplicationFilePath()
-{
-#ifdef __unix__
-  QString executable = qgetenv("APPIMAGE");
-  if (!executable.isEmpty()) {
-    return executable;
-  }
-#endif
-  return QCoreApplication::applicationFilePath();
-}
-
-QString getNxmHandlerPath()
-{
-#ifdef __unix__
-  const QString appDir = qgetenv("APPDIR");
-  if (!appDir.isEmpty()) {
-    return appDir % "/usr/bin/nxmhandler"_L1;
-  }
-#endif
-  return QCoreApplication::applicationDirPath() % "/"_L1 % AppConfig::nxmHandlerExe();
 }
 
 void NexusSettings::registerAsNXMHandler(bool force)
