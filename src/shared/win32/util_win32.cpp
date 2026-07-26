@@ -259,4 +259,9 @@ void SetThisThreadName(const QString& s)
   }
 }
 
+QString getApplicationFilePath()
+{
+  return QCoreApplication::applicationFilePath();
+}
+
 }  // namespace MOShared

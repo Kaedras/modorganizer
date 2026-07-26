@@ -38,4 +38,13 @@ QString findFileNameCaseInsensitive(const QDir& dir, const QString& fileName)
   return fileName;
 }
 
+QString getApplicationFilePath()
+{
+  QString executable = qgetenv("APPIMAGE");
+  if (!executable.isEmpty()) {
+    return executable;
+  }
+  return QCoreApplication::applicationFilePath();
+}
+
 }  // namespace MOShared

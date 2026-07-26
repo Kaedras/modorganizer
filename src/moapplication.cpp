@@ -61,6 +61,10 @@ using namespace MOShared;
 
 extern void addDllsToPath();
 
+#ifdef __unix__
+void installDesktopFile();
+#endif
+
 // style proxy that changes the appearance of drop indicators
 //
 class ProxyStyle : public QProxyStyle
@@ -330,6 +334,11 @@ int MOApplication::run(MOMultiProcess& multiProcess)
     splash.close();
 
     tt.stop();
+
+#ifdef __unix__
+    // prompt the user to install a desktop file if it doesn't exist yet
+    installDesktopFile();
+#endif
 
     res = exec();
     mainWindow.close();

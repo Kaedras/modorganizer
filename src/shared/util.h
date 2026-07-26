@@ -64,6 +64,10 @@ inline FILETIME ToFILETIME(std::filesystem::file_time_type t)
   return ft;
 }
 
+// this function should be used instead of `QCoreApplication::applicationFilePath()` and
+// handles some AppImage-specific issues
+QString getApplicationFilePath();
+
 #ifdef __unix__
 QString findFileNameCaseInsensitive(const QDir& dir, const QString& fileName);
 #endif

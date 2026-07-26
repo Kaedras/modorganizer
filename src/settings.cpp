@@ -26,6 +26,8 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 #include "serverinfo.h"
 #include "settingsutilities.h"
 #include "shared/appconfig.h"
+#include "shared/util.h"
+
 #include <QJsonDocument>
 #include <expanderwidget.h>
 #include <iplugingame.h>
@@ -38,17 +40,6 @@ using namespace Qt::StringLiterals;
 
 namespace
 {
-QString getApplicationFilePath()
-{
-#ifdef __unix__
-  QString executable = qgetenv("APPIMAGE");
-  if (!executable.isEmpty()) {
-    return executable;
-  }
-#endif
-  return QCoreApplication::applicationFilePath();
-}
-
 QString getNxmHandlerPath()
 {
 #ifdef __unix__
