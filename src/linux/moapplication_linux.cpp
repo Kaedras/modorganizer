@@ -43,7 +43,7 @@ void writeIcon()
       QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) %
       "/icons/hicolor/scalable/apps/ModOrganizer.svg"_L1;
   if (!QFile::exists(iconPath)) {
-    log::debug("installing icon");
+    log::debug("writing icon");
     QFile iconFile(iconPath);
     if (!iconFile.open(QIODevice::WriteOnly)) {
       log::error("Error opening '{}' for writing: ", iconFile.fileName(),
@@ -82,7 +82,7 @@ void installDesktopFile()
             "/ModOrganizer.desktop"_L1);
         writeIcon();
       } else {
-        log::debug("NOT installing desktop file");
+        log::debug("user denied installing the desktop file");
       }
     });
     dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -101,11 +101,12 @@ void installDesktopFile()
     bool shouldWrite = false;
 
     if (!match.hasMatch()) {
-      log::debug("no match");
+      log::debug("prompting user to rewrite desktop file because it may be corrupt");
       shouldWrite = true;
     } else {
       if (match.captured(1) != MOShared::getApplicationFilePath()) {
-        log::debug("exec line does not match");
+        log::debug("prompting user to rewrite desktop file because the Exec field does "
+                   "not match the application path");
         shouldWrite = true;
       }
     }
@@ -121,7 +122,7 @@ void installDesktopFile()
                          if (dialog->standardButton(button) == QMessageBox::Yes) {
                            writeDesktopFile(desktopFileLocation);
                          } else {
-                           log::debug("NOT installing desktop file");
+                           log::debug("user denied rewriting the desktop file");
                          }
                        });
       dialog->setAttribute(Qt::WA_DeleteOnClose);
