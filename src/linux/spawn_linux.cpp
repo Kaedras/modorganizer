@@ -199,7 +199,7 @@ QString makeRightsDetails(const QFileInfo& info)
          (permissions.testFlag(QFileDevice::ReadOther) ? QChar('r') : QChar('-')) %
          (permissions.testFlag(QFileDevice::WriteOther) ? QChar('w') : QChar('-')) %
          (permissions.testFlag(QFileDevice::ExeOther) ? QChar('x') : QChar('-')) %
-         QStringLiteral(" (%1%2%3)").arg(user, group, others);
+         QStringLiteral(" (0%1%2%3)").arg(user).arg(group).arg(others);
 }
 
 QString makeDetails(const SpawnParameters& sp, DWORD code, const QString& more = {})
