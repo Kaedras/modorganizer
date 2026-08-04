@@ -12,6 +12,18 @@ using namespace json;
 static QString LootReportPath       = QDir::temp().absoluteFilePath("lootreport.json");
 static QString SortedPluginListPath = QDir::temp().absoluteFilePath("loadorder.txt");
 
+namespace
+{
+QString lootPathArg(const QString& path)
+{
+#ifdef __unix__
+  return path;
+#else
+  return QString("\"%1\"").arg(path);
+#endif
+}
+}  // namespace
+
 log::Levels levelFromLoot(lootcli::LogLevels level)
 {
   using LC = lootcli::LogLevels;
@@ -270,18 +282,18 @@ QStringList Loot::createLootCliParams(bool didUpdateMasterList) const
   parameters << "--game" << m_core.managedGame()->lootGameName()
 
              << "--gamePath"
-             << QString("\"%1\"").arg(
-                    m_core.managedGame()->gameDirectory().absolutePath())
+             << lootPathArg(m_core.managedGame()->gameDirectory().absolutePath())
 
              << "--pluginListPath"
-             << QString("\"%1/loadorder.txt\"").arg(m_core.profilePath())
+             << lootPathArg(
+                    QDir(m_core.profilePath()).absoluteFilePath("loadorder.txt"))
 
              << "--logLevel"
              << QString::fromStdString(lootcli::logLevelToString(logLevel))
 
-             << "--out" << QString("\"%1\"").arg(LootReportPath)
+             << "--out" << lootPathArg(LootReportPath)
 
-             << "--pluginListOutputPath" << QString("\"%1\"").arg(SortedPluginListPath)
+             << "--pluginListOutputPath" << lootPathArg(SortedPluginListPath)
 
              << "--language" << m_core.settings().interface().language();
 
