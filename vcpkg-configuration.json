@@ -12,7 +12,6 @@
       "packages": [
         "mo2-*",
         "7zip",
-        "bit7z",
         "usvfs",
         "usvfs-fuse",
         "libbsarchpp"
