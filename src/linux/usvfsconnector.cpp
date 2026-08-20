@@ -69,25 +69,25 @@ UsvfsConnector::UsvfsConnector() : m_usvfsManager(UsvfsManager::instance())
              " . log: {}",
              SHMID, usvfsLogLevelToString(logLevel));
 
-  m_usvfsManager->usvfsClearExecutableBlacklist();
+  m_usvfsManager->clearExecutableBlacklist();
   for (const auto& exec : s.executablesBlacklist().split(';')) {
-    m_usvfsManager->usvfsBlacklistExecutable(exec.toStdString());
+    m_usvfsManager->blacklistExecutable(exec.toStdString());
   }
 
-  m_usvfsManager->usvfsClearExecutableBlacklist();
+  m_usvfsManager->clearExecutableBlacklist();
   for (const auto& suffix : s.skipFileSuffixes()) {
     if (suffix.isEmpty()) {
       continue;
     }
-    m_usvfsManager->usvfsAddSkipFileSuffix(suffix.toStdString());
+    m_usvfsManager->addSkipFileSuffix(suffix.toStdString());
   }
 
-  m_usvfsManager->usvfsClearSkipFileSuffixes();
+  m_usvfsManager->clearSkipFileSuffixes();
   for (const auto& dir : s.skipDirectories()) {
-    m_usvfsManager->usvfsAddSkipDirectory(dir.toStdString());
+    m_usvfsManager->addSkipDirectory(dir.toStdString());
   }
 
-  m_usvfsManager->usvfsClearLibraryForceLoads();
+  m_usvfsManager->clearLibraryForceLoads();
 }
 
 UsvfsConnector::~UsvfsConnector()
@@ -112,11 +112,11 @@ void UsvfsConnector::updateMapping(const MappingType& mapping)
 
   log::debug("Updating VFS mappings...");
 
-  m_usvfsManager->usvfsClearVirtualMappings();
+  m_usvfsManager->clearVirtualMappings();
 
   for (const auto& map : mapping) {
     if (progress.wasCanceled()) {
-      m_usvfsManager->usvfsClearVirtualMappings();
+      m_usvfsManager->clearVirtualMappings();
       throw UsvfsConnectorException(u"VFS mapping canceled by user"_s);
     }
     progress.setValue(value++);
@@ -126,17 +126,17 @@ void UsvfsConnector::updateMapping(const MappingType& mapping)
 
     try {
       if (map.isDirectory) {
-        m_usvfsManager->usvfsVirtualLinkDirectoryStatic(
+        m_usvfsManager->virtualLinkDirectoryStatic(
             map.source.toStdString(), map.destination.toStdString(),
             map.createTarget ? linkFlag::CREATE_TARGET : 0);
         ++dirs;
       } else {
-        m_usvfsManager->usvfsVirtualLinkFile(map.source.toStdString(),
-                                             map.destination.toStdString());
+        m_usvfsManager->virtualLinkFile(map.source.toStdString(),
+                                        map.destination.toStdString());
         ++files;
       }
     } catch (const std::runtime_error& ex) {
-      m_usvfsManager->usvfsClearVirtualMappings();
+      m_usvfsManager->clearVirtualMappings();
       throw UsvfsConnectorException(ex.what());
     }
   }
@@ -162,40 +162,40 @@ void UsvfsConnector::updateParams(log::Levels logLevel,
   m_usvfsManager->setLogLevel(toUsvfsLogLevel(logLevel));
   m_usvfsManager->setProcessDelay(duration_cast<milliseconds>(spawnDelay));
 
-  m_usvfsManager->usvfsClearExecutableBlacklist();
+  m_usvfsManager->clearExecutableBlacklist();
   for (const auto& exec : executableBlacklist.split(';')) {
-    m_usvfsManager->usvfsBlacklistExecutable(exec.toStdString());
+    m_usvfsManager->blacklistExecutable(exec.toStdString());
   }
 
-  m_usvfsManager->usvfsClearSkipFileSuffixes();
+  m_usvfsManager->clearSkipFileSuffixes();
   for (auto& suffix : skipFileSuffixes) {
     if (suffix.isEmpty()) {
       continue;
     }
-    m_usvfsManager->usvfsAddSkipFileSuffix(suffix.toStdString());
+    m_usvfsManager->addSkipFileSuffix(suffix.toStdString());
   }
 
-  m_usvfsManager->usvfsClearSkipDirectories();
+  m_usvfsManager->clearSkipDirectories();
   for (auto& dir : skipDirectories) {
-    m_usvfsManager->usvfsAddSkipDirectory(dir.toStdString());
+    m_usvfsManager->addSkipDirectory(dir.toStdString());
   }
 }
 
 void UsvfsConnector::updateForcedLibraries(
     const QList<ExecutableForcedLoadSetting>& forcedLibraries)
 {
-  m_usvfsManager->usvfsClearLibraryForceLoads();
+  m_usvfsManager->clearLibraryForceLoads();
   for (const auto& setting : forcedLibraries) {
     if (setting.enabled()) {
-      m_usvfsManager->usvfsForceLoadLibrary(setting.process().toStdString(),
-                                            setting.library().toStdString());
+      m_usvfsManager->forceLoadLibrary(setting.process().toStdString(),
+                                       setting.library().toStdString());
     }
   }
 }
 
 std::vector<HANDLE> getRunningUSVFSProcesses()
 {
-  const auto& pids = UsvfsManager::instance()->usvfsGetVFSProcessList();
+  const auto& pids = UsvfsManager::instance()->getVFSProcessList();
 
   std::vector<HANDLE> result;
 

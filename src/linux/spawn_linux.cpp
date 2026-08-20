@@ -387,7 +387,7 @@ DWORD spawn(const SpawnParameters& sp, HANDLE& processHandle)
     logSpawning(sp, binary % ' ' % args);
 
     if (sp.hooked) {
-      pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+      pid_t pid = UsvfsManager::instance()->createProcessHooked(
           binary, args, sp.currentDirectory.absolutePath());
       if (pid >= 0) {
         processHandle = pidfd_open(pid, 0);
@@ -484,7 +484,7 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
 
     logSpawning(sp, reaper % ' ' % params);
 
-    pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+    pid_t pid = UsvfsManager::instance()->createProcessHooked(
         reaper, params, sp.currentDirectory.absolutePath(), env);
 
     if (pid >= 0) {
@@ -542,7 +542,7 @@ int spawnAsCompatTool(const SpawnParameters& sp, HANDLE& pidFd)
   logSpawning(newSp, newSp.arguments);
 
   if (newSp.hooked) {
-    const pid_t pid = UsvfsManager::instance()->usvfsCreateProcessHooked(
+    const pid_t pid = UsvfsManager::instance()->createProcessHooked(
         newSp.binary.absolutePath(), newSp.arguments,
         newSp.currentDirectory.absolutePath());
 

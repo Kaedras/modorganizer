@@ -16,7 +16,7 @@ Version createVersionInfo()
 
 QString getUsvfsVersionString()
 {
-  return UsvfsManager::usvfsVersionString();
+  return UsvfsManager::versionString();
 }
 
 void SetThisThreadName(const QString& s)
