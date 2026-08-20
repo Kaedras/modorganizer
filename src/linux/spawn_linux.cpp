@@ -422,7 +422,6 @@ int spawnProton(const SpawnParameters& sp, HANDLE& pidFd)
     return STEAM_NOT_FOUND;
   }
 
-  // appID is required to get the proton version to use as well as the compatdata path
   if (sp.steamAppID.isEmpty()) {
     return APPID_EMPTY;
   }
