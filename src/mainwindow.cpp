@@ -1220,6 +1220,16 @@ void MainWindow::hookUpWindowTutorials()
 
 bool MainWindow::shouldStartTutorial() const
 {
+  // work around a segfault on kde until
+  // https://invent.kde.org/plasma/plasma-integration/-/merge_requests/238 and
+  // https://invent.kde.org/plasma/plasma-integration/-/merge_requests/241 are merged
+#ifdef __unix__
+  const char* currentDesktop = getenv("XDG_CURRENT_DESKTOP");
+  if (currentDesktop != nullptr && strcmp(currentDesktop, "KDE") == 0) {
+    return false;
+  }
+#endif
+
   if (GlobalSettings::hideTutorialQuestion()) {
     return false;
   }
