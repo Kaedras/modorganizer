@@ -1,17 +1,15 @@
-#include "../shared/os_error.h"
-#include <QObject>
 #include <QString>
 #include <linux/fdcloser.h>
 #include <sys/file.h>
 
-bool isFileLocked(const QString& fileName) noexcept(false)
+bool isFileLocked(const QString& fileName)
 {
   // open file descriptor
   FdCloser fd(open(fileName.toStdString().c_str(), O_RDWR | O_EXCL));
   if (!fd) {
     const int e = errno;
-    throw MOShared::os_error(
-        QObject::tr("failed to access %1").arg(fileName).toUtf8().constData(), e);
+    MOBase::log::error("failed to access {}: {}", fileName, strerror(e));
+    return false;
   }
 
   // check if the file has been locked using fcntl
