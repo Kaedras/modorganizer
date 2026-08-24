@@ -64,13 +64,6 @@
 // google breakpad
 #include <client/linux/handler/exception_handler.h>
 #include <client/linux/minidump_writer/minidump_writer.h>
-
-// libsecret
-// undefine signals from qtmetamacros.h because it conflicts with glib
-#ifdef signals
-#undef signals
-#endif
-#include <libsecret/secret.h>
 #endif
 
 // boost
