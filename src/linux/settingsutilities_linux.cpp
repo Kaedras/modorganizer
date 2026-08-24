@@ -11,6 +11,9 @@ using namespace std;
 
 extern QString secretName(const QString& key);
 
+namespace
+{
+
 struct HashTableDeleter
 {
   void operator()(GHashTable* h) const
@@ -155,6 +158,8 @@ bool addSecret(const QString& key, const QString& data)
 
   return result;
 }
+
+}  // namespace
 
 QString getSecret(const QString& key) noexcept(false)
 {
