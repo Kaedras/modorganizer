@@ -1220,16 +1220,6 @@ void MainWindow::hookUpWindowTutorials()
 
 bool MainWindow::shouldStartTutorial() const
 {
-  // work around a segfault on kde until
-  // https://invent.kde.org/plasma/plasma-integration/-/merge_requests/238 and
-  // https://invent.kde.org/plasma/plasma-integration/-/merge_requests/241 are merged
-#ifdef __unix__
-  const char* currentDesktop = getenv("XDG_CURRENT_DESKTOP");
-  if (currentDesktop != nullptr && strcmp(currentDesktop, "KDE") == 0) {
-    return false;
-  }
-#endif
-
   if (GlobalSettings::hideTutorialQuestion()) {
     return false;
   }
@@ -1274,127 +1264,16 @@ void MainWindow::showEvent(QShowEvent* event)
     m_Tutorial.registerControl();
 
     hookUpWindowTutorials();
-    if (m_OrganizerCore.settings().firstStart()) {
-      QString firstStepsTutorial = AppConfig::firstStepsTutorial();
-      if (TutorialManager::instance().hasTutorial(firstStepsTutorial)) {
-        if (shouldStartTutorial()) {
-          TutorialManager::instance().activateTutorial("MainWindow",
-                                                       firstStepsTutorial);
-        }
-      } else {
-        log::error("{} missing", firstStepsTutorial);
-        QPoint pos = ui->toolBar->mapToGlobal(QPoint());
-        pos.rx() += ui->toolBar->width() / 2;
-        pos.ry() += ui->toolBar->height();
-        QWhatsThis::showText(pos,
-                             QObject::tr("Please use \"Help\" from the toolbar to get "
-                                         "usage instructions to all elements"));
-      }
-      if (!m_OrganizerCore.managedGame()->getSupportURL().isEmpty()) {
-        QMessageBox::information(this, tr("Game Support Wiki"),
-                                 tr("Do you know how to mod this game? Do you need to "
-                                    "learn? There's a game support wiki available! "
-                                    "Click OK to open the wiki. In the future, you can "
-                                    "access this link from the \"Help\" menu."),
-                                 QMessageBox::Ok);
-        gameSupportTriggered();
-      }
 
-      QMessageBox newCatDialog;
-      newCatDialog.setWindowTitle(tr("Category Setup"));
-      newCatDialog.setText(
-          tr("Please choose how to handle the default category setup.\n\n"
-             "If you've already connected to Nexus, you can automatically import Nexus "
-             "categories for this game (if applicable). Otherwise, use the old Mod "
-             "Organizer default category structure, or leave the categories blank (for "
-             "manual setup)."));
-      QPushButton importBtn(tr("&Import Nexus Categories"));
-      QPushButton defaultBtn(tr("Use &Old Category Defaults"));
-      QPushButton cancelBtn(tr("Do &Nothing"));
-      if (NexusInterface::instance().getAccessManager()->validated()) {
-        newCatDialog.addButton(&importBtn, QMessageBox::ButtonRole::AcceptRole);
-      }
-      newCatDialog.addButton(&defaultBtn, QMessageBox::ButtonRole::AcceptRole);
-      newCatDialog.addButton(&cancelBtn, QMessageBox::ButtonRole::RejectRole);
-      newCatDialog.exec();
-      if (newCatDialog.clickedButton() == &importBtn) {
-        importCategories(false);
-      } else if (newCatDialog.clickedButton() == &cancelBtn) {
-        m_CategoryFactory.reset();
-      } else if (newCatDialog.clickedButton() == &defaultBtn) {
-        m_CategoryFactory.loadCategories();
-      }
-      m_CategoryFactory.saveCategories();
-
-      m_OrganizerCore.settings().setFirstStart(false);
-    } else {
-      auto& settings = m_OrganizerCore.settings();
-      if (m_LastVersion < QVersionNumber(2, 5) &&
-          !GlobalSettings::hideCategoryReminder()) {
-        QMessageBox migrateCatDialog;
-        migrateCatDialog.setWindowTitle("Category Migration");
-        migrateCatDialog.setText(
-            tr("This is your first time running version 2.5 or higher with an old MO2 "
-               "instance. The category system now relies on an updated system to map "
-               "Nexus categories.\n\n"
-               "In order to assign Nexus categories automatically, you will need to "
-               "import the Nexus categories for the currently managed game and map "
-               "them to your preferred category structure.\n\n"
-               "You can either manually open the category editor, via the Settings "
-               "dialog or the category filter sidebar, and set up the mappings as you "
-               "see fit, or you can automatically import and map the categories as "
-               "defined on Nexus.\n\n"
-               "As a final option, you can disable Nexus category mapping altogether, "
-               "which can be changed at any time in the Settings dialog."));
-        QPushButton importBtn(tr("&Import Nexus Categories"));
-        QPushButton openSettingsBtn(tr("&Open Categories Dialog"));
-        QPushButton disableBtn(tr("&Disable Nexus Mappings"));
-        QPushButton closeBtn(tr("&Close"));
-        QCheckBox dontShow(tr("&Don't show this again"));
-        if (NexusInterface::instance().getAccessManager()->validated()) {
-          migrateCatDialog.addButton(&importBtn, QMessageBox::ButtonRole::AcceptRole);
-        }
-        migrateCatDialog.addButton(&openSettingsBtn,
-                                   QMessageBox::ButtonRole::ActionRole);
-        migrateCatDialog.addButton(&disableBtn,
-                                   QMessageBox::ButtonRole::DestructiveRole);
-        migrateCatDialog.addButton(&closeBtn, QMessageBox::ButtonRole::RejectRole);
-        migrateCatDialog.setCheckBox(&dontShow);
-        migrateCatDialog.exec();
-        if (migrateCatDialog.clickedButton() == &importBtn) {
-          importCategories(dontShow.isChecked());
-        } else if (migrateCatDialog.clickedButton() == &openSettingsBtn) {
-          this->ui->filtersEdit->click();
-        } else if (migrateCatDialog.clickedButton() == &disableBtn) {
-          Settings::instance().nexus().setCategoryMappings(false);
-        }
-        if (dontShow.isChecked()) {
-          GlobalSettings::setHideCategoryReminder(true);
-        }
-      }
-    }
-
-    m_OrganizerCore.settings().widgets().restoreIndex(ui->groupCombo);
-
-    m_OrganizerCore.settings().registerDownloadHandlers(false);
-    m_WasVisible = true;
-    updateProblemsButton();
-
-    // notify plugins that the MO2 is ready
-    m_PluginContainer.startPlugins(this);
-
-    // forces a log list refresh to display startup logs
-    //
-    // since the log list is not visible until this point, the automatic
-    // resize of columns seems to break the log list (since Qt 5.15.1 or
-    // 5.15.2), an make the list empty on startup (in debug the list is not
-    // empty because some logs are added after the log list becomes visible)
-    //
-    // the reset() forces a re-computation of the column size, thus properly
-    // the logs that are already in the log model
-    //
-    ui->logList->reset();
-    ui->logList->scrollToBottom();
+    // use a queued connection to execute code that opens dialogs after the event loop
+    // is ready. required because functions like QDialog::exec() would return without
+    // doing anything
+    QMetaObject::invokeMethod(
+        this,
+        [this]() {
+          showStartupDialogs();
+        },
+        Qt::QueuedConnection);
   }
 }
 
@@ -3081,6 +2960,128 @@ void MainWindow::updateSortButton()
     ui->sortButton->setToolTip(tr("There is no supported sort mechanism for this game. "
                                   "You will probably have to use a third-party tool."));
   }
+}
+
+void MainWindow::showStartupDialogs()
+{
+  if (m_OrganizerCore.settings().firstStart()) {
+    QString firstStepsTutorial = AppConfig::firstStepsTutorial();
+    if (TutorialManager::instance().hasTutorial(firstStepsTutorial)) {
+      if (shouldStartTutorial()) {
+        TutorialManager::instance().activateTutorial("MainWindow", firstStepsTutorial);
+      }
+    } else {
+      log::error("{} missing", firstStepsTutorial);
+      QPoint pos = ui->toolBar->mapToGlobal(QPoint());
+      pos.rx() += ui->toolBar->width() / 2;
+      pos.ry() += ui->toolBar->height();
+      QWhatsThis::showText(pos,
+                           QObject::tr("Please use \"Help\" from the toolbar to get "
+                                       "usage instructions to all elements"));
+    }
+    if (!m_OrganizerCore.managedGame()->getSupportURL().isEmpty()) {
+      QMessageBox::information(this, tr("Game Support Wiki"),
+                               tr("Do you know how to mod this game? Do you need to "
+                                  "learn? There's a game support wiki available! "
+                                  "Click OK to open the wiki. In the future, you can "
+                                  "access this link from the \"Help\" menu."),
+                               QMessageBox::Ok);
+      gameSupportTriggered();
+    }
+
+    QMessageBox newCatDialog;
+    newCatDialog.setWindowTitle(tr("Category Setup"));
+    newCatDialog.setText(
+        tr("Please choose how to handle the default category setup.\n\n"
+           "If you've already connected to Nexus, you can automatically import Nexus "
+           "categories for this game (if applicable). Otherwise, use the old Mod "
+           "Organizer default category structure, or leave the categories blank (for "
+           "manual setup)."));
+    QPushButton importBtn(tr("&Import Nexus Categories"));
+    QPushButton defaultBtn(tr("Use &Old Category Defaults"));
+    QPushButton cancelBtn(tr("Do &Nothing"));
+    if (NexusInterface::instance().getAccessManager()->validated()) {
+      newCatDialog.addButton(&importBtn, QMessageBox::ButtonRole::AcceptRole);
+    }
+    newCatDialog.addButton(&defaultBtn, QMessageBox::ButtonRole::AcceptRole);
+    newCatDialog.addButton(&cancelBtn, QMessageBox::ButtonRole::RejectRole);
+    newCatDialog.exec();
+    if (newCatDialog.clickedButton() == &importBtn) {
+      importCategories(false);
+    } else if (newCatDialog.clickedButton() == &cancelBtn) {
+      m_CategoryFactory.reset();
+    } else if (newCatDialog.clickedButton() == &defaultBtn) {
+      m_CategoryFactory.loadCategories();
+    }
+    m_CategoryFactory.saveCategories();
+
+    m_OrganizerCore.settings().setFirstStart(false);
+  } else {
+    auto& settings = m_OrganizerCore.settings();
+    if (m_LastVersion < QVersionNumber(2, 5) &&
+        !GlobalSettings::hideCategoryReminder()) {
+      QMessageBox migrateCatDialog;
+      migrateCatDialog.setWindowTitle("Category Migration");
+      migrateCatDialog.setText(
+          tr("This is your first time running version 2.5 or higher with an old MO2 "
+             "instance. The category system now relies on an updated system to map "
+             "Nexus categories.\n\n"
+             "In order to assign Nexus categories automatically, you will need to "
+             "import the Nexus categories for the currently managed game and map "
+             "them to your preferred category structure.\n\n"
+             "You can either manually open the category editor, via the Settings "
+             "dialog or the category filter sidebar, and set up the mappings as you "
+             "see fit, or you can automatically import and map the categories as "
+             "defined on Nexus.\n\n"
+             "As a final option, you can disable Nexus category mapping altogether, "
+             "which can be changed at any time in the Settings dialog."));
+      QPushButton importBtn(tr("&Import Nexus Categories"));
+      QPushButton openSettingsBtn(tr("&Open Categories Dialog"));
+      QPushButton disableBtn(tr("&Disable Nexus Mappings"));
+      QPushButton closeBtn(tr("&Close"));
+      QCheckBox dontShow(tr("&Don't show this again"));
+      if (NexusInterface::instance().getAccessManager()->validated()) {
+        migrateCatDialog.addButton(&importBtn, QMessageBox::ButtonRole::AcceptRole);
+      }
+      migrateCatDialog.addButton(&openSettingsBtn, QMessageBox::ButtonRole::ActionRole);
+      migrateCatDialog.addButton(&disableBtn, QMessageBox::ButtonRole::DestructiveRole);
+      migrateCatDialog.addButton(&closeBtn, QMessageBox::ButtonRole::RejectRole);
+      migrateCatDialog.setCheckBox(&dontShow);
+      migrateCatDialog.exec();
+      if (migrateCatDialog.clickedButton() == &importBtn) {
+        importCategories(dontShow.isChecked());
+      } else if (migrateCatDialog.clickedButton() == &openSettingsBtn) {
+        this->ui->filtersEdit->click();
+      } else if (migrateCatDialog.clickedButton() == &disableBtn) {
+        Settings::instance().nexus().setCategoryMappings(false);
+      }
+      if (dontShow.isChecked()) {
+        GlobalSettings::setHideCategoryReminder(true);
+      }
+    }
+  }
+
+  m_OrganizerCore.settings().widgets().restoreIndex(ui->groupCombo);
+
+  m_OrganizerCore.settings().registerDownloadHandlers(false);
+  m_WasVisible = true;
+  updateProblemsButton();
+
+  // notify plugins that the MO2 is ready
+  m_PluginContainer.startPlugins(this);
+
+  // forces a log list refresh to display startup logs
+  //
+  // since the log list is not visible until this point, the automatic
+  // resize of columns seems to break the log list (since Qt 5.15.1 or
+  // 5.15.2), an make the list empty on startup (in debug the list is not
+  // empty because some logs are added after the log list becomes visible)
+  //
+  // the reset() forces a re-computation of the column size, thus properly
+  // the logs that are already in the log model
+  //
+  ui->logList->reset();
+  ui->logList->scrollToBottom();
 }
 
 void MainWindow::nxmEndorsementsAvailable(QVariant userData, QVariant resultData, int)

@@ -248,6 +248,8 @@ private:
 
   void updateSortButton();
 
+  void showStartupDialogs();
+
   // update info
   struct NxmUpdateInfoData
   {
