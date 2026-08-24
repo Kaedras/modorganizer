@@ -32,7 +32,7 @@ void writeDesktopFile(const QString& path)
 
   // fix the Exec field
   desktopFileContent.replace(regex,
-                             "Exec="_L1 % MOShared::getApplicationFilePath() % "\n");
+                             "Exec="_L1 % MOShared::getApplicationFilePath() % '\n');
 
   file.write(desktopFileContent.toLocal8Bit());
 }
