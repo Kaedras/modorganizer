@@ -22,7 +22,6 @@ along with Mod Organizer.  If not, see <http://www.gnu.org/licenses/>.
 namespace AppConfig
 {
 
-#define PARWSTRING wstring
 #define APPPARAM(partype, parid, value)                                                \
   partype parid()                                                                      \
   {                                                                                    \
@@ -32,7 +31,6 @@ namespace AppConfig
 
 namespace MOShared
 {
-#undef PARWSTRING
 #undef APPPARAM
 
 }  // namespace MOShared
