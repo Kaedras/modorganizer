@@ -6,7 +6,8 @@
 
 ### Known Issues
 
-- Running the tutorial can cause a segfault
+- Switching instances several times causes a segfault
+- Closing dialogs using the x button causes a segfault on KDE due to a bug in plasma-integration. There are already open merge requests, so this may get fixed soon.
 - ModOrganizer does not exit properly after switching instances
 
 #### Low priority
