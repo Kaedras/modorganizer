@@ -31,12 +31,12 @@
 #include <vector>
 #include <wchar.h>
 
+// windows
 #ifdef _WIN32
 // keep this header separated to avoid ordering issue since this must be
 // included before DbgHelp.h
 #include <windows.h>
 
-// windows
 #include <dbghelp.h>
 #include <eh.h>
 #include <lmcons.h>
@@ -47,6 +47,9 @@
 #include <tchar.h>
 #include <wincred.h>
 #include <windowsx.h>
+
+// openssl
+#include <tlhelp32.h>
 #endif
 
 // linux
@@ -87,11 +90,6 @@
 #include <boost/thread.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
-
-#ifdef _WIN32
-// openssl
-#include <tlhelp32.h>
-#endif
 
 // qt
 #include <QAbstractButton>
