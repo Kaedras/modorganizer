@@ -18,57 +18,46 @@
 using namespace MOBase;
 using namespace std;
 using namespace Qt::StringLiterals;
+using namespace google_breakpad;
 namespace fs = std::filesystem;
 
 namespace env
 {
 // defined in `env.cpp`
-extern std::unique_ptr<QFile> dumpFile(const QString& dir);
+extern HandlePtr dumpFile(const QString& dir);
 }  // namespace env
 
-static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void*,
-                         bool succeeded)
+bool filterCallback(void* context);
+
+static bool dumpCallback(const MinidumpDescriptor&, void*, bool succeeded)
 {
   MOMultiProcess::removeShm();
 
   if (succeeded) {
-    // get filename
-    error_code ec;
-    auto h = env::dumpFile(OrganizerCore::getGlobalCoreDumpPath());
-    if (!h) {
-      cerr << "Error getting dump file path!\n";
-      return succeeded;
-    }
-    fs::path filename = h->filesystemFileName();
-    h->close();
-
-    // rename file
-    fs::rename(descriptor.path(), filename, ec);
-    if (ec) {
-      cerr << "Error renaming minidump, " << ec.message() << "\n";
-      return succeeded;
-    }
-
-    // move file into crash dump directory if it is set
-    string path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
-    if (!path.empty()) {
-      fs::create_directory(path);
-      fs::rename(filename, path / filename, ec);
-      if (ec) {
-        cerr << "Error moving minidump to " << path << ", " << ec.message() << "\n";
-      }
-    }
-
+    log::error("ModOrganizer has crashed, core dump created.");
   } else {
-    cerr << "Error creating minidump\n";
+    log::error("ModOrganizer has crashed, core dump failed.");
   }
-
-  cout << "Minidump created\n";
   return succeeded;
 }
 
 thread_local std::terminate_handler g_prevTerminateHandler = nullptr;
 thread_local std::atomic<bool> g_signalHandlersInstalled{false};
+thread_local QString g_coreDumpPath;
+thread_local MinidumpDescriptor g_minidumpDescriptor(".");
+thread_local ExceptionHandler g_exceptionHandler(g_minidumpDescriptor, filterCallback,
+                                                 dumpCallback, nullptr, true, -1);
+
+// the filter callback is used to set the minidump descriptor
+bool filterCallback(void*)
+{
+  env::HandlePtr file = env::dumpFile(g_coreDumpPath);
+
+  g_minidumpDescriptor = MinidumpDescriptor{file.release()};
+  g_exceptionHandler.set_minidump_descriptor(g_minidumpDescriptor);
+
+  return true;
+}
 
 int run(int argc, char* argv[]);
 
@@ -83,9 +72,6 @@ int run(int argc, char* argv[])
 {
   MOShared::SetThisThreadName(u"main"_s);
   setExceptionHandlers();
-  google_breakpad::MinidumpDescriptor descriptor(".");
-  google_breakpad::ExceptionHandler eh(descriptor, nullptr, dumpCallback, nullptr, true,
-                                       -1);
 
   // allow ptrace from any process. required for crashdump command
   if (prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY) == -1) {
@@ -204,17 +190,8 @@ int run(int argc, char* argv[])
         }
       }
 
-      // move old crash dumps into the crash dump folder
-      // getGlobalCoreDumpPath() returns empty values before MOApplication::setup() is
-      // called
-      fs::path path = OrganizerCore::getGlobalCoreDumpPath().toStdString();
-      if (!path.empty()) {
-        for (const auto& item : fs::directory_iterator(".")) {
-          if (item.path().extension() == ".dmp") {
-            fs::rename(item.path(), path / item.path().filename());
-          }
-        }
-      }
+      // set core dump path after `MOApplication::setup()` has been called
+      g_coreDumpPath = OrganizerCore::getGlobalCoreDumpPath();
 
       // check if the command line wants to run something right now
       if (auto r = cl.runPostOrganizer(app.core())) {

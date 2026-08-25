@@ -21,7 +21,7 @@ using namespace MOBase;
 
 // functions are defined in `env.cpp`
 DWORD findOtherPid();
-std::unique_ptr<QFile> dumpFile(const QString& dir);
+HandlePtr dumpFile(const QString& dir);
 
 Console::Console() : m_hasConsole(true), m_in(stdin), m_out(stdout), m_err(stderr) {}
 
@@ -97,7 +97,7 @@ bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
 {
   string dumpPath;
 
-  std::unique_ptr<QFile> file = dumpFile(dir);
+  HandlePtr file = dumpFile(dir);
   if (!file) {
     cerr << "nowhere to write the dump file\n";
     return false;
@@ -106,7 +106,7 @@ bool createMiniDumpForPid(const QString& dir, pid_t process, CoreDumpTypes type)
   using namespace google_breakpad;
 
   ExceptionHandler::CrashContext blob{{}, process};
-  bool result = WriteMinidump(file->handle(), process, &blob, sizeof(blob));
+  bool result = WriteMinidump(file.get(), process, &blob, sizeof(blob));
   if (!result) {
     const int e = errno;
     cerr << "Error creating minidump, " << strerror(e) << "\n";

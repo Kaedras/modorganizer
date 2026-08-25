@@ -21,7 +21,7 @@ using namespace MOBase;
 // functions are defined in `env.cpp`
 DWORD findOtherPid();
 std::pair<QString, QString> splitExeAndArguments(const QString& cmd);
-std::unique_ptr<QFile> dumpFile(const QString& dir);
+HandlePtr dumpFile(const QString& dir);
 
 Console::Console() : m_hasConsole(false), m_in(nullptr), m_out(nullptr), m_err(nullptr)
 {
@@ -660,16 +660,9 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
 {
   const DWORD pid = GetProcessId(process);
 
-  std::unique_ptr<QFile> file = dumpFile(dir);
+  const HandlePtr file = dumpFile(dir);
   if (!file) {
     std::wcerr << L"nowhere to write the dump file\n";
-    return false;
-  }
-
-  const auto h = reinterpret_cast<HANDLE>(_get_osfhandle(file->handle()));
-  if (h == INVALID_HANDLE_VALUE) {
-    const int e = errno;
-    std::wcerr << L"failed to get file handle, " << _wcserror(e) << L"\n";
     return false;
   }
 

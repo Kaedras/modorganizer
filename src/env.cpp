@@ -6,6 +6,7 @@
 #include "envprocess.h"
 #include "envsecurity.h"
 #include "settings.h"
+#include "shared/nativeString.h"
 #include "shared/util.h"
 #include <QCoreApplication>
 #include <QStorageInfo>
@@ -13,7 +14,8 @@
 #include <log.h>
 
 #ifdef __unix__
-static inline const QString defaultName = QStringLiteral("ModOrganizer");
+static inline const QString defaultName       = QStringLiteral("ModOrganizer");
+static inline constexpr int ERROR_FILE_EXISTS = EEXIST;
 #else
 static inline const QString defaultName = QStringLiteral("ModOrganizer.exe");
 #endif
@@ -410,8 +412,7 @@ QString safeVersion()
   }
 }
 
-// unique_ptr is used because QFile has no move ctor
-std::unique_ptr<QFile> tempFile(const QString& dir)
+HandlePtr tempFile(const QString& dir)
 {
   // maximum tries of incrementing the counter
   constexpr int MaxTries = 100;
@@ -431,38 +432,48 @@ std::unique_ptr<QFile> tempFile(const QString& dir)
   for (int i = 0; i < MaxTries; ++i) {
     std::wclog << L"trying file '" << path.toStdWString() << L"'\n";
 
-    if (!QFile::exists(path)) {
-      auto file = std::make_unique<QFile>(path);
-      if (!file->open(QIODeviceBase::WriteOnly)) {
-        std::wcerr << L"failed to create dump file, "
-                   << file->errorString().toStdWString() << L'\n';
-        return {};
-      }
+#ifdef _WIN32
+    HandlePtr h(CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW,
+                            FILE_ATTRIBUTE_NORMAL, nullptr));
+#else
+    HandlePtr h(open(path.toLocal8Bit().constData(), O_RDWR | O_CREAT | O_EXCL, 0666));
+#endif
+    if (h.get() != INVALID_HANDLE_VALUE) {
+      // worked
+      return h;
+    }
 
-      return file;
+    const auto e = GetLastError();
+
+    if (e != ERROR_FILE_EXISTS) {
+      // probably no write access
+      NATIVE_CERR << NATIVE_STRING("failed to create dump file, ")
+                  << formatSystemMessage(e) << NATIVE_STRING("\n");
+
+      return {};
     }
     // try again with "-i"
     path = dir % '/' % prefix % '-' % QString::number(i + 1) % ext;
   }
 
-  std::wcerr << L"can't create dump file, ran out of filenames\n";
+  NATIVE_CERR << NATIVE_STRING("can't create dump file, ran out of filenames\n");
   return {};
 }
 
-std::unique_ptr<QFile> dumpFile(const QString& dir)
+HandlePtr dumpFile(const QString& dir)
 {
   // try the given directory, if any
   if (!dir.isEmpty()) {
-    std::unique_ptr<QFile> file = tempFile(dir);
-    if (file) {
-      return file;
+    HandlePtr h = tempFile(dir);
+    if (h.get() != INVALID_HANDLE_VALUE) {
+      return h;
     }
   }
 
   // try the current directory
-  std::unique_ptr<QFile> file = tempFile(u"."_s);
-  if (file) {
-    return file;
+  HandlePtr h = tempFile(u"."_s);
+  if (h.get() != INVALID_HANDLE_VALUE) {
+    return h;
   }
 
   std::wclog << L"cannot write dump file in current directory\n";
@@ -471,9 +482,9 @@ std::unique_ptr<QFile> dumpFile(const QString& dir)
   const QString temp = QDir::tempPath();
 
   if (!temp.isEmpty()) {
-    file = tempFile(temp);
-    if (file) {
-      return file;
+    h = tempFile(temp);
+    if (h.get() != INVALID_HANDLE_VALUE) {
+      return h;
     }
   }
 
