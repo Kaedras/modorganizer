@@ -433,8 +433,8 @@ HandlePtr tempFile(const QString& dir)
     std::wclog << L"trying file '" << path.toStdWString() << L"'\n";
 
 #ifdef _WIN32
-    HandlePtr h(CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_NEW,
-                            FILE_ATTRIBUTE_NORMAL, nullptr));
+    HandlePtr h(CreateFileW(path.toStdWString().c_str(), GENERIC_WRITE, 0, nullptr,
+                            CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr));
 #else
     HandlePtr h(open(path.toLocal8Bit().constData(), O_RDWR | O_CREAT | O_EXCL, 0666));
 #endif
