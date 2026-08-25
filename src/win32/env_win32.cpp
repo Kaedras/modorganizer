@@ -680,7 +680,8 @@ bool createMiniDump(const QString& dir, HANDLE process, CoreDumpTypes type)
     std::wclog << L"writing mini minidump\n";
   }
 
-  const auto ret = MiniDumpWriteDump(process, pid, h, flags, nullptr, nullptr, nullptr);
+  const auto ret =
+      MiniDumpWriteDump(process, pid, file.get(), flags, nullptr, nullptr, nullptr);
 
   if (!ret) {
     const auto e = GetLastError();
