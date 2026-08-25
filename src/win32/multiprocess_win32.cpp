@@ -1,9 +1,13 @@
 #include "multiprocess.h"
 
-bool isOnlyMoProcess()
+void MOMultiProcess::registerShmKey(const QString&)
 {
   // no-op
-  return false;
+}
+
+void MOMultiProcess::removeShm()
+{
+  // no-op
 }
 
 MOMultiProcess::~MOMultiProcess() = default;

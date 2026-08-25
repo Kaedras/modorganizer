@@ -8,7 +8,10 @@
 #include "shared/util.h"
 #include "thread_utils.h"
 #include <QMessageBox>
+#include <atomic>
 #include <client/linux/handler/exception_handler.h>
+#include <csignal>
+#include <cstring>
 #include <report.h>
 #include <sys/prctl.h>
 
@@ -19,12 +22,15 @@ namespace fs = std::filesystem;
 
 namespace env
 {
+// defined in `env.cpp`
 extern std::unique_ptr<QFile> dumpFile(const QString& dir);
 }  // namespace env
 
 static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void*,
                          bool succeeded)
 {
+  MOMultiProcess::removeShm();
+
   if (succeeded) {
     // get filename
     error_code ec;
@@ -62,6 +68,7 @@ static bool dumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, 
 }
 
 thread_local std::terminate_handler g_prevTerminateHandler = nullptr;
+thread_local std::atomic<bool> g_signalHandlersInstalled{false};
 
 int run(int argc, char* argv[]);
 
@@ -75,6 +82,7 @@ int main(int argc, char* argv[])
 int run(int argc, char* argv[])
 {
   MOShared::SetThisThreadName(u"main"_s);
+  setExceptionHandlers();
   google_breakpad::MinidumpDescriptor descriptor(".");
   google_breakpad::ExceptionHandler eh(descriptor, nullptr, dumpCallback, nullptr, true,
                                        -1);
@@ -234,4 +242,43 @@ int run(int argc, char* argv[])
   }
 }
 
-void setExceptionHandlers() {}
+void signalHandler(int sig)
+{
+  MOMultiProcess::removeShm();
+
+  // clear the signal handler and raise the signal again
+  struct sigaction sa = {};
+  sa.sa_handler       = SIG_DFL;
+  sigemptyset(&sa.sa_mask);
+  sigaction(sig, &sa, nullptr);
+  raise(sig);
+}
+
+void onTerminate() noexcept
+{
+  MOMultiProcess::removeShm();
+  if (g_prevTerminateHandler) {
+    g_prevTerminateHandler();
+  } else {
+    std::abort();
+  }
+}
+
+void setExceptionHandlers()
+{
+  if (!g_prevTerminateHandler) {
+    g_prevTerminateHandler = std::set_terminate(onTerminate);
+  }
+
+  if (!g_signalHandlersInstalled.exchange(true)) {
+    struct sigaction sa = {};
+    sa.sa_handler       = signalHandler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESETHAND;
+
+    sigaction(SIGINT, &sa, nullptr);
+    sigaction(SIGTERM, &sa, nullptr);
+    sigaction(SIGHUP, &sa, nullptr);
+    sigaction(SIGQUIT, &sa, nullptr);
+  }
+}

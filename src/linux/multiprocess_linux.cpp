@@ -1,7 +1,7 @@
-#include "envprocess.h"
 #include "multiprocess.h"
-#include <QApplication>
-#include <log.h>
+#include <atomic>
+#include <cstring>
+#include <semaphore.h>
 #include <sys/mman.h>
 
 // From https://doc.qt.io/qt-6/native-ipc-keys.html#ownership:
@@ -12,29 +12,43 @@
 // attach to an existing one.
 
 // note: the shared memory object is located in a dedicated tmpfs filesystem that is
-// normally mounted under /dev/shm, so manual clean-up can be achieved with `rm
-// /dev/shm/<key>`
+// normally mounted under /dev/shm, so manual clean-up can be achieved with
+// `rm /dev/shm/<key>`
 
-bool isOnlyMoProcess()
+using namespace std;
+
+static array<char, 256> s_shmKey{};
+static atomic s_hasShmKey{false};
+
+void MOMultiProcess::registerShmKey(const QString& key)
 {
-  const std::vector<env::Process> processes = env::getRunningProcesses();
-  for (const auto& process : processes) {
-    if (process.name() == QApplication::applicationName() &&
-        std::cmp_not_equal(process.pid(), getpid())) {
-      return false;
+  const QByteArray bytes = key.toLocal8Bit();
+  if (cmp_less(bytes.size(), s_shmKey.size())) {
+    memcpy(s_shmKey.data(), bytes.constData(), bytes.size());
+    s_shmKey[bytes.size()] = '\0';
+    s_hasShmKey.store(true);
+  } else {
+    MOBase::log::error("shm key too large, size: {}, max: {}", bytes.size(),
+                       s_shmKey.size());
+  }
+}
+
+void MOMultiProcess::removeShm()
+{
+  if (s_hasShmKey.exchange(false)) {
+    if (shm_unlink(s_shmKey.data()) == -1) {
+      cerr << "shm_unlink error: " << strerror(errno) << '\n';
+    }
+
+    if (sem_unlink(s_shmKey.data()) == -1) {
+      cerr << "sem_unlink error: " << strerror(errno) << '\n';
     }
   }
-
-  return true;
 }
 
 MOMultiProcess::~MOMultiProcess()
 {
   if (m_OwnsSM) {
-    if (shm_unlink(m_SharedMem.nativeKey().toLocal8Bit()) == -1) {
-      const int e = errno;
-      MOBase::log::error("Error removing shm key '{}': {}", m_SharedMem.nativeKey(),
-                         strerror(e));
-    }
+    removeShm();
   }
 }

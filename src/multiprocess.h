@@ -38,6 +38,19 @@ public:
    **/
   void sendMessage(const QString& message);
 
+  /**
+   * @brief stores the shm key for later use by removeShm()
+   * @param key shm key to store
+   * @note only relevant on linux
+   */
+  static void registerShmKey(const QString& key);
+
+  /**
+   * @brief deletes the shm key that was registered by registerShmKey()
+   * @note only relevant on linux
+   */
+  static void removeShm();
+
 signals:
 
   /**
