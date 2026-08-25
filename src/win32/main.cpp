@@ -147,7 +147,7 @@ LONG WINAPI onUnhandledException(_EXCEPTION_POINTERS* ptrs)
   const auto path = OrganizerCore::getGlobalCoreDumpPath();
   const auto type = OrganizerCore::getGlobalCoreDumpType();
 
-  const auto r = env::coredump(path.isEmpty() ? nullptr : path, type);
+  const auto r = env::coredump(path, type);
 
   if (r) {
     log::error("ModOrganizer has crashed, core dump created.");
