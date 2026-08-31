@@ -7,8 +7,16 @@
 ### Known Issues
 
 - Switching instances several times causes a segfault
-- Closing dialogs using the x button causes a segfault on KDE due to a bug in plasma-integration. There are already open merge requests, so this may get fixed soon.
-- ModOrganizer does not exit properly after switching instances
+- Closing dialogs using the x button causes a segfault on KDE due to a bug in plasma-integration. There are already open
+  merge requests, so this may get fixed soon.
+- ModOrganizer does not exit properly after switching/creating instances
+- occasional warning `QIODevice::read (QSslSocket): device not open`
+- error when checking for mod updates:
+  ```
+  dataChanged() called with an invalid index range:
+  topleft: QModelIndex(-1,-1,0x0,QObject(0x0))
+  bottomRight:QModelIndex(-1,-1,0x0,QObject(0x0))
+  ```
 
 #### Low priority
 
@@ -18,7 +26,7 @@
 - After installing a fomod the tmp dir is not removed
 - Deactivating a mod causes a warning: `Plugin not found: <plugin name>`
 - `GameGamebryo::identifyGamePath()` does not work for newly installed games
-  - caused by `libraryfolders.vdf` not getting updated until restarting steam
+    - caused by `libraryfolders.vdf` not getting updated until restarting steam
 
 ### Work in progress
 
