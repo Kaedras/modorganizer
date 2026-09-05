@@ -41,10 +41,23 @@ void writeIcon()
 {
   QString iconPath =
       QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) %
-      "/icons/hicolor/scalable/apps/ModOrganizer.svg"_L1;
-  if (!QFile::exists(iconPath)) {
+      "/icons/hicolor/scalable/apps"_L1;
+  QString iconFilePath = iconPath % "/ModOrganizer.svg"_L1;
+  QDir iconDir(iconPath);
+
+  if (!iconDir.exists()) {
+    log::debug("creating icon directory");
+    std::error_code ec;
+    std::filesystem::create_directories(iconDir.filesystemAbsolutePath(), ec);
+    if (ec) {
+      log::warn("error creating icon directory: {}", ec.message());
+      return;
+    }
+  }
+
+  if (!QFile::exists(iconFilePath)) {
     log::debug("writing icon");
-    QFile iconFile(iconPath);
+    QFile iconFile(iconFilePath);
     if (!iconFile.open(QIODevice::WriteOnly)) {
       log::error("Error opening '{}' for writing: ", iconFile.fileName(),
                  iconFile.errorString());
