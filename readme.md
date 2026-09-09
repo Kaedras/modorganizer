@@ -7,8 +7,6 @@
 ### Known Issues
 
 - Switching instances several times causes a segfault
-- Closing dialogs using the x button causes a segfault on KDE due to a bug in plasma-integration. There are already open
-  merge requests, so this may get fixed soon.
 - ModOrganizer does not exit properly after switching/creating instances
 - occasional warning `QIODevice::read (QSslSocket): device not open`
 - error when checking for mod updates:
@@ -17,6 +15,7 @@
   topleft: QModelIndex(-1,-1,0x0,QObject(0x0))
   bottomRight:QModelIndex(-1,-1,0x0,QObject(0x0))
   ```
+- On KDE Plasma < 6.7.5: Closing dialogs using the x button causes a segfault due to a bug in plasma-integration
 
 #### Low priority
 
