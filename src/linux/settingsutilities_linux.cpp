@@ -75,7 +75,7 @@ bool deleteSecret(const QString& key)
     g_error_free(e);
 
     log::error("failed to delete secret {}, {}", keyName, message);
-    throw runtime_error(message);
+    return false;
   }
 
   // not an error if the key already doesn't exist, and don't log it because
@@ -94,13 +94,11 @@ bool deleteSecret(const QString& key)
       g_error_free(e);
 
       log::error("failed to delete secret {}, {}", keyName, message);
-      throw runtime_error(message);
+      return false;
     }
   } else {
-    string message =
-        format("failed to delete secret {}, found {} items", keyName, length);
-    log::error(message);
-    throw runtime_error(message);
+    log::error("failed to delete secret {}, found {} items", keyName, length);
+    return false;
   }
 
   log::debug("deleted secret {}", key);
@@ -120,7 +118,7 @@ bool addSecret(const QString& key, const QString& data)
     g_error_free(e);
 
     log::error("failed to connect to secret service, {}", message);
-    throw runtime_error(message);
+    return false;
   }
 
   // try to unlock
@@ -130,7 +128,7 @@ bool addSecret(const QString& key, const QString& data)
     g_error_free(e);
 
     log::error("failed to unlock default collection, {}", message);
-    throw runtime_error(message);
+    return false;
   }
 
   const QString keyName = secretName(key);
@@ -151,7 +149,7 @@ bool addSecret(const QString& key, const QString& data)
     g_error_free(e);
 
     log::error("failed to add secret {}, {}", keyName, message);
-    throw runtime_error(message);
+    return false;
   }
 
   log::debug("set secret {}", keyName);
@@ -161,7 +159,7 @@ bool addSecret(const QString& key, const QString& data)
 
 }  // namespace
 
-QString getSecret(const QString& key) noexcept(false)
+QString getSecret(const QString& key)
 {
   GError* e             = nullptr;
   const QString keyName = secretName(key);
@@ -188,7 +186,7 @@ QString getSecret(const QString& key) noexcept(false)
   return QString::fromUtf8(text);
 }
 
-bool setSecret(const QString& key, const QString& data) noexcept(false)
+bool setSecret(const QString& key, const QString& data)
 {
   if (data.isEmpty()) {
     return deleteSecret(key);
