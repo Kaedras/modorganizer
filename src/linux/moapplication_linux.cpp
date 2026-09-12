@@ -1,3 +1,4 @@
+#include "settings.h"
 #include "shared/util.h"
 
 #include <QStandardPaths>
@@ -5,6 +6,7 @@
 
 using namespace Qt::StringLiterals;
 using namespace MOBase;
+using namespace MOShared;
 
 namespace
 {
@@ -19,7 +21,12 @@ constexpr char desktopFile[] = {
 
 const QRegularExpression regex(u"Exec=(.*)\n"_s);
 
-void writeDesktopFile(const QString& path)
+void fixExecField(QString& str)
+{
+  str.replace(regex, "Exec="_L1 % getApplicationFilePath() % '\n');
+}
+
+void writeDesktopFile(const QString& path, const QString& data)
 {
   log::debug("writing desktop file");
   QFile file(path);
@@ -28,13 +35,14 @@ void writeDesktopFile(const QString& path)
     return;
   }
 
-  QString desktopFileContent = QString::fromUtf8(desktopFile, sizeof(desktopFile));
+  file.write(data.toUtf8());
+}
 
-  // fix the Exec field
-  desktopFileContent.replace(regex,
-                             "Exec="_L1 % MOShared::getApplicationFilePath() % '\n');
-
-  file.write(desktopFileContent.toLocal8Bit());
+void writeDesktopFile(const QString& path)
+{
+  QString data = QString::fromUtf8(desktopFile, sizeof(desktopFile));
+  fixExecField(data);
+  writeDesktopFile(path, data);
 }
 
 void writeIcon()
@@ -67,6 +75,35 @@ void writeIcon()
   }
 }
 
+bool checkIcon()
+{
+  QString iconFilePath =
+      QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) %
+      "/icons/hicolor/scalable/apps/ModOrganizer.svg"_L1;
+  QFile iconFile(iconFilePath);
+
+  if (!iconFile.exists()) {
+    return false;
+  }
+  if (!iconFile.open(QIODeviceBase::ReadOnly)) {
+    log::error("Error opening icon file: {}", iconFile.errorString());
+    return false;
+  }
+
+  const QByteArray iconFileData = iconFile.readAll();
+  const QByteArray targetData   = QByteArray::fromRawData(icon, sizeof(icon));
+
+  return iconFileData != targetData;
+}
+
+void createFiles()
+{
+  writeDesktopFile(
+      QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) %
+      "/ModOrganizer.desktop"_L1);
+  writeIcon();
+}
+
 }  // namespace
 
 // runtime libraries are found using rpath or runpath
@@ -79,65 +116,131 @@ void addDllsToPath()
 
 void installDesktopFile()
 {
+  using enum GlobalSettings::DesktopFileAction;
+
+  if (GlobalSettings::desktopFileDefaultAction() == ignore) {
+    return;
+  }
+
   auto desktopFileLocation = QStandardPaths::locate(
       QStandardPaths::ApplicationsLocation, u"ModOrganizer.desktop"_s);
   if (desktopFileLocation.isEmpty()) {
-    log::debug("No desktop file found, prompting user to install one");
+    if (GlobalSettings::desktopFileDefaultAction() == installOrUpdate) {
+      log::debug("No desktop file found and default action is `installOrUpdate`. "
+                 "Creating it without asking the user");
+      createFiles();
+      return;
+    }
+    log::debug("No desktop file found, asking user to install it");
     auto* dialog = new QMessageBox(
-        QMessageBox::Icon::Question, QObject::tr("Install desktop file?"),
-        QObject::tr("No ModOrganizer desktop file has been detected.\nWould you like "
-                    "to install one?"),
-        QMessageBox::Yes | QMessageBox::No);
-    QObject::connect(dialog, &QMessageBox::buttonClicked, [=](QAbstractButton* button) {
-      if (dialog->standardButton(button) == QMessageBox::Yes) {
-        writeDesktopFile(
-            QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) %
-            "/ModOrganizer.desktop"_L1);
-        writeIcon();
-      } else {
-        log::debug("user denied installing the desktop file");
-      }
-    });
+        QMessageBox::Icon::Question,
+        QObject::tr(
+            "Add ModOrganizer to your application launcher? (write desktop file)"),
+        QObject::tr("ModOrganizer is not currently registered with your desktop "
+                    "environment.\n\n"
+                    "Adding a launcher entry enables features such as taskbar download "
+                    "progress "
+                    "and makes ModOrganizer appear in your application launcher.\n\n"
+                    "This is recommended for most users. Do you want to add it now?"));
+    const auto* yesButton =
+        dialog->addButton(QObject::tr("Install"), QMessageBox::YesRole);
+    dialog->addButton(QObject::tr("Not now"), QMessageBox::NoRole);
+    dialog->setCheckBox(new QCheckBox(QObject::tr("Don't ask again")));
+
+    QObject::connect(dialog, &QMessageBox::buttonClicked,
+                     [=](const QAbstractButton* button) {
+                       if (button == yesButton) {
+                         createFiles();
+                       } else {
+                         log::debug("User declined installing the desktop file");
+                       }
+                       if (dialog->checkBox()->isChecked()) {
+                         GlobalSettings::setDesktopFileDefaultAction(
+                             button == yesButton ? installOrUpdate : ignore);
+                       }
+                     });
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
   } else {
-    // check if the Exec field inside the desktop file should be updated as a mismatch
-    // can cause dbus errors
+    // check if the desktop file should be updated. this can be necessary if the user
+    // has run ModOrganizer from a different location (Exec field has to be updated) or
+    // to apply any changes.
     QFile file(desktopFileLocation);
     if (!file.open(QIODeviceBase::ReadOnly)) {
       log::error("Error opening '{}': ", file.fileName(), file.errorString());
       return;
     }
-    const QString data            = QString::fromUtf8(file.readAll());
-    QRegularExpressionMatch match = regex.match(data);
+
+    const QByteArray data = file.readAll();
+    QString dataString    = QString::fromUtf8(data);
+    fixExecField(dataString);
+
+    QString targetDataString = QString::fromUtf8(desktopFile, std::size(desktopFile));
+    fixExecField(targetDataString);
+    if (targetDataString == dataString) {
+      return;
+    }
+
+    const QRegularExpressionMatch match = regex.match(dataString);
 
     bool shouldWrite = false;
-
-    if (!match.hasMatch()) {
-      log::debug("prompting user to rewrite desktop file because it may be corrupt");
-      shouldWrite = true;
-    } else {
-      if (match.captured(1) != MOShared::getApplicationFilePath()) {
-        log::debug("prompting user to rewrite desktop file because the Exec field does "
-                   "not match the application path");
+    QString reason;
+    if (match.hasMatch()) {
+      if (match.captured(1) != getApplicationFilePath()) {
+        log::debug("Found an issue in the desktop file: The Exec field does not match "
+                   "the application path");
         shouldWrite = true;
+        reason = QObject::tr("The existing ModOrganizer application launcher entry "
+                             "(desktop file) points to a different executable.");
       }
+    } else {
+      log::debug("Found an issue in the desktop file: It either has to get updated or "
+                 "may be corrupt");
+      shouldWrite = true;
+      reason      = QObject::tr("The existing ModOrganizer application launcher entry "
+                                "(desktop file) appears to be outdated "
+                                "or could not be recognized.");
     }
 
     if (shouldWrite) {
+      if (GlobalSettings::desktopFileDefaultAction() == installOrUpdate) {
+        log::debug(
+            "Default action is `installOrUpdate`. Rewriting without asking the user");
+        writeDesktopFile(desktopFileLocation, dataString);
+        if (!checkIcon()) {
+          log::debug("There was something wrong with the application icon in addition "
+                     "to the desktop file, rewriting it");
+          writeIcon();
+        }
+        return;
+      }
+
       auto* dialog = new QMessageBox(
-          QMessageBox::Icon::Question, QObject::tr("Fix desktop file?"),
-          QObject::tr("A ModOrganizer desktop file has been found, but refers to "
-                      "another executable.\nShould it be rewritten?"),
-          QMessageBox::Yes | QMessageBox::No);
-      QObject::connect(dialog, &QMessageBox::buttonClicked,
-                       [=](QAbstractButton* button) {
-                         if (dialog->standardButton(button) == QMessageBox::Yes) {
-                           writeDesktopFile(desktopFileLocation);
-                         } else {
-                           log::debug("user denied rewriting the desktop file");
-                         }
-                       });
+          QMessageBox::Icon::Question,
+          QObject::tr("Update ModOrganizer application launcher entry (desktop file)?"),
+          QObject::tr("%1\n\nDo you want to update it now?").arg(reason));
+      const auto* yesButton =
+          dialog->addButton(QObject::tr("Update"), QMessageBox::YesRole);
+      dialog->addButton(QObject::tr("Keep existing"), QMessageBox::NoRole);
+      dialog->setCheckBox(new QCheckBox(QObject::tr("Don't ask again")));
+
+      QObject::connect(
+          dialog, &QMessageBox::buttonClicked, [=](QAbstractButton* button) {
+            if (button == yesButton) {
+              writeDesktopFile(desktopFileLocation, dataString);
+              if (!checkIcon()) {
+                log::debug("There was something wrong with the application icon in "
+                           "addition to the desktop file, rewriting it");
+                writeIcon();
+              }
+            } else {
+              log::debug("User declined rewriting the desktop file");
+            }
+            if (dialog->checkBox()->isChecked()) {
+              GlobalSettings::setDesktopFileDefaultAction(
+                  button == yesButton ? installOrUpdate : ignore);
+            }
+          });
       dialog->setAttribute(Qt::WA_DeleteOnClose);
       dialog->show();
     }

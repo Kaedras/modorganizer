@@ -1010,6 +1010,18 @@ public:
   // resets anything that the user can disable
   static void resetDialogs();
 
+#ifdef __unix__
+  enum class DesktopFileAction
+  {
+    ask             = 0,
+    installOrUpdate = 1,
+    ignore          = 2,
+  };
+
+  static DesktopFileAction desktopFileDefaultAction();
+  static void setDesktopFileDefaultAction(DesktopFileAction a);
+#endif
+
 private:
   static QSettings settings();
 };

@@ -33,6 +33,19 @@ void GlobalSettings::updateRegistryKey()
   // no-op
 }
 
+GlobalSettings::DesktopFileAction GlobalSettings::desktopFileDefaultAction()
+{
+  return static_cast<DesktopFileAction>(
+      settings()
+          .value("DesktopFileDefaultAction", static_cast<int>(DesktopFileAction::ask))
+          .toInt());
+}
+
+void GlobalSettings::setDesktopFileDefaultAction(DesktopFileAction a)
+{
+  settings().setValue("DesktopFileDefaultAction", static_cast<int>(a));
+}
+
 QString GameSettings::prefix() const
 {
   return get<QString>(m_Settings, u"General"_s, u"prefix_directory"_s, {});
