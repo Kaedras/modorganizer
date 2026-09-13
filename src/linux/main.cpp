@@ -12,6 +12,7 @@
 #include <client/linux/handler/exception_handler.h>
 #include <csignal>
 #include <cstring>
+#include <dirent.h>
 #include <report.h>
 #include <sys/prctl.h>
 
@@ -28,6 +29,108 @@ extern HandlePtr dumpFile(const QString& dir);
 }  // namespace env
 
 bool filterCallback(void* context);
+
+namespace
+{
+set<pid_t> getChildPids(pid_t pid)
+{
+  set<pid_t> pids;
+  string taskDirPath = "/proc/" + to_string(pid) + "/task";
+  DIR* dir           = opendir(taskDirPath.c_str());
+  if (!dir) {
+    return pids;
+  }
+
+  while (dirent* entry = readdir(dir)) {
+    if (entry->d_name[0] == '.') {
+      continue;
+    }
+    string childrenFilePath = taskDirPath + "/" + entry->d_name + "/children";
+    ifstream file(childrenFilePath);
+    pid_t p;
+    while (file >> p) {
+      pids.insert(p);
+    }
+  }
+
+  closedir(dir);
+  return pids;
+}
+
+void getAllDescendants(pid_t pid, set<pid_t>& allPids)
+{
+  const auto children = getChildPids(pid);
+  for (pid_t child : children) {
+    if (allPids.insert(child).second) {
+      getAllDescendants(child, allPids);
+    }
+  }
+}
+
+void reap()
+{
+  static constexpr auto timeout = 100ms;
+
+  prctl(PR_SET_CHILD_SUBREAPER, 1);
+  const auto g = qScopeGuard([] {
+    prctl(PR_SET_CHILD_SUBREAPER, 0);
+  });
+
+  set<pid_t> descendants;
+  getAllDescendants(getpid(), descendants);
+
+  if (descendants.empty()) {
+    return;
+  }
+
+  for (pid_t pid : descendants) {
+    kill(pid, SIGTERM);
+  }
+
+  const auto start = chrono::steady_clock::now();
+  while (true) {
+    pid_t result = waitpid(-1, nullptr, WNOHANG);
+    if (result > 0) {
+      descendants.erase(result);
+      continue;
+    }
+    if (result == -1 && errno == ECHILD) {
+      return;
+    }
+    if (chrono::steady_clock::now() - start >= timeout) {
+      // send SIGKILL after timeout has passed
+      for (pid_t pid : descendants) {
+        kill(pid, SIGKILL);
+      }
+      while (wait(nullptr) > 0 || errno == EINTR) {
+      }
+      return;
+    }
+    this_thread::sleep_for(1ms);
+  }
+}
+
+[[noreturn]] void RestartModOrganizer(int exitCode)
+{
+  MOMultiProcess::removeShm();
+
+  // required to not leave zombie `QtWebEngineProcess` processes behind
+  reap();
+
+  const QByteArray pathBA = MOShared::getApplicationFilePath().toLocal8Bit();
+  const char* path        = pathBA.constData();
+
+  if (exitCode == ReselectExitCode) {
+    execl(path, path, "--pick", nullptr);
+  } else {
+    execl(path, path, nullptr);
+  }
+
+  const int e = errno;
+  log::error("exec error: {}", strerror(e));
+  exit(1);
+}
+}  // namespace
 
 static bool dumpCallback(const MinidumpDescriptor&, void*, bool succeeded)
 {
@@ -153,69 +256,49 @@ int run(int argc, char* argv[])
   // the current instance cannot be used
   bool pick = cl.pick();
 
-  // MO runs in a loop because it can be restarted in several ways, such as
-  // when switching instances or changing some settings
-  for (;;) {
-    try {
-      auto& m = InstanceManager::singleton();
+  try {
+    auto& m = InstanceManager::singleton();
 
-      if (cl.instance()) {
-        m.overrideInstance(*cl.instance());
-      }
-
-      if (cl.profile()) {
-        m.overrideProfile(*cl.profile());
-      }
-
-      // set up plugins, OrganizerCore, etc.
-      {
-        const auto r = app.setup(multiProcess, pick);
-        pick         = false;
-
-        if (r == RestartExitCode || r == ReselectExitCode) {
-          // resets things when MO is "restarted"
-          app.resetForRestart();
-
-          // don't reprocess command line
-          cl.clear();
-
-          if (r == ReselectExitCode) {
-            pick = true;
-          }
-
-          continue;
-        } else if (r != 0) {
-          // something failed, quit
-          return r;
-        }
-      }
-
-      // set core dump path after `MOApplication::setup()` has been called
-      g_coreDumpPath = OrganizerCore::getGlobalCoreDumpPath();
-
-      // check if the command line wants to run something right now
-      if (auto r = cl.runPostOrganizer(app.core())) {
-        return *r;
-      }
-
-      // run the main window
-      const auto r = app.run(multiProcess);
-
-      if (r == RestartExitCode) {
-        // resets things when MO is "restarted"
-        app.resetForRestart();
-
-        // don't reprocess command line
-        cl.clear();
-
-        continue;
-      }
-
-      return r;
-    } catch (const std::exception& e) {
-      reportError(e.what());
-      return 1;
+    if (cl.instance()) {
+      m.overrideInstance(*cl.instance());
     }
+
+    if (cl.profile()) {
+      m.overrideProfile(*cl.profile());
+    }
+
+    // set up plugins, OrganizerCore, etc.
+    {
+      const auto r = app.setup(multiProcess, pick);
+      pick         = false;
+
+      if (r == RestartExitCode || r == ReselectExitCode) {
+        RestartModOrganizer(r);
+      } else if (r != 0) {
+        // something failed, quit
+        return r;
+      }
+    }
+
+    // set core dump path after `MOApplication::setup()` has been called
+    g_coreDumpPath = OrganizerCore::getGlobalCoreDumpPath();
+
+    // check if the command line wants to run something right now
+    if (auto r = cl.runPostOrganizer(app.core())) {
+      return *r;
+    }
+
+    // run the main window
+    const auto r = app.run(multiProcess);
+
+    if (r == RestartExitCode || r == ReselectExitCode) {
+      RestartModOrganizer(r);
+    }
+
+    return r;
+  } catch (const std::exception& e) {
+    reportError(e.what());
+    return 1;
   }
 }
 

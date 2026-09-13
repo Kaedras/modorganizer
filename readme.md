@@ -6,8 +6,6 @@
 
 ### Known Issues
 
-- Switching instances several times causes a segfault
-- ModOrganizer does not exit properly after switching/creating instances
 - occasional warning `QIODevice::read (QSslSocket): device not open`
 - error when checking for mod updates:
   ```
