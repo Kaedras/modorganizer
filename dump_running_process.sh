@@ -2,6 +2,6 @@
 
 set -e
 
-cd "$(dirname "$0")"
+cd "$(dirname "$(realpath "$0")")"
 
 exec ./ModOrganizer crashdump
