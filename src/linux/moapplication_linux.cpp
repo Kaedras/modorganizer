@@ -222,7 +222,8 @@ void installDesktopFile()
       const auto* yesButton =
           dialog->addButton(QObject::tr("Update"), QMessageBox::YesRole);
       dialog->addButton(QObject::tr("Keep existing"), QMessageBox::NoRole);
-      dialog->setCheckBox(new QCheckBox(QObject::tr("Don't ask again")));
+      dialog->setCheckBox(
+          new QCheckBox(QObject::tr("Save preference and don't ask again")));
 
       QObject::connect(
           dialog, &QMessageBox::buttonClicked, [=](QAbstractButton* button) {
