@@ -1,13 +1,13 @@
 {
   "default-registry": {
     "kind": "git",
-    "baseline": "256acc64012b23a13041d8705805e1f23b43a024",
+    "baseline": "4056a718039dc20216cccb960bccce4b9ad69519",
     "repository": "https://github.com/Microsoft/vcpkg"
   },
   "registries": [
     {
       "kind": "git",
-      "baseline": "05b877ccc11bcd448edae0a0f7db3cb173a6c2a3",
+      "baseline": "e25e30e8233b5d98f0f85a5e7a310274ba5acc69",
       "repository": "https://github.com/Kaedras/vcpkg-registry",
       "packages": [
         "mo2-*",
