@@ -17,10 +17,8 @@
 
 #### Low priority
 
-- Fallout 4/SkyrimSE/SkyrimVR icons are not extracted properly
 - Desktop theme is not applied correctly when running as AppImage
 - When MO is locked, the stated reason may be `bash` or `python` instead of the expected executable
-- After installing a fomod the tmp dir is not removed
 - Deactivating a mod causes a warning: `Plugin not found: <plugin name>`
 - `GameGamebryo::identifyGamePath()` does not work for newly installed games
     - caused by `libraryfolders.vdf` not getting updated until restarting steam
