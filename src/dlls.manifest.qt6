@@ -5,7 +5,7 @@
   <file name="d3dcompiler_47.dll" />
   <file name="dxcompiler.dll" />
   <file name="dxil.dll" />
-  <file name="libbsarch.dll" />
+  <file name="libbsarchpp.dll" />
   <file name="liblz4.dll" />
   <file name="opengl32sw.dll" />
   <file name="Qt6Concurrent.dll" />
