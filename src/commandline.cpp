@@ -707,6 +707,21 @@ std::optional<int> LaunchCommand::runEarly()
   return SpawnWaitProcess(arg[1].c_str(), args);
 }
 
+int LaunchCommand::SpawnWaitProcess(nativeCString workingDirectory,
+                                    nativeCString commandLine)
+{
+  QProcess process;
+  process.setWorkingDirectory(ToQString(workingDirectory));
+  process.startCommand(ToQString(commandLine));
+
+  if (!process.waitForStarted(-1) || !process.waitForFinished(-1)) {
+    log::error("Error running command '{}': {}", commandLine, process.errorString());
+    return -1;
+  }
+
+  return process.exitCode();
+}
+
 // Parses the first parseArgCount arguments of the current process command line and
 // returns them in parsedArgs, the rest of the command line is returned untouched.
 nativeCString
